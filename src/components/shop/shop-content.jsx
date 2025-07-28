@@ -7,7 +7,6 @@ import ColorFilter from "./shop-filter/color-filter";
 import PriceFilter from "./shop-filter/price-filter";
 import ProductBrand from "./shop-filter/product-brand";
 import StatusFilter from "./shop-filter/status-filter";
-import TopRatedProducts from "./shop-filter/top-rated-products";
 import ShopListItem from "./shop-list-item";
 import ShopTopLeft from "./shop-top-left";
 import ShopTopRight from "./shop-top-right";
@@ -49,8 +48,6 @@ const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar
                   <CategoryFilter setCurrPage={setCurrPage} />
                   {/* color */}
                   <ColorFilter setCurrPage={setCurrPage} />
-                  {/* product rating */}
-                  <TopRatedProducts />
                   {/* brand */}
                   <ProductBrand setCurrPage={setCurrPage} />
                   {/* reset filter */}
@@ -157,8 +154,6 @@ const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar
                   <CategoryFilter setCurrPage={setCurrPage} />
                   {/* color */}
                   <ColorFilter setCurrPage={setCurrPage} />
-                  {/* product rating */}
-                  <TopRatedProducts />
                   {/* brand */}
                   <ProductBrand setCurrPage={setCurrPage} />
                   {/* reset filter */}

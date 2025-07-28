@@ -3,7 +3,7 @@ import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Scrollbar, Navigation,Autoplay } from "swiper/modules";
 // internal
-import { useGetRelatedProductsQuery } from "@/redux/features/goodsApi";
+import { useGetRelatedProductsQuery } from "@/redux/features/productsApi";
 import ProductItem from "../products/beauty/product-item";
 import ErrorMsg from "../common/error-msg";
 import { HomeNewArrivalPrdLoader } from "../loader";

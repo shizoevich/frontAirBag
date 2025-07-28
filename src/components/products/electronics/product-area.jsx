@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from "react";
-import { useGetGoodsByCategoryQuery } from "@/redux/features/goodsApi";
+import { useGetProductsByCategoryQuery } from "@/redux/features/productsApi";
 import { ShapeLine } from "@/svg";
 import ProductItem from "./product-item";
 import ErrorMsg from "@/components/common/error-msg";
@@ -10,7 +10,7 @@ import { getRootCategories, getChildCategories } from "@/data/categories";
 const ProductArea = () => {
   const rootCategories = getRootCategories();
   const [activeCategoryId, setActiveCategoryId] = useState(rootCategories[0]?.id || 0);
-  const { data: goods, isLoading, isError } = useGetGoodsByCategoryQuery(activeCategoryId);
+  const { data: products, isLoading, isError } = useGetProductsByCategoryQuery(activeCategoryId);
 
   // Получаем дочерние категории для активной родительской
   const activeRootCategory = rootCategories.find(cat => cat.id === activeCategoryId) || 
@@ -28,12 +28,12 @@ const ProductArea = () => {
     content = <ErrorMsg msg="Ошибка загрузки товаров" />;
   }
   
-  if (!isLoading && !isError && (!goods || goods.length === 0)) {
+  if (!isLoading && !isError && (!products || products.length === 0)) {
     content = <ErrorMsg msg="Товары не найдены" />;
   }
   
-  if (!isLoading && !isError && goods?.length > 0) {
-    content = goods.map((product) => (
+  if (!isLoading && !isError && products?.length > 0) {
+    content = products.map((product) => (
       <div key={product.id} className="col-xl-3 col-lg-3 col-sm-6">
         <ProductItem product={product} />  
       </div>

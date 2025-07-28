@@ -4,7 +4,7 @@ import {useSearchParams, useRouter} from 'next/navigation';
 import ShopLoader from "../loader/shop/shop-loader";
 import ErrorMsg from "../common/error-msg";
 import ShopFilterOffCanvas from "../common/shop-filter-offcanvas";
-import { useGetAllGoodsQuery } from "@/redux/features/goodsApi";
+import { useGetAllProductsQuery } from "@/redux/features/productsApi";
 import ShopContent from "./shop-content";
 
 const ShopArea = ({shop_right=false,hidden_sidebar=false}) => {
@@ -17,7 +17,7 @@ const ShopArea = ({shop_right=false,hidden_sidebar=false}) => {
   const subCategory = searchParams.get('subCategory');
   const filterColor = searchParams.get('color');
   const status = searchParams.get('status');
-  const { data: products, isError, isLoading } = useGetAllGoodsQuery();
+  const { data: products, isError, isLoading } = useGetAllProductsQuery();
   const [priceValue, setPriceValue] = useState([0, 0]);
   const [selectValue, setSelectValue] = useState("");
   const [currPage, setCurrPage] = useState(1);

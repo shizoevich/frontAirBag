@@ -1,14 +1,14 @@
 'use client';
 import React from 'react';
 import { ShapeLineSm } from '@/svg';
-import { useGetGoodsByCategoryQuery } from '@/redux/features/goodsApi';
+import { useGetProductsByCategoryQuery } from '@/redux/features/productsApi';
 import ErrorMsg from '@/components/common/error-msg';
 import ProductSmItem from './product-sm-item';
 import HomeSmPrdLoader from '@/components/loader/home/home-sm-prd-loader';
 
 const ProductSmArea = () => {
   // Получаем товары категории electronics
-  const { data: products, isError, isLoading } = useGetGoodsByCategoryQuery('electronics');
+  const { data: products, isError, isLoading } = useGetProductsByCategoryQuery('electronics');
   
   // Фильтрация и сортировка товаров
   const discountProducts = products?.filter(p => p.discount > 0).slice(0, 3) || [];

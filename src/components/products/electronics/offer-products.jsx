@@ -5,7 +5,7 @@ import { Pagination } from "swiper/modules";
 import Link from "next/link";
 // internal
 import ProductItem from "./product-item";
-import { useGetFeaturedProductsQuery } from "@/redux/features/goodsApi";
+import { useGetFeaturedProductsQuery } from "@/redux/features/productsApi";
 import { ArrowRightLong, ShapeLine } from "@/svg";
 import ErrorMsg from "@/components/common/error-msg";
 import HomeProductLoader from "@/components/loader/home/home-gadget-prd-loader";

@@ -5,14 +5,14 @@ import NiceSelect from "@/ui/nice-select";
 import ErrorMsg from "@/components/common/error-msg";
 import SearchPrdLoader from "@/components/loader/search-prd-loader";
 import ProductItem from "@/components/products/fashion/product-item";
-import { useGetAllGoodsQuery } from "@/redux/features/goodsApi";
+import { useGetAllProductsQuery } from "@/redux/features/productsApi";
 
 
 export default function SearchArea() {
   const searchParams = useSearchParams();
   const searchText = searchParams.get('searchText');
   const productType = searchParams.get('productType');
-  const { data: products, isError, isLoading } = useGetAllGoodsQuery();
+  const { data: products, isError, isLoading } = useGetAllProductsQuery();
   const [shortValue, setShortValue] = useState("");
   const perView = 8;
   const [next, setNext] = useState(perView);

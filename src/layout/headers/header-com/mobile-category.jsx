@@ -3,46 +3,31 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 // internal
-import { useGetProductTypeCategoryQuery } from "@/redux/features/categoryApi";
+import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
 import ErrorMsg from "@/components/common/error-msg";
 import Loader from "@/components/loader/loader";
 
-const MobileCategory = ({ isCategoryActive, categoryType }) => {
-  const {data: categories,isError,isLoading} = useGetProductTypeCategoryQuery(categoryType);
-  const [isActiveSubMenu,setIsActiveSubMenu] = useState("")
+const MobileCategory = ({ isCategoryActive }) => {
+  const { data: categories, isError, isLoading } = useGetShowCategoryQuery();
+  const [isActiveSubMenu, setIsActiveSubMenu] = useState("");
   const router = useRouter();
 
-  // handleOpenSubMenu
+  // Открытие/закрытие подменю
   const handleOpenSubMenu = (title) => {
-    if(title === isActiveSubMenu){
-      setIsActiveSubMenu("")
-    }
-    else {
-      setIsActiveSubMenu(title)
-    }
-  }
+    setIsActiveSubMenu(prev => (prev === title ? "" : title));
+  };
 
-  // handle category route
-  const handleCategoryRoute = (title, route) => {
-    if (route === "parent") {
-      router.push(
-        `/shop?category=${title
-          .toLowerCase()
-          .replace("&", "")
-          .split(" ")
-          .join("-")}`
-      );
+  // Переход по категории
+  const handleCategoryRoute = (title, type = "parent") => {
+    const slug = title.toLowerCase().replace("&", "").split(" ").join("-");
+    if (type === "parent") {
+      router.push(`/shop?category=${slug}`);
     } else {
-      router.push(
-        `/shop?subCategory=${title
-          .toLowerCase()
-          .replace("&", "")
-          .split(" ")
-          .join("-")}`
-      );
+      router.push(`/shop?subCategory=${slug}`);
     }
   };
-  // decide what to render
+
+  // Контент
   let content = null;
 
   if (isLoading) {
@@ -52,38 +37,47 @@ const MobileCategory = ({ isCategoryActive, categoryType }) => {
       </div>
     );
   }
+
   if (!isLoading && isError) {
     content = <ErrorMsg msg="There was an error" />;
   }
-  if (!isLoading && !isError && categories?.result?.length === 0) {
+
+  if (!isLoading && !isError && categories?.length === 0) {
     content = <ErrorMsg msg="No Category found!" />;
   }
-  if (!isLoading && !isError && categories?.result?.length > 0) {
-    const category_items = categories.result;
-    content = category_items.map((item) => (
-      <li className="has-dropdown" key={item._id}>
+
+  if (!isLoading && !isError && categories?.length > 0) {
+    content = categories.map((item) => (
+      <li className="has-dropdown" key={item.id}>
         <a className="cursor-pointer">
           {item.img && (
             <span>
               <Image src={item.img} alt="cate img" width={50} height={50} />
             </span>
           )}
-          {item.parent}
-          {item.children && (
-            <button onClick={()=> handleOpenSubMenu(item.parent)} className="dropdown-toggle-btn">
+          {item.title}
+          {item.children?.length > 0 && (
+            <button
+              onClick={() => handleOpenSubMenu(item.title)}
+              className="dropdown-toggle-btn"
+            >
               <i className="fa-regular fa-angle-right"></i>
             </button>
           )}
         </a>
 
-        {item.children && (
-          <ul className={`tp-submenu ${isActiveSubMenu === item.parent ? 'active':''}`}>
-            {item.children.map((child, i) => (
+        {item.children?.length > 0 && (
+          <ul
+            className={`tp-submenu ${
+              isActiveSubMenu === item.title ? "active" : ""
+            }`}
+          >
+            {item.children.map((child) => (
               <li
-                key={i}
-                onClick={() => handleCategoryRoute(child, "children")}
+                key={child.id}
+                onClick={() => handleCategoryRoute(child.title, "child")}
               >
-                <a className="cursor-pointer">{child}</a>
+                <a className="cursor-pointer">{child.title}</a>
               </li>
             ))}
           </ul>
@@ -91,6 +85,7 @@ const MobileCategory = ({ isCategoryActive, categoryType }) => {
       </li>
     ));
   }
+
   return <ul className={isCategoryActive ? "active" : ""}>{content}</ul>;
 };
 

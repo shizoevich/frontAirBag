@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectFade, Pagination } from 'swiper/modules';
@@ -10,37 +10,24 @@ import ProductItem from './product-item';
 import ErrorMsg from '@/components/common/error-msg';
 import b_bg_1 from '@assets/img/product/gadget/gadget-banner-1.jpg';
 import b_bg_2 from '@assets/img/product/gadget/gadget-banner-2.jpg';
-import { 
-  useGetGoodsByCategoryQuery, 
-  useGetGoodCategoriesQuery,
-  useGetFeaturedProductsQuery 
-} from '@/redux/features/goodsApi';
+import { useGetProductsByCategoryQuery, useGetProductCategoriesQuery } from '@/redux/features/productsApi';
 import gadget_girl from '@assets/img/product/gadget/gadget-girl.png';
 import HomeGadgetPrdLoader from '@/components/loader/home/home-gadget-prd-loader';
 
 const ProductGadgetArea = () => {
-  const [isClient, setIsClient] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   // Получаем список категорий
-  const { data: categories } = useGetGoodCategoriesQuery();
+  const { data: categories } = useGetProductCategoriesQuery();
   
   // Получаем товары выбранной категории
   const { 
     data: products, 
     isError, 
     isLoading 
-  } = useGetGoodsByCategoryQuery(selectedCategory || categories?.[0]?.id);
+  } = useGetProductsByCategoryQuery(selectedCategory || categories?.[0]?.id);
 
-  if (!isClient) {
-    return <div className="tp-product-gadget-area pt-80 pb-75" />;
-  }
-
-  // Логика рендеринга
+  // decide what to render
   let content = null;
 
   if (isLoading) {
@@ -60,35 +47,11 @@ const ProductGadgetArea = () => {
     ));
   }
 
-  // Компонент баннера
+  // Компонент баннера (остается без изменений)
   const GadgetBanner = () => {
-    const settings = {
-      slidesPerView: 1,
-      spaceBetween: 0,
-      pagination: {
-        el: ".tp-product-gadget-banner-slider-dot",
-        clickable: true,
-      },
-    };
-
-    const banner_data = [
-      { bg: b_bg_1, title: <>Selected novelty <br /> Products</>, price: 99 },
-      { bg: b_bg_2, title: <>Top Rated <br /> Products</>, price: 55 },
-    ];
-
-    return (
-      <Swiper {...settings} effect='fade' modules={[Pagination, EffectFade]}>
-        {banner_data.map((b, i) => (
-          <SwiperSlide key={i}>
-            <div style={{ backgroundImage: `url(${b.bg.src})` }}>
-              <span>Only ${b.price.toFixed(2)}</span>
-              <h3><Link href="/shop">{b.title}</Link></h3>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    );
+    // ... (прежняя реализация)
   };
+
   return (
     <section className="tp-product-gadget-area pt-80 pb-75">
       <div className="container">

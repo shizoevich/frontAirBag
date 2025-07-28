@@ -4,7 +4,6 @@ import { Rating } from 'react-simple-star-rating';
 import Link from 'next/link';
 // internal
 import ErrorMsg from '@/components/common/error-msg';
-import { useGetTopRatedProductsQuery } from '@/redux/features/goodsApi';
 import ShopTopRatedLoader from '@/components/loader/shop/top-rated-prd-loader';
 
 const TopRatedProducts = () => {

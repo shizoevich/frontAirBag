@@ -6,7 +6,7 @@ import { NextArr, PrevArr, ShapeLine } from '@/svg';
 import ErrorMsg from '@/components/common/error-msg';
 import ProductItem from './product-item';
 import HomeNewArrivalPrdLoader from '@/components/loader/home/home-newArrival-prd-loader';
-import { useGetGoodsByCategoryQuery } from '@/redux/features/goodsApi';
+import { useGetProductsByCategoryQuery } from '@/redux/features/productsApi';
 
 const sliderSettings = {
   slidesPerView: 4,
@@ -36,7 +36,7 @@ const NewArrivals = () => {
   }, []);
 
   // Получаем товары категории electronics
-  const { data: products, isError, isLoading } = useGetGoodsByCategoryQuery('electronics');
+  const { data: products, isError, isLoading } = useGetProductsByCategoryQuery('electronics');
 
   if (!isClient) {
     return <div className="tp-product-arrival-area pb-55" />;

@@ -3,7 +3,7 @@ import React from "react";
 import PrdDetailsLoader from "../loader/prd-details-loader";
 import ErrorMsg from "../common/error-msg";
 import ProductDetailsBreadcrumb from "../breadcrumb/product-details-breadcrumb";
-import { useGetProductQuery } from "@/redux/features/goodsApi";
+import { useGetProductQuery } from "@/redux/features/productsApi";
 import ProductDetailsContent from "./product-details-content";
 
 const ProductDetailsArea = ({id="6431364df5a812bd37e765ac"}) => {
