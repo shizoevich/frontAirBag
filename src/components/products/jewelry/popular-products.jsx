@@ -1,13 +1,11 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Scrollbar } from 'swiper/modules';
-// internal
-import { useGetProductTypeQuery } from '@/redux/features/productApi';
+import { useGetShowCategoryQuery, useGetProductsByCategoryIdRemonlineQuery } from '@/redux/features/categoryApi';
 import ProductSliderItem from './product-slider-item';
 import ErrorMsg from '@/components/common/error-msg';
 import { HomeTwoPopularPrdLoader } from '@/components/loader';
-
 
 // slider setting 
 const slider_setting = {
@@ -24,79 +22,90 @@ const slider_setting = {
     snapOnRelease: true,
   },
   breakpoints: {
-    '1400': {
-      slidesPerView: 5,
-    },
-    '1200': {
-      slidesPerView: 4,
-    },
-    '992': {
-      slidesPerView: 3,
-    },
-    '768': {
-      slidesPerView: 2,
-    },
-    '576': {
-      slidesPerView: 2,
-    },
-    '0': {
-      slidesPerView: 1,
-    },
+    1400: { slidesPerView: 5 },
+    1200: { slidesPerView: 4 },
+    992: { slidesPerView: 3 },
+    768: { slidesPerView: 2 },
+    576: { slidesPerView: 2 },
+    0: { slidesPerView: 1 },
   }
-}
+};
 
 const PopularProducts = () => {
-  const { data: products, isError, isLoading } =
-    useGetProductTypeQuery({ type: 'jewelry', query: `new=true` });
-  // decide what to render
+  const { data: categories, isLoading: categoriesLoading, isError: categoriesError } = useGetShowCategoryQuery();
+  const [activeCategory, setActiveCategory] = useState(null);
+
+  // При загрузке категорий выбираем первую
+  useEffect(() => {
+    if (categories?.length && !activeCategory) {
+      setActiveCategory(categories[0]);
+    }
+  }, [categories, activeCategory]);
+
+  // Загружаем товары по активной категории
+  const {
+    data: products,
+    isLoading: productsLoading,
+    isError: productsError,
+  } = useGetProductsByCategoryIdRemonlineQuery(activeCategory?.id_remonline, { skip: !activeCategory });
+
+  // Рендер категорий (например, как табы или кнопки)
+  const categoryTabs = categories?.map((cat) => (
+    <button
+      key={cat.id}
+      className={`tp-category-tab-btn ${activeCategory?.id === cat.id ? 'active' : ''}`}
+      onClick={() => setActiveCategory(cat)}
+      style={{ marginRight: '10px', padding: '6px 12px', cursor: 'pointer' }}
+    >
+      {cat.title}
+    </button>
+  ));
+
   let content = null;
 
-  if (isLoading) {
-    content = (
-      <HomeTwoPopularPrdLoader loading={isLoading} />
-    );
-  }
-  if (!isLoading && isError) {
-    content = <ErrorMsg msg="There was an error" />;
-  }
-  if (!isLoading && !isError && products?.data?.length === 0) {
-    content = <ErrorMsg msg="No Products found!" />;
-  }
-  if (!isLoading && !isError && products?.data?.length > 0) {
-    const product_items = products.data.slice(0, 8);
+  if (categoriesLoading || productsLoading) {
+    content = <HomeTwoPopularPrdLoader loading={true} />;
+  } else if (categoriesError || productsError) {
+    content = <ErrorMsg msg="Ошибка загрузки категорий или товаров" />;
+  } else if (!products || products.length === 0) {
+    content = <ErrorMsg msg="Товары не найдены" />;
+  } else {
+    const product_items = products.slice(0, 8);
     content = (
       <Swiper {...slider_setting} modules={[Scrollbar, Pagination]} className="tp-category-slider-active-4 swiper-container mb-70">
         {product_items.map(item => (
-          <SwiperSlide key={item._id}>
+          <SwiperSlide key={item.id}>
             <ProductSliderItem product={item} />
           </SwiperSlide>
         ))}
       </Swiper>
-    )
+    );
   }
+
   return (
-    <>
-      <section className="tp-category-area pt-115 pb-105 tp-category-plr-85" style={{backgroundColor:`#EFF1F5`}}>
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-xl-12">
-              <div className="tp-section-title-wrapper-4 mb-60 text-center">
-                <span className="tp-section-title-pre-4">Shop by Category</span>
-                <h3 className="tp-section-title-4">Popular on the Shofy store.</h3>
-              </div>
+    <section className="tp-category-area pt-115 pb-105 tp-category-plr-85" style={{ backgroundColor: '#EFF1F5' }}>
+      <div className="container-fluid">
+        <div className="row mb-4">
+          <div className="col-xl-12 text-center">
+            <div className="tp-section-title-wrapper-4 mb-3">
+              <span className="tp-section-title-pre-4">Shop by Category</span>
+              <h3 className="tp-section-title-4">Popular on the Shofy store.</h3>
             </div>
-          </div>
-          <div className="row">
-            <div className="col-xl-12">
-              <div className="tp-category-slider-4">
-                {content}
-                <div className="tp-category-swiper-scrollbar tp-swiper-scrollbar"></div>
-              </div>
+            <div className="category-tabs-wrapper">
+              {categoryTabs}
             </div>
           </div>
         </div>
-      </section>
-    </>
+        <div className="row">
+          <div className="col-xl-12">
+            <div className="tp-category-slider-4">
+              {content}
+              <div className="tp-category-swiper-scrollbar tp-swiper-scrollbar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 };
 

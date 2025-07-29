@@ -1,65 +1,80 @@
 'use client';
-import React from 'react';
-import Link from 'next/link';
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 // internal
-import { ArrowRightSmTwo } from '@/svg';
-import ProductItem from './product-item';
-import ErrorMsg from '@/components/common/error-msg';
-import { useGetProductTypeQuery } from '@/redux/features/productApi';
-import { HomeThreePrdLoader } from '@/components/loader';
+import ErrorMsg from "../common/error-msg";
+import { ArrowRightLong } from "@/svg";
+import { HomeTwoCateLoader } from "../loader";
+import { getRootCategories } from "@/data/categories"; // путь скорректируй под себя
 
-const ProductArea = () => {
-  const { data: products, isError, isLoading } =
-    useGetProductTypeQuery({ type: 'beauty', query: `topSellers=true` });
-  // decide what to render
+const FashionCategory = () => {
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setLoading] = useState(true);
+  const [isError, setError] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    try {
+      const rootCats = getRootCategories();
+      setCategories(rootCats);
+      setError(false);
+    } catch (e) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const handleCategoryRoute = (title) => {
+    const slug = title
+      .toLowerCase()
+      .replace("&", "")
+      .split(" ")
+      .join("-");
+    router.push(`/shop?category=${slug}`);
+  };
+
   let content = null;
 
   if (isLoading) {
-    content = (
-      <HomeThreePrdLoader loading={isLoading} />
-    );
-  }
-  if (!isLoading && isError) {
+    content = <HomeTwoCateLoader loading={true} />;
+  } else if (isError) {
     content = <ErrorMsg msg="There was an error" />;
-  }
-  if (!isLoading && !isError && products?.data?.length === 0) {
-    content = <ErrorMsg msg="No Products found!" />;
-  }
-  if (!isLoading && !isError && products?.data?.length > 0) {
-    const product_items = products.data.slice(0, 8);
-    content = product_items.map((prd) => (
-      <div key={prd._id} className="col-lg-3 col-md-4 col-sm-6">
-        <ProductItem product={prd} />
-      </div>
-    ))
-  }
-  return (
-    <>
-      <section className="tp-product-area grey-bg-8 pt-95 pb-80">
-        <div className="container">
-          <div className="row align-items-end">
-            <div className="col-lg-6 col-md-8">
-              <div className="tp-section-title-wrapper-3 mb-55">
-                <span className="tp-section-title-pre-3">Shop by Category</span>
-                <h3 className="tp-section-title-3">Best sellers in beauty</h3>
-              </div>
-            </div>
-            <div className="col-lg-6 col-md-4">
-              <div className="tp-product-more-3 text-md-end mb-65">
-                <Link href="/shop" className="tp-btn">
-                  Shop All Products
-                  {" "}<ArrowRightSmTwo />
-                </Link>
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            {content}
+  } else if (categories.length === 0) {
+    content = <ErrorMsg msg="No Category found!" />;
+  } else {
+    content = categories.map((item) => (
+      <div key={item.id} className="col-xxl-4 col-lg-6">
+        <div className="tp-banner-item-2 p-relative z-index-1 grey-bg-2 mb-20 fix">
+          <div
+            className="tp-banner-thumb-2 include-bg transition-3"
+            style={{ backgroundImage: `url(/images/categories/${item.image})` }} // путь адаптируй
+          ></div>
+          <h3 className="tp-banner-title-2">
+            <span onClick={() => handleCategoryRoute(item.title)} className="cursor-pointer">
+              {item.title}
+            </span>
+          </h3>
+          <div className="tp-banner-btn-2">
+            <span
+              onClick={() => handleCategoryRoute(item.title)}
+              className="cursor-pointer tp-btn tp-btn-border tp-btn-border-sm"
+            >
+              Shop Now <ArrowRightLong />
+            </span>
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    ));
+  }
+
+  return (
+    <section className="tp-banner-area mt-20">
+      <div className="container-fluid tp-gx-40">
+        <div className="row tp-gx-20">{content}</div>
+      </div>
+    </section>
   );
 };
 
-export default ProductArea;
+export default FashionCategory;

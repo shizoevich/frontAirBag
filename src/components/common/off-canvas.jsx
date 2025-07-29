@@ -9,21 +9,22 @@ import language_img from '@assets/img/icon/language-flag.png';
 import MobileCategory from '@/layout/headers/header-com/mobile-category';
 import MobileMenus from './mobile-menus';
 
-const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen,categoryType = "electronics" }) => {
+const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
   const [isCategoryActive, setIsCategoryActive] = useState(false);
   const [isCurrencyActive, setIsCurrencyActive] = useState(false);
   const [isLanguageActive, setIsLanguageActive] = useState(false);
 
   // handle language active
   const handleLanguageActive = () => {
-    setIsLanguageActive(!isLanguageActive)
-    setIsCurrencyActive(false)
-  }
+    setIsLanguageActive(!isLanguageActive);
+    setIsCurrencyActive(false);
+  };
   // handle Currency active
   const handleCurrencyActive = () => {
-    setIsCurrencyActive(!isCurrencyActive)
-    setIsLanguageActive(false)
-  }
+    setIsCurrencyActive(!isCurrencyActive);
+    setIsLanguageActive(false);
+  };
+
   return (
     <>
       <div className={`offcanvas__area offcanvas__radius ${isOffCanvasOpen ? "offcanvas-opened" : ""}`}>
@@ -48,7 +49,8 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen,categoryType = "electronic
               </button>
               <div className="tp-category-mobile-menu">
                 <nav className={`tp-category-menu-content ${isCategoryActive ? "active" : ""}`}>
-                  <MobileCategory categoryType={categoryType} isCategoryActive={isCategoryActive} />
+                  {/* Убрали передачу categoryType */}
+                  <MobileCategory isCategoryActive={isCategoryActive} />
                 </nav>
               </div>
             </div>

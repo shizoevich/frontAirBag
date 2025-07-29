@@ -9,7 +9,21 @@ import {add_cart_product,quantityDecrement} from "@/redux/features/cartSlice";
 import { remove_wishlist_product } from "@/redux/features/wishlist-slice";
 
 const WishlistItem = ({ product }) => {
-  const { _id, img, title, price } = product || {};
+  const { _id, img, images, imageURLs, title, price } = product || {};
+  
+  // Получаем изображение из API с правильной логикой
+  let productImage = '/assets/img/product/3/product-1.jpg'; // заглушка по умолчанию
+  
+  if (imageURLs && Array.isArray(imageURLs) && imageURLs.length > 0) {
+    // Если есть imageURLs, используем первое изображение
+    productImage = imageURLs[0].img || imageURLs[0];
+  } else if (images && Array.isArray(images) && images.length > 0) {
+    // Если есть images, используем первое изображение
+    productImage = typeof images[0] === 'string' ? images[0] : images[0].url || images[0].img || images[0];
+  } else if (img) {
+    // Если есть img, используем его
+    productImage = img;
+  }
   const { cart_products } = useSelector((state) => state.cart);
   const isAddToCart = cart_products.find((item) => item._id === _id);
   const dispatch = useDispatch();
@@ -30,7 +44,7 @@ const WishlistItem = ({ product }) => {
     <tr>
       <td className="tp-cart-img">
         <Link href={`/product-details/${_id}`}>
-          <Image src={img} alt="product img" width={70} height={100} />
+          <Image src={productImage} alt="product img" width={70} height={100} />
         </Link>
       </td>
       <td className="tp-cart-title">

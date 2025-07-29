@@ -7,11 +7,11 @@ export const metadata = {
   title: "Shofy - Product Details Swatches Page",
 };
 
-export default function ProductSwatchesDetailsPage() {
+export default function ProductSwatchesDetailsPage({ params }) {
   return (
     <Wrapper>
       <HeaderTwo style_2={true} />
-      <ProductDetailsArea id="641e887d05f9ee1717e1348a"/>
+      <ProductDetailsArea id={params.id}/>
       <Footer primary_style={true} />
     </Wrapper>
   );

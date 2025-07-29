@@ -15,15 +15,17 @@ export const categoryApi = apiSlice.injectEndpoints({
 
     // Получение всех категорий
     getShowCategory: builder.query({
-      query: () => '/good-categories/',
-      providesTags: ['categories'],
-    }),
+  query: () => '/good-categories/',
+  transformResponse: (response) => response.data || response || [],
+  providesTags: ['categories'],
+}),
 
     // Получение товаров по категории (через id_remonline)
-    getProductsByCategoryIdRemonline: builder.query({
-      query: (id_remonline) => `/goods/?category__id_remonline=${id_remonline}`,
-      providesTags: (result, error, id_remonline) => [{ type: 'products', id: id_remonline }],
-    }),
+   getProductsByCategoryIdRemonline: builder.query({
+  query: (id_remonline) => `goods/?category__id_remonline=${id_remonline}`,
+  transformResponse: (response) => response.results || [],
+  providesTags: (result, error, id_remonline) => [{ type: 'products', id: id_remonline }],
+}),
   }),
 });
 

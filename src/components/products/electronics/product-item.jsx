@@ -15,30 +15,20 @@ const ProductItem = ({ product }) => {
   const { wishlist } = useSelector((state) => state.wishlist);
   const dispatch = useDispatch();
   
-  const { _id, img, category, title, reviews, price, status } = product || {};
+  const { id, category, title, price, images, residue } = product || {};
   const [ratingVal, setRatingVal] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
-    if (reviews && reviews.length > 0) {
-      const rating =
-        reviews.reduce((acc, review) => acc + review.rating, 0) /
-        reviews.length;
-      setRatingVal(rating);
-    } else {
-      setRatingVal(0);
-    }
-  }, [reviews]);
-
   if (!isClient) {
     return <div className="tp-product-item mb-25" />; // Скелетон для SSR
   }
 
-  const isAddedToCart = cart_products.some((prd) => prd._id === _id);
-  const isAddedToWishlist = wishlist.some((prd) => prd._id === _id);
+  const isAddedToCart = cart_products.some((prd) => prd.id === id);
+  const isAddedToWishlist = wishlist.some((prd) => prd.id === id);
+  const isOutOfStock = residue === 0;
 
   // handle add product
   const handleAddProduct = (prd) => {
@@ -53,17 +43,23 @@ const ProductItem = ({ product }) => {
   return (
     <div className="tp-product-item mb-25 transition-3">
       <div className="tp-product-thumb p-relative fix">
-        <Link href={`/product-details/${_id}`}>
-          <Image
-            src={img}
-            width="0"
-            height="0"
-            sizes="100vw"
-            style={{ width: '100%', height: 'auto' }}
-            alt="product-electronic"
-          />
+        <Link href={`/product-details/${id}`}>
+          {images?.length > 0 && (
+            <Image
+              src={images[0]}
+              width={300}
+              height={300}
+              alt={title || "product image"}
+              className="img-fluid"
+              style={{
+                width: '100%',
+                height: 'auto',
+                objectFit: 'cover'
+              }}
+            />
+          )}
           <div className="tp-product-badge">
-            {status === 'out-of-stock' && <span className="product-hot">out-stock</span>}
+            {isOutOfStock && <span className="product-hot">out-stock</span>}
           </div>
         </Link>
 
@@ -82,7 +78,7 @@ const ProductItem = ({ product }) => {
                 onClick={() => handleAddProduct(product)}
                 type="button"
                 className={`tp-product-action-btn ${isAddedToCart ? 'active' : ''} tp-product-add-cart-btn`}
-                disabled={status === 'out-of-stock'}
+                disabled={isOutOfStock}
               >
                 <Cart />
                 <span className="tp-product-tooltip">Add to Cart</span>
@@ -100,7 +96,7 @@ const ProductItem = ({ product }) => {
               type="button"
               className={`tp-product-action-btn ${isAddedToWishlist ? 'active' : ''} tp-product-add-to-wishlist-btn`}
               onClick={() => handleWishlistProduct(product)}
-              disabled={status === 'out-of-stock'}
+              disabled={isOutOfStock}
             >
               <Wishlist />
               <span className="tp-product-tooltip">Add To Wishlist</span>
@@ -112,10 +108,10 @@ const ProductItem = ({ product }) => {
       {/* product content */}
       <div className="tp-product-content">
         <div className="tp-product-category">
-          <a href="#">{category?.name}</a>
+          <a href="#">{category?.title}</a>
         </div>
         <h3 className="tp-product-title">
-          <Link href={`/product-details/${_id}`}>{title}</Link>
+          <Link href={`/product-details/${id}`}>{title}</Link>
         </h3>
         <div className="tp-product-rating d-flex align-items-center">
           <div className="tp-product-rating-icon">
@@ -127,13 +123,11 @@ const ProductItem = ({ product }) => {
             />
           </div>
           <div className="tp-product-rating-text">
-            <span>
-              ({reviews && reviews.length > 0 ? reviews.length : 0} Review)
-            </span>
+            <span>(0 Review)</span>
           </div>
         </div>
         <div className="tp-product-price-wrapper">
-          <span className="tp-product-price new-price">${parseFloat(price).toFixed(2)}</span>
+          <span className="tp-product-price new-price">${price?.toFixed(2)}</span>
         </div>
       </div>
     </div>

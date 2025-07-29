@@ -1,17 +1,24 @@
 'use client';
-import React from "react";
+import React, { useState, useEffect } from "react";
 import useSearchFormSubmit from "@/hooks/use-search-form-submit";
+// импортируем твой хук RTK Query
+import { useGetProductCategoriesQuery } from "@/redux/features/productsApi";
 
 const SearchBar = ({ isSearchOpen, setIsSearchOpen }) => {
-  const { setSearchText, setCategory, handleSubmit, searchText } =
-    useSearchFormSubmit();
+  const { setSearchText, setCategory, handleSubmit, searchText } = useSearchFormSubmit();
+
+  // Получаем категории из API
+  const { data: categoriesData, isLoading, isError } = useGetProductCategoriesQuery();
+
+  // Преобразуем категории для отображения
+  // Возьмем только корневые категории (без вложенных)
+  const categories = categoriesData?.map(cat => cat.title) || [];
 
   // selectHandle
   const handleCategory = (value) => {
     setCategory(value);
   };
 
-  const categories = ["electronics", "fashion", "beauty", "jewelry"];
   return (
     <>
       <section
@@ -43,16 +50,23 @@ const SearchBar = ({ isSearchOpen, setIsSearchOpen }) => {
                   </div>
                   <div className="tp-search-category">
                     <span>Search by : </span>
-                    {categories.map((c, i) => (
-                      <a
-                        key={i}
-                        onClick={() => handleCategory(c)}
-                        className="cursor-pointer"
-                      >
-                        {c}
-                        {i < categories.length - 1 && ", "}
-                      </a>
-                    ))}
+                    {isLoading && <span>Loading categories...</span>}
+                    {isError && <span>Error loading categories</span>}
+                    {!isLoading && !isError && categories.length === 0 && (
+                      <span>No categories found</span>
+                    )}
+                    {!isLoading && !isError && categories.length > 0 &&
+                      categories.map((c, i) => (
+                        <a
+                          key={i}
+                          onClick={() => handleCategory(c)}
+                          className="cursor-pointer"
+                        >
+                          {c}
+                          {i < categories.length - 1 && ", "}
+                        </a>
+                      ))
+                    }
                   </div>
                 </form>
               </div>

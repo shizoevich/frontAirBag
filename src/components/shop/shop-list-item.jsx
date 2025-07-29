@@ -11,7 +11,21 @@ import { add_to_wishlist } from "@/redux/features/wishlist-slice";
 import { add_to_compare } from "@/redux/features/compareSlice";
 
 const ShopListItem = ({ product }) => {
-  const { _id, img, category, title, reviews, price, discount, tags, description } = product || {};
+  const { _id, img, images, imageURLs, category, title, reviews, price, discount, tags, description } = product || {};
+  
+  // Получаем изображение из API с правильной логикой
+  let productImage = '/assets/img/product/3/product-1.jpg'; // заглушка по умолчанию
+  
+  if (imageURLs && Array.isArray(imageURLs) && imageURLs.length > 0) {
+    // Если есть imageURLs, используем первое изображение
+    productImage = imageURLs[0].img || imageURLs[0];
+  } else if (images && Array.isArray(images) && images.length > 0) {
+    // Если есть images, используем первое изображение
+    productImage = typeof images[0] === 'string' ? images[0] : images[0].url || images[0].img || images[0];
+  } else if (img) {
+    // Если есть img, используем его
+    productImage = img;
+  }
   const dispatch = useDispatch()
   const [ratingVal, setRatingVal] = useState(0);
   useEffect(() => {
@@ -43,7 +57,7 @@ const ShopListItem = ({ product }) => {
     <div className="tp-product-list-item d-md-flex">
       <div className="tp-product-list-thumb p-relative fix">
         <Link href={`/product-details/${_id}`}>
-          <Image src={img} alt="product img" width={350} height={310} />
+          <Image src={productImage} alt="product img" width={350} height={310} />
         </Link>
 
         {/* <!-- product action --> */}

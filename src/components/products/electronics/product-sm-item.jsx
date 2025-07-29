@@ -4,7 +4,21 @@ import React, { useEffect, useState } from "react";
 import { Rating } from "react-simple-star-rating";
 
 const ProductSmItem = ({ product }) => {
-  const {_id, img, category, title,price, reviews } = product || {};
+  const {_id, img, images, imageURLs, category, title, price, reviews } = product || {};
+  
+  // Получаем изображение из API с правильной логикой
+  let productImage = '/assets/img/product/3/product-1.jpg'; // заглушка по умолчанию
+  
+  if (imageURLs && Array.isArray(imageURLs) && imageURLs.length > 0) {
+    // Если есть imageURLs, используем первое изображение
+    productImage = imageURLs[0].img || imageURLs[0];
+  } else if (images && Array.isArray(images) && images.length > 0) {
+    // Если есть images, используем первое изображение
+    productImage = typeof images[0] === 'string' ? images[0] : images[0].url || images[0].img || images[0];
+  } else if (img) {
+    // Если есть img, используем его
+    productImage = img;
+  }
   const [ratingVal, setRatingVal] = useState(0);
 
   useEffect(() => {
@@ -23,7 +37,7 @@ const ProductSmItem = ({ product }) => {
       <div className="tp-product-thumb mr-25 fix">
         <Link href={`/product-details/${_id}`}>
           <Image
-            src={img}
+            src={productImage}
             alt="product img"
             width={140}
             height={140}

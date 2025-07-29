@@ -24,6 +24,8 @@ export const apiSlice = createApi({
   tagTypes: [
     "Products", "Coupon", "Product", "RelatedProducts", "UserOrder", 
     "UserOrders", "ProductType", "OfferProducts", "PopularProducts", 
-    "products", "productCategories", "Orders", "Carts", "FeaturedProducts", "NewArrivals"
+    "products", "productCategories", "Orders", "Carts", "FeaturedProducts", "NewArrivals",
+    "categories", "User", "CartItems", "OrderItems", "OrderUpdates", "Clients", 
+    "ClientUpdates", "Discounts", "BotVisitors", "Templates"
   ]
 });

@@ -8,7 +8,21 @@ import { Close, Minus, Plus } from "@/svg";
 import { add_cart_product, quantityDecrement, remove_product } from "@/redux/features/cartSlice";
 
 const CartItem = ({product}) => {
-  const {_id, img,title,price, orderQuantity = 0 } = product || {};
+  const { _id, img, images, imageURLs, title, price, category, status, orderQuantity = 0 } = product || {};
+  
+  // Получаем изображение из API с правильной логикой
+  let productImage = '/assets/img/product/3/product-1.jpg'; // заглушка по умолчанию
+  
+  if (imageURLs && Array.isArray(imageURLs) && imageURLs.length > 0) {
+    // Если есть imageURLs, используем первое изображение
+    productImage = imageURLs[0].img || imageURLs[0];
+  } else if (images && Array.isArray(images) && images.length > 0) {
+    // Если есть images, используем первое изображение
+    productImage = typeof images[0] === 'string' ? images[0] : images[0].url || images[0].img || images[0];
+  } else if (img) {
+    // Если есть img, используем его
+    productImage = img;
+  }
 
   const dispatch = useDispatch();
 
@@ -31,7 +45,7 @@ const CartItem = ({product}) => {
       {/* img */}
       <td className="tp-cart-img">
         <Link href={`/product-details/${_id}`}>
-          <Image src={img} alt="product img" width={70} height={100} />
+          <Image src={productImage} alt="product img" width={70} height={100} />
         </Link>
       </td>
       {/* title */}

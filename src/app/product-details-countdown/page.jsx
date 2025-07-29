@@ -7,11 +7,11 @@ export const metadata = {
   title: "Shofy - Product Details Countdown Page",
 };
 
-export default function ProductCountDownDetailsPage() {
+export default function ProductCountDownDetailsPage({ params }) {
   return (
     <Wrapper>
       <HeaderTwo style_2={true} />
-      <ProductDetailsArea id="641e887d05f9ee1717e134b2" />
+      <ProductDetailsArea id={params.id} />
       <Footer primary_style={true} />
     </Wrapper>
   );

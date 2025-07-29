@@ -43,7 +43,9 @@ const slider_setting = {
 }
 
 const BlogArea = () => {
-  const blogs = blogData.filter(b => b.blog === 'electronics')
+  // показываем все записи без фильтра
+  const blogs = blogData;
+
   return (
     <section className="tp-blog-area pt-50 pb-75">
       <div className="container">

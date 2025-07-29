@@ -28,15 +28,54 @@ const sliderSettings = {
   }
 };
 
+// ID нескольких популярных категорий
+const POPULAR_CATEGORIES = [
+  753896, // Электроника
+  753906, // Автозапчасти
+  753915  // Бытовая техника
+];
+
 const NewArrivals = () => {
   const [isClient, setIsClient] = useState(false);
-  
+  const [products, setProducts] = useState([]);
+
+  // Call the hook for each category at the top level
+  const categoryQuery0 = useGetProductsByCategoryQuery(POPULAR_CATEGORIES[0]);
+  const categoryQuery1 = useGetProductsByCategoryQuery(POPULAR_CATEGORIES[1]);
+  const categoryQuery2 = useGetProductsByCategoryQuery(POPULAR_CATEGORIES[2]);
+  const categoryQueries = [categoryQuery0, categoryQuery1, categoryQuery2];
+
   useEffect(() => {
     setIsClient(true);
-  }, []);
 
-  // Получаем товары категории electronics
-  const { data: products, isError, isLoading } = useGetProductsByCategoryQuery('electronics');
+    // Aggregate loading and error states
+    const loading = categoryQueries.some((q) => q.isLoading);
+    const error = categoryQueries.some((q) => q.isError);
+
+    if (loading) {
+      setProducts([]);
+      return;
+    }
+
+    if (error) {
+      setProducts([]);
+      return;
+    }
+
+    // Collect products from all categories
+    const allProducts = [];
+    categoryQueries.forEach((q) => {
+      const categoryProducts = q.data?.result || q.data?.data || [];
+      allProducts.push(...categoryProducts.slice(0, 4));
+    });
+
+    setProducts(allProducts);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryQueries[0].data, categoryQueries[1].data, categoryQueries[2].data, categoryQueries[0].isLoading, categoryQueries[1].isLoading, categoryQueries[2].isLoading, categoryQueries[0].isError, categoryQueries[1].isError, categoryQueries[2].isError]);
+
+  // Aggregate loading and error states for rendering
+  const isLoading = categoryQueries.some((q) => q.isLoading);
+  const isError = categoryQueries.some((q) => q.isError);
 
   if (!isClient) {
     return <div className="tp-product-arrival-area pb-55" />;
@@ -46,14 +85,11 @@ const NewArrivals = () => {
 
   if (isLoading) {
     content = <HomeNewArrivalPrdLoader loading={isLoading} />;
-  }
-  if (!isLoading && isError) {
-    content = <ErrorMsg msg="There was an error" />;
-  }
-  if (!isLoading && !isError && products?.length === 0) {
-    content = <ErrorMsg msg="No Products found!" />;
-  }
-  if (!isLoading && !isError && products?.length > 0) {
+  } else if (isError) {
+    content = <ErrorMsg msg="There was an error loading products" />;
+  } else if (products.length === 0) {
+    content = <ErrorMsg msg="No products found" />;
+  } else {
     content = (
       <Swiper 
         {...sliderSettings} 
@@ -76,7 +112,7 @@ const NewArrivals = () => {
           <div className="col-xl-5 col-sm-6">
             <div className="tp-section-title-wrapper mb-40">
               <h3 className="tp-section-title">
-                Electronics Products
+                Popular Products
                 <ShapeLine />
               </h3>
             </div>

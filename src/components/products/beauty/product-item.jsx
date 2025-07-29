@@ -9,7 +9,21 @@ import { add_cart_product } from "@/redux/features/cartSlice";
 import { add_to_wishlist } from "@/redux/features/wishlist-slice";
 
 const ProductItem = ({ product, prdCenter = false,primary_style=false }) => {
-  const { _id, img, title, discount, price, tags,status } = product || {};
+  const { _id, img, images, imageURLs, title, discount, price, tags, status } = product || {};
+  
+  // Получаем изображение из API с правильной логикой
+  let productImage = '/assets/img/product/3/product-1.jpg'; // заглушка по умолчанию
+  
+  if (imageURLs && Array.isArray(imageURLs) && imageURLs.length > 0) {
+    // Если есть imageURLs, используем первое изображение
+    productImage = imageURLs[0].img || imageURLs[0];
+  } else if (images && Array.isArray(images) && images.length > 0) {
+    // Если есть images, используем первое изображение
+    productImage = typeof images[0] === 'string' ? images[0] : images[0].url || images[0].img || images[0];
+  } else if (img) {
+    // Если есть img, используем его
+    productImage = img;
+  }
   const { cart_products } = useSelector((state) => state.cart);
   const { wishlist } = useSelector((state) => state.wishlist);
   const isAddedToCart = cart_products.some((prd) => prd._id === _id);
@@ -31,7 +45,7 @@ const ProductItem = ({ product, prdCenter = false,primary_style=false }) => {
     >
       <div className="tp-product-thumb-3 mb-15 fix p-relative z-index-1">
         <Link href={`/product-details/${_id}`}>
-          <Image src={img} alt="product image" width={282} height={320} />
+          <Image src={productImage} alt="product image" width={282} height={320} />
         </Link>
 
         <div className="tp-product-badge">
@@ -99,7 +113,7 @@ const ProductItem = ({ product, prdCenter = false,primary_style=false }) => {
       </div>
       <div className="tp-product-content-3">
         <div className="tp-product-tag-3">
-          <span>{tags[1]}</span>
+          <span>{tags && tags[1] ? tags[1] : 'Product'}</span>
         </div>
         <h3 className="tp-product-title-3">
           <Link href={`/product-details/${_id}`}>{title}</Link>

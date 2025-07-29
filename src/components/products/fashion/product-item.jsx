@@ -1,144 +1,145 @@
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Rating } from "react-simple-star-rating";
+import Image from "next/image";
 import Link from "next/link";
+import { Rating } from "react-simple-star-rating";
+import { useDispatch, useSelector } from "react-redux";
 // internal
-import { Cart, CompareThree, QuickView, Wishlist } from "@/svg";
+import { Cart, QuickView, Wishlist } from "@/svg";
 import { handleProductModal } from "@/redux/features/productModalSlice";
 import { add_cart_product } from "@/redux/features/cartSlice";
 import { add_to_wishlist } from "@/redux/features/wishlist-slice";
-import { add_to_compare } from "@/redux/features/compareSlice";
 
-const ProductItem = ({ product, style_2 = false }) => {
-  const { _id, img, category, title, reviews, price, discount, tags, status } = product || {};
-  const [ratingVal, setRatingVal] = useState(0);
+const ProductItem = ({ product }) => {
+  const [isClient, setIsClient] = useState(false);
   const { cart_products } = useSelector((state) => state.cart);
   const { wishlist } = useSelector((state) => state.wishlist);
-  const isAddedToCart = cart_products.some((prd) => prd._id === _id);
-  const isAddedToWishlist = wishlist.some((prd) => prd._id === _id);
   const dispatch = useDispatch();
+  
+  const { id, category, title, price, images, residue } = product || {};
+  const [ratingVal, setRatingVal] = useState(0);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-    if (reviews && reviews.length > 0) {
-      const rating =
-        reviews.reduce((acc, review) => acc + review.rating, 0) /
-        reviews.length;
-      setRatingVal(rating);
-    } else {
-      setRatingVal(0);
-    }
-  }, [reviews]);
+    setIsClient(true);
+  }, []);
 
-  // handle add product
+  if (!isClient) {
+    return <div className="tp-product-item mb-25" />;
+  }
+
+  const isAddedToCart = cart_products.some((prd) => prd.id === id);
+  const isAddedToWishlist = wishlist.some((prd) => prd.id === id);
+  const isOutOfStock = residue === 0;
+
   const handleAddProduct = (prd) => {
     dispatch(add_cart_product(prd));
   };
-  // handle wishlist product
+
   const handleWishlistProduct = (prd) => {
     dispatch(add_to_wishlist(prd));
   };
 
-  // handle compare product
-  const handleCompareProduct = (prd) => {
-    dispatch(add_to_compare(prd));
-  };
-
-
   return (
-    <div className={`tp-product-item-2 ${style_2 ? "" : "mb-40"}`}>
-      <div className="tp-product-thumb-2 p-relative z-index-1 fix">
-        <Link href={`/product-details/${_id}`}>
-          <Image
-            src={img}
-            alt="product img"
-            width={284}
-            height={302}
-          />
+    <div className="tp-product-item mb-25 transition-3">
+      <div className="tp-product-thumb p-relative fix">
+        <Link href={`/product-details/${id}`}>
+          {images?.length > 0 && !imageError ? (
+            <Image
+              src={images[0]}
+              width={300}
+              height={300}
+              alt={title || "product image"}
+              className="img-fluid"
+              style={{
+                width: '100%',
+                height: 'auto',
+                objectFit: 'cover'
+              }}
+              onError={() => setImageError(true)}
+              priority={false}
+            />
+          ) : (
+            <div className="image-placeholder" style={{
+              width: '100%',
+              height: '300px',
+              backgroundColor: '#f5f5f5',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <span>No Image</span>
+            </div>
+          )}
+          <div className="tp-product-badge">
+            {isOutOfStock && <span className="product-hot">out-stock</span>}
+          </div>
         </Link>
-        <div className="tp-product-badge">
-          {status === 'out-of-stock' && <span className="product-hot">out-stock</span>}
-        </div>
+
         {/* product action */}
-        <div className="tp-product-action-2 tp-product-action-blackStyle">
-          <div className="tp-product-action-item-2 d-flex flex-column">
+        <div className="tp-product-action">
+          <div className="tp-product-action-item d-flex flex-column">
             {isAddedToCart ? (
               <Link
                 href="/cart"
-                className={`tp-product-action-btn-2 ${isAddedToCart ? 'active' : ''} tp-product-add-cart-btn`}
+                className={`tp-product-action-btn ${isAddedToCart ? 'active' : ''} tp-product-add-cart-btn`}
               >
-                <Cart />
-                <span className="tp-product-tooltip tp-product-tooltip-right">
-                  View Cart
-                </span>
+                <Cart /> <span className="tp-product-tooltip">View Cart</span>
               </Link>
             ) : (
               <button
-                type="button"
                 onClick={() => handleAddProduct(product)}
-                className={`tp-product-action-btn-2 ${isAddedToCart ? 'active' : ''} tp-product-add-cart-btn`}
-                disabled={status === 'out-of-stock'}
+                type="button"
+                className={`tp-product-action-btn ${isAddedToCart ? 'active' : ''} tp-product-add-cart-btn`}
+                disabled={isOutOfStock}
               >
                 <Cart />
-                <span className="tp-product-tooltip tp-product-tooltip-right">
-                  Add to Cart
-                </span>
+                <span className="tp-product-tooltip">Add to Cart</span>
               </button>
             )}
             <button
               onClick={() => dispatch(handleProductModal(product))}
-              className="tp-product-action-btn-2 tp-product-quick-view-btn"
+              type="button"
+              className="tp-product-action-btn tp-product-quick-view-btn"
             >
               <QuickView />
-              <span className="tp-product-tooltip tp-product-tooltip-right">
-                Quick View
-              </span>
+              <span className="tp-product-tooltip">Quick View</span>
             </button>
-            <button disabled={status === 'out-of-stock'} onClick={() => handleWishlistProduct(product)} className={`tp-product-action-btn-2 ${isAddedToWishlist ? 'active' : ''} tp-product-add-to-wishlist-btn`}>
+            <button
+              type="button"
+              className={`tp-product-action-btn ${isAddedToWishlist ? 'active' : ''} tp-product-add-to-wishlist-btn`}
+              onClick={() => handleWishlistProduct(product)}
+              disabled={isOutOfStock}
+            >
               <Wishlist />
-              <span className="tp-product-tooltip tp-product-tooltip-right">
-                Add To Wishlist
-              </span>
-            </button>
-            <button disabled={status === 'out-of-stock'} onClick={() => handleCompareProduct(product)} className="tp-product-action-btn-2 tp-product-add-to-compare-btn">
-              <CompareThree />
-              <span className="tp-product-tooltip tp-product-tooltip-right">
-                Add To Compare
-              </span>
+              <span className="tp-product-tooltip">Add To Wishlist</span>
             </button>
           </div>
         </div>
       </div>
-      <div className="tp-product-content-2 pt-15">
-        <div className="tp-product-tag-2">
-          {tags.map((t, i) => (
-            <a key={i} href="#">
-              {t}
-              {i < tags.length - 1 && ","}
-            </a>
-          ))}
+      
+      {/* product content */}
+      <div className="tp-product-content">
+        <div className="tp-product-category">
+          <a href="#">{category?.title}</a>
         </div>
-        <h3 className="tp-product-title-2">
-          <Link href={`/product-details/${_id}`}>{title}</Link>
+        <h3 className="tp-product-title">
+          <Link href={`/product-details/${id}`}>{title}</Link>
         </h3>
-        <div className="tp-product-rating-icon tp-product-rating-icon-2">
-          <Rating allowFraction size={16} initialValue={ratingVal} readonly={true} />
+        <div className="tp-product-rating d-flex align-items-center">
+          <div className="tp-product-rating-icon">
+            <Rating
+              allowFraction
+              size={16}
+              initialValue={ratingVal}
+              readonly={true}
+            />
+          </div>
+          <div className="tp-product-rating-text">
+            <span>(0 Review)</span>
+          </div>
         </div>
-        <div className="tp-product-price-wrapper-2">
-          {discount > 0 ? (
-            <>
-              <span className="tp-product-price-2 new-price">
-                ${price.toFixed(2)}{" "}
-              </span>
-              <span className="tp-product-price-2 old-price">
-                {" "}${(Number(price) - (Number(price) * Number(discount)) / 100).toFixed(2)}
-              </span>
-            </>
-          ) : (
-            <span className="tp-product-price-2 new-price">
-              ${price.toFixed(2)}
-            </span>
-          )}
+        <div className="tp-product-price-wrapper">
+          <span className="tp-product-price new-price">${price?.toFixed(2)}</span>
         </div>
       </div>
     </div>

@@ -1,67 +1,83 @@
 'use client';
-import React from 'react';
-import Link from 'next/link';
-// internal
-import { TextShapeLine } from '@/svg';
-import ProductItem from './product-item';
+import React, { useEffect, useState } from 'react';
 import ErrorMsg from '@/components/common/error-msg';
-import { useGetProductTypeQuery } from '@/redux/features/productApi';
-import { HomeTwoBestSellPrdPrdLoader } from '@/components/loader';
+import ProductItem from './product-item';
+import { HomeTwoPrdLoader } from '@/components/loader';
 
-const BestSellerProducts = () => {
-  const { data: products, isError, isLoading } =
-    useGetProductTypeQuery({ type: 'fashion', query: `topSellers=true` });
-  // decide what to render
-  let content = null;
+// tabs
+const tabs = ['All Collection', 'Shoes', 'Clothing', 'Bags'];
 
-  if (isLoading) {
-    content = (
-      <HomeTwoBestSellPrdPrdLoader loading={isLoading}/>
-    );
-  }
-  if (!isLoading && isError) {
-    content = <ErrorMsg msg="There was an error" />;
-  }
-  if (!isLoading && !isError && products?.data?.length === 0) {
-    content = <ErrorMsg msg="No Products found!" />;
-  }
-  if (!isLoading && !isError && products?.data?.length > 0) {
-    const product_items = products.data.slice(0, 4);
-    content = product_items.map((prd) => (
-      <div key={prd._id} className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-        <ProductItem product={prd} />
-      </div>
-    ))
-  }
+const ProductArea = () => {
+  const [activeTab, setActiveTab] = useState(tabs[0]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Загружаем данные при монтировании и при смене activeTab
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Заменяй URL на твой реальный API, например: /api/products?type=fashion
+        const res = await fetch(`/api/products?type=fashion`);
+        if (!res.ok) throw new Error('Failed to fetch products');
+        const json = await res.json();
+        setProducts(json.data || []);
+      } catch (err) {
+        setError(err.message || 'Error fetching data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Фильтрация по категории
+  const filteredProducts = products.filter(p => {
+    if (activeTab === 'All Collection') return true;
+    return p.category?.name === activeTab;
+  });
+
+  // Рендер
+  if (loading) return <HomeTwoPrdLoader loading={loading} />;
+  if (error) return <ErrorMsg msg={error} />;
+  if (products.length === 0) return <ErrorMsg msg="No Products found!" />;
+
   return (
-    <>
-      <section className="tp-seller-area pb-140">
-        <div className="container">
-          <div className="row">
-            <div className="col-xl-12">
-              <div className="tp-section-title-wrapper-2 mb-50">
-                <span className="tp-section-title-pre-2">
-                  Best Seller This Week’s
-                  <TextShapeLine />
-                </span>
-                <h3 className="tp-section-title-2">This {"Week's"} Featured</h3>
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            {content}
-          </div>
-          <div className="row">
-            <div className="col-xl-12">
-              <div className="tp-seller-more text-center mt-10">
-                <Link href="/shop" className="tp-btn tp-btn-border tp-btn-border-sm">Shop All Product</Link>
-              </div>
+    <section className="tp-product-area pb-90">
+      <div className="container">
+        <div className="row">
+          <div className="col-xl-12">
+            <div className="tp-product-tab-2 tp-tab mb-50 text-center">
+              <nav>
+                <div className="nav nav-tabs justify-content-center">
+                  {tabs.map((tab, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveTab(tab)}
+                      className={`nav-link text-capitalize ${activeTab === tab ? 'active' : ''}`}
+                    >
+                      {tab}
+                      <span className="tp-product-tab-tooltip">{filteredProducts.length}</span>
+                    </button>
+                  ))}
+                </div>
+              </nav>
             </div>
           </div>
         </div>
-      </section>
-    </>
+        <div className="row">
+          {filteredProducts.map(prd => (
+            <div key={prd._id} className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+              <ProductItem product={prd} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 };
 
-export default BestSellerProducts;
+export default ProductArea;

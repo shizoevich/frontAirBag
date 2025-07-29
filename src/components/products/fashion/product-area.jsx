@@ -1,100 +1,104 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ErrorMsg from '@/components/common/error-msg';
-import { useGetProductTypeQuery } from '@/redux/features/productApi';
+import { useGetShowCategoriesQuery, useGetProductsByCategoryQuery } from '@/redux/features/productsApi';
 import { TextShapeLine } from '@/svg';
 import ProductItem from './product-item';
 import { HomeTwoPrdLoader } from '@/components/loader';
 
-// tabs
-const tabs = ["All Collection", "Shoes", "Clothing", "Bags"];
-
 const ProductArea = () => {
-  const [activeTab, setActiveTab] = useState(tabs[0]);
-  const { data: products, isError, isLoading } =
-    useGetProductTypeQuery({ type: 'fashion' });
-  // handleActiveTab
-  const handleActiveTab = (tab) => {
-    setActiveTab(tab);
+  // Загружаем категории
+  const { data: categories, isLoading: loadingCategories, isError: errorCategories } = useGetShowCategoriesQuery();
+  
+  // Состояние выбранной категории
+  const [activeCategoryId, setActiveCategoryId] = useState(null);
+
+  // При загрузке категорий автоматически выбрать первую
+  useEffect(() => {
+    if (categories?.length && !activeCategoryId) {
+      setActiveCategoryId(categories[0].id);
+    }
+  }, [categories, activeCategoryId]);
+
+  // Загружаем товары по выбранной категории
+  const { data: products, isLoading: loadingProducts, isError: errorProducts } = useGetProductsByCategoryQuery(
+    activeCategoryId,
+    { skip: !activeCategoryId }
+  );
+
+  const handleActiveTab = (id) => {
+    setActiveCategoryId(id);
   };
 
-  // decide what to render
+  // Формируем кнопки табов из категорий
+  const tabs = categories?.map(cat => ({
+    id: cat.id,
+    name: cat.title
+  })) || [];
+
+  // Считаем количество товаров под выбранную категорию
+  const productCount = products?.length || 0;
+
+  // Решаем, что отображать
   let content = null;
 
-  if (isLoading) {
+  if (loadingCategories || loadingProducts) {
+    content = <HomeTwoPrdLoader loading={true} />;
+  } else if (errorCategories || errorProducts) {
+    content = <ErrorMsg msg="Ошибка загрузки данных" />;
+  } else if (!products || products.length === 0) {
+    content = <ErrorMsg msg="Нет товаров в выбранной категории" />;
+  } else {
     content = (
-      <HomeTwoPrdLoader loading={isLoading} />
-    );
-  }
-  if (!isLoading && isError) {
-    content = <ErrorMsg msg="There was an error" />;
-  }
-  if (!isLoading && !isError && products?.data?.length === 0) {
-    content = <ErrorMsg msg="No Products found!" />;
-  }
-  if (!isLoading && !isError && products?.data?.length > 0) {
-    let product_items = products.data;
-    if (activeTab === 'All Collection') {
-      product_items = products.data
-    }
-    else if (activeTab === 'Shoes') {
-      product_items = products.data.filter(p => p.category.name === 'Shoes')
-    } else if (activeTab === 'Clothing') {
-      product_items = products.data.filter(p => p.category.name === 'Clothing')
-    } else if (activeTab === 'Bags') {
-      product_items = products.data.filter(p => p.category.name === 'Bags')
-    } else {
-      product_items = products.data;
-    }
-    content = <>
       <div className="row">
-        <div className="col-xl-12">
-          <div className="tp-product-tab-2 tp-tab mb-50 text-center">
-            <nav>
-              <div className="nav nav-tabs justify-content-center">
-                {tabs.map((tab, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleActiveTab(tab)}
-                    className={`nav-link text-capitalize ${activeTab === tab ? "active" : ""}`}
-                  >
-                    {tab.split("-").join(" ")}
-                    <span className="tp-product-tab-tooltip">{product_items.length}</span>
-                  </button>
-                ))}
-              </div>
-            </nav>
-          </div>
-        </div>
-      </div>
-      <div className="row">
-        {product_items.map((prd) => (
+        {products.map(prd => (
           <div key={prd._id} className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
             <ProductItem product={prd} />
           </div>
         ))}
       </div>
-    </>
+    );
   }
+
   return (
-    <>
-      <section className="tp-product-area pb-90">
-        <div className="container">
-          <div className="row">
-            <div className="col-xl-12">
-              <div className="tp-section-title-wrapper-2 text-center mb-35">
-                <span className="tp-section-title-pre-2">
-                  All Product Shop
-                  <TextShapeLine />
-                </span>
-                <h3 className="tp-section-title-2">Customer Favorite Style Product</h3>
-              </div>
+    <section className="tp-product-area pb-90">
+      <div className="container">
+        <div className="row">
+          <div className="col-xl-12">
+            <div className="tp-section-title-wrapper-2 text-center mb-35">
+              <span className="tp-section-title-pre-2">
+                All Product Shop
+                <TextShapeLine />
+              </span>
+              <h3 className="tp-section-title-2">Customer Favorite Style Product</h3>
             </div>
           </div>
-          {content}
         </div>
-      </section>
-    </>
+
+        <div className="row">
+          <div className="col-xl-12">
+            <div className="tp-product-tab-2 tp-tab mb-50 text-center">
+              <nav>
+                <div className="nav nav-tabs justify-content-center">
+                  {tabs.map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => handleActiveTab(tab.id)}
+                      className={`nav-link text-capitalize ${activeCategoryId === tab.id ? "active" : ""}`}
+                    >
+                      {tab.name}
+                      <span className="tp-product-tab-tooltip">{activeCategoryId === tab.id ? productCount : ''}</span>
+                    </button>
+                  ))}
+                </div>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        {content}
+      </div>
+    </section>
   );
 };
 

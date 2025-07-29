@@ -9,7 +9,7 @@ import Link from "next/link";
 // internal
 import { TextShapeLine } from "@/svg";
 import ErrorMsg from "@/components/common/error-msg";
-import { useGetPopularProductByTypeQuery } from "@/redux/features/productApi";
+import { useGetPopularProductByTypeQuery } from "@/redux/features/productsApi";
 import { add_cart_product } from "@/redux/features/cartSlice";
 import { HomeTwoPopularPrdLoader } from "@/components/loader";
 import { notifyError } from "@/utils/toast";
