@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { Rating } from "react-simple-star-rating";
 import { useDispatch, useSelector } from "react-redux";
 // internal
 import { Cart, QuickView, Wishlist } from "@/svg";
 import { handleProductModal } from "@/redux/features/productModalSlice";
 import { add_cart_product } from "@/redux/features/cartSlice";
 import { add_to_wishlist } from "@/redux/features/wishlist-slice";
+import BlurImage from "@/components/common/BlurImage";
 
 const ProductItem = ({ product }) => {
   const [isClient, setIsClient] = useState(false);
@@ -16,8 +15,7 @@ const ProductItem = ({ product }) => {
   const dispatch = useDispatch();
   
   const { id, category, title, price, images, residue } = product || {};
-  const [ratingVal, setRatingVal] = useState(0);
-  const [imageError, setImageError] = useState(false);
+
 
   useEffect(() => {
     setIsClient(true);
@@ -43,33 +41,17 @@ const ProductItem = ({ product }) => {
     <div className="tp-product-item mb-25 transition-3">
       <div className="tp-product-thumb p-relative fix">
         <Link href={`/product-details/${id}`}>
-          {images?.length > 0 && !imageError ? (
-            <Image
-              src={images[0]}
-              width={300}
-              height={300}
+          <div style={{
+            width: '100%',
+            height: '300px',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <BlurImage 
+              image={images?.length > 0 ? images[0] : null}
               alt={title || "product image"}
-              className="img-fluid"
-              style={{
-                width: '100%',
-                height: 'auto',
-                objectFit: 'cover'
-              }}
-              onError={() => setImageError(true)}
-              priority={false}
             />
-          ) : (
-            <div className="image-placeholder" style={{
-              width: '100%',
-              height: '300px',
-              backgroundColor: '#f5f5f5',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <span>No Image</span>
-            </div>
-          )}
+          </div>
           <div className="tp-product-badge">
             {isOutOfStock && <span className="product-hot">out-stock</span>}
           </div>
@@ -118,28 +100,24 @@ const ProductItem = ({ product }) => {
       </div>
       
       {/* product content */}
-      <div className="tp-product-content">
-        <div className="tp-product-category">
-          <a href="#">{category?.title}</a>
-        </div>
-        <h3 className="tp-product-title">
-          <Link href={`/product-details/${id}`}>{title}</Link>
-        </h3>
-        <div className="tp-product-rating d-flex align-items-center">
-          <div className="tp-product-rating-icon">
-            <Rating
-              allowFraction
-              size={16}
-              initialValue={ratingVal}
-              readonly={true}
-            />
+      <div className="tp-product-content" style={{ height: '120px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div>
+          <div className="tp-product-category">
+            <a href="#">{category?.title}</a>
           </div>
-          <div className="tp-product-rating-text">
-            <span>(0 Review)</span>
-          </div>
+          <h3 className="tp-product-title" style={{ 
+            height: '48px', 
+            overflow: 'hidden', 
+            display: '-webkit-box', 
+            WebkitLineClamp: 2, 
+            WebkitBoxOrient: 'vertical',
+            lineHeight: '24px'
+          }}>
+            <Link href={`/product-details/${id}`}>{title}</Link>
+          </h3>
         </div>
         <div className="tp-product-price-wrapper">
-          <span className="tp-product-price new-price">${price?.toFixed(2)}</span>
+          <span className="tp-product-price new-price">{price?.toFixed(2)} ₴</span>
         </div>
       </div>
     </div>

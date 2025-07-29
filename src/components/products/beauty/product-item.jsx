@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 // internal
@@ -7,6 +6,7 @@ import { Cart, QuickView, Wishlist } from "@/svg";
 import { handleProductModal } from "@/redux/features/productModalSlice";
 import { add_cart_product } from "@/redux/features/cartSlice";
 import { add_to_wishlist } from "@/redux/features/wishlist-slice";
+import BlurImage from "@/components/common/BlurImage";
 
 const ProductItem = ({ product, prdCenter = false,primary_style=false }) => {
   const { _id, img, images, imageURLs, title, discount, price, tags, status } = product || {};
@@ -45,7 +45,9 @@ const ProductItem = ({ product, prdCenter = false,primary_style=false }) => {
     >
       <div className="tp-product-thumb-3 mb-15 fix p-relative z-index-1">
         <Link href={`/product-details/${_id}`}>
-          <Image src={productImage} alt="product image" width={282} height={320} />
+          <div style={{ width: '282px', height: '320px', position: 'relative' }}>
+            <BlurImage image={productImage} alt={title || 'Product Image'} />
+          </div>
         </Link>
 
         <div className="tp-product-badge">
@@ -111,15 +113,24 @@ const ProductItem = ({ product, prdCenter = false,primary_style=false }) => {
           )}
         </div>
       </div>
-      <div className="tp-product-content-3">
-        <div className="tp-product-tag-3">
-          <span>{tags && tags[1] ? tags[1] : 'Product'}</span>
+      <div className="tp-product-content-3" style={{ height: '120px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div>
+          <div className="tp-product-tag-3">
+            <span>{tags && tags[1] ? tags[1] : 'Product'}</span>
+          </div>
+          <h3 className="tp-product-title-3" style={{ 
+            height: '48px', 
+            overflow: 'hidden', 
+            display: '-webkit-box', 
+            WebkitLineClamp: 2, 
+            WebkitBoxOrient: 'vertical',
+            lineHeight: '24px'
+          }}>
+            <Link href={`/product-details/${_id}`}>{title}</Link>
+          </h3>
         </div>
-        <h3 className="tp-product-title-3">
-          <Link href={`/product-details/${_id}`}>{title}</Link>
-        </h3>
         <div className="tp-product-price-wrapper-3">
-          <span className="tp-product-price-3">${price.toFixed(2)}</span>
+          <span className="tp-product-price-3">{price.toFixed(2)} ₴</span>
         </div>
       </div>
     </div>

@@ -1,11 +1,11 @@
 'use client';
 import React from "react";
-import Image from "next/image";
 import { useDispatch } from "react-redux";
 import Link from "next/link";
 // internal
 import { Close, Minus, Plus } from "@/svg";
 import { add_cart_product, quantityDecrement, remove_product } from "@/redux/features/cartSlice";
+import BlurImage from "@/components/common/BlurImage";
 
 const CartItem = ({product}) => {
   const { _id, img, images, imageURLs, title, price, category, status, orderQuantity = 0 } = product || {};
@@ -45,7 +45,9 @@ const CartItem = ({product}) => {
       {/* img */}
       <td className="tp-cart-img">
         <Link href={`/product-details/${_id}`}>
-          <Image src={productImage} alt="product img" width={70} height={100} />
+          <div style={{ width: '70px', height: '100px', position: 'relative' }}>
+            <BlurImage image={productImage} alt={title || 'Product Image'} />
+          </div>
         </Link>
       </td>
       {/* title */}

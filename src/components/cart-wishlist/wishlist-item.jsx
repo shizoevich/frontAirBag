@@ -1,12 +1,12 @@
 'use client';
 import React from "react";
-import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 // internal
 import { Close, Minus, Plus } from "@/svg";
 import {add_cart_product,quantityDecrement} from "@/redux/features/cartSlice";
 import { remove_wishlist_product } from "@/redux/features/wishlist-slice";
+import BlurImage from "@/components/common/BlurImage";
 
 const WishlistItem = ({ product }) => {
   const { _id, img, images, imageURLs, title, price } = product || {};
@@ -44,7 +44,9 @@ const WishlistItem = ({ product }) => {
     <tr>
       <td className="tp-cart-img">
         <Link href={`/product-details/${_id}`}>
-          <Image src={productImage} alt="product img" width={70} height={100} />
+          <div style={{ width: '70px', height: '100px', position: 'relative' }}>
+            <BlurImage image={productImage} alt={title || 'Product Image'} />
+          </div>
         </Link>
       </td>
       <td className="tp-cart-title">

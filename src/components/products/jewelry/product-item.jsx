@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 // internal
@@ -7,6 +6,7 @@ import { AddCart, Cart, QuickView, Wishlist } from "@/svg";
 import { handleProductModal } from "@/redux/features/productModalSlice";
 import { add_cart_product } from "@/redux/features/cartSlice";
 import { add_to_wishlist } from "@/redux/features/wishlist-slice";
+import BlurImage from "@/components/common/BlurImage";
 
 const ProductItem = ({ product }) => {
   const { _id, img, images, imageURLs, title, price, tags, status } = product || {};
@@ -44,7 +44,9 @@ const ProductItem = ({ product }) => {
     <div className="tp-product-item-4 p-relative mb-40">
       <div className="tp-product-thumb-4 p-relative fix">
         <Link href={`/product-details/${_id}`}>
-          <Image src={productImage} alt="product img" width={284} height={352} />
+          <div style={{ width: '306px', height: '350px', position: 'relative' }}>
+            <BlurImage image={productImage} alt={title || 'Product Image'} />
+          </div>
         </Link>
         <div className="tp-product-badge">
           {status === 'out-of-stock' && <span className="product-hot">out-stock</span>}
@@ -90,17 +92,26 @@ const ProductItem = ({ product }) => {
           </div>
         </div>
       </div>
-      <div className="tp-product-content-4">
-        <h3 className="tp-product-title-4">
-          <Link href={`/product-details/${_id}`}>{title}</Link>
-        </h3>
-        <div className="tp-product-info-4">
-          <p>{tags[0]}</p>
+      <div className="tp-product-content-4" style={{ height: '140px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div>
+          <h3 className="tp-product-title-4" style={{ 
+            height: '48px', 
+            overflow: 'hidden', 
+            display: '-webkit-box', 
+            WebkitLineClamp: 2, 
+            WebkitBoxOrient: 'vertical',
+            lineHeight: '24px'
+          }}>
+            <Link href={`/product-details/${_id}`}>{title}</Link>
+          </h3>
+          <div className="tp-product-info-4">
+            <p>{tags[0]}</p>
+          </div>
         </div>
 
         <div className="tp-product-price-inner-4">
           <div className="tp-product-price-wrapper-4">
-            <span className="tp-product-price-4">${price.toFixed(2)}</span>
+            <span className="tp-product-price-4">{price.toFixed(2)} ₴</span>
           </div>
           <div className="tp-product-price-add-to-cart">
             {isAddedToCart ? <Link href="/cart" className="tp-product-add-to-cart-4">

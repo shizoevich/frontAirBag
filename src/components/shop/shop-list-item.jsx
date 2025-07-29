@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import Image from "next/image";
-import { Rating } from "react-simple-star-rating";
 import Link from "next/link";
+import { Rating } from "react-simple-star-rating";
 // internal
 import { Cart, CompareThree, QuickView, Wishlist } from "@/svg";
 import { handleProductModal } from "@/redux/features/productModalSlice";
 import { add_cart_product } from "@/redux/features/cartSlice";
 import { add_to_wishlist } from "@/redux/features/wishlist-slice";
+import BlurImage from "@/components/common/BlurImage";
 import { add_to_compare } from "@/redux/features/compareSlice";
 
 const ShopListItem = ({ product }) => {
@@ -57,7 +57,9 @@ const ShopListItem = ({ product }) => {
     <div className="tp-product-list-item d-md-flex">
       <div className="tp-product-list-thumb p-relative fix">
         <Link href={`/product-details/${_id}`}>
-          <Image src={productImage} alt="product img" width={350} height={310} />
+          <div style={{ width: '306px', height: '350px', position: 'relative' }}>
+            <BlurImage image={productImage} alt={title || 'Product Image'} />
+          </div>
         </Link>
 
         {/* <!-- product action --> */}

@@ -7,6 +7,7 @@ import { handleProductModal } from "@/redux/features/productModalSlice";
 import { add_cart_product } from "@/redux/features/cartSlice";
 import { add_to_wishlist } from "@/redux/features/wishlist-slice";
 import { notifyError } from "@/utils/toast";
+import BlurImage from "@/components/common/BlurImage";
 
 const ProductSliderItem = ({ product }) => {
   const { _id, title, price, img,status } = product || {};
@@ -31,14 +32,17 @@ const ProductSliderItem = ({ product }) => {
   };
   return (
     <div className="tp-category-item-4 p-relative z-index-1 fix text-center">
-      <div
-        className="tp-category-thumb-4 include-bg"
-        style={{
-          backgroundImage: `url(${img})`,
-          backgroundColor: "#FFFFFF",
-          backgroundPosition: "0px -80px",
-        }}
-      ></div>
+      <div className="tp-category-thumb-4" style={{
+        width: '100%',
+        height: '300px',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        <BlurImage 
+          image={img}
+          alt={title || "product image"}
+        />
+      </div>
       <div className="tp-product-action-3 tp-product-action-4 tp-product-action-blackStyle tp-product-action-brownStyle">
         <div className="tp-product-action-item-3 d-flex flex-column">
           {isAddedToCart ? (

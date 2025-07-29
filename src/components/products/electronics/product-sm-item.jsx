@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Rating } from "react-simple-star-rating";
+import BlurImage from "@/components/common/BlurImage";
 
 const ProductSmItem = ({ product }) => {
   const {_id, img, images, imageURLs, category, title, price, reviews } = product || {};
@@ -19,48 +19,35 @@ const ProductSmItem = ({ product }) => {
     // Если есть img, используем его
     productImage = img;
   }
-  const [ratingVal, setRatingVal] = useState(0);
 
-  useEffect(() => {
-    if (reviews && reviews.length > 0) {
-      const rating =
-        reviews.reduce((acc, review) => acc + review.rating, 0) /
-        reviews.length;
-      setRatingVal(rating);
-    } else {
-      setRatingVal(0);
-    }
-  }, [reviews]);
 
   return (
     <div className="tp-product-sm-item d-flex align-items-center">
       <div className="tp-product-thumb mr-25 fix">
         <Link href={`/product-details/${_id}`}>
-          <Image
-            src={productImage}
-            alt="product img"
-            width={140}
-            height={140}
-          />
+          <div style={{ width: '140px', height: '140px', position: 'relative' }}>
+            <BlurImage image={productImage} alt={title || 'Product Image'} />
+          </div>
         </Link>
       </div>
-      <div className="tp-product-sm-content">
-        <div className="tp-product-category">
-          <a href="#">{category?.name}</a>
-        </div>
-        <h3 className="tp-product-title">
-          <Link href={`/product-details/${_id}`}>{title}</Link>
-        </h3>
-        <div className="tp-product-rating d-sm-flex align-items-center">
-          <div className="tp-product-rating-icon">
-            <Rating allowFraction size={16} initialValue={ratingVal} readonly={true} />
+      <div className="tp-product-sm-content" style={{ height: '120px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div>
+          <div className="tp-product-category">
+            <a href="#">{category?.name}</a>
           </div>
-          <div className="tp-product-rating-text">
-          ({reviews && reviews.length > 0 ? reviews.length : 0} Review)
-          </div>
+          <h3 className="tp-product-title" style={{ 
+            height: '48px', 
+            overflow: 'hidden', 
+            display: '-webkit-box', 
+            WebkitLineClamp: 2, 
+            WebkitBoxOrient: 'vertical',
+            lineHeight: '24px'
+          }}>
+            <Link href={`/product-details/${_id}`}>{title}</Link>
+          </h3>
         </div>
         <div className="tp-product-price-wrapper">
-          <span className="tp-product-price">${price.toFixed(2)}</span>
+          <span className="tp-product-price">{price.toFixed(2)} ₴</span>
         </div>
       </div>
     </div>
