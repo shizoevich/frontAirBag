@@ -1,5 +1,5 @@
 import Wrapper from "@/layout/wrapper";
-import HeaderTwo from "@/layout/headers/header-2";
+import Header from "@/layout/headers/header";
 import ContactBreadcrumb from "@/components/breadcrumb/contact-breadcrumb";
 import ContactArea from "@/components/contact/contact-area";
 import ContactMap from "@/components/contact/contact-map";
@@ -12,7 +12,7 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <Wrapper>
-      <HeaderTwo style_2={true} />
+      <Header />
       <ContactBreadcrumb />
       <ContactArea/>
       <ContactMap/>

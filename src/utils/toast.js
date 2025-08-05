@@ -1,38 +1,26 @@
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+// Custom toast system - compatible with Next.js 15.4.2
+const notifySuccess = (message) => {
+  if (typeof window !== 'undefined' && window.addToast) {
+    window.addToast(message, 'success');
+  } else {
+    console.log('✓ Success:', message);
+  }
+};
 
-const notifySuccess = (message) =>
-  toast.success(message, {
-    position: 'top-center',
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-  });
+const notifyError = (message) => {
+  if (typeof window !== 'undefined' && window.addToast) {
+    window.addToast(message, 'error');
+  } else {
+    console.log('✕ Error:', message);
+  }
+};
 
-const notifyError = (message) =>
-  toast.error(message, {
-    position: 'top-center',
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-  });
+const notifyInfo = (message) => {
+  if (typeof window !== 'undefined' && window.addToast) {
+    window.addToast(message, 'info');
+  } else {
+    console.log('ℹ Info:', message);
+  }
+};
 
-<ToastContainer
-  position="top-center"
-  autoClose={3000}
-  hideProgressBar={false}
-  newestOnTop={false}
-  closeOnClick
-  rtl={false}
-  pauseOnFocusLoss
-  draggable
-  pauseOnHover
-/>;
-
-export { ToastContainer, notifySuccess, notifyError };
+export { notifySuccess, notifyError, notifyInfo };

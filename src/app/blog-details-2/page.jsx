@@ -1,5 +1,5 @@
 import Wrapper from "@/layout/wrapper";
-import HeaderTwo from "@/layout/headers/header-2";
+import Header from "@/layout/headers/header";
 import blogData from "@/data/blog-data";
 import BlogDetailsAreaTwo from "@/components/blog-details/blog-details-area-2";
 import Footer from "@/layout/footers/footer";
@@ -12,7 +12,7 @@ export const metadata = {
 export default function BlogDetailsPageTwo() {
   return (
     <Wrapper>
-      <HeaderTwo style_2={true} />
+      <Header />
       <BlogDetailsAreaTwo blog={blogData[4]} />
       <Footer primary_style={true} />
     </Wrapper>

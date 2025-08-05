@@ -7,6 +7,7 @@ import { handleProductModal } from "@/redux/features/productModalSlice";
 import { add_cart_product } from "@/redux/features/cartSlice";
 import { add_to_wishlist } from "@/redux/features/wishlist-slice";
 import BlurImage from "@/components/common/BlurImage";
+import { getProductImage, getProductId } from "@/utils/image-utils";
 
 const ProductItem = ({ product }) => {
   const [isClient, setIsClient] = useState(false);
@@ -24,7 +25,11 @@ const ProductItem = ({ product }) => {
     return <div className="tp-product-item mb-25" />; // Скелетон для SSR
   }
 
-  const isAddedToCart = cart_products.some((prd) => prd.id === id);
+  const isAddedToCart = cart_products.some((prd) => {
+    const prdId = prd.id || prd._id;
+    const currentId = id || product._id;
+    return prdId === currentId;
+  });
   const isAddedToWishlist = wishlist.some((prd) => prd.id === id);
   const isOutOfStock = residue === 0;
 
@@ -41,7 +46,7 @@ const ProductItem = ({ product }) => {
   return (
     <div className="tp-product-item mb-25 transition-3">
       <div className="tp-product-thumb p-relative fix">
-        <Link href={`/product-details/${id}`}>
+        <Link href={`/product-details/${id || ''}`}>
           <div style={{
             width: '100%',
             height: '300px',
@@ -49,7 +54,7 @@ const ProductItem = ({ product }) => {
             overflow: 'hidden'
           }}>
             <BlurImage 
-              image={images?.length > 0 ? images[0] : null}
+              image={getProductImage(product)}
               alt={title || "product image"}
             />
           </div>

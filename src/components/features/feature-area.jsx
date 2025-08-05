@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { feature_data } from './feature-area-2';
+import { feature_data } from './feature-data';
 
 const FeatureArea = () => {
   return (

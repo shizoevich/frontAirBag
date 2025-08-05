@@ -1,7 +1,6 @@
 'use client'
 import React,{ useState} from 'react';
 import Pagination from "@/ui/Pagination";
-import ProductItem from "../products/fashion/product-item";
 import CategoryFilter from "./shop-filter/category-filter";
 import ColorFilter from "./shop-filter/color-filter";
 import PriceFilter from "./shop-filter/price-filter";
@@ -11,6 +10,7 @@ import ShopListItem from "./shop-list-item";
 import ShopTopLeft from "./shop-top-left";
 import ShopTopRight from "./shop-top-right";
 import ResetButton from "./shop-filter/reset-button";
+import ProductItem from "../products/electronics/product-item";
 
 const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar}) => {
   const {priceFilterValues,selectHandleFilter,currPage,setCurrPage} = otherProps;

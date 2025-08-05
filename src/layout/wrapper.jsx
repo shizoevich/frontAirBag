@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ToastContainer } from "react-toastify";
+
 if (typeof window !== "undefined") {
   require("bootstrap/dist/js/bootstrap");
 }
@@ -37,7 +37,6 @@ const Wrapper = ({ children }) => {
     <div id="wrapper">
       {children}
       <BackToTopCom />
-      <ToastContainer />
       {/* product modal start */}
       {productItem && <ProductModal />}
       {/* product modal end */}

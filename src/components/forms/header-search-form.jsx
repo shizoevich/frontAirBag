@@ -1,12 +1,44 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // internal
 import { Search } from "@/svg";
 import NiceSelect from "@/ui/nice-select";
 import useSearchFormSubmit from "@/hooks/use-search-form-submit";
+import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
 
 const HeaderSearchForm = () => {
   const { setSearchText, setCategory, handleSubmit, searchText } = useSearchFormSubmit();
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  
+  // Get categories from API
+  const { data: categoriesData, isLoading } = useGetShowCategoryQuery();
+  
+  useEffect(() => {
+    if (categoriesData && !isLoading) {
+      // Format categories for the dropdown
+      const options = [
+        { value: "Select Category", text: "Select Category" }
+      ];
+      
+      // Add categories from API
+      const categories = Array.isArray(categoriesData) 
+        ? categoriesData 
+        : Array.isArray(categoriesData?.data) 
+          ? categoriesData.data 
+          : Array.isArray(categoriesData?.results) 
+            ? categoriesData.results 
+            : [];
+            
+      categories.forEach(cat => {
+        options.push({
+          value: cat.id_remonline || cat.id,
+          text: cat.title
+        });
+      });
+      
+      setCategoryOptions(options);
+    }
+  }, [categoriesData, isLoading]);
 
   // selectHandle
   const selectCategoryHandle = (e) => {
@@ -26,13 +58,7 @@ const HeaderSearchForm = () => {
         </div>
         <div className="tp-header-search-category">
           <NiceSelect
-            options={[
-              { value: "Select Category", text: "Select Category" },
-              { value: "electronics", text: "electronics" },
-              { value: "fashion", text: "fashion" },
-              { value: "beauty", text: "beauty" },
-              { value: "jewelry", text: "jewelry" },
-            ]}
+            options={categoryOptions}
             defaultCurrent={0}
             onChange={selectCategoryHandle}
             name="Select Category"

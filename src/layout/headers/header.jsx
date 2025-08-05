@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +9,7 @@ import useSticky from "@/hooks/use-sticky";
 import logo from "@assets/img/logo/logo.svg";
 import useCartInfo from "@/hooks/use-cart-info";
 import OffCanvas from "@/components/common/off-canvas";
-import { openCartMini } from "@/redux/features/cartSlice";
+import { openCartMini, closeCartMini } from "@/redux/features/cartSlice";
 import HeaderCategory from "./header-com/header-category";
 import HeaderTopRight from "./header-com/header-top-right";
 import HeaderMainRight from "./header-com/header-main-right";
@@ -19,14 +19,44 @@ import { CartTwo, CategoryMenu, Compare, Menu, Phone, ShippingCar, Wishlist } fr
 
 const Header = () => {
   const { wishlist } = useSelector((state) => state.wishlist);
+  const { cartMiniOpen } = useSelector((state) => state.cart);
   const [isOffCanvasOpen, setIsCanvasOpen] = useState(false);
   const [isCategoryActive, setIsCategoryActive] = useState(false);
   const { quantity } = useCartInfo();
   const { sticky } = useSticky();
   const dispatch = useDispatch();
+  
+  // Close category menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isCategoryActive && !event.target.closest('.tp-header-category')) {
+        setIsCategoryActive(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isCategoryActive]);
+  
+  // Handle cart mini sidebar
+  const handleCartMini = () => {
+    dispatch(openCartMini());
+  };
+  
+  const handleCloseCartMini = () => {
+    dispatch(closeCartMini());
+  };
   return (
     <>
-      <header>
+      {/* Cart Mini Sidebar */}
+      <CartMiniSidebar />
+      
+      {/* Mobile Off Canvas Menu */}
+      <OffCanvas isOffCanvasOpen={isOffCanvasOpen} setIsCanvasOpen={setIsCanvasOpen} />
+      
+      <header className={sticky ? "header-sticky" : ""}>
         <div className="tp-header-area p-relative z-index-11">
           {/* header top start  */}
           <div className="tp-header-top black-bg p-relative z-index-1 d-none d-md-block">
@@ -37,7 +67,7 @@ const Header = () => {
                     <span>
                       <ShippingCar />
                     </span>
-                    <p>FREE Express Shipping On Orders $570+</p>
+                    <p>🚚 Бесплатная доставка при заказе от 2000 ₴ | 🛡️ Гарантия качества на все запчасти Airbag</p>
                   </div>
                 </div>
                 <div className="col-md-6">

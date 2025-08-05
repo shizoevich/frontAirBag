@@ -84,7 +84,7 @@ const ProductBanner = () => {
                         </div>
 
                         <div className="tp-product-banner-thumb text-end p-relative z-index-1">
-                          <Image src={item.img} alt="banner-slider img" />
+                          <Image src={item.img || 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg'} alt="banner-slider img" />
                         </div>
                       </div>
                     </div>

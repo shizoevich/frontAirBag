@@ -45,7 +45,7 @@ const CompareArea = () => {
                           <td key={item._id} className="">
                             <div className="tp-compare-thumb">
                               <Image
-                                src={item.img}
+                                src={item.img || 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg'}
                                 alt="compare"
                                 width={205}
                                 height={176}

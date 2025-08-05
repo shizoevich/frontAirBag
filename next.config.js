@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['storage.remonline.app'],
+    domains: ['storage.remonline.app', 't3.ftcdn.net'],
     // Опционально: настройки для форматов и качества
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60,

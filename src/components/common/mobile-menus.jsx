@@ -1,10 +1,16 @@
-import React,{useState} from "react";
+'use client';
+import React, {useState, useEffect} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { mobile_menu } from "@/data/menu-data";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { closeCartMini } from "@/redux/features/cartSlice";
 
-const MobileMenus = () => {
-  const [isActiveMenu,setIsActiveMenu] = useState("")
+const MobileMenus = ({setIsCanvasOpen}) => {
+  const [isActiveMenu, setIsActiveMenu] = useState("");
+  const router = useRouter();
+  const dispatch = useDispatch();
 
   // handleOpenSubMenu
   const handleOpenSubMenu = (title) => {
@@ -14,6 +20,13 @@ const MobileMenus = () => {
     else {
       setIsActiveMenu(title)
     }
+  }
+  
+  // Handle navigation
+  const handleNavigation = (link) => {
+    setIsCanvasOpen(false); // Close mobile menu
+    dispatch(closeCartMini()); // Close cart mini if open
+    router.push(link);
   }
   return (
     <>
@@ -33,9 +46,9 @@ const MobileMenus = () => {
                     {menu.home_pages.map((home, i) => (
                       <div key={i} className="col">
                         <div className="home-menu-item">
-                          <Link href={home.link}>
+                          <Link href={home.link} onClick={() => handleNavigation(home.link)}>
                             <div className="home-menu-thumb p-relative fix">
-                              <Image src={home.img} alt="home img" />
+                              <Image src={home.img || '/assets/img/product/placeholder.jpg'} alt="home img" width={200} height={150} />
                             </div>
                             <div className="home-menu-content">
                               <h5 className="home-menu-title">{home.title}</h5>
@@ -58,14 +71,14 @@ const MobileMenus = () => {
                 <ul className={`tp-submenu ${isActiveMenu === menu.title ? 'active':''}`}>
                   {menu.sub_menus.map((b, i) => (
                     <li key={i}>
-                      <Link href={b.link}>{b.title}</Link>
+                      <Link href={b.link} onClick={() => handleNavigation(b.link)}>{b.title}</Link>
                     </li>
                   ))}
                 </ul>
               </li>
             ) : (
               <li key={menu.id}>
-                <Link href={menu.link}>{menu.title}</Link>
+                <Link href={menu.link} onClick={() => handleNavigation(menu.link)}>{menu.title}</Link>
               </li>
             )}
           </ul>

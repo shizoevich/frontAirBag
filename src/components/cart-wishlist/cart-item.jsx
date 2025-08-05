@@ -6,23 +6,14 @@ import Link from "next/link";
 import { Close, Minus, Plus } from "@/svg";
 import { add_cart_product, quantityDecrement, remove_product } from "@/redux/features/cartSlice";
 import BlurImage from "@/components/common/BlurImage";
+import { getProductImage, getProductId } from "@/utils/image-utils";
 
 const CartItem = ({product}) => {
-  const { _id, img, images, imageURLs, title, price, category, status, orderQuantity = 0 } = product || {};
+  const { title, price, category, status, orderQuantity = 0 } = product || {};
   
-  // Получаем изображение из API с правильной логикой
-  let productImage = '/assets/img/product/3/product-1.jpg'; // заглушка по умолчанию
-  
-  if (imageURLs && Array.isArray(imageURLs) && imageURLs.length > 0) {
-    // Если есть imageURLs, используем первое изображение
-    productImage = imageURLs[0].img || imageURLs[0];
-  } else if (images && Array.isArray(images) && images.length > 0) {
-    // Если есть images, используем первое изображение
-    productImage = typeof images[0] === 'string' ? images[0] : images[0].url || images[0].img || images[0];
-  } else if (img) {
-    // Если есть img, используем его
-    productImage = img;
-  }
+  // Используем утилиты для получения ID и изображения
+  const productId = getProductId(product);
+  const productImage = getProductImage(product);
 
   const dispatch = useDispatch();
 
@@ -44,7 +35,7 @@ const CartItem = ({product}) => {
     <tr>
       {/* img */}
       <td className="tp-cart-img">
-        <Link href={`/product-details/${_id}`}>
+        <Link href={`/product-details/${productId}`}>
           <div style={{ width: '70px', height: '100px', position: 'relative' }}>
             <BlurImage image={productImage} alt={title || 'Product Image'} />
           </div>
@@ -52,7 +43,7 @@ const CartItem = ({product}) => {
       </td>
       {/* title */}
       <td className="tp-cart-title">
-        <Link href={`/product-details/${_id}`}>{title}</Link>
+        <Link href={`/product-details/${productId}`}>{title}</Link>
       </td>
       {/* price */}
       <td className="tp-cart-price">

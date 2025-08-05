@@ -46,7 +46,14 @@ export const productsApi = apiSlice.injectEndpoints({
 
     // Получение товаров по категории (по id_remonline)
     getProductsByCategory: builder.query({
-      query: (id_remonline) => `/goods/?category__id_remonline=${id_remonline}`,
+      query: (id_remonline) => {
+        console.log(`Запрос товаров по категории id_remonline=${id_remonline}`);
+        return `/goods/?category__id_remonline=${id_remonline}`;
+      },
+      transformResponse: (response) => {
+        console.log('Ответ API товаров по категории:', response);
+        return response;
+      },
       providesTags: (result, error, id_remonline) => [{ type: 'products', id: id_remonline }],
     }),
     

@@ -25,7 +25,7 @@ const InstagramArea = () => {
           {instagram_data.map((item) => (
             <div key={item.id} className="col">
               <div className="tp-instagram-item p-relative z-index-1 fix mb-30 w-img">
-                <Image src={item.img} alt="instagram img" style={{width:'100%',height:'100%'}} />
+                <Image src={item.img || 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg'} alt="instagram img" style={{width:'100%',height:'100%'}} />
                 <div className="tp-instagram-icon">
                   <a href={item.link} target="_blank" className="popup-image">
                     <i className="fa-brands fa-instagram"></i>

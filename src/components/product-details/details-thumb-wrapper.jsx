@@ -13,7 +13,7 @@ const DetailsWrapper = ({
   status = ''
 }) => {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
-  const defaultImage = '/assets/img/product/3/product-1.jpg'; // Используем существующее изображение как заглушку
+  const defaultImage = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg'; // Используем стандартную заглушку для всего сайта
 
   // Безопасная обработка изображений
   const normalizedImages = useMemo(() => {
@@ -71,7 +71,7 @@ const DetailsWrapper = ({
                 onClick={() => handleSafeClick(item)}
               >
                 <Image
-                  src={item.img}
+                  src={item.img || 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg'}
                   alt={`Thumbnail ${i + 1}`}
                   width={78}
                   height={100}

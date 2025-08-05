@@ -1,5 +1,5 @@
 import React from "react";
-import HeaderTwo from "@/layout/headers/header-2";
+import Header from "@/layout/headers/header";
 import Wrapper from "@/layout/wrapper";
 import blogData from "@/data/blog-data";
 import BlogDetailsAreaTwo from "@/components/blog-details/blog-details-area-2";
@@ -13,7 +13,7 @@ export default function BlogDetailsPageTwo({ params }) {
   const blogItem = blogData.find((b) => Number(b.id) === Number(params.id));
   return (
     <Wrapper>
-      <HeaderTwo style_2={true} />
+      <Header />
       <BlogDetailsAreaTwo blog={blogItem} />
       <Footer primary_style={true} />
     </Wrapper>

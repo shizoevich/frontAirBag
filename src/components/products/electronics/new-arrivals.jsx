@@ -29,10 +29,14 @@ const sliderSettings = {
 };
 
 // ID нескольких популярных категорий
+// Используем несколько разных ID для повышения шанса получить товары
 const POPULAR_CATEGORIES = [
   753896, // Электроника
   753906, // Автозапчасти
-  753915  // Бытовая техника
+  753915, // Бытовая техника
+  1,      // Пробуем простые ID
+  2,
+  3
 ];
 
 const NewArrivals = () => {
@@ -52,23 +56,58 @@ const NewArrivals = () => {
     const loading = categoryQueries.some((q) => q.isLoading);
     const error = categoryQueries.some((q) => q.isError);
 
+    console.log('NewArrivals useEffect - loading:', loading, 'error:', error);
+    
+    // Логируем состояние запросов по каждой категории
+    categoryQueries.forEach((q, index) => {
+      console.log(`Категория ${POPULAR_CATEGORIES[index]}:`, {
+        loading: q.isLoading,
+        error: q.isError,
+        data: q.data,
+        dataStructure: q.data ? Object.keys(q.data) : 'no data'
+      });
+    });
+
     if (loading) {
+      console.log('Загрузка товаров еще идет...');
       setProducts([]);
       return;
     }
 
     if (error) {
+      console.log('Ошибка загрузки товаров');
       setProducts([]);
       return;
     }
 
     // Collect products from all categories
     const allProducts = [];
-    categoryQueries.forEach((q) => {
-      const categoryProducts = q.data?.result || q.data?.data || [];
-      allProducts.push(...categoryProducts.slice(0, 4));
+    categoryQueries.forEach((q, index) => {
+      // Проверяем разные возможные структуры данных
+      let categoryProducts = [];
+      
+      if (q.data?.results) {
+        // Формат API с пагинацией {count, next, previous, results: []}
+        categoryProducts = q.data.results;
+      } else if (q.data?.result) {
+        // Формат {result: []}
+        categoryProducts = q.data.result;
+      } else if (q.data?.data) {
+        // Формат {data: []}
+        categoryProducts = q.data.data;
+      } else if (Array.isArray(q.data)) {
+        // Формат []
+        categoryProducts = q.data;
+      }
+      
+      console.log(`Найдено ${categoryProducts.length} товаров для категории ${POPULAR_CATEGORIES[index]}`);
+      
+      if (categoryProducts.length > 0) {
+        allProducts.push(...categoryProducts.slice(0, 4));
+      }
     });
 
+    console.log('Всего товаров найдено:', allProducts.length);
     setProducts(allProducts);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryQueries[0].data, categoryQueries[1].data, categoryQueries[2].data, categoryQueries[0].isLoading, categoryQueries[1].isLoading, categoryQueries[2].isLoading, categoryQueries[0].isError, categoryQueries[1].isError, categoryQueries[2].isError]);

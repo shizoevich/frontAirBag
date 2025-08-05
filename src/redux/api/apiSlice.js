@@ -1,6 +1,9 @@
 import Cookies from "js-cookie";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+// Логируем базовый URL для отладки
+console.log('API Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
+
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
@@ -26,6 +29,6 @@ export const apiSlice = createApi({
     "UserOrders", "ProductType", "OfferProducts", "PopularProducts", 
     "products", "productCategories", "Orders", "Carts", "FeaturedProducts", "NewArrivals",
     "categories", "User", "CartItems", "OrderItems", "OrderUpdates", "Clients", 
-    "ClientUpdates", "Discounts", "BotVisitors", "Templates"
+    "ClientUpdates", "Discounts", "BotVisitors", "Templates", "allProducts"
   ]
 });

@@ -137,7 +137,7 @@ const HomeHeroSlider = () => {
                   </div>
                   <div className="col-xl-7 col-lg-6 col-md-6">
                     <div className="tp-slider-thumb text-end">
-                      <Image src={item.img} alt="slider-img" />
+                      <Image src={item.img || 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg'} alt="slider-img" />
                     </div>
                   </div>
                 </div>

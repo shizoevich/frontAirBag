@@ -8,6 +8,7 @@ import useCartInfo from '@/hooks/use-cart-info';
 import RenderCartProgress from './render-cart-progress';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
 import { closeCartMini, remove_product } from '@/redux/features/cartSlice';
+import { getProductImage, getProductId } from '@/utils/image-utils';
 
 const CartMiniSidebar = () => {
   const { cart_products, cartMiniOpen } = useSelector((state) => state.cart);
@@ -45,13 +46,22 @@ const handleCloseCartMini = () => {
               {cart_products.map((item,i) => (
                 <div key={i} className="cartmini__widget-item">
                   <div className="cartmini__thumb">
-                    <Link href={`/product-details/${item._id}`}>
-                      <Image src={item.img} width={70} height={60} alt="product img" />
-                    </Link>
+                    {(() => {
+  // Use utility functions for product ID and image
+  const productId = getProductId(item);
+  const productImage = getProductImage(item);
+  
+  return (
+    <Link href={`/product-details/${productId}`}>
+      <Image src={productImage} width={70} height={60} alt="product img" />
+    </Link>
+  );
+})()}
+
                   </div>
                   <div className="cartmini__content">
                     <h5 className="cartmini__title">
-                      <Link href={`/product-details/${item._id}`}>{item.title}</Link>
+                      <Link href={`/product-details/${getProductId(item)}`}>{item.title}</Link>
                     </h5>
                     <div className="cartmini__price-wrapper">
                       {item.discount > 0 ? <span className="cartmini__price">${(Number(item.price) - (Number(item.price) * Number(item.discount)) / 100).toFixed(2)}</span> : <span className="cartmini__price">${item.price.toFixed(2)}</span>}

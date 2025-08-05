@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import Pagination from "@/ui/Pagination";
-import ProductItem from "../products/fashion/product-item";
 import ShopListItem from "./shop-list-item";
 import ShopTopLeft from "./shop-top-left";
 import ShopTopRight from "./shop-top-right";
+import ProductItem from "../products/electronics/product-item";
 
 const ShopHiddenSidebarArea = ({
   all_products,

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+'use client';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 // internal
 import { CloseTwo } from '@/svg';
 import logo from '@assets/img/logo/logo.svg';
@@ -13,6 +15,19 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
   const [isCategoryActive, setIsCategoryActive] = useState(false);
   const [isCurrencyActive, setIsCurrencyActive] = useState(false);
   const [isLanguageActive, setIsLanguageActive] = useState(false);
+  const router = useRouter();
+  
+  // Close offcanvas when route changes
+  useEffect(() => {
+    const handleRouteChange = () => {
+      setIsCanvasOpen(false);
+    };
+    
+    // Clean up event listener
+    return () => {
+      handleRouteChange();
+    };
+  }, [setIsCanvasOpen]);
 
   // handle language active
   const handleLanguageActive = () => {
@@ -37,9 +52,11 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
           <div className="offcanvas__content">
             <div className="offcanvas__top mb-70 d-flex justify-content-between align-items-center">
               <div className="offcanvas__logo logo">
-                <Link href="/">
-                  <Image src={logo} alt="logo" />
-                </Link>
+                <div className="offcanvas__logo logo">
+                  <Link href="/" onClick={() => setIsCanvasOpen(false)}>
+                    <Image src={logo} alt="logo" />
+                  </Link>
+                </div>
               </div>
             </div>
             <div className="offcanvas__category pb-40">
@@ -55,7 +72,7 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
               </div>
             </div>
             <div className="tp-main-menu-mobile fix d-lg-none mb-40">
-              <MobileMenus />
+              <MobileMenus setIsCanvasOpen={setIsCanvasOpen} />
             </div>
 
             <div className="offcanvas__contact align-items-center d-none">
@@ -71,7 +88,7 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
               </div>
             </div>
             <div className="offcanvas__btn">
-              <Link href="/contact" className="tp-btn-2 tp-btn-border-2">Contact Us</Link>
+              <Link href="/contact" onClick={() => setIsCanvasOpen(false)} className="tp-btn-2 tp-btn-border-2">Contact Us</Link>
             </div>
           </div>
           <div className="offcanvas__bottom">

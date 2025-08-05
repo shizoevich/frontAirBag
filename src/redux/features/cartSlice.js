@@ -13,30 +13,30 @@ export const cartSlice = createSlice({
   initialState,
   reducers: {
     add_cart_product: (state, { payload }) => {
-      const isExist = state.cart_products.some((i) => i._id === payload._id);
-      if (!isExist) {
+      // Use id or _id for product identification (normalize field)
+      const productId = payload.id || payload._id;
+      // Find product in cart
+      const existingIndex = state.cart_products.findIndex((i) => (i.id || i._id) === productId);
+      if (existingIndex === -1) {
+        // Add new product
         const newItem = {
           ...payload,
+          id: productId, // ensure id field always present
           orderQuantity: state.orderQuantity,
         };
         state.cart_products.push(newItem);
-        notifySuccess(`${state.orderQuantity} ${payload.title} added to cart`);
+        notifySuccess(`${state.orderQuantity} ${payload.title} добавлено в корзину`);
       } else {
-        state.cart_products.map((item) => {
-          if (item._id === payload._id) {
-            if (item.quantity >= item.orderQuantity + state.orderQuantity) {
-              item.orderQuantity =
-                state.orderQuantity !== 1
-                  ? state.orderQuantity + item.orderQuantity
-                  : item.orderQuantity + 1;
-              notifySuccess(`${state.orderQuantity} ${item.title} added to cart`);
-            } else {
-              notifyError("No more quantity available for this product!");
-              state.orderQuantity = 1;
-            }
-          }
-          return { ...item };
-        });
+        // Increment quantity for existing product
+        const item = state.cart_products[existingIndex];
+        const maxQty = item.quantity || 99;
+        // Проверяем, не превышает ли итоговое количество доступное
+        if ((item.orderQuantity + state.orderQuantity) <= maxQty) {
+          item.orderQuantity += state.orderQuantity;
+          notifySuccess(`${state.orderQuantity} ${item.title} добавлено в корзину`);
+        } else {
+          notifyError("Нет такого количества товара на складе!");
+        }
       }
       setLocalStorage("cart_products", state.cart_products);
     },
@@ -49,11 +49,33 @@ export const cartSlice = createSlice({
           ? state.orderQuantity - 1
           : (state.orderQuantity = 1);
     },
+    quantityIncrement: (state, { payload }) => {
+      const productId = payload.id || payload._id;
+      state.cart_products = state.cart_products.map((item) => {
+        const itemId = item.id || item._id;
+        if (itemId === productId) {
+          const maxQty = item.quantity || 99;
+          if (maxQty > item.orderQuantity) {
+            item.orderQuantity = item.orderQuantity + 1;
+            notifySuccess(`Количество ${item.title} увеличено`);
+          } else {
+            notifyError("Недостаточно товара на складе!");
+          }
+        }
+        return { ...item };
+      });
+      setLocalStorage("cart_products", state.cart_products);
+    },
     quantityDecrement: (state, { payload }) => {
-      state.cart_products.map((item) => {
-        if (item._id === payload._id) {
+      const productId = payload.id || payload._id;
+      state.cart_products = state.cart_products.map((item) => {
+        const itemId = item.id || item._id;
+        if (itemId === productId) {
           if (item.orderQuantity > 1) {
             item.orderQuantity = item.orderQuantity - 1;
+            notifySuccess(`Количество ${item.title} уменьшено`);
+          } else {
+            notifyError("Минимальное количество: 1");
           }
         }
         return { ...item };
@@ -61,9 +83,11 @@ export const cartSlice = createSlice({
       setLocalStorage("cart_products", state.cart_products);
     },
     remove_product: (state, { payload }) => {
-      state.cart_products = state.cart_products.filter(
-        (item) => item._id !== payload.id
-      );
+      const productId = payload.id;
+      state.cart_products = state.cart_products.filter((item) => {
+        const itemId = item.id || item._id;
+        return itemId !== productId;
+      });
       setLocalStorage("cart_products", state.cart_products);
       notifyError(`${payload.title} Remove from cart`);
     },
@@ -95,10 +119,11 @@ export const {
   decrement,
   get_cart_products,
   remove_product,
+  quantityIncrement,
   quantityDecrement,
   initialOrderQuantity,
   clearCart,
-  closeCartMini,
   openCartMini,
+  closeCartMini,
 } = cartSlice.actions;
 export default cartSlice.reducer;

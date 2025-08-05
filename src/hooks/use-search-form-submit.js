@@ -14,7 +14,7 @@ const useSearchFormSubmit = () => {
       let route = `/search?searchText=${searchText}`;
 
       if (category && category !== "Select Category") {
-        route += `&productType=${category}`;
+        route += `&categoryId=${category}`;
         setCategory("");
       }
 

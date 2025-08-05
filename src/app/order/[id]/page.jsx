@@ -1,5 +1,5 @@
 import Wrapper from "@/layout/wrapper";
-import HeaderTwo from "@/layout/headers/header-2";
+import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
 import OrderArea from "@/components/order/order-area";
 
@@ -10,7 +10,7 @@ export const metadata = {
 export default function OrderPage({ params }) {
   return (
     <Wrapper>
-      <HeaderTwo style_2={true} />
+      <Header />
       <OrderArea orderId={params.id} />
       <Footer primary_style={true} />
     </Wrapper>

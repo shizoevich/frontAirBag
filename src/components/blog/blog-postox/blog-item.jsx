@@ -34,7 +34,7 @@ const BlogItem = ({ item = {} }) => {
           !item.slider && (
             <div className="tp-postbox-thumb w-img">
               <Link href={`/blog-details/${item.id}`}>
-                <Image src={item.img} alt="blog img" />
+                <Image src={item.img || '/assets/img/product/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg'} alt="blog img" width={800} height={500} />
               </Link>
             </div>
           )}

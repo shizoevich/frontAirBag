@@ -4,7 +4,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Scrollbar, Navigation,Autoplay } from "swiper/modules";
 // internal
 import { useGetRelatedProductsQuery } from "@/redux/features/productsApi";
-import ProductItem from "../products/beauty/product-item";
+import ProductItem from "../products/electronics/product-item";
 import ErrorMsg from "../common/error-msg";
 import { HomeNewArrivalPrdLoader } from "../loader";
 
