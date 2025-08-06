@@ -67,24 +67,11 @@ const ProductDetailsContent = ({ productItem }) => {
         </div>
       </div>
 
-      {/* product details description */}
-      <div className="tp-product-details-bottom pb-140">
-        <div className="container">
-          <div className="row">
-            <div className="col-xl-12">
-              <DetailsTabNav product={productItem} />
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* product details description */}
-
       {/* related products start */}
-      <section className="tp-related-product pt-95 pb-50">
+      <section className="tp-related-product pt-0 pb-0">
         <div className="container">
           <div className="row">
             <div className="tp-section-title-wrapper-6 text-center mb-40">
-              <span className="tp-section-title-pre-6">Next day Products</span>
               <h3 className="tp-section-title-6">Related Products</h3>
             </div>
           </div>

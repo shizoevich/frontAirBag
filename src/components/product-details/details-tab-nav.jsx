@@ -41,34 +41,6 @@ const DetailsTabNav = ({ product }) => {
 
   return (
     <>
-      <div className="tp-product-details-tab-nav tp-tab">
-        <nav>
-          <div className="nav nav-tabs justify-content-center p-relative tp-product-tab" id="navPresentationTab" role="tablist">
-            <NavItem active={true} linkRef={activeRef} id="desc" title="Description" />
-            <NavItem id="additional" title="Additional information" />
-
-            <span ref={marker} id="productTabMarker" className="tp-product-details-tab-line"></span>
-          </div>
-        </nav>
-        <div className="tab-content" id="navPresentationTabContent">
-          {/* nav-desc */}
-          <div className="tab-pane fade show active" id="nav-desc" role="tabpanel" aria-labelledby="nav-desc-tab" tabIndex="-1">
-            <div className="tp-product-details-desc-wrapper pt-60">
-              <div className="row">
-                <div className="col-xl-12">
-                  <div className="tp-product-details-desc-item">
-                    <div className="row align-items-center">
-                      <div className="col-lg-12">
-                        <div className="tp-product-details-desc-content">
-                          <p>{description}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
           {/* addInfo */}
           <div className="tab-pane fade" id="nav-additional" role="tabpanel" aria-labelledby="nav-additional-tab" tabIndex="-1">
 
@@ -89,9 +61,6 @@ const DetailsTabNav = ({ product }) => {
               </div>
             </div>
           </div>
-
-        </div>
-      </div>
     </>
   );
 };
