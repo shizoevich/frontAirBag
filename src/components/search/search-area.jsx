@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import NiceSelect from "@/ui/nice-select";
 import ErrorMsg from "@/components/common/error-msg";
 import SearchPrdLoader from "@/components/loader/search-prd-loader";
-import { useGetAllProductsQuery } from "@/redux/features/categoryApi";
+import { useGetAllProductsQuery } from "@/redux/features/productsApi";
 import ProductItem from "@/components/products/electronics/product-item";
 import ReactPaginate from 'react-paginate';
 
@@ -12,7 +12,7 @@ export default function SearchArea() {
   const searchParams = useSearchParams();
   const searchText = searchParams.get('searchText');
   const categoryId = searchParams.get('categoryId');
-  const { data: products = [], isError, isLoading } = useGetAllProductsQuery();
+  const { data: productsData, isError, isLoading } = useGetAllProductsQuery();
   const [shortValue, setShortValue] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 12;
@@ -39,6 +39,14 @@ export default function SearchArea() {
     content = <ErrorMsg msg="There was an error" />;
   }
 
+  const products = Array.isArray(productsData) 
+    ? productsData 
+    : Array.isArray(productsData?.data) 
+      ? productsData.data 
+      : Array.isArray(productsData?.results) 
+        ? productsData.results 
+        : [];
+
   if (!isLoading && !isError && products.length === 0) {
     content = <ErrorMsg msg="No products found!" />;
   }
@@ -48,9 +56,11 @@ export default function SearchArea() {
     let product_items = all_products;
 
     if (searchText) {
-      product_items = all_products.filter((prd) =>
-        prd.title.toLowerCase().includes(searchText.toLowerCase())
-      );
+      product_items = all_products.filter((prd) => {
+        const titleMatch = prd.title.toLowerCase().includes(searchText.toLowerCase());
+        const categoryMatch = prd.category?.title?.toLowerCase().includes(searchText.toLowerCase());
+        return titleMatch || categoryMatch;
+      });
     }
     
     if (categoryId && categoryId !== "Select Category") {

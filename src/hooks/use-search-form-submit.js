@@ -10,21 +10,25 @@ const useSearchFormSubmit = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (searchText) {
-      let route = `/search?searchText=${searchText}`;
+    const isSearchable = searchText || (category && category !== "Select Category");
 
+    if (isSearchable) {
+      const queryParams = [];
+      if (searchText) {
+        queryParams.push(`searchText=${searchText}`);
+      }
       if (category && category !== "Select Category") {
-        route += `&categoryId=${category}`;
-        setCategory("");
+        queryParams.push(`categoryId=${category}`);
       }
 
+      const route = `/search?${queryParams.join('&')}`;
       router.push(route);
-      setSearchText("");
-    } else {
-      router.push(`/`);
+
+      // Reset fields after search
       setSearchText("");
       setCategory("");
     }
+    // If nothing is entered, do nothing, preventing the redirect to home.
   };
 
   return {
