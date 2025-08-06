@@ -41,11 +41,7 @@ const charm = Charm({
   variable: "--tp-ff-charm",
 });
 
-// Metadata
-export const metadata = {
-  title: 'Shofy - E-commerce',
-  description: 'Shofy - E-commerce Template by ThemePure',
-};
+// Metadata определяется в generateMetadata
 
 // Function to get messages
 async function getMessages(locale) {
@@ -61,10 +57,19 @@ export async function generateStaticParams() {
   return ['en', 'ru', 'uk'].map((locale) => ({ locale }));
 }
 
+// Generate metadata for the page
+export async function generateMetadata({ params }) {
+  return {
+    title: 'Shofy - E-commerce App',
+    description: 'Shofy - E-commerce App',
+  };
+}
+
 // Root Layout Component
 export default async function RootLayout({ children, params }) {
-  const locale = params.locale;
-  const messages = await getMessages(locale);
+  // В App Router Next.js, params должен быть ожидаемым (awaited) перед использованием его свойств
+  const { locale } = await params;
+  const messages = await getMessages(locale || 'uk');
 
   return (
     <html lang={locale} suppressHydrationWarning={true}>
