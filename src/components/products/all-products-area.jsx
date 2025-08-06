@@ -1,7 +1,9 @@
 'use client';
+'use client';
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from 'next-intl';
 import { ShapeLine } from "@/svg";
 import ProductItem from "./electronics/product-item";
 import ErrorMsg from "@/components/common/error-msg";
@@ -15,6 +17,8 @@ import ParentCategories from "@/components/categories/parent-categories";
 const FALLBACK_IMAGE = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg';
 
 const AllProductsArea = () => {
+  const t = useTranslations('AllProductsArea');
+  const tPagination = useTranslations('SearchArea');
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedParentCategory, setSelectedParentCategory] = useState(null);
@@ -141,9 +145,9 @@ const AllProductsArea = () => {
   if (productsLoading) {
     content = <HomePrdLoader loading />;
   } else if (productsError) {
-    content = <ErrorMsg msg="Ошибка загрузки товаров" />;
+    content = <ErrorMsg msg={t('loadingError')} />;
   } else if (!currentProducts || currentProducts.length === 0) {
-    content = <ErrorMsg msg="Товары не найдены" />;
+    content = <ErrorMsg msg={t('noProductsFound')} />;
   } else {
     content = currentProducts.map((product) => {
       // Ensure product has an id
@@ -195,7 +199,7 @@ const AllProductsArea = () => {
               />
               <div className="tp-section-title-wrapper mb-40">
               <h3 className="tp-section-title">
-                Наши товары
+                {t('ourProducts')}
                 <ShapeLine />
               </h3>
             </div>
@@ -210,12 +214,12 @@ const AllProductsArea = () => {
             <div className="col-xl-12">
               <div className="tp-pagination mt-35">
                 <ReactPaginate
-                  breakLabel="..."
-                  nextLabel="→"
+                  breakLabel={tPagination('breakLabel')}
+                  nextLabel={tPagination('nextPage')}
                   onPageChange={handlePageClick}
                   pageRangeDisplayed={3}
                   pageCount={pageCount}
-                  previousLabel="←"
+                  previousLabel={tPagination('previousPage')}
                   renderOnZeroPageCount={null}
                   containerClassName="tp-pagination-style mb-20 text-center"
                   pageLinkClassName="tp-pagination-link"

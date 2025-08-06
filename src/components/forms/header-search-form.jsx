@@ -1,5 +1,7 @@
 'use client';
+'use client';
 import { useState, useEffect } from "react";
+import { useTranslations } from 'next-intl';
 // internal
 import { Search } from "@/svg";
 import NiceSelect from "@/ui/nice-select";
@@ -7,6 +9,7 @@ import useSearchFormSubmit from "@/hooks/use-search-form-submit";
 import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
 
 const HeaderSearchForm = () => {
+  const t = useTranslations('HeaderSearchForm');
   const { setSearchText, setCategory, handleSubmit, searchText } = useSearchFormSubmit();
   const [categoryOptions, setCategoryOptions] = useState([]);
   
@@ -17,7 +20,7 @@ const HeaderSearchForm = () => {
     if (categoriesData && !isLoading) {
       // Format categories for the dropdown
       const options = [
-        { value: "Select Category", text: "Select Category" }
+        { value: "Select Category", text: t('selectCategory') }
       ];
       
       // Add categories from API
@@ -53,7 +56,7 @@ const HeaderSearchForm = () => {
             onChange={(e) => setSearchText(e.target.value)}
             value={searchText}
             type="text"
-            placeholder="Search for Products..."
+            placeholder={t('placeholder')}
           />
         </div>
         <div className="tp-header-search-category">
@@ -61,7 +64,7 @@ const HeaderSearchForm = () => {
             options={categoryOptions}
             defaultCurrent={0}
             onChange={selectCategoryHandle}
-            name="Select Category"
+            name={t('selectCategory')}
           />
         </div>
         <div className="tp-header-search-btn">

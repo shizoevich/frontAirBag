@@ -1,15 +1,18 @@
 'use client';
+'use client';
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from 'next-intl';
 // internal
 import useCartInfo from "@/hooks/use-cart-info";
-import { CartTwo, Compare, Menu, User, Wishlist } from "@/svg";
+import { CartTwo, Menu, User, Wishlist } from "@/svg";
 import { openCartMini } from "@/redux/features/cartSlice";
 import { useRouter } from "next/navigation";
 
 const HeaderMainRight = ({ setIsCanvasOpen }) => {
+  const t = useTranslations('HeaderMainRight');
   const { user: userInfo } = useSelector((state) => state.auth);
   const { wishlist } = useSelector((state) => state.wishlist);
   const { quantity } = useCartInfo();
@@ -54,23 +57,18 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
           <div className="tp-header-login-content d-none d-xl-block">
             {!userInfo?.name && (
               <Link href="/login">
-                <span>Hello,</span>
+                <span>{t('hello')}</span>
               </Link>
             )}
-            {userInfo?.name && <span>Hello, {userInfo?.name}</span>}
+            {userInfo?.name && <span>{t('helloWithName', { name: userInfo.name })}</span>}
             <div className="tp-header-login-title">
-              {!userInfo?.name && <Link href="/login">Sign In</Link>}
-              {userInfo?.name && <Link href="/profile">Your Account</Link>}
+              {!userInfo?.name && <Link href="/login">{t('signIn')}</Link>}
+              {userInfo?.name && <Link href="/profile">{t('yourAccount')}</Link>}
             </div>
           </div>
         </div>
       </div>
       <div className="tp-header-action d-flex align-items-center ml-50">
-        <div className="tp-header-action-item d-none d-lg-block">
-          <Link href="/compare" className="tp-header-action-btn">
-            <Compare />
-          </Link>
-        </div>
         <div className="tp-header-action-item d-none d-lg-block">
           <Link href="/wishlist" className="tp-header-action-btn">
             <Wishlist />
@@ -82,7 +80,7 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
             onClick={handleCartClick}
             type="button"
             className="tp-header-action-btn cartmini-open-btn"
-            aria-label="Open cart"
+            aria-label={t('openCart')}
           >
             <CartTwo />
             <span className="tp-header-action-badge">{quantity}</span>

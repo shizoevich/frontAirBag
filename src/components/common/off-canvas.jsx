@@ -3,18 +3,18 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 // internal
 import { CloseTwo } from '@/svg';
 import logo from '@assets/img/logo/logo.svg';
 import contact_img from '@assets/img/icon/contact.png';
-import language_img from '@assets/img/icon/language-flag.png';
 import MobileCategory from '@/layout/headers/header-com/mobile-category';
 import MobileMenus from './mobile-menus';
+import LanguageSwitcher from './language-switcher'; // Импортируем новый компонент
 
 const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
+  const t = useTranslations('OffCanvas');
   const [isCategoryActive, setIsCategoryActive] = useState(false);
-  const [isCurrencyActive, setIsCurrencyActive] = useState(false);
-  const [isLanguageActive, setIsLanguageActive] = useState(false);
   const router = useRouter();
   
   // Close offcanvas when route changes
@@ -28,17 +28,6 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
       handleRouteChange();
     };
   }, [setIsCanvasOpen]);
-
-  // handle language active
-  const handleLanguageActive = () => {
-    setIsLanguageActive(!isLanguageActive);
-    setIsCurrencyActive(false);
-  };
-  // handle Currency active
-  const handleCurrencyActive = () => {
-    setIsCurrencyActive(!isCurrencyActive);
-    setIsLanguageActive(false);
-  };
 
   return (
     <>
@@ -62,7 +51,7 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
             <div className="offcanvas__category pb-40">
               <button onClick={() => setIsCategoryActive(!isCategoryActive)} className="tp-offcanvas-category-toggle">
                 <i className="fa-solid fa-bars"></i>
-                All Categories
+                {t('all_categories')}
               </button>
               <div className="tp-category-mobile-menu">
                 <nav className={`tp-category-menu-content ${isCategoryActive ? "active" : ""}`}>
@@ -88,28 +77,13 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
               </div>
             </div>
             <div className="offcanvas__btn">
-              <Link href="/contact" onClick={() => setIsCanvasOpen(false)} className="tp-btn-2 tp-btn-border-2">Contact Us</Link>
+              <Link href="/contact" onClick={() => setIsCanvasOpen(false)} className="tp-btn-2 tp-btn-border-2">{t('contact_us')}</Link>
             </div>
           </div>
           <div className="offcanvas__bottom">
             <div className="offcanvas__footer d-flex align-items-center justify-content-between">
               
-              <div className="offcanvas__select language">
-                <div className="offcanvas__lang d-flex align-items-center justify-content-md-end">
-                  <div className="offcanvas__lang-img mr-15">
-                    <Image src={language_img} alt="language-flag" />
-                  </div>
-                  <div className="offcanvas__lang-wrapper">
-                    <span onClick={handleLanguageActive} className="offcanvas__lang-selected-lang tp-lang-toggle" id="tp-offcanvas-lang-toggle">English</span>
-                    <ul className={`offcanvas__lang-list tp-lang-list ${isLanguageActive ? 'tp-lang-list-open' : ''}`}>
-                      <li>Spanish</li>
-                      <li>Portugese</li>
-                      <li>American</li>
-                      <li>Canada</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
+              <LanguageSwitcher />
             </div>
           </div>
         </div>

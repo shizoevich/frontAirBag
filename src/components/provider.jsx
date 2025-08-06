@@ -1,61 +1,21 @@
-'use client'
-import React, { useEffect, useState } from 'react';
-import store from "@/redux/store";
-import { Provider } from "react-redux";
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import { ToastProvider } from '@/components/common/custom-toast';
+'use client';
 
-// stripePromise
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY);
+import React from 'react';
+import { ReduxProvider } from '@/redux/provider';
+import { AppProvider } from '@/context/app-context';
+import { NextIntlClientProvider } from 'next-intl';
+import { Toaster } from 'react-hot-toast';
 
-const Providers = ({ children }) => {
-  const [hasMounted, setHasMounted] = useState(false);
-
-  useEffect(() => {
-    setHasMounted(true);
-    
-    // Suppress browser extension warnings
-    const originalError = console.error;
-    console.error = (...args) => {
-      if (
-        typeof args[0] === 'string' &&
-        (args[0].includes('hydration') || 
-         args[0].includes('cz-shortcut-listen') ||
-         args[0].includes('server rendered HTML'))
-      ) {
-        return;
-      }
-      originalError.call(console, ...args);
-    };
-  }, []);
-
-  if (!hasMounted) {
-    return (
-      <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
-        <Provider store={store}>
-          <Elements stripe={stripePromise}>
-            <div style={{ minHeight: '100vh' }}>
-              {children}
-            </div>
-          </Elements>
-        </Provider>
-      </GoogleOAuthProvider>
-    );
-  }
-
+// This component centralizes all client-side providers
+export default function Providers({ children, locale, messages }) {
   return (
-    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
-      <Provider store={store}>
-        <Elements stripe={stripePromise}>
-          <ToastProvider>
-            {children}
-          </ToastProvider>
-        </Elements>
-      </Provider>
-    </GoogleOAuthProvider>
+    <ReduxProvider>
+      <NextIntlClientProvider locale={locale} messages={messages}>
+        <AppProvider>
+          {children}
+          <Toaster />
+        </AppProvider>
+      </NextIntlClientProvider>
+    </ReduxProvider>
   );
-};
-
-export default Providers;
+}

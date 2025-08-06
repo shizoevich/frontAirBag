@@ -1,6 +1,8 @@
+'use client';
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslations } from 'next-intl';
 // internal
 import { Cart, QuickView, Wishlist } from "@/svg";
 import { handleProductModal } from "@/redux/features/productModalSlice";
@@ -10,6 +12,7 @@ import BlurImage from "@/components/common/BlurImage";
 import { getProductImage, getProductId } from "@/utils/image-utils";
 
 const ProductItem = ({ product }) => {
+  const t = useTranslations('ProductItem');
   const [isClient, setIsClient] = useState(false);
   const { cart_products } = useSelector((state) => state.cart);
   const { wishlist } = useSelector((state) => state.wishlist);
@@ -59,7 +62,7 @@ const ProductItem = ({ product }) => {
             />
           </div>
           <div className="tp-product-badge">
-            {isOutOfStock && <span className="product-hot">out-stock</span>}
+            {isOutOfStock && <span className="product-hot">{t('outOfStock')}</span>}
           </div>
         </Link>
 
@@ -71,7 +74,7 @@ const ProductItem = ({ product }) => {
                 href="/cart"
                 className={`tp-product-action-btn ${isAddedToCart ? 'active' : ''} tp-product-add-cart-btn`}
               >
-                <Cart /> <span className="tp-product-tooltip">View Cart</span>
+                <Cart /> <span className="tp-product-tooltip">{t('viewCart')}</span>
               </Link>
             ) : (
               <button
@@ -81,7 +84,7 @@ const ProductItem = ({ product }) => {
                 disabled={isOutOfStock}
               >
                 <Cart />
-                <span className="tp-product-tooltip">Add to Cart</span>
+                <span className="tp-product-tooltip">{t('addToCart')}</span>
               </button>
             )}
             <button
@@ -90,7 +93,7 @@ const ProductItem = ({ product }) => {
               className="tp-product-action-btn tp-product-quick-view-btn"
             >
               <QuickView />
-              <span className="tp-product-tooltip">Quick View</span>
+              <span className="tp-product-tooltip">{t('quickView')}</span>
             </button>
             <button
               type="button"
@@ -99,7 +102,7 @@ const ProductItem = ({ product }) => {
               disabled={isOutOfStock}
             >
               <Wishlist />
-              <span className="tp-product-tooltip">Add To Wishlist</span>
+              <span className="tp-product-tooltip">{t('addToWishlist')}</span>
             </button>
           </div>
         </div>

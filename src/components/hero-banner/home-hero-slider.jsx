@@ -5,6 +5,7 @@ import { Navigation, Pagination, EffectFade } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from 'next-intl';
 // internal
 import slider_img_1 from "@assets/img/slider/slider-img-1.png";
 import slider_img_2 from "@assets/img/slider/slider-img-2.png";
@@ -15,46 +16,6 @@ import shape_3 from "@assets/img/slider/shape/slider-shape-3.png";
 import shape_4 from "@assets/img/slider/shape/slider-shape-4.png";
 import { ArrowRightLong, SliderNextBtn, SliderPrevBtn, TextShape } from "@/svg";
 
-// slider data
-const sliderData = [
-  {
-    id: 1,
-    pre_title: { text: "Starting at", price: 274 },
-    title: "The best tablet Collection 2023",
-    subtitle: {
-      text_1: "Exclusive offer ",
-      percent: 35,
-      text_2: "off this week",
-    },
-    img: slider_img_1,
-    green_bg: true,
-  },
-  {
-    id: 2,
-    pre_title: { text: "Starting at", price: 999 },
-    title: "The best note book collection 2023",
-    subtitle: {
-      text_1: "Exclusive offer ",
-      percent: 10,
-      text_2: "off this week",
-    },
-    img: slider_img_2,
-    green_bg: true,
-  },
-  {
-    id: 3,
-    pre_title: { text: "Starting at", price: 999 },
-    title: "The best note book collection 2023",
-    subtitle: {
-      text_1: "Exclusive offer ",
-      percent: 10,
-      text_2: "off this week",
-    },
-    img: slider_img_3,
-    is_light: true,
-  },
-];
-
 function Shape({ img, num }) {
   return (
     <Image className={`tp-slider-shape-${num}`} src={img} alt="slider-shape" priority />
@@ -62,6 +23,46 @@ function Shape({ img, num }) {
 }
 
 const HomeHeroSlider = () => {
+  const t = useTranslations('HomeHeroSlider');
+  // slider data
+  const sliderData = [
+    {
+      id: 1,
+      pre_title: { text: t('startingAt'), price: 274 },
+      title: t('bestTablet'),
+      subtitle: {
+        text_1: t('exclusiveOffer'),
+        percent: 35,
+        text_2: t('offThisWeek'),
+      },
+      img: slider_img_1,
+      green_bg: true,
+    },
+    {
+      id: 2,
+      pre_title: { text: t('startingAt'), price: 999 },
+      title: t('bestNotebook'),
+      subtitle: {
+        text_1: t('exclusiveOffer'),
+        percent: 10,
+        text_2: t('offThisWeek'),
+      },
+      img: slider_img_2,
+      green_bg: true,
+    },
+    {
+      id: 3,
+      pre_title: { text: t('startingAt'), price: 999 },
+      title: t('bestSmartwatch'),
+      subtitle: {
+        text_1: t('exclusiveOffer'),
+        percent: 10,
+        text_2: t('offThisWeek'),
+      },
+      img: slider_img_3,
+      is_light: true,
+    },
+  ];
   const [active,setActive] = useState(false);
 
   // handleActiveIndex
@@ -115,7 +116,7 @@ const HomeHeroSlider = () => {
                   <div className="col-xl-5 col-lg-6 col-md-6">
                     <div className="tp-slider-content p-relative z-index-1">
                       <span>
-                        {item.pre_title.text} <b>${item.pre_title.text}</b>
+                        {item.pre_title.text} <b>${item.pre_title.price}</b>
                       </span>
                       <h3 className="tp-slider-title">{item.title}</h3>
                       <p>
@@ -129,7 +130,7 @@ const HomeHeroSlider = () => {
 
                       <div className="tp-slider-btn">
                         <Link href="/shop" className="tp-btn tp-btn-2 tp-btn-white">
-                          Shop Now
+                          {t('shopNow')}
                           {" "} <ArrowRightLong />
                         </Link>
                       </div>

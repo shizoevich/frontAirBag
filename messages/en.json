@@ -1,0 +1,119 @@
+{
+  "Header": {
+    "contact_us": "Contact Us",
+    "shippingInfo": "🚚 Free shipping on orders over 2000 ₴ | 🛡️ Quality guarantee for all Airbag parts"
+  },
+  "HeaderSearchForm": {
+    "placeholder": "Search for products...",
+    "selectCategory": "Select Category"
+  },
+  "HeaderMainRight": {
+    "hello": "Hello,",
+    "helloWithName": "Hello, {name}",
+    "signIn": "Sign In",
+    "yourAccount": "Your Account",
+    "openCart": "Open cart"
+  },
+  "Footer": {
+    "description": "Your reliable supplier of Airbag parts. Quality guarantee and fast delivery.",
+    "myAccountTitle": "My Account",
+    "trackOrders": "Track Orders",
+    "shipping": "Shipping",
+    "wishlist": "Wishlist",
+    "myAccount": "My Account",
+    "orderHistory": "Order History",
+    "returns": "Returns",
+    "informationTitle": "Information",
+    "ourStory": "Our Story",
+    "careers": "Careers",
+    "privacyPolicy": "Privacy Policy",
+    "termsAndConditions": "Terms & Conditions",
+    "latestNews": "Latest News",
+    "contactUs": "Contact Us",
+    "talkToUsTitle": "Talk To Us",
+    "gotQuestions": "Got Questions? Call us",
+    "phoneNumber": "+38 012 345 67 89",
+    "emailAddress": "support@example.com",
+    "address": "Ukraine, Kyiv, Prykladna St, 1",
+    "copyright": "© {year} All Rights Reserved | Next.js Template by ThemePure"
+  },
+  "ProductItem": {
+    "outOfStock": "Out of Stock",
+    "viewCart": "View Cart",
+    "addToCart": "Add to Cart",
+    "quickView": "Quick View",
+    "addToWishlist": "Add To Wishlist"
+  },
+  "ProductModal": {
+    "contentLabel": "Product Details"
+  },
+  "ProductDetails": {
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "seeLess": "See less",
+    "seeMore": "See more",
+    "colorLabel": "Color :",
+    "quantityLabel": "Quantity",
+    "addToCart": "Add To Cart",
+    "buyNow": "Buy Now",
+    "addWishlist": "Add Wishlist",
+    "askQuestion": "Ask a question",
+    "skuLabel": "SKU: ",
+    "categoryLabel": "Category: ",
+    "tagLabel": "Tag: ",
+    "shareLabel": "Share: ",
+    "easyReturns": "30 days easy returns",
+    "sameDayDispatch": "Order yours before 2.30pm for same day dispatch",
+    "safeCheckout": "Guaranteed safe & secure checkout"
+  },
+  "SearchArea": {
+    "placeholder": "Search for products...",
+    "error": "Something went wrong...",
+    "noProductsFound": "No products found",
+    "noResults": "Sorry, but nothing matched your search terms: {searchText}",
+    "showingResults": "Showing {start} – {end} of {total} results",
+    "shortByPrice": "Short By Price",
+    "priceLowToHigh": "Price low to high",
+    "priceHighToLow": "Price high to low",
+    "breakLabel": "...",
+    "nextPage": "→",
+    "previousPage": "←"
+  },
+  "OffCanvas": {
+    "all_categories": "All Categories",
+    "contact_us": "Contact Us",
+    "english": "English",
+    "russian": "Russian",
+    "ukrainian": "Ukrainian"
+  },
+  "HeaderTopRight": {
+    "setting": "Setting",
+    "my_profile": "My Profile",
+    "wishlist": "Wishlist",
+    "cart": "Cart",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "ParentCategories": {
+    "all_categories": "All Categories",
+    "covers": "Covers",
+    "airbag_components": "Airbag SRS Components",
+    "squibs": "Squibs",
+    "loadingError": "Error loading categories",
+    "noCategoriesFound": "Categories not found"
+  },
+  "AllProductsArea": {
+    "loadingError": "Error loading products",
+    "noProductsFound": "No products found",
+    "ourProducts": "Our Products"
+  },
+  "HomeHeroSlider": {
+    "startingAt": "Starting at",
+    "bestTablet": "The best tablet Collection 2023",
+    "bestNotebook": "The best notebook collection 2023",
+    "bestSmartwatch": "The best smartwatch collection 2023",
+    "exclusiveOffer": "Exclusive offer",
+    "offThisWeek": "off this week",
+    "shopNow": "Shop Now"
+  }
+}

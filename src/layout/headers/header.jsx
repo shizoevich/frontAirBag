@@ -1,8 +1,10 @@
 'use client';
+'use client';
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslations } from 'next-intl';
 // internal
 import Menus from "./header-com/menus";
 import useSticky from "@/hooks/use-sticky";
@@ -18,6 +20,7 @@ import HeaderSearchForm from "@/components/forms/header-search-form";
 import { CartTwo, CategoryMenu, Compare, Menu, Phone, ShippingCar, Wishlist } from "@/svg";
 
 const Header = () => {
+  const t = useTranslations('Header');
   const { wishlist } = useSelector((state) => state.wishlist);
   const { cartMiniOpen } = useSelector((state) => state.cart);
   const [isOffCanvasOpen, setIsCanvasOpen] = useState(false);
@@ -67,7 +70,7 @@ const Header = () => {
                     <span>
                       <ShippingCar />
                     </span>
-                    <p>🚚 Бесплатная доставка при заказе от 2000 ₴ | 🛡️ Гарантия качества на все запчасти Airbag</p>
+                    <p>{t('shippingInfo')}</p>
                   </div>
                 </div>
                 <div className="col-md-6">

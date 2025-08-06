@@ -1,6 +1,8 @@
+'use client';
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactModal from "react-modal";
+import { useTranslations } from 'next-intl';
 // internal
 import { handleModalClose } from "@/redux/features/productModalSlice";
 import DetailsThumbWrapper from "@/components/product-details/details-thumb-wrapper";
@@ -20,6 +22,7 @@ const customStyles = {
 };
 
 const ProductModal = () => {
+  const t = useTranslations('ProductModal');
   const { productItem, isModalOpen } = useSelector(
     (state) => state.productModal
   );
@@ -46,7 +49,7 @@ const ProductModal = () => {
         isOpen={isModalOpen}
         onRequestClose={() => dispatch(handleModalClose())}
         style={customStyles}
-        contentLabel="Product Modal"
+        contentLabel={t('contentLabel')}
       >
         <div className="tp-product-modal">
           <div className="tp-product-modal-content d-lg-flex">

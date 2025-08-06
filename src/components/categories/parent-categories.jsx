@@ -1,5 +1,7 @@
 'use client';
+'use client';
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import ErrorMsg from '@/components/common/error-msg';
 import HomeCateLoader from '../loader/home/home-cate-loader';
 
@@ -10,6 +12,7 @@ const ParentCategories = ({
   selectedParentCategory, 
   onParentCategorySelect 
 }) => {
+  const t = useTranslations('ParentCategories');
   // Находим родительские категории по ID (Covers, Комплектующие Airbag SRS, Пиропатроны)
   const parentCategoryIds = [754099, 754100, 754101]; // ID родительских категорий
   
@@ -31,16 +34,16 @@ const ParentCategories = ({
   if (parentCategories.length === 0) {
     console.log('Родительские категории не найдены, создаем вручную');
     parentCategories = [
-      { id: 754099, title: "Covers", image: "noimage.png" },
-      { id: 754100, title: "Комплектующие Airbag SRS", image: "noimage.png" },
-      { id: 754101, title: "Пиропатроны", image: "noimage.png" }
+      { id: 754099, title: t('covers'), image: "noimage.png" },
+      { id: 754100, title: t('airbag_components'), image: "noimage.png" },
+      { id: 754101, title: t('squibs'), image: "noimage.png" }
     ];
   }
   
   // Добавляем опцию "Все категории"
   const allCategoriesOption = {
     id: 'all',
-    title: 'Все категории',
+    title: t('all_categories'),
     parent_id: null
   };
   
@@ -53,11 +56,11 @@ const ParentCategories = ({
   }
   
   if (!isLoading && isError) {
-    content = <ErrorMsg msg="Ошибка загрузки категорий" />;
+    content = <ErrorMsg msg={t('loadingError')} />;
   }
   
   if (!isLoading && !isError && (!displayCategories || displayCategories.length === 0)) {
-    content = <ErrorMsg msg="Категории не найдены" />;
+    content = <ErrorMsg msg={t('noCategoriesFound')} />;
   }
   
   if (!isLoading && !isError && displayCategories && displayCategories.length > 0) {

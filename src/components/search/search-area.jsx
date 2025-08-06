@@ -1,6 +1,7 @@
 'use client';
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from 'next-intl';
 import NiceSelect from "@/ui/nice-select";
 import ErrorMsg from "@/components/common/error-msg";
 import SearchPrdLoader from "@/components/loader/search-prd-loader";
@@ -9,6 +10,7 @@ import ProductItem from "@/components/products/electronics/product-item";
 import ReactPaginate from 'react-paginate';
 
 export default function SearchArea() {
+  const t = useTranslations('SearchArea');
   const searchParams = useSearchParams();
   const searchText = searchParams.get('searchText');
   const categoryId = searchParams.get('categoryId');
@@ -36,7 +38,7 @@ export default function SearchArea() {
   }
 
   if (!isLoading && isError) {
-    content = <ErrorMsg msg="There was an error" />;
+    content = <ErrorMsg msg={t('error')} />;
   }
 
   const products = Array.isArray(productsData) 
@@ -48,7 +50,7 @@ export default function SearchArea() {
         : [];
 
   if (!isLoading && !isError && products.length === 0) {
-    content = <ErrorMsg msg="No products found!" />;
+    content = <ErrorMsg msg={t('noProductsFound')} />;
   }
 
   if (!isLoading && !isError && products.length > 0) {
@@ -71,16 +73,16 @@ export default function SearchArea() {
     }
     
     // Price low to high
-    if (shortValue === "Price low to high") {
+    if (shortValue === "price-asc") {
       product_items = [...product_items].sort((a, b) => Number(a.price) - Number(b.price));
-    } else if (shortValue === "Price high to low") {
+    } else if (shortValue === "price-desc") {
       product_items = [...product_items].sort((a, b) => Number(b.price) - Number(a.price));
     }
     
     if (product_items.length === 0) {
       content = (
         <div className="text-center pt-80 pb-80">
-          <h3>Sorry, nothing matched <span style={{color:'#0989FF'}}>{searchText}</span> search terms</h3>
+          <h3>{t('noResults', { searchText: searchText ? <span style={{color:'#0989FF'}}>{searchText}</span> : '' })}</h3>
         </div>
       );
     } else {
@@ -100,7 +102,7 @@ export default function SearchArea() {
                       <div className="col-xl-6">
                         <div className="tp-shop-top-left d-flex align-items-center">
                           <div className="tp-shop-top-result">
-                            <p>Showing {offset + 1}–{Math.min(offset + itemsPerPage, product_items.length)} of {product_items.length} results</p>
+                            <p>{t('showingResults', { start: offset + 1, end: Math.min(offset + itemsPerPage, product_items.length), total: product_items.length })}</p>
                           </div>
                         </div>
                       </div>
@@ -109,13 +111,13 @@ export default function SearchArea() {
                           <div className="tp-shop-top-select">
                             <NiceSelect
                               options={[
-                                { value: "Short By Price", text: "Short By Price" },
-                                { value: "Price low to high", text: "Price low to high" },
-                                { value: "Price high to low", text: "Price high to low" },
+                                { value: "default", text: t('shortByPrice') },
+                                { value: "price-asc", text: t('priceLowToHigh') },
+                                { value: "price-desc", text: t('priceHighToLow') },
                               ]}
                               defaultCurrent={0}
                               onChange={shortHandler}
-                              name="Short By Price"
+                              name={t('shortByPrice')}
                             />
                           </div>
                         </div>
@@ -146,12 +148,12 @@ export default function SearchArea() {
                   {pageCount > 1 && (
                     <div className="tp-pagination mt-35">
                       <ReactPaginate
-                        breakLabel="..."
-                        nextLabel="→"
+                        breakLabel={t('breakLabel')}
+                        nextLabel={t('nextPage')}
                         onPageChange={handlePageClick}
                         pageRangeDisplayed={3}
                         pageCount={pageCount}
-                        previousLabel="←"
+                        previousLabel={t('previousPage')}
                         renderOnZeroPageCount={null}
                         containerClassName="tp-pagination-style mb-20 text-center"
                         pageLinkClassName="tp-pagination-link"

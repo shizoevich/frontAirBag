@@ -1,6 +1,8 @@
+'use client';
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 // internal
 import logo from '@assets/img/logo/logo.svg';
 import pay from '@assets/img/footer/footer-pay.png';
@@ -8,6 +10,7 @@ import social_data from '@/data/social-data';
 import { Email, Location } from '@/svg';
 
 const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
+  const t = useTranslations('Footer');
   return (
     <footer>
       <div className={`tp-footer-area ${primary_style?'tp-footer-style-2 tp-footer-style-primary tp-footer-style-6':''} ${style_2 ?'tp-footer-style-2':style_3 ? 'tp-footer-style-2 tp-footer-style-3': ''}`}
@@ -23,7 +26,7 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                         <Image src={logo} alt="logo" />
                       </Link>
                     </div>
-                    <p className="tp-footer-desc">We are a team of designers and developers that create high quality WordPress</p>
+                    <p className="tp-footer-desc">{t('description')}</p>
                     <div className="tp-footer-social">
                       {social_data.map(s => <a href={s.link} key={s.id} target="_blank">
                         <i className={s.icon}></i>
@@ -35,41 +38,41 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
               </div>
               <div className="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                 <div className="tp-footer-widget footer-col-2 mb-50">
-                  <h4 className="tp-footer-widget-title">My Account</h4>
+                  <h4 className="tp-footer-widget-title">{t('myAccountTitle')}</h4>
                   <div className="tp-footer-widget-content">
                     <ul>
-                      <li><a href="#">Track Orders</a></li>
-                      <li><a href="#">Shipping</a></li>
-                      <li><a href="#">Wishlist</a></li>
-                      <li><a href="#">My Account</a></li>
-                      <li><a href="#">Order History</a></li>
-                      <li><a href="#">Returns</a></li>
+                      <li><Link href="/track-order">{t('trackOrders')}</Link></li>
+                      <li><Link href="/shipping">{t('shipping')}</Link></li>
+                      <li><Link href="/wishlist">{t('wishlist')}</Link></li>
+                      <li><Link href="/profile">{t('myAccount')}</Link></li>
+                      <li><Link href="/profile">{t('orderHistory')}</Link></li>
+                      <li><Link href="/returns">{t('returns')}</Link></li>
                     </ul>
                   </div>
                 </div>
               </div>
               <div className="col-xl-3 col-lg-3 col-md-4 col-sm-6">
                 <div className="tp-footer-widget footer-col-3 mb-50">
-                  <h4 className="tp-footer-widget-title">Information</h4>
+                  <h4 className="tp-footer-widget-title">{t('informationTitle')}</h4>
                   <div className="tp-footer-widget-content">
                     <ul>
-                      <li><a href="#">Our Story</a></li>
-                      <li><a href="#">Careers</a></li>
-                      <li><a href="#">Privacy Policy</a></li>
-                      <li><a href="#">Terms & Conditions</a></li>
-                      <li><a href="#">Latest News</a></li>
-                      <li><a href="#">Contact Us</a></li>
+                      <li><Link href="/about">{t('ourStory')}</Link></li>
+                      <li><Link href="/careers">{t('careers')}</Link></li>
+                      <li><Link href="/policy">{t('privacyPolicy')}</Link></li>
+                      <li><Link href="/terms">{t('termsAndConditions')}</Link></li>
+                      <li><Link href="/blog">{t('latestNews')}</Link></li>
+                      <li><Link href="/contact">{t('contactUs')}</Link></li>
                     </ul>
                   </div>
                 </div>
               </div>
               <div className="col-xl-3 col-lg-3 col-md-4 col-sm-6">
                 <div className="tp-footer-widget footer-col-4 mb-50">
-                  <h4 className="tp-footer-widget-title">Talk To Us</h4>
+                  <h4 className="tp-footer-widget-title">{t('talkToUsTitle')}</h4>
                   <div className="tp-footer-widget-content">
                     <div className="tp-footer-talk mb-20">
-                      <span>Got Questions? Call us</span>
-                      <h4><a href="tel:670-413-90-762">+670 413 90 762</a></h4>
+                      <span>{t('gotQuestions')}</span>
+                      <h4><a href="tel:+380123456789">{t('phoneNumber')}</a></h4>
                     </div>
                     <div className="tp-footer-contact">
                       <div className="tp-footer-contact-item d-flex align-items-start">
@@ -79,7 +82,7 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                           </span>
                         </div>
                         <div className="tp-footer-contact-content">
-                          <p><a href="mailto:shofy@support.com">shofy@support.com</a></p>
+                          <p><a href="mailto:support@example.com">{t('emailAddress')}</a></p>
                         </div>
                       </div>
                       <div className="tp-footer-contact-item d-flex align-items-start">
@@ -89,7 +92,7 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                           </span>
                         </div>
                         <div className="tp-footer-contact-content">
-                          <p><a href="https://www.google.com/maps/place/Sleepy+Hollow+Rd,+Gouverneur,+NY+13642,+USA/@44.3304966,-75.4552367,17z/data=!3m1!4b1!4m6!3m5!1s0x4cccddac8972c5eb:0x56286024afff537a!8m2!3d44.3304928!4d-75.453048!16s%2Fg%2F1tdsjdj4" target="_blank">79 Sleepy Hollow St. <br /> Jamaica, New York 1432</a></p>
+                          <p><a href="#" target="_blank">{t('address')}</a></p>
                         </div>
                       </div>
                     </div>
@@ -105,9 +108,7 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
               <div className="row align-items-center">
                 <div className="col-md-6">
                   <div className="tp-footer-copyright">
-                    <p>© {new Date().getFullYear()} All Rights Reserved  |  Next js Template by
-                      <Link href="/">{" "}ThemePure</Link>.
-                    </p>
+                    <p>{t('copyright', { year: new Date().getFullYear() })}</p>
                   </div>
                 </div>
                 <div className="col-md-6">
