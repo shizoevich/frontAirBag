@@ -99,8 +99,10 @@ const ParentCategories = ({
   
   return (
     <div className="parent-categories-container mb-4">
-      <h4 className="mb-3">Выберите категорию</h4>
+      <h2 className="mb-3">Выберите категорию</h2>
+      
       {content}
+      
     </div>
   );
 };

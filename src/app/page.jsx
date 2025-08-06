@@ -1,6 +1,5 @@
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
-import HomeHeroSlider from "@/components/hero-banner/home-hero-slider";
 import BannerArea from "@/components/banner/banner-area";
 import CtaArea from "@/components/cta/cta-area";
 import FeatureArea from "@/components/features/feature-area";
@@ -15,7 +14,6 @@ export default function HomePage() {
   return (
     <Wrapper>
       <Header/>
-      <HomeHeroSlider/>
       <FeatureArea/>
       <AllProductsArea/>
       <BannerArea/>

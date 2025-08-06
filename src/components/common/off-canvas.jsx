@@ -93,15 +93,7 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
           </div>
           <div className="offcanvas__bottom">
             <div className="offcanvas__footer d-flex align-items-center justify-content-between">
-              <div className="offcanvas__currency-wrapper currency">
-                <span onClick={handleCurrencyActive} className="offcanvas__currency-selected-currency tp-currency-toggle" id="tp-offcanvas-currency-toggle">Currency : USD</span>
-                <ul className={`offcanvas__currency-list tp-currency-list ${isCurrencyActive ? 'tp-currency-list-open' : ''}`}>
-                  <li>USD</li>
-                  <li>ERU</li>
-                  <li>BDT </li>
-                  <li>INR</li>
-                </ul>
-              </div>
+              
               <div className="offcanvas__select language">
                 <div className="offcanvas__lang d-flex align-items-center justify-content-md-end">
                   <div className="offcanvas__lang-img mr-15">

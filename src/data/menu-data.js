@@ -14,9 +14,9 @@ const menu_data = [
     product_pages: [
       {
         title: '🚘 Марки автомобилей',
-        link: '/shop-category/brands',
+        link: '/search/brand',
         mega_menus: [
-          { title: 'Выберите марку автомобиля', link: '/shop-category/brands' },
+          { title: 'Выберите марку автомобиля', link: '/search/brand' },
           { title: 'Автоковеры по брендам', link: '/shop/covers' },
           { title: 'Поиск запчастей по марке авто', link: '/search/by-brand' },
         ]
@@ -96,7 +96,7 @@ export const mobile_menu = [
     title: '🔧 Каталог',
     link: '/shop',
     sub_menus: [
-      { title: '🚘 Марки автомобилей', link: '/shop-category/brands' },
+      { title: '🚘 Марки автомобилей', link: '/search/brand' },
       { title: '🛡️ Комплектующие Airbag SRS', link: '/shop-category/airbag-components' },
       { title: '💥 Пиропатроны', link: '/shop-category/pyrotechnics' },
     ],

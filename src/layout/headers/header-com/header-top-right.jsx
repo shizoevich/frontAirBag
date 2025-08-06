@@ -31,34 +31,6 @@ function Language({active,handleActive}) {
   );
 }
 
-// currency
-function Currency({active,handleActive}) {
-  return (
-    <div className="tp-header-top-menu-item tp-header-currency">
-      <span
-        onClick={() => handleActive('currency')}
-        className="tp-header-currency-toggle"
-        id="tp-header-currency-toggle"
-      >
-        USD
-      </span>
-      <ul className={active === 'currency' ? "tp-currency-list-open" : ""}>
-        <li>
-          <a href="#">EUR</a>
-        </li>
-        <li>
-          <a href="#">CHF</a>
-        </li>
-        <li>
-          <a href="#">GBP</a>
-        </li>
-        <li>
-          <a href="#">KWD</a>
-        </li>
-      </ul>
-    </div>
-  );
-}
 
 // setting
 function ProfileSetting({active,handleActive}) {
@@ -112,7 +84,6 @@ const HeaderTopRight = () => {
   return (
     <div className="tp-header-top-menu d-flex align-items-center justify-content-end">
       <Language active={active} handleActive={handleActive} />
-      <Currency active={active} handleActive={handleActive} />
       <ProfileSetting active={active} handleActive={handleActive} />
     </div>
   );

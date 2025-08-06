@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ShapeLine } from "@/svg";
-import ProductItem from "./electronics/product-item";
+import ProductItem from "../products/electronics/product-item";
 import ErrorMsg from "@/components/common/error-msg";
 import HomePrdLoader from "@/components/loader/home/home-prd-loader";
 import { useGetShowCategoryQuery, useGetAllProductsQuery } from "@/redux/features/categoryApi";
@@ -14,10 +14,10 @@ import ParentCategories from "@/components/categories/parent-categories";
 // Fallback image URL
 const FALLBACK_IMAGE = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg';
 
-const AllProductsArea = () => {
+const BrandSearchArea = () => {
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [selectedParentCategory, setSelectedParentCategory] = useState(null);
+  const [selectedParentCategory, setSelectedParentCategory] = useState(754099); // По умолчанию выбрана категория Covers (автомобили)
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const itemsPerPage = 12; // Number of products per page
   
@@ -98,138 +98,135 @@ const AllProductsArea = () => {
           if (!categoryId) return false;
           
           // Находим категорию товара
-          const productCategory = allCategories.find(cat => {
-            const catId = cat.id_remonline || cat.id;
-            return String(catId).trim() === String(categoryId).trim();
-          });
+          const productCategory = allCategories.find(cat => 
+            String(cat.id) === String(categoryId) || 
+            String(cat.id_remonline) === String(categoryId)
+          );
+          
+          if (!productCategory) return false;
           
           // Проверяем, является ли категория товара подкатегорией выбранной родительской категории
-          return productCategory && String(productCategory.parent_id) === String(selectedParentCategory);
+          return String(productCategory.parent_id) === String(selectedParentCategory);
         })
-      : safeProductsData;
-
+      : safeProductsData; // Если ничего не выбрано, показываем все товары
+  
+  console.log('Filtered products:', filteredProducts);
+  
   // Calculate pagination
   const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
   const offset = currentPage * itemsPerPage;
   const currentProducts = filteredProducts.slice(offset, offset + itemsPerPage);
-
+  
   // Handle page change
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
-    // Scroll to top of product section
-    document.getElementById('all-products-section')?.scrollIntoView({ behavior: 'smooth' });
   };
-
-  // Handle parent category filter change
+  
+  // Handle parent category selection
   const handleParentCategoryChange = (categoryId) => {
     setSelectedParentCategory(categoryId);
     setSelectedSubcategory(null); // Reset subcategory when parent category changes
-    setCurrentPage(0); // Reset to first page when changing category
+    setCurrentPage(0); // Reset pagination
   };
   
-  // Handle subcategory filter change
+  // Handle subcategory selection
   const handleSubcategoryChange = (categoryId) => {
-    setSelectedSubcategory(categoryId === selectedSubcategory ? null : categoryId);
-    setCurrentPage(0); // Reset to first page when changing subcategory
+    setSelectedSubcategory(categoryId);
+    setCurrentPage(0); // Reset pagination
   };
 
-  if (!mounted) return null;
-
-  // Products content
-  let content = null;
-
-  if (productsLoading) {
-    content = <HomePrdLoader loading />;
-  } else if (productsError) {
-    content = <ErrorMsg msg="Ошибка загрузки товаров" />;
-  } else if (!currentProducts || currentProducts.length === 0) {
-    content = <ErrorMsg msg="Товары не найдены" />;
-  } else {
-    content = currentProducts.map((product) => {
-      // Ensure product has an id
-      const productId = product?.id || product?._id || Math.random().toString(36).substr(2, 9);
-      return (
-        <div key={productId} className="col-xl-3 col-lg-3 col-sm-6">
-          <ProductItem product={product} />
-        </div>
-      );
-    });
-  }
-
-  // No longer using category filters in tabs since we have the carousel
-
   return (
-    <section id="all-products-section" className="tp-product-area pb-55">
+    <section className="tp-product-area pb-90">
       <div className="container">
-        <div className="row align-items-end">
-          <div className="col-xl-5 col-lg-6 col-md-5">
-            
+        <div className="row">
+          <div className="col-xl-12">
+            <div className="tp-section-title-wrapper-2 mb-40">
+              <h3 className="tp-section-title-2">Поиск по бренду</h3>
+            </div>
           </div>
         </div>
         
-        {/* Родительские категории (без фото) */}
-        <div className="row">
-          <div className="col-12">
-            <ParentCategories
-              categories={allCategories}
-              isLoading={catLoading}
-              isError={catError}
-              selectedParentCategory={selectedParentCategory}
-              onParentCategorySelect={handleParentCategoryChange}
+        {/* Родительские категории */}
+        <div className="row mb-40">
+          <div className="col-xl-12">
+            <ParentCategories 
+              categories={allCategories} 
+              selectedParentCategory={selectedParentCategory} 
+              onSelectParentCategory={handleParentCategoryChange} 
             />
           </div>
         </div>
         
-        {/* Подкатегории в карусели (с фото) */}
-        <div className="row">
-          <div className="col-12">
-            <div className="tp-product-tab tp-product-tab-border mb-45 tp-tab">
-              <CategoryCarousel
-                categories={allCategories}
-                isLoading={catLoading}
-                isError={catError}
-                parentCategoryId={selectedParentCategory}
-                selectedCategory={selectedSubcategory}
-                onCategorySelect={handleSubcategoryChange}
-                
-              />
-              <div className="tp-section-title-wrapper mb-40">
-              <h3 className="tp-section-title">
-                Наши товары
-                <ShapeLine />
-              </h3>
-            </div>
-            </div>
+        {/* Карусель подкатегорий (марки автомобилей) */}
+        <div className="row mb-40">
+          <div className="col-xl-12">
+            <CategoryCarousel 
+              categories={allCategories} 
+              parentCategoryId={selectedParentCategory} 
+              selectedSubcategory={selectedSubcategory} 
+              onSelectSubcategory={handleSubcategoryChange} 
+            />
           </div>
         </div>
-        <div className="row">{content}</div>
         
-        {/* Pagination */}
-        {pageCount > 1 && (
-          <div className="row">
-            <div className="col-xl-12">
-              <div className="tp-pagination mt-35">
-                <ReactPaginate
-                  breakLabel="..."
-                  nextLabel="→"
-                  onPageChange={handlePageClick}
-                  pageRangeDisplayed={3}
-                  pageCount={pageCount}
-                  previousLabel="←"
-                  renderOnZeroPageCount={null}
-                  containerClassName="tp-pagination-style mb-20 text-center"
-                  pageLinkClassName="tp-pagination-link"
-                  previousLinkClassName="tp-pagination-link"
-                  nextLinkClassName="tp-pagination-link"
-                  activeLinkClassName="active"
-                />
+        {/* Товары */}
+        <div className="row">
+          <div className="col-xl-12">
+            <div className="tp-product-tab-content">
+              <div className="tab-content" id="myTabContent">
+                <div
+                  className="tab-pane fade show active"
+                  id="all-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="all-tab"
+                  tabIndex="0"
+                >
+                  <div className="row">
+                    {productsLoading && !productsError && (
+                      <HomePrdLoader loading={productsLoading} />
+                    )}
+                    {!productsLoading && productsError && (
+                      <ErrorMsg msg="Ошибка загрузки товаров" />
+                    )}
+                    {!productsLoading && !productsError && currentProducts.length === 0 && (
+                      <ErrorMsg msg="Товары не найдены" />
+                    )}
+                    {!productsLoading && !productsError && currentProducts.length > 0 && 
+                      currentProducts.map((item) => (
+                        <div key={item.id} className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                          <ProductItem product={item} />
+                        </div>
+                      ))
+                    }
+                  </div>
+                  
+                  {/* Pagination */}
+                  {pageCount > 1 && (
+                    <div className="tp-pagination mt-20">
+                      <ReactPaginate
+                        breakLabel="..."
+                        nextLabel="→"
+                        onPageChange={handlePageClick}
+                        pageRangeDisplayed={3}
+                        pageCount={pageCount}
+                        previousLabel="←"
+                        renderOnZeroPageCount={null}
+                        containerClassName="tp-pagination-nav"
+                        pageLinkClassName="tp-pagination-link"
+                        previousLinkClassName="tp-pagination-link"
+                        nextLinkClassName="tp-pagination-link"
+                        activeLinkClassName="active"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
 };
 
-export default AllProductsArea;
+export default BrandSearchArea;

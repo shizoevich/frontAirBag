@@ -110,15 +110,7 @@ const Header = () => {
                   <div className="col-xl-3 col-lg-3">
                     {/* category start */}
                     <div className="tp-header-category tp-category-menu tp-header-category-toggle">
-                      <button
-                        onClick={() => setIsCategoryActive(!isCategoryActive)}
-                        className="tp-category-menu-btn tp-category-menu-toggle"
-                      >
-                        <span>
-                          <CategoryMenu />
-                        </span>
-                        All Departments
-                      </button>
+
                       <nav className="tp-category-menu-content">
                         <HeaderCategory categoryType="electronics" isCategoryActive={isCategoryActive} />
                       </nav>
