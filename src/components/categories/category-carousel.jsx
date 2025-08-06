@@ -1,23 +1,26 @@
 'use client';
 import React, { useRef, useState, useEffect } from 'react';
-import Script from 'next/script';
 import Image from 'next/image';
+import Script from 'next/script';
 import { Swiper, SwiperSlide } from 'swiper/react';
-// Правильный импорт модулей Swiper
 import { Navigation as SwiperNavigation, Grid as SwiperGrid } from 'swiper/modules';
-// Импортируем стили Swiper для клиентской стороны
 import 'swiper/css';
-import 'swiper/css/navigation';
 import 'swiper/css/grid';
+import 'swiper/css/navigation';
 import ErrorMsg from '../common/error-msg';
-import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 import HomeCateLoader from '../loader/home/home-cate-loader';
 
 // Fallback image URL для категорий, когда изображение не загружается
 const FALLBACK_IMAGE = '/assets/img/category/noimage.png';
 
-const CategoryCarousel = ({ onCategorySelect, selectedCategory }) => {
-  const { data: categories, isLoading, isError } = useGetShowCategoryQuery();
+const CategoryCarousel = ({ 
+  categories = [], 
+  isLoading, 
+  isError, 
+  parentCategoryId, 
+  selectedCategory, 
+  onCategorySelect 
+}) => {
   const navigationPrevRef = useRef(null);
   const navigationNextRef = useRef(null);
   const [mounted, setMounted] = useState(false);
@@ -25,12 +28,6 @@ const CategoryCarousel = ({ onCategorySelect, selectedCategory }) => {
   // Fix hydration mismatch by only rendering on client
   useEffect(() => {
     setMounted(true);
-    
-    // Add Swiper CSS dynamically to avoid SSR mismatch
-    const swiperCoreCSS = document.createElement('link');
-    swiperCoreCSS.rel = 'stylesheet';
-    swiperCoreCSS.href = 'https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css';
-    document.head.appendChild(swiperCoreCSS);
   }, []);
 
   // Handle category selection
@@ -62,9 +59,6 @@ const CategoryCarousel = ({ onCategorySelect, selectedCategory }) => {
     console.log('Структура данных категорий:', categories ? Object.keys(categories) : 'categories is null');
     console.log('Все категории:', categories?.results || []);
     
-    // Фильтруем категории автомобильных брендов
-    console.log('Проверяем структуру категорий:', categories);
-    
     // Получаем категории из правильного поля в зависимости от структуры данных
     let allCategories = [];
     if (categories?.results && Array.isArray(categories.results)) {
@@ -74,20 +68,30 @@ const CategoryCarousel = ({ onCategorySelect, selectedCategory }) => {
     }
     
     console.log('Все категории после обработки:', allCategories);
+    console.log('Текущая родительская категория:', parentCategoryId);
     
-    // Фильтруем только категории с непустыми названиями
-    const carBrandCategories = allCategories.filter(category => {
-      return category && category.title && category.title.trim() !== '';
-    });
+    // Фильтруем только подкатегории выбранной родительской категории
+    const subcategories = parentCategoryId 
+      ? allCategories.filter(category => {
+          // Проверяем, является ли категория подкатегорией выбранной родительской категории
+          return category && category.title && category.title.trim() !== '' && 
+                 category.parent_id && String(category.parent_id) === String(parentCategoryId);
+        })
+      : allCategories.filter(category => {
+          // Если родительская категория не выбрана, показываем только марки автомобилей (parent_id === 754099)
+          return category && category.title && category.title.trim() !== '' && 
+                 category.parent_id && String(category.parent_id) === '754099';
+        });
     
-    // Add "All Categories" option
+    // Add "All Categories" option для подкатегорий
     const allCategoriesOption = {
       id: 'all',
-      title: 'Все категории',
+      title: 'Все подкатегории',
       image: 'noimage.png'
     };
     
-    const displayCategories = [allCategoriesOption, ...carBrandCategories];
+    // Используем отфильтрованные подкатегории
+    const displayCategories = parentCategoryId ? [allCategoriesOption, ...subcategories] : subcategories;
     
     // Create two slides with categories in a grid layout (two rows per slide)
     // Calculate how many categories to show per slide (2 rows x 5 columns = 10 per slide)
@@ -153,50 +157,35 @@ const CategoryCarousel = ({ onCategorySelect, selectedCategory }) => {
       >
         {displayCategories.map((category) => {
           const categoryId = category.id === 'all' ? null : (category.id_remonline || category.id);
-          // Map car brand names to their image files
-          let imageName = category.image || '';
+          // Используем поле image из структуры данных категории
+          let imageName = category.image || 'noimage.png';
           
-          // If it's a car brand, try to find matching image file
-          if (category.id !== 'all') {
-            const brandName = category.title.toLowerCase().trim().replace(/\s+/g, '_');
-            console.log('Processing category:', category.title, 'brandName:', brandName);
-            
-            // More comprehensive list of possible image name formats
-            const possibleImageNames = [
-              `${brandName}.jpg`,
-              `${brandName.replace(/_/g, '')}.jpg`,
-              `${brandName.split('_')[0]}.jpg`
-            ];
-            
-            // Check if we have a matching image in our list
-            const carBrandImages = ['acura.jpg', 'audi.jpg', 'bmw.jpg', 'buick.jpg', 'cadillac.jpg', 
-                                   'chevrolet.jpg', 'dodge.jpg', 'fiat.jpg', 'ford.jpg', 'gmc.jpg', 
-                                   'honda.jpg', 'hundai.jpg', 'infinity.jpg', 'jaguar.jpg', 'jeep.jpg', 
-                                   'kia.jpg', 'land_rover.jpg', 'lexus.jpg', 'lincoln.jpg', 'mazda.jpg', 
-                                   'mercedes.jpg', 'mini_cooper.jpg', 'mitsubishi.jpg', 'mustang.jpg', 
-                                   'nissan.jpg', 'porsche.jpg', 'subaru.jpg', 'tesla.jpg', 'toyota.jpg', 
-                                   'volvo.jpg', 'vw.jpg'];
-            
-            // Try to find a matching image with more flexible matching
-            const matchingImage = carBrandImages.find(img => {
-              const imgBaseName = img.replace('.jpg', '').toLowerCase();
-              return possibleImageNames.includes(img) || 
-                     img.includes(brandName) || 
-                     brandName.includes(imgBaseName) ||
-                     category.title.toLowerCase().includes(imgBaseName) ||
-                     imgBaseName.includes(category.title.toLowerCase());
-            });
-            
-            console.log('Category:', category.title, 'Matching image:', matchingImage || 'none found');
-            
-            if (matchingImage) {
-              imageName = matchingImage;
-            }
+          // Для опции "Все подкатегории" используем noimage.png
+          if (category.id === 'all') {
+            imageName = 'noimage.png';
           }
           
-          const imagePath = imageName 
-            ? `/assets/img/category/${imageName}` 
-            : '/assets/img/category/noimage.png';
+          console.log('Category:', category.title, 'Image:', imageName);
+          
+          // Добавляем проверку на соответствие имени файла изображения с предоставленным JSON
+          // Если имя файла не соответствует ни одному из известных имен, используем noimage.png
+          const knownImages = ['acura.jpg', 'audi.jpg', 'bmw.jpg', 'buick.jpg', 'cadillac.jpg', 
+                            'chevrolet.jpg', 'dodge.jpg', 'fiat.jpg', 'ford.jpg', 'gmc.jpg', 
+                            'honda.jpg', 'hundai.jpg', 'infinity.jpg', 'jaguar.jpg', 'jeep.jpg', 
+                            'kia.jpg', 'land_rover.jpg', 'lexus.jpg', 'lincoln.jpg', 'mazda.jpg', 
+                            'mercedes.jpg', 'mini_cooper.jpg', 'mitsubishi.jpg', 'mustang.jpg', 
+                            'nissan.jpg', 'porsche.jpg', 'subaru.jpg', 'tesla.jpg', 'toyota.jpg', 
+                            'volvo.jpg', 'vw.jpg', 'pp-nogi-sedenie.jpg', 'connektory.jpg', 'kreplenia.jpg',
+                            'obmanki-rezistory.jpg', 'parashuty-meshki.jpg', 'capchasti-dlya-remnei.jpg',
+                            'pp-v-remni.jpg', 'pp-v-shtory.jpg', 'pp-v-rul-1-zapal.jpg', 'pp-v-rul-2-zapal.jpg',
+                            'pp-torpedo-1-zapal.jpg', 'pp-torpedo-2-zapal.jpg', 'noimage.png'];
+          
+          if (!knownImages.includes(imageName)) {
+            console.log(`Изображение ${imageName} не найдено в списке известных изображений, используем noimage.png`);
+            imageName = 'noimage.png';
+          }
+          
+          const imagePath = `/assets/img/category/${imageName}`;
           
           return (
             <SwiperSlide key={category.id}>

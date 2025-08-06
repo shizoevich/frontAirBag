@@ -9,6 +9,7 @@ import HomePrdLoader from "@/components/loader/home/home-prd-loader";
 import { useGetShowCategoryQuery, useGetAllProductsQuery } from "@/redux/features/categoryApi";
 import ReactPaginate from 'react-paginate';
 import CategoryCarousel from "@/components/categories/category-carousel";
+import ParentCategories from "@/components/categories/parent-categories";
 
 // Fallback image URL
 const FALLBACK_IMAGE = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg';
@@ -16,7 +17,8 @@ const FALLBACK_IMAGE = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQ
 const AllProductsArea = () => {
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedParentCategory, setSelectedParentCategory] = useState(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const itemsPerPage = 12; // Number of products per page
   
   useEffect(() => {
@@ -38,13 +40,21 @@ const AllProductsArea = () => {
   } = useGetAllProductsQuery();
 
   // Convert categories data to array
-  const categories = Array.isArray(categoriesData) 
+  const allCategories = Array.isArray(categoriesData) 
     ? categoriesData 
     : Array.isArray(categoriesData?.data) 
       ? categoriesData.data 
       : Array.isArray(categoriesData?.results) 
         ? categoriesData.results 
         : [];
+        
+  console.log('Raw categoriesData:', categoriesData);
+  console.log('Processed allCategories:', allCategories);
+  console.log('Parent category IDs to find:', [754099, 754100, 754101]);
+  
+  // Проверяем, есть ли родительские категории в данных
+  const parentCats = allCategories.filter(cat => [754099, 754100, 754101].includes(Number(cat.id)));
+  console.log('Found parent categories:', parentCats);
 
   // Ensure productsData is always an array
   console.log('Raw productsData:', productsData);
@@ -62,25 +72,41 @@ const AllProductsArea = () => {
   
   console.log('Processed products data:', safeProductsData);
 
-  // Filter products by selected category
-  const filteredProducts = selectedCategory 
+  // Filter products by selected subcategory or parent category
+  const filteredProducts = selectedSubcategory 
     ? safeProductsData.filter(product => {
         // Check all possible category ID formats
         const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
         
         // Log for debugging
-        console.log('Product category ID:', categoryId, 'Selected category:', selectedCategory);
+        console.log('Product category ID:', categoryId, 'Selected subcategory:', selectedSubcategory);
         
         // More robust comparison
-        if (!categoryId && !selectedCategory) return true;
+        if (!categoryId && !selectedSubcategory) return true;
         if (!categoryId) return false;
         
         const productCategoryId = String(categoryId).trim();
-        const selectedCategoryId = String(selectedCategory).trim();
+        const selectedCategoryId = String(selectedSubcategory).trim();
         
         return productCategoryId === selectedCategoryId;
       })
-    : safeProductsData;
+    : selectedParentCategory 
+      ? safeProductsData.filter(product => {
+          // Если выбрана родительская категория, но не выбрана подкатегория,
+          // показываем товары всех подкатегорий этой родительской категории
+          const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
+          if (!categoryId) return false;
+          
+          // Находим категорию товара
+          const productCategory = allCategories.find(cat => {
+            const catId = cat.id_remonline || cat.id;
+            return String(catId).trim() === String(categoryId).trim();
+          });
+          
+          // Проверяем, является ли категория товара подкатегорией выбранной родительской категории
+          return productCategory && String(productCategory.parent_id) === String(selectedParentCategory);
+        })
+      : safeProductsData;
 
   // Calculate pagination
   const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -94,10 +120,17 @@ const AllProductsArea = () => {
     document.getElementById('all-products-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Handle category filter change
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId === selectedCategory ? null : categoryId);
+  // Handle parent category filter change
+  const handleParentCategoryChange = (categoryId) => {
+    setSelectedParentCategory(categoryId);
+    setSelectedSubcategory(null); // Reset subcategory when parent category changes
     setCurrentPage(0); // Reset to first page when changing category
+  };
+  
+  // Handle subcategory filter change
+  const handleSubcategoryChange = (categoryId) => {
+    setSelectedSubcategory(categoryId === selectedSubcategory ? null : categoryId);
+    setCurrentPage(0); // Reset to first page when changing subcategory
   };
 
   if (!mounted) return null;
@@ -128,37 +161,42 @@ const AllProductsArea = () => {
   return (
     <section id="all-products-section" className="tp-product-area pb-55">
       <div className="container">
-        <div className="row align-items-center">
-          <div className="col-xl-12">
-            <div className="tp-section-title-wrapper mb-40 text-center">
-              <h3 className="tp-section-title">
-                Категории <ShapeLine />
-              </h3>
-            </div>
-          </div>
-        </div>
-        
-        {/* Category Carousel Display */}
-        <div className="row justify-content-center mb-30">
-          <div className="col-xl-12">
-            <CategoryCarousel 
-              onCategorySelect={handleCategoryChange} 
-              selectedCategory={selectedCategory} 
-            />
-          </div>
-        </div>
-        
         <div className="row align-items-end">
           <div className="col-xl-5 col-lg-6 col-md-5">
             <div className="tp-section-title-wrapper mb-40">
               <h3 className="tp-section-title">
-                Наши товары <ShapeLine />
+                Наши товары
+                <ShapeLine />
               </h3>
             </div>
           </div>
-          <div className="col-xl-7 col-lg-6 col-md-7">
-            <div className="tp-product-tab tp-product-tab-border mb-45 tp-tab d-flex justify-content-md-end">
-              {/* Category filters removed - using carousel only */}
+        </div>
+        
+        {/* Родительские категории (без фото) */}
+        <div className="row">
+          <div className="col-12">
+            <ParentCategories
+              categories={allCategories}
+              isLoading={catLoading}
+              isError={catError}
+              selectedParentCategory={selectedParentCategory}
+              onParentCategorySelect={handleParentCategoryChange}
+            />
+          </div>
+        </div>
+        
+        {/* Подкатегории в карусели (с фото) */}
+        <div className="row">
+          <div className="col-12">
+            <div className="tp-product-tab tp-product-tab-border mb-45 tp-tab">
+              <CategoryCarousel
+                categories={allCategories}
+                isLoading={catLoading}
+                isError={catError}
+                parentCategoryId={selectedParentCategory}
+                selectedCategory={selectedSubcategory}
+                onCategorySelect={handleSubcategoryChange}
+              />
             </div>
           </div>
         </div>
