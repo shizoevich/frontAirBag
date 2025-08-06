@@ -3,8 +3,7 @@
 import { useLocale } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
-import Image from 'next/image';
-import language_img from '@assets/img/icon/language-flag.png';
+import { IoMdArrowDropdown } from 'react-icons/io';
 
 const languages = {
   en: 'English',
@@ -28,14 +27,11 @@ const LanguageSwitcher = () => {
   return (
     <div className="offcanvas__select language">
       <div className="offcanvas__lang d-flex align-items-center justify-content-md-end">
-        <div className="offcanvas__lang-img mr-15">
-          <Image src={language_img} alt="language-flag" />
-        </div>
         <div className="offcanvas__lang-wrapper">
           <span onClick={() => setIsOpen(!isOpen)} className="offcanvas__lang-selected-lang tp-lang-toggle" id="tp-offcanvas-lang-toggle">
-            {languages[locale]}
+            {languages[locale]} <IoMdArrowDropdown style={{ verticalAlign: 'middle', marginLeft: '3px' }} />
           </span>
-          <ul className={`offcanvas__lang-list tp-lang-list ${isOpen ? 'tp-lang-list-open' : ''}`}>
+          <ul className={`offcanvas__lang-list tp-lang-list ${isOpen ? 'tp-lang-list-open' : ''}`} style={{ top: '100%', bottom: 'auto' }}>
             {Object.keys(languages).map((lang) => (
               <li key={lang} onClick={() => handleLanguageChange(lang)} style={{ cursor: 'pointer' }}>
                 {languages[lang]}
