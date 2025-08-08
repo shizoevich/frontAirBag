@@ -1,17 +1,17 @@
 import React from "react";
 import useCartInfo from "@/hooks/use-cart-info";
+import { useTranslations } from 'next-intl';
 
 const RenderCartProgress = () => {
   const { total } = useCartInfo();
+  const t = useTranslations('Cart');
   const freeShippingThreshold = 200;
   const progress = (total / freeShippingThreshold) * 100;
   if (total < freeShippingThreshold) {
     const remainingAmount = freeShippingThreshold - total;
     return (
       <>
-        <p>{`Add $${remainingAmount.toFixed(
-          2
-        )} more to qualify for free shipping`}</p>
+        <p>{t('addMoreForFreeShipping', { amount: `$${remainingAmount.toFixed(2)}` })}</p>
         <div className="progress">
           <div
             className="progress-bar progress-bar-striped progress-bar-animated"
@@ -28,7 +28,7 @@ const RenderCartProgress = () => {
   }
   return (
     <>
-      <p> You are eligible for free shipping</p>
+      <p>{t('eligibleForFreeShipping')}</p>
       <div className="progress">
         <div
           className="progress-bar progress-bar-striped progress-bar-animated"

@@ -9,9 +9,12 @@ import useSearchFormSubmit from "@/hooks/use-search-form-submit";
 import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
 
 const HeaderSearchForm = () => {
-  const t = useTranslations('HeaderSearchForm');
+  const tForm = useTranslations('HeaderSearchForm');
+  const t = useTranslations('ParentCategories');
   const { setSearchText, setCategory, handleSubmit, searchText } = useSearchFormSubmit();
-  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([
+    { value: "Select Category", text: t('selectCategory') }
+  ]);
   
   // Get categories from API
   const { data: categoriesData, isLoading } = useGetShowCategoryQuery();
@@ -56,7 +59,7 @@ const HeaderSearchForm = () => {
             onChange={(e) => setSearchText(e.target.value)}
             value={searchText}
             type="text"
-            placeholder={t('placeholder')}
+            placeholder={tForm('placeholder')}
           />
         </div>
         <div className="tp-header-search-category">
@@ -64,7 +67,9 @@ const HeaderSearchForm = () => {
             options={categoryOptions}
             defaultCurrent={0}
             onChange={selectCategoryHandle}
-            name={t('selectCategory')}
+            name="category"
+            placeholder={t('selectCategory')}
+            className="custom-nice-select"
           />
         </div>
         <div className="tp-header-search-btn">

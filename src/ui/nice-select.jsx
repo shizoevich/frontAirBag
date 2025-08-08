@@ -26,7 +26,17 @@ const NiceSelect = ({options,defaultCurrent, placeholder,className,onChange,name
             onKeyPress={(e) => e}
             ref={ref}
         >
-            <span className="current">{current?.text || placeholder}</span>
+            <span 
+                className="current" 
+                style={{
+                    color: className?.includes('custom-nice-select') ? '#999999' : undefined,
+                    fontFamily: className?.includes('custom-nice-select') ? 'Roboto, sans-serif' : undefined,
+                    fontSize: className?.includes('custom-nice-select') ? '14px' : undefined,
+                    fontWeight: className?.includes('custom-nice-select') ? '400' : undefined
+                }}
+            >
+                {current?.text || placeholder}
+            </span>
             <ul
                 className="list"
                 role="menubar"

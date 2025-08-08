@@ -7,6 +7,7 @@ import ErrorMsg from '@/components/common/error-msg';
 import ProductItem from './product-item';
 import HomeNewArrivalPrdLoader from '@/components/loader/home/home-newArrival-prd-loader';
 import { useGetProductsByCategoryQuery } from '@/redux/features/productsApi';
+import { useTranslations } from 'next-intl';
 
 const sliderSettings = {
   slidesPerView: 4,
@@ -40,6 +41,7 @@ const POPULAR_CATEGORIES = [
 ];
 
 const NewArrivals = () => {
+  const t = useTranslations('Cart');
   const [isClient, setIsClient] = useState(false);
   const [products, setProducts] = useState([]);
 
@@ -151,7 +153,7 @@ const NewArrivals = () => {
           <div className="col-xl-5 col-sm-6">
             <div className="tp-section-title-wrapper mb-40">
               <h3 className="tp-section-title">
-                Popular Products
+                {t('popularProducts')}
                 <ShapeLine />
               </h3>
             </div>

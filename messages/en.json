@@ -53,6 +53,17 @@
     "loadingError": "Error loading categories",
     "noCategoriesFound": "No categories found"
   },
+  "Cart": {
+    "shoppingCart": "Shopping Cart",
+    "addMoreForFreeShipping": "Add {amount} more to qualify for free shipping",
+    "eligibleForFreeShipping": "You are eligible for free shipping",
+    "yourCartIsEmpty": "Your Cart is empty",
+    "goToShop": "Go to Shop",
+    "subtotal": "Subtotal:",
+    "viewCart": "view cart",
+    "checkout": "checkout",
+    "popularProducts": "Popular Products"
+  },
   "HeaderSearchForm": {
     "placeholder": "Search for products..."
   },

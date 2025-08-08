@@ -38,20 +38,31 @@
     "fastDelivery": "Швидка доставка",
     "fastDeliveryDesc": "Доставка по всій Україні за 1-3 дні",
     "qualityGuarantee": "Гарантія якості",
-    "qualityGuaranteeDesc": "Всі запчастини Airbag перевірені та сертифіковані",
+    "qualityGuaranteeDesc": "Всі запчастини Airbag сертифіковані",
     "techSupport": "Техпідтримка",
     "techSupportDesc": "Консультації з підбору та встановлення",
     "affordablePrices": "Вигідні ціни",
     "affordablePricesDesc": "Найкращі ціни на ринку автозапчастин"
   },
   "ParentCategories": {
-    "selectCategory": "Виберіть категорію",
+    "selectCategory": "Категорії...",
     "all_categories": "Всі категорії",
     "covers": "Накладки",
     "airbag_components": "Комплектуючі Airbag SRS",
     "squibs": "Піропатрони",
     "loadingError": "Помилка завантаження категорій",
     "noCategoriesFound": "Категорії не знайдено"
+  },
+  "Cart": {
+    "shoppingCart": "Кошик покупок",
+    "addMoreForFreeShipping": "Додайте ще {amount} для безкоштовної доставки",
+    "eligibleForFreeShipping": "Ви маєте право на безкоштовну доставку",
+    "yourCartIsEmpty": "Ваш кошик порожній",
+    "goToShop": "Перейти до магазину",
+    "subtotal": "Проміжний підсумок:",
+    "viewCart": "Переглянути кошик",
+    "checkout": "Оформити замовлення",
+    "popularProducts": "Популярні товари"
   },
   "HeaderSearchForm": {
     "placeholder": "Пошук товарів..."

@@ -1,0 +1,67 @@
+/* Кастомные стили для выравнивания шрифтов в поиске */
+
+/* Стили для кастомного NiceSelect в поиске */
+.tp-header-search-category .nice-select.custom-nice-select {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #999999 !important; /* Принудительно серый цвет */
+}
+
+.tp-header-search-category .nice-select.custom-nice-select .current {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #999999 !important; /* Принудительно серый цвет как у placeholder */
+}
+
+/* Стили для NiceSelect в поиске (общие) */
+.tp-header-search-category .nice-select {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #999999 !important; /* Принудительно серый цвет */
+}
+
+.tp-header-search-category .nice-select .current {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #999999 !important; /* Принудительно серый цвет как у placeholder */
+}
+
+/* Дополнительные правила для переопределения любых других стилей */
+.tp-header-search-wrapper .tp-header-search-category .nice-select,
+.tp-header-search-wrapper .tp-header-search-category .nice-select .current {
+  color: #999999 !important;
+}
+
+/* Максимально специфичные правила для принудительного серого цвета */
+.tp-header .tp-header-search .tp-header-search-wrapper .tp-header-search-category .nice-select {
+  color: #999999 !important;
+}
+
+.tp-header .tp-header-search .tp-header-search-wrapper .tp-header-search-category .nice-select .current {
+  color: #999999 !important;
+}
+
+/* Правила для всех возможных состояний */
+.tp-header-search-category .nice-select:not(.open) .current,
+.tp-header-search-category .nice-select.open .current,
+.tp-header-search-category .nice-select .current:hover,
+.tp-header-search-category .nice-select .current:focus {
+  color: #999999 !important;
+}
+
+/* Стили для опций в выпадающем списке */
+.tp-header-search-category .nice-select .list .option {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: var(--tp-common-black) !important; /* Черный цвет для опций в списке */
+}
+
+/* Стили для выбранной опции */
+.tp-header-search-category .nice-select .list .option.selected {
+  color: var(--tp-theme-primary) !important;
+}

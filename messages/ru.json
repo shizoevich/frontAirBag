@@ -53,6 +53,17 @@
     "loadingError": "Ошибка загрузки категорий",
     "noCategoriesFound": "Категории не найдены"
   },
+  "Cart": {
+    "shoppingCart": "Корзина покупок",
+    "addMoreForFreeShipping": "Добавьте еще {amount} для бесплатной доставки",
+    "eligibleForFreeShipping": "Вы имеете право на бесплатную доставку",
+    "yourCartIsEmpty": "Ваша корзина пуста",
+    "goToShop": "Перейти в магазин",
+    "subtotal": "Промежуточный итог:",
+    "viewCart": "Посмотреть корзину",
+    "checkout": "Оформить заказ",
+    "popularProducts": "Популярные товары"
+  },
   "HeaderSearchForm": {
     "placeholder": "Поиск товаров..."
   },

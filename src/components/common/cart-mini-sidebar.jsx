@@ -3,6 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslations } from 'next-intl';
 // internal
 import useCartInfo from '@/hooks/use-cart-info';
 import RenderCartProgress from './render-cart-progress';
@@ -14,6 +15,7 @@ const CartMiniSidebar = () => {
   const { cart_products, cartMiniOpen } = useSelector((state) => state.cart);
   const { total } = useCartInfo();
   const dispatch = useDispatch();
+  const t = useTranslations('Cart');
 
   // handle remove product
   const handleRemovePrd = (prd) => {
@@ -31,7 +33,7 @@ const handleCloseCartMini = () => {
           <div className="cartmini__top-wrapper">
             <div className="cartmini__top p-relative">
               <div className="cartmini__top-title">
-                <h4>Shopping cart</h4>
+                <h4>{t('shoppingCart')}</h4>
               </div>
               <div className="cartmini__close">
                 <button onClick={() => dispatch(closeCartMini())} type="button" className="cartmini__close-btn cartmini-close-btn">
@@ -75,18 +77,18 @@ const handleCloseCartMini = () => {
             {/* if no item in cart */}
             {cart_products.length === 0 && <div className="cartmini__empty text-center">
               <Image src={empty_cart_img} alt="empty-cart-img" />
-              <p>Your Cart is empty</p>
-              <Link href="/shop" className="tp-btn">Go to Shop</Link>
+              <p>{t('yourCartIsEmpty')}</p>
+              <Link href="/shop" className="tp-btn">{t('goToShop')}</Link>
             </div>}
           </div>
           <div className="cartmini__checkout">
             <div className="cartmini__checkout-title mb-30">
-              <h4>Subtotal:</h4>
+              <h4>{t('subtotal')}</h4>
               <span>{total.toFixed(2)}₴</span>
             </div>
             <div className="cartmini__checkout-btn">
-              <Link href="/cart" onClick={handleCloseCartMini} className="tp-btn mb-10 w-100"> view cart</Link>
-              <Link href="/checkout" onClick={handleCloseCartMini} className="tp-btn tp-btn-border w-100"> checkout</Link>
+              <Link href="/cart" onClick={handleCloseCartMini} className="tp-btn mb-10 w-100">{t('viewCart')}</Link>
+              <Link href="/checkout" onClick={handleCloseCartMini} className="tp-btn tp-btn-border w-100">{t('checkout')}</Link>
             </div>
           </div>
         </div>
