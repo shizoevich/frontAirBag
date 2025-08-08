@@ -87,7 +87,8 @@ const ParentCategories = ({
                     margin: '0 8px 8px 0',
                     cursor: 'pointer',
                     borderRadius: '4px',
-                    backgroundColor: isActive ? '#3577f0' : '#f0f2f5',
+                    backgroundColor: isActive ? '#3577f0' : 'transparent',
+                    border: isActive ? 'none' : '1px solid #e0e0e0',
                     color: isActive ? 'white' : '#333',
                     fontWeight: isActive ? 'bold' : 'normal',
                     transition: 'all 0.3s ease'

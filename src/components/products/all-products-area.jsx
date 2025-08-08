@@ -187,7 +187,7 @@ const AllProductsArea = () => {
         {/* Подкатегории в карусели (с фото) */}
         <div className="row">
           <div className="col-12">
-            <div className="tp-product-tab tp-product-tab-border mb-45 tp-tab">
+            <div className="tp-product-tab mb-45 tp-tab">
               <CategoryCarousel
                 categories={allCategories}
                 isLoading={catLoading}
