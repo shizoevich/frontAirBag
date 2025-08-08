@@ -1,58 +1,27 @@
-import { NextResponse } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
 
-const defaultLocale = 'uk'; // Украинский как язык по умолчанию
-const locales = ['uk', 'ru', 'en']; // Поддерживаемые языки
+export default createMiddleware({
+  // A list of all locales that are supported
+  locales: ['uk', 'ru', 'en'],
 
-// Функция для проверки, является ли путь публичным (не требующим локализации)
-function isPublicPath(path) {
-  // Публичные пути, которые не требуют перенаправления
-  const publicPaths = [
-    '/favicon.ico',
-    '/robots.txt',
-    '/sitemap.xml',
-    '/api/',
-    '/_next/',
-    '/assets/',
-    '/public/'
-  ];
-  
-  return publicPaths.some(publicPath => path.startsWith(publicPath));
-}
+  // Used when no locale matches
+  defaultLocale: 'uk',
 
-export function middleware(request) {
-  // Получаем текущий путь
-  const pathname = request.nextUrl.pathname;
-  
-  // Если путь публичный, пропускаем его без изменений
-  if (isPublicPath(pathname)) {
-    return NextResponse.next();
-  }
-  
-  // Проверяем, содержит ли URL уже локаль
-  const pathnameHasLocale = locales.some(
-    locale => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-  );
-  
-  // Если локаль уже указана в URL, пропускаем запрос
-  if (pathnameHasLocale) {
-    return NextResponse.next();
-  }
-  
-  // Если локаль не указана, перенаправляем на URL с локалью по умолчанию
-  const newUrl = new URL(`/${defaultLocale}${pathname}`, request.url);
-  
-  // Копируем все параметры запроса в новый URL
-  request.nextUrl.searchParams.forEach((value, key) => {
-    newUrl.searchParams.set(key, value);
-  });
-  
-  return NextResponse.redirect(newUrl);
-}
+  // Always use a locale prefix
+  localePrefix: 'always',
+});
 
-// Указываем, для каких путей должен срабатывать middleware
 export const config = {
   matcher: [
-    // Исключаем все статические ресурсы
-    '/((?!api|_next/static|_next/image|favicon.ico|assets|public).*)',
-  ],
+    // Enable a redirect to a matching locale at the root
+    '/',
+
+    // Set a cookie to remember the previous locale for
+    // all requests that have a locale prefix
+    '/(uk|ru|en)/:path*',
+
+    // Enable redirects that add a locale prefix
+    // (e.g. `/pathnames` -> `/en/pathnames`)
+    '/((?!_next|.*\\..*).*)'
+  ]
 };

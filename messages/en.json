@@ -104,8 +104,12 @@
   },
   "AllProductsArea": {
     "loadingError": "Error loading products",
-    "noProductsFound": "No products found",
+    "noProductsFound": "Products not found",
     "ourProducts": "Our Products"
+  },
+  "SearchPage": {
+    "title": "Shofy - Search Products",
+    "searchProducts": "Search Products"
   },
   "HomeHeroSlider": {
     "startingAt": "Starting at",

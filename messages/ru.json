@@ -107,6 +107,10 @@
     "noProductsFound": "Товары не найдены",
     "ourProducts": "Наши товары"
   },
+  "SearchPage": {
+    "title": "Shofy - Поиск товаров",
+    "searchProducts": "Поиск товаров"
+  },
   "HomeHeroSlider": {
     "startingAt": "От",
     "bestTablet": "Лучшая коллекция планшетов 2023",

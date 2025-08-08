@@ -1,9 +1,10 @@
 'use client';
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 
 const useSearchFormSubmit = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const [searchText, setSearchText] = useState("");
   const [category, setCategory] = useState("");
 
@@ -21,7 +22,9 @@ const useSearchFormSubmit = () => {
         queryParams.push(`categoryId=${category}`);
       }
 
-      const route = `/search?${queryParams.join('&')}`;
+      // Extract current locale from pathname
+      const locale = pathname.split('/')[1] || 'uk';
+      const route = `/${locale}/search?${queryParams.join('&')}`;
       router.push(route);
 
       // Reset fields after search

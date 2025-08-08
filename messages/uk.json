@@ -107,6 +107,10 @@
     "noProductsFound": "Товари не знайдено",
     "ourProducts": "Наші товари"
   },
+  "SearchPage": {
+    "title": "Shofy - Пошук товарів",
+    "searchProducts": "Пошук товарів"
+  },
   "HomeHeroSlider": {
     "startingAt": "Від",
     "bestTablet": "Найкраща колекція планшетів 2023",

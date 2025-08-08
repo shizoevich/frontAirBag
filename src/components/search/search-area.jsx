@@ -1,7 +1,5 @@
 'use client';
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { useTranslations } from 'next-intl';
 import NiceSelect from "@/ui/nice-select";
 import ErrorMsg from "@/components/common/error-msg";
 import SearchPrdLoader from "@/components/loader/search-prd-loader";
@@ -9,11 +7,9 @@ import { useGetAllProductsQuery } from "@/redux/features/productsApi";
 import ProductItem from "@/components/products/electronics/product-item";
 import ReactPaginate from 'react-paginate';
 
-export default function SearchArea() {
-  const t = useTranslations('SearchArea');
-  const searchParams = useSearchParams();
-  const searchText = searchParams.get('searchText');
-  const categoryId = searchParams.get('categoryId');
+export default function SearchArea({ translations, initialSearchText, initialCategoryId }) {
+  const searchText = initialSearchText;
+  const categoryId = initialCategoryId;
   const { data: productsData, isError, isLoading } = useGetAllProductsQuery();
   const [shortValue, setShortValue] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
@@ -38,7 +34,7 @@ export default function SearchArea() {
   }
 
   if (!isLoading && isError) {
-    content = <ErrorMsg msg={t('error')} />;
+    content = <ErrorMsg msg={translations.error} />;
   }
 
   const products = Array.isArray(productsData) 
@@ -50,7 +46,7 @@ export default function SearchArea() {
         : [];
 
   if (!isLoading && !isError && products.length === 0) {
-    content = <ErrorMsg msg={t('noProductsFound')} />;
+    content = <ErrorMsg msg={translations.noProductsFound} />;
   }
 
   if (!isLoading && !isError && products.length > 0) {
@@ -82,7 +78,7 @@ export default function SearchArea() {
     if (product_items.length === 0) {
       content = (
         <div className="text-center pt-80 pb-80">
-          <h3>{t('noResults', { searchText: searchText ? <span style={{color:'#0989FF'}}>{searchText}</span> : '' })}</h3>
+          <h3>{translations.noResults.replace('{searchText}', searchText || '')}</h3>
         </div>
       );
     } else {
@@ -102,7 +98,7 @@ export default function SearchArea() {
                       <div className="col-xl-6">
                         <div className="tp-shop-top-left d-flex align-items-center">
                           <div className="tp-shop-top-result">
-                            <p>{t('showingResults', { start: offset + 1, end: Math.min(offset + itemsPerPage, product_items.length), total: product_items.length })}</p>
+                            <p>Показано {offset + 1}-{Math.min(offset + itemsPerPage, product_items.length)} з {product_items.length} товарів</p>
                           </div>
                         </div>
                       </div>
@@ -111,13 +107,13 @@ export default function SearchArea() {
                           <div className="tp-shop-top-select">
                             <NiceSelect
                               options={[
-                                { value: "default", text: t('shortByPrice') },
-                                { value: "price-asc", text: t('priceLowToHigh') },
-                                { value: "price-desc", text: t('priceHighToLow') },
+                                { value: "default", text: translations.shortByPrice },
+                                { value: "price-asc", text: translations.priceLowToHigh },
+                                { value: "price-desc", text: translations.priceHighToLow },
                               ]}
                               defaultCurrent={0}
                               onChange={shortHandler}
-                              name={t('shortByPrice')}
+                              name={translations.shortByPrice}
                             />
                           </div>
                         </div>
@@ -148,12 +144,12 @@ export default function SearchArea() {
                   {pageCount > 1 && (
                     <div className="tp-pagination mt-35">
                       <ReactPaginate
-                        breakLabel={t('breakLabel')}
-                        nextLabel={t('nextPage')}
+                        breakLabel={translations.breakLabel}
+                        nextLabel={translations.nextPage}
                         onPageChange={handlePageClick}
                         pageRangeDisplayed={3}
                         pageCount={pageCount}
-                        previousLabel={t('previousPage')}
+                        previousLabel={translations.previousPage}
                         renderOnZeroPageCount={null}
                         containerClassName="tp-pagination-style mb-20 text-center"
                         pageLinkClassName="tp-pagination-link"
