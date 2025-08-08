@@ -138,3 +138,206 @@
   height: auto !important;
   object-fit: contain !important;
 }
+
+/* Стили для слайдера фотографий в product-details */
+.tp-product-details-thumb-wrapper {
+  gap: 20px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.tp-product-details-thumb-nav {
+  flex-shrink: 0;
+  width: 100px;
+  max-width: 100px;
+}
+
+.tp-product-details-main-slider {
+  flex: 1;
+  position: relative;
+  max-width: 100% !important;
+  width: 100% !important;
+  overflow: hidden;
+}
+
+.product-thumbs-swiper {
+  height: 500px;
+}
+
+.tp-product-details-thumb-item {
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tp-product-details-thumb-item img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.tp-product-details-thumb-item:hover {
+  border-color: var(--tp-theme-primary);
+}
+
+.product-thumbs-swiper .swiper-slide-thumb-active .tp-product-details-thumb-item {
+  border-color: var(--tp-theme-primary);
+}
+
+.product-main-swiper {
+  border-radius: 8px;
+  overflow: hidden;
+  max-height: 500px;
+}
+
+.product-main-swiper .tp-product-details-nav-main-thumb {
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.product-main-swiper .tp-product-details-nav-main-thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Для одиночного изображения без слайдера */
+.tp-product-details-main-slider .tp-product-details-nav-main-thumb {
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.tp-product-details-main-slider .tp-product-details-nav-main-thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Навигационные стрелки */
+.tp-product-details-nav-prev,
+.tp-product-details-nav-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.tp-product-details-main-slider:hover .tp-product-details-nav-prev,
+.tp-product-details-main-slider:hover .tp-product-details-nav-next {
+  opacity: 1;
+}
+
+.tp-product-details-nav-prev:hover,
+.tp-product-details-nav-next:hover {
+  background: var(--tp-theme-primary);
+}
+
+.tp-product-details-nav-prev {
+  left: 10px;
+}
+
+.tp-product-details-nav-next {
+  right: 10px;
+}
+
+/* Принудительное ограничение размеров изображений */
+.tp-product-details-thumb-wrapper {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.tp-product-details-main-slider {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.product-main-swiper {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.tp-product-details-thumb-wrapper img,
+.tp-product-details-main-slider img,
+.product-main-swiper img {
+  max-width: 100% !important;
+  max-height: 500px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+.tp-product-details-thumb-item img {
+  max-width: 78px !important;
+  max-height: 100px !important;
+  width: 78px !important;
+  height: 100px !important;
+  object-fit: contain !important;
+}
+
+/* Мобильные стили */
+@media (max-width: 600px) {
+  .tp-product-details-main-slider,
+  .tp-product-details-thumb-wrapper {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  .tp-product-details-thumb-wrapper {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .tp-product-details-thumb-nav {
+    width: 100%;
+    order: 2;
+  }
+  
+  .product-thumbs-swiper {
+    height: auto;
+  }
+  
+  .tp-product-details-main-slider {
+    order: 1;
+  }
+  
+  /* Мобильные размеры изображений */
+  .tp-product-details-thumb-wrapper img,
+  .tp-product-details-main-slider img,
+  .product-main-swiper img {
+    max-height: 300px !important;
+  }
+}

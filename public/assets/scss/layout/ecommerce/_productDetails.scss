@@ -32,13 +32,17 @@
     }
     &-nav-main-thumb{
         position: relative;
-        background-color:#F5F6F8;
+        background-color: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         & img{
-            object-fit: cover;
+            object-fit: contain;
         }
     }
     &-thumb{
         &-wrapper{
+            position: relative; /* Ensure this is the positioning context for arrows */
             position: sticky;
             top: 120px;
             margin-right: 20px;
@@ -1012,6 +1016,24 @@
     }
     &-bottom{
         border-bottom: 1px solid #E0E2E3;
+    }
+    &-nav-prev,
+    &-nav-next{
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid #ddd;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        &:hover {
+            background: #fff;
+            color: var(--tp-theme-primary);
+        }
     }
     &-tab{
         &-nav{

@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import "@/styles/custom-slider.css";
 
 if (typeof window !== "undefined") {
   require("bootstrap/dist/js/bootstrap");

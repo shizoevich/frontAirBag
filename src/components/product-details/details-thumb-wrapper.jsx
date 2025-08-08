@@ -1,30 +1,57 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import Image from 'next/image';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Thumbs, FreeMode } from 'swiper/modules';
 import PopupVideo from '../common/popup-video';
 
-const DetailsWrapper = ({
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/thumbs';
+import 'swiper/css/free-mode';
+
+const DetailsThumbWrapper = ({
+  product,
+  activeImg,
+  handleImageActive,
   imageURLs = [],
-  handleImageActive = () => {},
-  activeImg = '',
   imgWidth = 416,
   imgHeight = 480,
   videoId = false,
   status = ''
 }) => {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const mainSwiperRef = useRef(null);
   const defaultImage = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg'; // Используем стандартную заглушку для всего сайта
 
   // Безопасная обработка изображений
   const normalizedImages = useMemo(() => {
     try {
-      if (!Array.isArray(imageURLs)) return [];
-      return imageURLs
-        .filter(item => item?.img && typeof item.img === 'string')
-        .map(item => ({
+      if (!Array.isArray(imageURLs)) {
+        return [];
+      }
+      
+      const filtered = imageURLs.filter(item => {
+        // Поддерживаем как объекты {img: "url"}, так и простые строки
+        if (typeof item === 'string') {
+          return item.trim().length > 0;
+        }
+        return item?.img && typeof item.img === 'string';
+      });
+      
+      const normalized = filtered.map(item => {
+        // Нормализуем в единый формат {img: "url"}
+        if (typeof item === 'string') {
+          return { img: item.trim() || defaultImage };
+        }
+        return {
           ...item,
           img: item.img.trim() || defaultImage
-        }));
+        };
+      });
+      
+      return normalized;
     } catch (error) {
       console.error('Error normalizing images:', error);
       return [];
@@ -59,42 +86,27 @@ const DetailsWrapper = ({
   const hasVideo = Boolean(videoId);
 
   return (
-    <div className="tp-product-details-thumb-wrapper tp-tab d-sm-flex">
-      {/* Миниатюры */}
-      {normalizedImages.length > 0 && (
-        <nav>
-          <div className="nav nav-tabs flex-sm-column">
-            {normalizedImages.map((item, i) => (
-              <button
-                key={`thumb-${i}`}
-                className={`nav-link ${item.img === safeActiveImg ? 'active' : ''}`}
-                onClick={() => handleSafeClick(item)}
-              >
-                <Image
-                  src={item.img || 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg'}
-                  alt={`Thumbnail ${i + 1}`}
-                  width={78}
-                  height={100}
-                  style={{ width: '100%', height: '100%' }}
-                  onError={(e) => {
-                    e.currentTarget.src = defaultImage;
-                  }}
-                />
-              </button>
-            ))}
-          </div>
-        </nav>
-      )}
-
-      {/* Основное изображение */}
-      <div className="tab-content m-img">
-        <div className="tab-pane fade show active">
+    <div className="tp-product-details-thumb-wrapper">
+      {/* Основной слайдер изображений */}
+      <div className="tp-product-details-main-slider">
+        {normalizedImages.length <= 1 ? (
+          // Если только одно изображение или нет, показываем без слайдера
           <div className="tp-product-details-nav-main-thumb p-relative">
             <Image
-              src={safeActiveImg}
-              alt="Product main image"
-              width={imgWidth}
-              height={imgHeight}
+              src={normalizedImages[0]?.img || defaultImage}
+              alt="Product image"
+              width={0}
+              height={0}
+              sizes="100vw"
+              style={{
+                width: '100%',
+                height: 'auto',
+                maxWidth: '100%',
+                maxHeight: '550px',
+                objectFit: 'contain',
+                display: 'block',
+                margin: '0 auto'
+              }}
               onError={(e) => {
                 e.currentTarget.src = defaultImage;
               }}
@@ -119,10 +131,75 @@ const DetailsWrapper = ({
               </div>
             )}
           </div>
-        </div>
+        ) : (
+          // Если несколько изображений, используем слайдер
+          <Swiper
+            ref={mainSwiperRef}
+            spaceBetween={10}
+            navigation={{
+              nextEl: '.tp-product-details-nav-next',
+              prevEl: '.tp-product-details-nav-prev',
+            }}
+            modules={[Navigation]}
+            className="product-main-swiper"
+          >
+            {normalizedImages.map((item, i) => (
+              <SwiperSlide key={`main-${i}`}>
+                <div className="tp-product-details-nav-main-thumb p-relative">
+                  <Image
+                    src={item.img || defaultImage}
+                    alt={`Product image ${i + 1}`}
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      maxWidth: '100%',
+                      maxHeight: '550px',
+                      objectFit: 'contain',
+                      display: 'block',
+                      margin: '0 auto'
+                    }}
+                    onError={(e) => {
+                      e.currentTarget.src = defaultImage;
+                    }}
+                  />
+
+                  {/* Бейдж статуса */}
+                  {status === 'out-of-stock' && i === 0 && (
+                    <div className="tp-product-badge">
+                      <span className="product-hot">out-stock</span>
+                    </div>
+                  )}
+
+                  {/* Кнопка видео */}
+                  {hasVideo && i === 0 && (
+                    <div
+                      onClick={() => setIsVideoOpen(true)}
+                      className="tp-product-details-thumb-video"
+                    >
+                      <button className="tp-product-details-thumb-video-btn popup-video">
+                        <i className="fas fa-play"></i>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
       </div>
 
-      {/* Попап видео */}
+      {/* Навигационные стрелки */}
+      <div className="tp-product-details-nav-prev">
+        <i className="fa-solid fa-angle-left"></i>
+      </div>
+      <div className="tp-product-details-nav-next">
+        <i className="fa-solid fa-angle-right"></i>
+      </div>
+
+      {/* Video popup */}
       {hasVideo && (
         <PopupVideo
           isVideoOpen={isVideoOpen}
@@ -134,4 +211,4 @@ const DetailsWrapper = ({
   );
 };
 
-export default DetailsWrapper;
+export default DetailsThumbWrapper;

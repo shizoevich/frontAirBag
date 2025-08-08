@@ -45,7 +45,7 @@ const ProductDetailsContent = ({ productItem }) => {
               <DetailsThumbWrapper
                 activeImg={activeImg}
                 handleImageActive={handleImageActive}
-                imageURLs={imageURLs}
+                imageURLs={imageURLs || images || []}
                 imgWidth={580}
                 imgHeight={670}
                 videoId={videoId}
