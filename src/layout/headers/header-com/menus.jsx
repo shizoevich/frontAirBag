@@ -3,14 +3,17 @@ import React from "react";
 import menu_data from "@/data/menu-data";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from 'next-intl';
 
 const Menus = () => {
+  const t = useTranslations('menu');
+  
   return (
     <ul>
       {menu_data.map((menu) =>
         menu.homes ? (
           <li key={menu.id} className="has-dropdown has-mega-menu">
-            <Link href={menu.link}>{menu.title}</Link>
+            <Link href={menu.link}>{menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
             <div className="home-menu tp-submenu tp-mega-menu">
               <div className="row row-cols-1 row-cols-lg-4 row-cols-xl-4">
                 {menu.home_pages.map((home, i) => (
@@ -32,17 +35,17 @@ const Menus = () => {
           </li>
         ) : menu.products ? (
           <li key={menu.id} className="has-dropdown has-mega-menu ">
-            <Link href={menu.link}>{menu.title}</Link>
+            <Link href={menu.link}>{menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
             <ul className="tp-submenu tp-mega-menu mega-menu-style-2">
               {menu.product_pages.map((p, i) => (
                 <li key={i} className="has-dropdown">
                   <Link href={p.link} className="mega-menu-title">
-                    {p.title}
+                    {p.titleKey ? t(p.titleKey.replace('menu.', '')) : p.title}
                   </Link>
                   <ul className="tp-submenu">
                     {p.mega_menus.map((m, i) => (
                       <li key={i}>
-                        <Link href={m.link}>{m.title}</Link>
+                        <Link href={m.link}>{m.titleKey ? t(m.titleKey.replace('menu.', '')) : m.title}</Link>
                       </li>
                     ))}
                   </ul>
@@ -52,18 +55,18 @@ const Menus = () => {
           </li>
         ) : menu.sub_menu ? (
           <li key={menu.id} className="has-dropdown">
-            <Link href={menu.link}>{menu.title}</Link>
+            <Link href={menu.link}>{menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
             <ul className="tp-submenu">
               {menu.sub_menus.map((b, i) => (
                 <li key={i}>
-                  <Link href={b.link}>{b.title}</Link>
+                  <Link href={b.link}>{b.titleKey ? t(b.titleKey.replace('menu.', '')) : b.title}</Link>
                 </li>
               ))}
             </ul>
           </li>
         ) : (
           <li key={menu.id}>
-            <Link href={menu.link}>{menu.title}</Link>
+            <Link href={menu.link}>{menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
           </li>
         )
       )}

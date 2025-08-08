@@ -6,11 +6,13 @@ import { mobile_menu } from "@/data/menu-data";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { closeCartMini } from "@/redux/features/cartSlice";
+import { useTranslations } from 'next-intl';
 
 const MobileMenus = ({setIsCanvasOpen}) => {
   const [isActiveMenu, setIsActiveMenu] = useState("");
   const router = useRouter();
   const dispatch = useDispatch();
+  const t = useTranslations('menu');
 
   // handleOpenSubMenu
   const handleOpenSubMenu = (title) => {
@@ -63,7 +65,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
             ) : menu.sub_menu ? (
               <li key={menu.id} className={`has-dropdown ${isActiveMenu === menu.title ? 'dropdown-opened':''}`}>
                 <a className={`${isActiveMenu === menu.title ? 'expanded':''}`}>
-                  {menu.title}
+                  {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
                   <button onClick={()=> handleOpenSubMenu(menu.title)} className={`dropdown-toggle-btn ${isActiveMenu === menu.title ? 'dropdown-opened':''}`}>
                     <i className="fa-regular fa-angle-right"></i>
                   </button>
@@ -71,14 +73,14 @@ const MobileMenus = ({setIsCanvasOpen}) => {
                 <ul className={`tp-submenu ${isActiveMenu === menu.title ? 'active':''}`}>
                   {menu.sub_menus.map((b, i) => (
                     <li key={i}>
-                      <Link href={b.link} onClick={() => handleNavigation(b.link)}>{b.title}</Link>
+                      <Link href={b.link} onClick={() => handleNavigation(b.link)}>{b.titleKey ? t(b.titleKey.replace('menu.', '')) : b.title}</Link>
                     </li>
                   ))}
                 </ul>
               </li>
             ) : (
               <li key={menu.id}>
-                <Link href={menu.link} onClick={() => handleNavigation(menu.link)}>{menu.title}</Link>
+                <Link href={menu.link} onClick={() => handleNavigation(menu.link)}>{menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
               </li>
             )}
           </ul>

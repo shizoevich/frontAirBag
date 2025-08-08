@@ -1,5 +1,4 @@
 'use client';
-'use client';
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import ErrorMsg from '@/components/common/error-msg';
@@ -13,6 +12,10 @@ const ParentCategories = ({
   onParentCategorySelect 
 }) => {
   const t = useTranslations('ParentCategories');
+  
+  // Отладка переводов
+  console.log('Translation for selectCategory:', t('selectCategory'));
+  console.log('Translation function t:', typeof t);
   // Находим родительские категории по ID (Covers, Комплектующие Airbag SRS, Пиропатроны)
   const parentCategoryIds = [754099, 754100, 754101]; // ID родительских категорий
   
@@ -102,7 +105,7 @@ const ParentCategories = ({
   
   return (
     <div className="parent-categories-container mb-4">
-      <h2 className="mb-3">Выберите категорию</h2>
+      <h2 className="mb-3">{t('selectCategory')}</h2>
       
       {content}
       

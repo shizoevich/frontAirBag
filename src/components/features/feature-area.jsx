@@ -1,8 +1,11 @@
 'use client';
 import React from 'react';
 import { feature_data } from './feature-data';
+import { useTranslations } from 'next-intl';
 
 const FeatureArea = () => {
+  const t = useTranslations('features');
+  
   return (
     <section className="tp-feature-area tp-feature-border-radius pb-70">
         <div className="container">
@@ -16,8 +19,8 @@ const FeatureArea = () => {
                       </span>
                     </div>
                     <div className="tp-feature-content">
-                      <h3 className="tp-feature-title">{item.title}</h3>
-                      <p>{item.subtitle}</p>
+                      <h3 className="tp-feature-title">{item.titleKey ? t(item.titleKey.replace('features.', '')) : item.title}</h3>
+                      <p>{item.subtitleKey ? t(item.subtitleKey.replace('features.', '')) : item.subtitle}</p>
                     </div>
                 </div>
               </div>

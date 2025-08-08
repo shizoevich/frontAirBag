@@ -4,25 +4,25 @@ export const feature_data = [
   {
     id: 1,
     icon: <DeliveryTwo />,
-    title: "Быстрая доставка",
-    subtitle: "Доставка по всей Украине за 1-3 дня"
+    titleKey: "features.fastDelivery",
+    subtitleKey: "features.fastDeliveryDesc"
   },
   {
     id: 2,
     icon: <Truck />,
-    title: "Гарантия качества",
-    subtitle: "Все запчасти Airbag проверены и сертифицированы"
+    titleKey: "features.qualityGuarantee",
+    subtitleKey: "features.qualityGuaranteeDesc"
   },
   {
     id: 3,
     icon: <Support />,
-    title: "Техподдержка",
-    subtitle: "Консультации по подбору и установке"
+    titleKey: "features.techSupport",
+    subtitleKey: "features.techSupportDesc"
   },
   {
     id: 4,
     icon: <Refund />,
-    title: "Выгодные цены",
-    subtitle: "Лучшие цены на рынке автозапчастей"
+    titleKey: "features.affordablePrices",
+    subtitleKey: "features.affordablePricesDesc"
   }
 ];

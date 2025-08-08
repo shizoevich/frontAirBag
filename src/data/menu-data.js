@@ -3,54 +3,54 @@ import home_1 from '@assets/img/menu/menu-home-1.jpg';
 const menu_data = [
   {
     id: 1,
-    title: 'Главная',
+    titleKey: 'menu.home',
     link: '/'
   },
   {
     id: 2,
     products: true,
-    title: '🔧 Каталог',
+    titleKey: 'menu.catalog',
     link: '/shop',
     product_pages: [
       {
-        title: '🚘 Марки автомобилей',
+        titleKey: 'menu.carBrands',
         link: '/search/brand',
         mega_menus: [
-          { title: 'Выберите марку автомобиля', link: '/search/brand' },
-          { title: 'Автоковеры по брендам', link: '/shop/covers' },
-          { title: 'Поиск запчастей по марке авто', link: '/search/by-brand' },
+          { titleKey: 'menu.selectCarBrand', link: '/search/brand' },
+          { titleKey: 'menu.carMats', link: '/shop/covers' },
+          { titleKey: 'menu.searchByBrand', link: '/search/by-brand' },
         ]
       },
       {
-        title: '🛡️ Комплектующие Airbag SRS',
+        titleKey: 'menu.airbagComponents',
         link: '/shop-category/airbag-components',
         mega_menus: [
-          { title: 'Коннекторы - Разъёмы и соединители для подушек безопасности', link: '/shop/connectors' },
-          { title: 'Крепления - Крепёжные элементы и скобы', link: '/shop/mounts' },
-          { title: 'Обманки (Резисторы) - Резисторы для диагностики SRS', link: '/shop/resistors' },
-          { title: 'Парашюты (Мешки) - Пневматические мешки (Airbag)', link: '/shop/airbags' },
-          { title: 'Запчасти для Ремней - Фурнитура и компоненты ремней безопасности', link: '/shop/belt-parts' },
+          { titleKey: 'menu.connectors', link: '/shop/connectors' },
+          { titleKey: 'menu.mounts', link: '/shop/mounts' },
+          { titleKey: 'menu.resistors', link: '/shop/resistors' },
+          { titleKey: 'menu.airbags', link: '/shop/airbags' },
+          { titleKey: 'menu.beltParts', link: '/shop/belt-parts' },
         ]
       },
       {
-        title: '💥 Пиропатроны',
+        titleKey: 'menu.pyrotechnics',
         link: '/shop-category/pyrotechnics',
         mega_menus: [
-          { title: 'ПП в Ремни - Пиропатроны в ремни безопасности', link: '/shop/pyro-belts' },
-          { title: 'ПП в Ноги/Сиденье - Пиропатроны в сиденья и нижнюю часть салона', link: '/shop/pyro-seats' },
-          { title: 'ПП в Шторы - Шторные пиропатроны (боковая защита)', link: '/shop/pyro-curtains' },
-          { title: 'ПП в руль 1 запал / 2 запала - Пиропатроны в рулевую подушку', link: '/shop/pyro-steering' },
-          { title: 'ПП в торпедо 1 запал / 2 запала - Пиропатроны в пассажирскую подушку', link: '/shop/pyro-dashboard' },
+          { titleKey: 'menu.pyroBelts', link: '/shop/pyro-belts' },
+          { titleKey: 'menu.pyroSeats', link: '/shop/pyro-seats' },
+          { titleKey: 'menu.pyroCurtains', link: '/shop/pyro-curtains' },
+          { titleKey: 'menu.pyroSteering', link: '/shop/pyro-steering' },
+          { titleKey: 'menu.pyroDashboard', link: '/shop/pyro-dashboard' },
         ]
       },
       {
-        title: '📊 Мой аккаунт',
+        titleKey: 'menu.myAccount',
         link: '/profile',
         mega_menus: [
-          { title: 'Корзина', link: '/cart' },
-          { title: 'Избранное', link: '/wishlist' },
-          { title: 'Оформление заказа', link: '/checkout' },
-          { title: 'Мои заказы', link: '/order' },
+          { titleKey: 'menu.cart', link: '/cart' },
+          { titleKey: 'menu.wishlist', link: '/wishlist' },
+          { titleKey: 'menu.checkout', link: '/checkout' },
+          { titleKey: 'menu.myOrders', link: '/order' },
         ]
       },
     ]
@@ -69,13 +69,13 @@ const menu_data = [
   {
     id: 4,
     single_link: true,
-    title: '📞 Контакты',
+    titleKey: 'menu.contacts',
     link: '/contact',
   },
   {
     id: 5,
     single_link: true,
-    title: '💰 Скидки',
+    titleKey: 'menu.discounts',
     link: '/coupon',
   },
 ]

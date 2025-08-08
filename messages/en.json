@@ -3,9 +3,58 @@
     "contact_us": "Contact Us",
     "shippingInfo": "🚚 Free shipping on orders over 2000 ₴ | 🛡️ Quality guarantee for all Airbag parts"
   },
+  "menu": {
+    "home": "🏠 Home",
+    "catalog": "🔧 Catalog",
+    "carBrands": "🚘 Car Brands",
+    "selectCarBrand": "Select Car Brand",
+    "carMats": "Car Mats by Brands",
+    "searchByBrand": "Search Parts by Car Brand",
+    "airbagComponents": "🛡️ Airbag SRS Components",
+    "connectors": "Connectors - Plugs and connectors for airbags",
+    "mounts": "Mounts - Mounting elements and brackets",
+    "resistors": "Resistors - Resistors for SRS diagnostics",
+    "airbags": "Airbags - Pneumatic bags (Airbag)",
+    "beltParts": "Belt Parts - Hardware and seat belt components",
+    "pyrotechnics": "💥 Pyrotechnics",
+    "pyroBelts": "PP in Belts - Pyrotechnics in seat belts",
+    "pyroSeats": "PP in Legs/Seat - Pyrotechnics in seats and lower cabin",
+    "pyroCurtains": "PP in Curtains - Curtain pyrotechnics (side protection)",
+    "pyroSteering": "PP in steering wheel 1 igniter / 2 igniters - Pyrotechnics in steering airbag",
+    "pyroDashboard": "PP in dashboard 1 igniter / 2 igniters - Pyrotechnics in passenger airbag",
+    "myAccount": "📊 My Account",
+    "cart": "Cart",
+    "wishlist": "Wishlist",
+    "checkout": "Checkout",
+    "myOrders": "My Orders",
+    "search": "🔍 Search",
+    "searchCatalog": "Search Catalog",
+    "searchByVin": "Search by VIN",
+    "searchByBrandMenu": "Search by Brand",
+    "contacts": "📞 Contacts",
+    "discounts": "💰 Discounts"
+  },
+  "features": {
+    "fastDelivery": "Fast Delivery",
+    "fastDeliveryDesc": "Delivery throughout Ukraine in 1-3 days",
+    "qualityGuarantee": "Quality Guarantee",
+    "qualityGuaranteeDesc": "All Airbag parts are tested and certified",
+    "techSupport": "Tech Support",
+    "techSupportDesc": "Consultations on selection and installation",
+    "affordablePrices": "Affordable Prices",
+    "affordablePricesDesc": "Best prices in the auto parts market"
+  },
+  "ParentCategories": {
+    "selectCategory": "Select Category",
+    "all_categories": "All Categories",
+    "covers": "Covers",
+    "airbag_components": "Airbag SRS Components",
+    "squibs": "Squibs",
+    "loadingError": "Error loading categories",
+    "noCategoriesFound": "No categories found"
+  },
   "HeaderSearchForm": {
-    "placeholder": "Search for products...",
-    "selectCategory": "Select Category"
+    "placeholder": "Search for products..."
   },
   "HeaderMainRight": {
     "hello": "Hello,",
@@ -93,14 +142,6 @@
     "cart": "Cart",
     "login": "Login",
     "logout": "Logout"
-  },
-  "ParentCategories": {
-    "all_categories": "All Categories",
-    "covers": "Covers",
-    "airbag_components": "Airbag SRS Components",
-    "squibs": "Squibs",
-    "loadingError": "Error loading categories",
-    "noCategoriesFound": "Categories not found"
   },
   "AllProductsArea": {
     "loadingError": "Error loading products",
