@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 // internal
 import Menus from "./header-com/menus";
 import useSticky from "@/hooks/use-sticky";
-import logo from "@assets/img/logo/logo.svg";
+import logo from "@assets/img/logo/auto-delivery-logo-nobg.png";
 import useCartInfo from "@/hooks/use-cart-info";
 import OffCanvas from "@/components/common/off-canvas";
 import { openCartMini, closeCartMini } from "@/redux/features/cartSlice";
@@ -89,7 +89,19 @@ const Header = () => {
                 <div className="col-xl-2 col-lg-2 col-md-4 col-6">
                   <div className="logo">
                     <Link href="/">
-                      <Image src={logo} alt="logo" />
+                      <Image 
+                        src={logo} 
+                        alt="logo" 
+                        style={{
+                          maxWidth: '140px',
+                          maxHeight: '70px',
+                          width: 'auto',
+                          height: 'auto',
+                          objectFit: 'contain'
+                        }}
+                        width={140}
+                        height={70}
+                      />
                     </Link>
                   </div>
                 </div>
@@ -157,7 +169,19 @@ const Header = () => {
               <div className="col-xl-3 col-lg-3 col-md-3 col-6">
                 <div className="logo">
                   <Link href="/">
-                    <Image src={logo} alt="logo" />
+                    <Image 
+                      src={logo} 
+                      alt="logo" 
+                      style={{
+                        maxWidth: '80px',
+                        maxHeight: '40px',
+                        width: 'auto',
+                        height: 'auto',
+                        objectFit: 'contain'
+                      }}
+                      width={80}
+                      height={40}
+                    />
                   </Link>
                 </div>
               </div>

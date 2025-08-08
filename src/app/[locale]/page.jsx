@@ -17,9 +17,7 @@ export default function HomePage() {
       <FeatureArea/>
       <AllProductsArea/>
       <BannerArea/>
-      <ProductBanner/>
       <NewArrivals/>
-      <InstagramArea/>
       <CtaArea/>
       <Footer/>
     </Wrapper>

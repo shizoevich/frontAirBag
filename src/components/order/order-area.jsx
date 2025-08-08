@@ -4,7 +4,7 @@ import Image from "next/image";
 import dayjs from "dayjs";
 import ReactToPrint from "react-to-print";
 // internal
-import logo from "@assets/img/logo/logo.svg";
+import logo from "@assets/img/logo/auto-delivery-logo-nobg.png";
 import ErrorMsg from "@/components/common/error-msg";
 import { useGetUserOrderByIdQuery } from "@/redux/features/order/orderApi";
 import PrdDetailsLoader from "@/components/loader/prd-details-loader";
@@ -43,7 +43,19 @@ const OrderArea = ({ orderId }) => {
                       <div className="row align-items-end">
                         <div className="col-md-4 col-sm-6">
                           <div className="invoice__left">
-                            <Image src={logo} alt="logo" />
+                            <Image 
+                              src={logo} 
+                              alt="logo" 
+                              style={{
+                                maxWidth: '120px',
+                                maxHeight: '60px',
+                                width: 'auto',
+                                height: 'auto',
+                                objectFit: 'contain'
+                              }}
+                              width={120}
+                              height={60}
+                            />
                             <p>2879 Elk Creek Road <br /> Stone Mountain, Georgia </p>
                           </div>
                         </div>

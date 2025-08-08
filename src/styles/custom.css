@@ -65,3 +65,76 @@
 .tp-header-search-category .nice-select .list .option.selected {
   color: var(--tp-theme-primary) !important;
 }
+
+/* Стили для нового логотипа - НОРМАЛЬНЫЙ размер как у Shofy */
+.logo img,
+.tp-footer-logo img,
+.offcanvas__logo img {
+  max-width: 120px !important;
+  max-height: 60px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+/* Специальные стили для логотипа в header */
+.tp-header .logo img,
+.tp-header-main .logo img {
+  max-width: 140px !important;
+  max-height: 70px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+/* Стили для логотипа в footer - увеличенный размер и центрирование */
+.tp-footer-logo {
+  text-align: center !important;
+  margin-bottom: 1rem !important;
+}
+
+.tp-footer-logo img {
+  max-width: 160px !important;
+  max-height: 80px !important;
+  width: auto !important;
+  height: auto !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+/* Дополнительные стили для auto-delivery-logo без фона */
+.logo img[src*="auto-delivery-logo-nobg"],
+.tp-footer-logo img[src*="auto-delivery-logo-nobg"],
+.offcanvas__logo img[src*="auto-delivery-logo-nobg"] {
+  max-width: 160px !important;
+  max-height: 80px !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* Специальные стили для footer с увеличенным логотипом */
+.tp-footer-logo img[src*="auto-delivery-logo-nobg"] {
+  max-width: 160px !important;
+  max-height: 80px !important;
+}
+
+/* Стили для логотипа в off-canvas меню - уменьшенный размер */
+.offcanvas__logo img {
+  max-width: 80px !important;
+  max-height: 40px !important;
+  width: 80px !important;
+  height: 40px !important;
+  object-fit: contain !important;
+}
+
+/* Стили для логотипа в sticky header - уменьшенный размер при прокрутке */
+.header-sticky .logo img,
+.header-sticky-2 .logo img,
+.tp-header-sticky-area .logo img {
+  max-width: 80px !important;
+  max-height: 40px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}

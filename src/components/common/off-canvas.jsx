@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 // internal
 import { CloseTwo } from '@/svg';
-import logo from '@assets/img/logo/logo.svg';
+import logo from '@assets/img/logo/auto-delivery-logo-nobg.png';
 import contact_img from '@assets/img/icon/contact.png';
 import MobileCategory from '@/layout/headers/header-com/mobile-category';
 import MobileMenus from './mobile-menus';
@@ -41,11 +41,21 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
           <div className="offcanvas__content">
             <div className="offcanvas__top mb-70 d-flex justify-content-between align-items-center">
               <div className="offcanvas__logo logo">
-                <div className="offcanvas__logo logo">
-                  <Link href="/" onClick={() => setIsCanvasOpen(false)}>
-                    <Image src={logo} alt="logo" />
-                  </Link>
-                </div>
+                <Link href="/" onClick={() => setIsCanvasOpen(false)}>
+                  <Image 
+                    src={logo} 
+                    alt="logo" 
+                    style={{
+                      maxWidth: '80px',
+                      maxHeight: '40px',
+                      width: 'auto',
+                      height: 'auto',
+                      objectFit: 'contain'
+                    }}
+                    width={80}
+                    height={40}
+                  />
+                </Link>
               </div>
             </div>
             <div className="offcanvas__category pb-40">

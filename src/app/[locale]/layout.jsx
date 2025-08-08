@@ -62,6 +62,15 @@ export async function generateMetadata({ params }) {
   return {
     title: 'Shofy - E-commerce App',
     description: 'Shofy - E-commerce App',
+    icons: {
+      icon: '/favicon.ico',
+      shortcut: '/favicon.ico',
+      apple: '/assets/img/logo/favicon.png',
+      other: {
+        rel: 'apple-touch-icon-precomposed',
+        url: '/assets/img/logo/favicon.png',
+      },
+    },
   };
 }
 

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 // internal
-import logo from '@assets/img/logo/logo.svg';
+import logo from '@assets/img/logo/auto-delivery-logo-nobg.png';
 import pay from '@assets/img/footer/footer-pay.png';
 import social_data from '@/data/social-data';
 import { Email, Location } from '@/svg';
@@ -21,9 +21,23 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
               <div className="col-xl-4 col-lg-3 col-md-4 col-sm-6">
                 <div className="tp-footer-widget footer-col-1 mb-50">
                   <div className="tp-footer-widget-content">
-                    <div className="tp-footer-logo">
+                    <div className="tp-footer-logo text-center mb-3">
                       <Link href="/">
-                        <Image src={logo} alt="logo" />
+                        <Image 
+                          src={logo} 
+                          alt="logo" 
+                          style={{
+                            maxWidth: '160px',
+                            maxHeight: '80px',
+                            width: 'auto',
+                            height: 'auto',
+                            objectFit: 'contain',
+                            display: 'block',
+                            margin: '0 auto'
+                          }}
+                          width={160}
+                          height={80}
+                        />
                       </Link>
                     </div>
                     <p className="tp-footer-desc">{t('description')}</p>

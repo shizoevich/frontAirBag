@@ -45,7 +45,7 @@
     "affordablePricesDesc": "Best prices in the auto parts market"
   },
   "ParentCategories": {
-    "selectCategory": "Select Category",
+    "selectCategory": "Category",
     "all_categories": "All Categories",
     "covers": "Covers",
     "airbag_components": "Airbag SRS Components",
