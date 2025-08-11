@@ -10,6 +10,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
 import 'swiper/css/free-mode';
+import './product-slider-fix.css';
 
 const DetailsThumbWrapper = ({
   product,
@@ -192,11 +193,13 @@ const DetailsThumbWrapper = ({
       </div>
 
       {/* Навигационные стрелки */}
-      <div className="tp-product-details-nav-prev">
-        <i className="fa-solid fa-angle-left"></i>
-      </div>
-      <div className="tp-product-details-nav-next">
-        <i className="fa-solid fa-angle-right"></i>
+      <div className="tp-product-details-nav-btns">
+        <div className="tp-product-details-nav-prev">
+          <i className="fa-solid fa-angle-left"></i>
+        </div>
+        <div className="tp-product-details-nav-next">
+          <i className="fa-solid fa-angle-right"></i>
+        </div>
       </div>
 
       {/* Video popup */}

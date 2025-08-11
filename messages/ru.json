@@ -110,6 +110,7 @@
   "ProductDetails": {
     "inStock": "В наличии",
     "outOfStock": "Нет в наличии",
+    "availableItems": "Доступно: {count} шт.",
     "seeLess": "Свернуть",
     "seeMore": "Показать больше",
     "colorLabel": "Цвет :",

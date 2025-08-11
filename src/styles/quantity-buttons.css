@@ -1,0 +1,26 @@
+/* Стили для неактивных кнопок увеличения/уменьшения количества товара */
+.tp-cart-plus.disabled,
+.tp-cart-minus.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Стили для кнопки "Купить сейчас" */
+.tp-product-details-buy-now-btn {
+  background-color: #ffffff;
+  color: #0989ff;
+  border: 1px solid #0989ff;
+}
+
+.tp-product-details-buy-now-btn:hover {
+  background-color: #f5f5f5;
+}
+
+/* Стили для кнопки "Купить сейчас" в неактивном состоянии */
+.tp-product-details-buy-now-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: #f0f0f0;
+  color: #999;
+  border: 1px solid #ddd;
+}

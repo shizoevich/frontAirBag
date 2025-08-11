@@ -110,6 +110,7 @@
   "ProductDetails": {
     "inStock": "В наявності",
     "outOfStock": "Немає в наявності",
+    "availableItems": "Доступно: {count} шт.",
     "seeLess": "Згорнути",
     "seeMore": "Показати більше",
     "colorLabel": "Колір :",

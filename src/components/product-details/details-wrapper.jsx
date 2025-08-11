@@ -8,13 +8,16 @@ import { AskQuestion, WishlistTwo } from '@/svg';
 import DetailsBottomInfo from './details-bottom-info';
 import ProductDetailsCountdown from './product-details-countdown';
 import ProductQuantity from './product-quantity';
+import StockNotification from './stock-notification';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { handleModalClose } from '@/redux/features/productModalSlice';
 
 const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBottom = false }) => {
   const t = useTranslations('ProductDetails');
-  const { sku, img, title, imageURLs, category, description, discount, price, status, tags, offerDate } = productItem || {};
+  const { sku, img, title, imageURLs, category, description, discount, price, status, tags, offerDate, residue = 0 } = productItem || {};
+  // Определяем доступность товара на основе residue
+  const isAvailable = residue > 0;
   const [textMore, setTextMore] = useState(false);
   const dispatch = useDispatch()
 
@@ -40,10 +43,12 @@ const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBott
       {/* inventory details */}
       <div className="tp-product-details-inventory d-flex align-items-center mb-10">
         <div className="tp-product-details-stock mb-10">
-          <span>{status === 'in-stock' ? t('inStock') : t('outOfStock')}</span>
+          <span>{isAvailable ? t('inStock') : t('outOfStock')}</span>
         </div>
-
       </div>
+      
+      {/* stock notification */}
+      <StockNotification availableQuantity={residue} requestedQuantity={0} />
       {description && (
         <p>{textMore ? description : `${description.substring(0, 100)}...`}
           <span onClick={() => setTextMore(!textMore)}>{textMore ? t('seeLess') : t('seeMore')}</span>
@@ -96,19 +101,19 @@ const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBott
         <h3 className="tp-product-details-action-title">{t('quantityLabel')}</h3>
         <div className="tp-product-details-action-item-wrapper d-sm-flex align-items-center">
           {/* product quantity */}
-          <ProductQuantity />
+          <ProductQuantity maxQuantity={residue} />
           {/* product quantity */}
           <div className="tp-product-details-add-to-cart mb-15 w-100">
-            <button onClick={() => handleAddProduct(productItem)} disabled={status === 'out-of-stock'} className="tp-product-details-add-to-cart-btn w-100">{t('addToCart')}</button>
+            <Link href="/cart" onClick={() => dispatch(handleModalClose())}>
+              <button disabled={!isAvailable} className="tp-product-details-buy-now-btn w-100">{t('buyNow')}</button>
+            </Link>
           </div>
         </div>
-        <Link href="/cart" onClick={() => dispatch(handleModalClose())}>
-          <button className="tp-product-details-buy-now-btn w-100">{t('buyNow')}</button>
-        </Link>
+        <button onClick={() => handleAddProduct(productItem)} disabled={!isAvailable} className="tp-product-details-add-to-cart-btn w-100">{t('addToCart')}</button>
       </div>
       {/* product-details-action-sm start */}
       <div className="tp-product-details-action-sm">
-        <button disabled={status === 'out-of-stock'} onClick={() => handleWishlistProduct(productItem)} type="button" className="tp-product-details-action-sm-btn">
+        <button disabled={!isAvailable} onClick={() => handleWishlistProduct(productItem)} type="button" className="tp-product-details-action-sm-btn">
           <WishlistTwo />
           {t('addWishlist')}
         </button>

@@ -15,27 +15,42 @@ export const cartSlice = createSlice({
     add_cart_product: (state, { payload }) => {
       // Use id or _id for product identification (normalize field)
       const productId = payload.id || payload._id;
+      // Получаем доступное количество товара (residue)
+      const availableQuantity = payload.residue || 0;
+      
+      // Если товара нет в наличии, показываем ошибку
+      if (availableQuantity <= 0) {
+        notifyError("Товар отсутствует на складе!");
+        return;
+      }
+      
       // Find product in cart
       const existingIndex = state.cart_products.findIndex((i) => (i.id || i._id) === productId);
+      
       if (existingIndex === -1) {
-        // Add new product
-        const newItem = {
-          ...payload,
-          id: productId, // ensure id field always present
-          orderQuantity: state.orderQuantity,
-        };
-        state.cart_products.push(newItem);
-        notifySuccess(`${state.orderQuantity} ${payload.title} добавлено в корзину`);
+        // Проверяем, не превышает ли заказываемое количество доступное
+        if (state.orderQuantity <= availableQuantity) {
+          // Add new product
+          const newItem = {
+            ...payload,
+            id: productId, // ensure id field always present
+            orderQuantity: state.orderQuantity,
+          };
+          state.cart_products.push(newItem);
+          notifySuccess(`${state.orderQuantity} ${payload.title} добавлено в корзину`);
+        } else {
+          notifyError(`Доступно только ${availableQuantity} шт. товара!`);
+        }
       } else {
         // Increment quantity for existing product
         const item = state.cart_products[existingIndex];
-        const maxQty = item.quantity || 99;
+        
         // Проверяем, не превышает ли итоговое количество доступное
-        if ((item.orderQuantity + state.orderQuantity) <= maxQty) {
+        if ((item.orderQuantity + state.orderQuantity) <= availableQuantity) {
           item.orderQuantity += state.orderQuantity;
           notifySuccess(`${state.orderQuantity} ${item.title} добавлено в корзину`);
         } else {
-          notifyError("Нет такого количества товара на складе!");
+          notifyError(`В корзине уже ${item.orderQuantity} шт. Доступно всего ${availableQuantity} шт.`);
         }
       }
       setLocalStorage("cart_products", state.cart_products);
@@ -49,17 +64,22 @@ export const cartSlice = createSlice({
           ? state.orderQuantity - 1
           : (state.orderQuantity = 1);
     },
+    setQuantity: (state, { payload }) => {
+      // Устанавливает конкретное значение количества
+      state.orderQuantity = payload > 0 ? payload : 1;
+    },
     quantityIncrement: (state, { payload }) => {
       const productId = payload.id || payload._id;
       state.cart_products = state.cart_products.map((item) => {
         const itemId = item.id || item._id;
         if (itemId === productId) {
-          const maxQty = item.quantity || 99;
+          // Используем residue вместо quantity для ограничения
+          const maxQty = item.residue || 0;
           if (maxQty > item.orderQuantity) {
             item.orderQuantity = item.orderQuantity + 1;
             notifySuccess(`Количество ${item.title} увеличено`);
           } else {
-            notifyError("Недостаточно товара на складе!");
+            notifyError(`Доступно только ${maxQty} шт. товара!`);
           }
         }
         return { ...item };
@@ -117,6 +137,7 @@ export const {
   add_cart_product,
   increment,
   decrement,
+  setQuantity,
   get_cart_products,
   remove_product,
   quantityIncrement,

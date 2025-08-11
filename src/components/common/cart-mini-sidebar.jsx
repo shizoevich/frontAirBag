@@ -70,7 +70,7 @@ const handleCloseCartMini = () => {
                       <span className="cartmini__quantity">{" "}x{item.orderQuantity}</span>
                     </div>
                   </div>
-                  <a onClick={() => handleRemovePrd({ title: item.title, id: item._id })} className="cartmini__del cursor-pointer"><i className="fa-regular fa-xmark"></i></a>
+                  <a onClick={() => handleRemovePrd({ title: item.title, id: item.id || item._id })} className="cartmini__del cursor-pointer"><i className="fa-regular fa-xmark"></i></a>
                 </div>
               ))}
             </div>}

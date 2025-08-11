@@ -110,6 +110,7 @@
   "ProductDetails": {
     "inStock": "In Stock",
     "outOfStock": "Out of Stock",
+    "availableItems": "Available: {count} pcs.",
     "seeLess": "See less",
     "seeMore": "See more",
     "colorLabel": "Color :",

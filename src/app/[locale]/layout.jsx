@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import Providers from '@/components/provider';
 import '../globals.scss';
+import '../../styles/quantity-buttons.css';
 
 // Font definitions
 const body = Jost({
