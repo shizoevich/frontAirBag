@@ -7,7 +7,7 @@ import Discount from "./discount";
 import Refund from "./refund";
 import Delivery from "./delivery";
 import Cart from "./cart";
-import Wishlist from "./wishlist";
+
 import QuickView from "./quick-view";
 import ShapeLine from "./shape-line";
 import TabLine from "./tab-line";
@@ -28,7 +28,7 @@ import Email from "./email";
 import Location from "./location";
 import AskQuestion from "./ask-a-question";
 import CompareTwo from "./compare-2";
-import WishlistTwo from "./wishlist-2";
+
 import Plus from "./plus";
 import Minus from "./minus";
 import PhoneTwo from "./phone-2";
@@ -122,7 +122,7 @@ export {
   PlusTwo,
   AskQuestion,
   CompareTwo,
-  WishlistTwo,
+
   AnimatedLine,
   TextShape,
   Tags,
@@ -142,7 +142,7 @@ export {
   Support,
   Cart,
   QuickView,
-  Wishlist,
+
   ShapeLine,
   TabLine,
   ShippingCar,

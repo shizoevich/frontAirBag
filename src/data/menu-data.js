@@ -48,7 +48,6 @@ const menu_data = [
         link: '/profile',
         mega_menus: [
           { titleKey: 'menu.cart', link: '/cart' },
-          { titleKey: 'menu.wishlist', link: '/wishlist' },
           { titleKey: 'menu.checkout', link: '/checkout' },
           { titleKey: 'menu.myOrders', link: '/order' },
         ]
@@ -119,7 +118,6 @@ export const mobile_menu = [
     link: '/profile',
     sub_menus: [
       { title: 'Корзина', link: '/cart' },
-      { title: 'Избранное', link: '/wishlist' },
       { title: 'Оформление заказа', link: '/checkout' },
       { title: 'Мои заказы', link: '/order' },
     ],

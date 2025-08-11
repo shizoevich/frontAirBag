@@ -91,12 +91,12 @@
         #{$self}{
             &-action{
                 &-badge{
-                    background-color: var(--tp-theme-primary);
+                    background-color: var(de8043);
                 }
                 &-item{
                     & button{
                         &:hover{
-                            color: var(--tp-theme-primary);
+                            color: var(de8043);
                         }
                     }
                     &:last-child{
@@ -111,7 +111,7 @@
                     & li{
                         & a{
                             &:hover{
-                                color: var(--tp-theme-primary);
+                                color: var(de8043);
                             }
                         }
                     }
@@ -120,61 +120,61 @@
         }
 
         .main-menu.menu-style-2 > nav > ul > li .tp-submenu li:hover > a {
-            color: var(--tp-theme-primary);
+            color: var(de8043);
         }
         .main-menu.menu-style-2 > nav > ul > li .tp-submenu li:hover > a::after {
-            color: var(--tp-theme-primary);
+            color: var(de8043);
         }
         .tp-header-sticky.header-sticky .tp-header-action-item .tp-header-action-btn .tp-header-action-badge {
-            background-color: var(--tp-theme-primary);
-            border-color: var(--tp-theme-primary);
+            background-color: var(de8043);
+            border-color: var(de8043);
             color: var(--tp-common-white);
         }
 
         .tp-header-sticky.header-sticky .tp-header-action-item button .tp-header-action-badge {
-            background-color: var(--tp-theme-primary);
+            background-color: var(de8043);
             border-color:var(--tp-common-white);
             color: var(--tp-common-white);
         }
 
         & .tp-header-info-item a{
             & span{
-                color: var(--tp-theme-primary);
+                color: var(de8043);
             }
 
             &:hover{
-                color: var(--tp-theme-primary);
+                color: var(de8043);
             }
         }
 
         .tp-header-search-2 input:focus {
-            border-color: var(--tp-theme-primary);
+            border-color: var(de8043);
         }
         .tp-header-search-2 button:hover {
-            color: var(--tp-theme-primary);
+            color: var(de8043);
         }
 
         .main-menu.menu-style-2 ul li:hover > a,
         .main-menu.menu-style-2 ul li:hover > a::after {
-            color: var(--tp-theme-primary);
+            color: var(de8043);
         }
 
 
         .main-menu.menu-style-2 > nav > ul > li .home-menu-title a:hover {
-            color: var(--tp-theme-primary);
+            color: var(de8043);
         }
 
         .main-menu.menu-style-2 .tp-menu-showcase-btn-2 {
             border-radius: 0;
-            background-color: var(--tp-theme-primary);
+            background-color: var(de8043);
         }
 
         .tp-header-sticky.header-sticky .tp-header-action-item .tp-header-action-btn:hover {
-            color: var(--tp-theme-primary);
+            color: var(de8043);
         }
 
         .main-menu.menu-style-2 > nav > ul > li .home-menu-item:hover .home-menu-title {
-            color: var(--tp-theme-primary);
+            color: var(de8043);
         }
         
     }

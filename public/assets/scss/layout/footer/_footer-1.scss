@@ -40,10 +40,10 @@
                     }
 
                     &:hover{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
 
                         &::after{
-                            background-color: var(--tp-theme-primary);
+                            background-color: var(de8043);
                         }
                     }
                 }
@@ -78,7 +78,7 @@
             margin-right: 5px;
 
             &:hover{
-                background-color: var(--tp-theme-primary);
+                background-color: var(de8043);
                 color: var(--tp-common-white);
                 box-shadow: none;
             }
@@ -99,7 +99,7 @@
 
             & a{
                 &:hover{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                 }
             }
 
@@ -128,7 +128,7 @@
 
                 & a{
                     &:hover{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
                     }
                 }
             }
@@ -144,7 +144,7 @@
             color: var(--tp-text-5);
             margin-bottom: 0;
             & a{
-                color: var(--tp-theme-primary);
+                color: var(de8043);
             }
         }
     }
@@ -184,7 +184,5 @@
             padding-left: 0;
         }
     }
-    &-4{
-
-    }
+   
 }

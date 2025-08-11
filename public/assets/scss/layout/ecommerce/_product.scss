@@ -44,7 +44,7 @@
             font-size: 14px;
             line-height: 1;
             color: var(--tp-common-white);
-            background-color: var(--tp-theme-primary);
+            background-color: var(de8043);
             border-radius: 4px;
             display: inline-block;
             padding: 4px 8px 2px;
@@ -89,7 +89,7 @@
             font-size: 12px;
 
             &:hover{
-                color: var(--tp-theme-primary);
+                color: var(de8043);
             }
         }
     }
@@ -102,7 +102,7 @@
 
         & a{
             &:hover{
-                color: var(--tp-theme-primary);
+                color: var(de8043);
             }
         }
     }
@@ -132,7 +132,7 @@
         font-weight: 700;
         font-size: 15px;
         letter-spacing: -0.02em;
-        color: var(--tp-theme-primary);
+        color: var(de8043);
 
         &.old-price{
             color: #55585B;
@@ -184,7 +184,7 @@
             @extend %tp-transition;
             & svg{
                 & path{
-                    stroke: var(--tp-theme-primary);
+                    stroke: var(de8043);
                 }
             }
         }
@@ -246,13 +246,13 @@
             }
             &.active{
                 color: var(--tp-common-white);
-                background-color: var(--tp-theme-primary);
-                border-color: var(--tp-theme-primary); 
+                background-color: var(de8043);
+                border-color: var(de8043); 
             }
             &:hover{
                 color: var(--tp-common-white);
-                background-color: var(--tp-theme-primary);
-                border-color: var(--tp-theme-primary);
+                background-color: var(de8043);
+                border-color: var(de8043);
 
                 #{$self}{
                     &-tooltip{
@@ -400,7 +400,7 @@
     
         &:hover{
             color: var(--tp-common-white);
-            background-color: var(--tp-theme-primary);
+            background-color: var(de8043);
         }
     }
     &-sm{
@@ -603,7 +603,7 @@
             left: 0;
             width: 150px;
             height: 1px;
-            background-color: var(--tp-theme-primary);
+            background-color: var(de8043);
             bottom: 0;
         }
     }
@@ -632,7 +632,7 @@
                         border-radius: 50%;
                     }
                     &:hover{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
                     }
                 }
             }

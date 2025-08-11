@@ -57,7 +57,7 @@
                     }
 
                     &:hover{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
                     }
                 }
 
@@ -104,7 +104,7 @@
                 }
 
                 &:hover{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                 }
             }
         }
@@ -128,7 +128,7 @@
 
             & a{
                 &:hover{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                 }
             }
         }
@@ -164,8 +164,8 @@
         border: 1px solid #E6E7E8;
         margin-bottom: 8px;
         &:hover{
-            background-color: var(--tp-theme-primary);
-            border-color: var(--tp-theme-primary);
+            background-color: var(de8043);
+            border-color: var(de8043);
             color: var(--tp-common-white);
         }
     }

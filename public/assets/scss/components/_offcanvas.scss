@@ -72,7 +72,7 @@
             color: var(--tp-common-black);
             background-color: #ECECEC;
             &:hover{
-                background-color: var(--tp-theme-primary);
+                background-color: var(de8043);
                 border-color: transparent;
                 color: var(--tp-common-white);
             }
@@ -117,7 +117,7 @@
 
                 &:hover{
                     & > a{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
                     }
                 }
             }
@@ -144,7 +144,7 @@
 
             & a{
                 &:hover{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                 }
             }
         }
@@ -156,7 +156,7 @@
 
             & a{
                 &:hover{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                 }
             }
         }
@@ -177,9 +177,9 @@
             border: 2px solid var(--tp-border-primary);
 
             &:hover{
-                background: var(--tp-theme-primary);
+                background: var(de8043);
                 color: var(--tp-common-white);
-                border-color: var(--tp-theme-primary);
+                border-color: var(de8043);
             }
         }
     }
@@ -202,7 +202,7 @@
 
                 & a{
                     &:hover{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
                     }
                 }
             }
@@ -245,9 +245,9 @@
 
                 &:hover{
                     & > a{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
                         &::after{
-                            color: var(--tp-theme-primary);
+                            color: var(de8043);
                         }
                     }
 
@@ -276,11 +276,11 @@
                         }
 
                         &.expanded{
-                            color: var(--tp-theme-primary);
+                            color: var(de8043);
 
                             & .dropdown-toggle-btn.dropdown-opened,
                             & .dropdown-toggle-btn.dropdown-opened i{
-                                color: var(--tp-theme-primary);
+                                color: var(de8043);
                             }
                         }
                     }
@@ -590,7 +590,7 @@
                 text-align: left;
 
                 &:hover{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                     cursor: pointer;
                 }
             }
@@ -618,7 +618,7 @@
             margin-bottom: 0;
             & a{
                 &:hover{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                 }
             }
         }
@@ -917,7 +917,7 @@
     position: relative;
     width: 100%;
     text-align: left;
-    background-color: var(--tp-theme-primary);
+    background-color: var(de8043);
     padding: 10px 20px;
     &::after{
         position: absolute;

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 // internal
 import useCartInfo from '@/hooks/use-cart-info';
 import RenderCartProgress from './render-cart-progress';
@@ -16,6 +17,7 @@ const CartMiniSidebar = () => {
   const { total } = useCartInfo();
   const dispatch = useDispatch();
   const t = useTranslations('Cart');
+  const { locale } = useParams();
 
   // handle remove product
   const handleRemovePrd = (prd) => {
@@ -54,7 +56,7 @@ const handleCloseCartMini = () => {
   const productImage = getProductImage(item);
   
   return (
-    <Link href={`/product-details/${productId}`}>
+    <Link href={`/${locale}/product-details/${productId}`}>
       <Image src={productImage} width={70} height={60} alt="product img" />
     </Link>
   );
@@ -63,7 +65,7 @@ const handleCloseCartMini = () => {
                   </div>
                   <div className="cartmini__content">
                     <h5 className="cartmini__title">
-                      <Link href={`/product-details/${getProductId(item)}`}>{item.title}</Link>
+                      <Link href={`/${locale}/product-details/${getProductId(item)}`}>{item.title}</Link>
                     </h5>
                     <div className="cartmini__price-wrapper">
                       {item.discount > 0 ? <span className="cartmini__price">${(Number(item.price) - (Number(item.price) * Number(item.discount)) / 100).toFixed(2)}</span> : <span className="cartmini__price">{item.price.toFixed(2)}₴</span>}
@@ -78,7 +80,7 @@ const handleCloseCartMini = () => {
             {cart_products.length === 0 && <div className="cartmini__empty text-center">
               <Image src={empty_cart_img} alt="empty-cart-img" />
               <p>{t('yourCartIsEmpty')}</p>
-              <Link href="/shop" className="tp-btn">{t('goToShop')}</Link>
+              <Link href={`/${locale}/shop`} className="tp-btn">{t('goToShop')}</Link>
             </div>}
           </div>
           <div className="cartmini__checkout">
@@ -87,8 +89,8 @@ const handleCloseCartMini = () => {
               <span>{total.toFixed(2)}₴</span>
             </div>
             <div className="cartmini__checkout-btn">
-              <Link href="/cart" onClick={handleCloseCartMini} className="tp-btn mb-10 w-100">{t('viewCart')}</Link>
-              <Link href="/checkout" onClick={handleCloseCartMini} className="tp-btn tp-btn-border w-100">{t('checkout')}</Link>
+              <Link href={`/${locale}/cart`} onClick={handleCloseCartMini} className="tp-btn mb-10 w-100">{t('viewCart')}</Link>
+              <Link href={`/${locale}/checkout`} onClick={handleCloseCartMini} className="tp-btn tp-btn-border w-100">{t('checkout')}</Link>
             </div>
           </div>
         </div>

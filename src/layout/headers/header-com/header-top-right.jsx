@@ -36,9 +36,6 @@ function ProfileSetting() {
           <Link href="/profile" onClick={() => setIsActive(false)}>{t('my_profile')}</Link>
         </li>
         <li>
-          <Link href="/wishlist" onClick={() => setIsActive(false)}>{t('wishlist')}</Link>
-        </li>
-        <li>
           <Link href="/cart" onClick={() => setIsActive(false)}>{t('cart')}</Link>
         </li>
         <li>

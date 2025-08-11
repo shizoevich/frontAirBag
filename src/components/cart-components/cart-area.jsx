@@ -2,6 +2,8 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 // internal
 import { clearCart } from '@/redux/features/cartSlice';
 import CartCheckout from './cart-checkout';
@@ -10,15 +12,17 @@ import RenderCartProgress from '../common/render-cart-progress';
 
 const CartArea = () => {
   const { cart_products } = useSelector((state) => state.cart);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const t = useTranslations('Cart');
+  const { locale } = useParams();
   return (
     <>
       <section className="tp-cart-area pb-120">
         <div className="container">
           {cart_products.length === 0 &&
             <div className='text-center pt-50'>
-              <h3>No Cart Items Found</h3>
-              <Link href="/shop" className="tp-cart-checkout-btn mt-20">Continue Shipping</Link>
+              <h3>{t('yourCartIsEmpty')}</h3>
+              <Link href={`/${locale}/shop`} className="tp-cart-checkout-btn mt-20">{t('goToShop')}</Link>
             </div>
           }
           {cart_products.length > 0 &&
@@ -31,9 +35,9 @@ const CartArea = () => {
                   <table className="table">
                     <thead>
                       <tr>
-                        <th colSpan="2" className="tp-cart-header-product">Product</th>
-                        <th className="tp-cart-header-price">Price</th>
-                        <th className="tp-cart-header-quantity">Quantity</th>
+                        <th colSpan="2" className="tp-cart-header-product">{t('product')}</th>
+                        <th className="tp-cart-header-price">{t('price')}</th>
+                        <th className="tp-cart-header-quantity">{t('quantity')}</th>
                         <th></th>
                       </tr>
                     </thead>
@@ -61,7 +65,7 @@ const CartArea = () => {
                     </div>
                     <div className="col-xl-6 col-md-4">
                       <div className="tp-cart-update text-md-end mr-30">
-                        <button onClick={() => dispatch(clearCart())} type="button" className="tp-cart-update-btn">Clear Cart</button>
+                        <button onClick={() => dispatch(clearCart())} type="button" className="tp-cart-update-btn">{t('clearCart')}</button>
                       </div>
                     </div>
                   </div>

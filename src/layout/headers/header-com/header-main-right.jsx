@@ -7,14 +7,13 @@ import Image from "next/image";
 import { useTranslations } from 'next-intl';
 // internal
 import useCartInfo from "@/hooks/use-cart-info";
-import { CartTwo, Menu, User, Wishlist } from "@/svg";
+import { CartTwo, Menu, User } from "@/svg";
 import { openCartMini } from "@/redux/features/cartSlice";
 import { useRouter } from "next/navigation";
 
 const HeaderMainRight = ({ setIsCanvasOpen }) => {
   const t = useTranslations('HeaderMainRight');
   const { user: userInfo } = useSelector((state) => state.auth);
-  const { wishlist } = useSelector((state) => state.wishlist);
   const { quantity } = useCartInfo();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -24,10 +23,7 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
     dispatch(openCartMini());
   };
   
-  // Handle wishlist button click
-  const handleWishlistClick = () => {
-    router.push('/wishlist');
-  };
+
   return (
     <div className="tp-header-main-right d-flex align-items-center justify-content-end">
       <div className="tp-header-login d-none d-lg-block">
@@ -69,12 +65,6 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
         </div>
       </div>
       <div className="tp-header-action d-flex align-items-center ml-50">
-        <div className="tp-header-action-item d-none d-lg-block">
-          <Link href="/wishlist" className="tp-header-action-btn">
-            <Wishlist />
-            <span className="tp-header-action-badge">{wishlist.length}</span>
-          </Link>
-        </div>
         <div className="tp-header-action-item">
           <button
             onClick={handleCartClick}

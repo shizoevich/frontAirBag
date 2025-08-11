@@ -18,8 +18,8 @@
                 &-btn{
                     & .tp-btn{
                        &:hover{
-                            background-color: var(--tp-theme-primary);
-                            border-color: var(--tp-theme-primary);
+                            background-color: var(de8043);
+                            border-color: var(de8043);
                             color: var(--tp-common-white);
                        }
                     }
@@ -29,7 +29,7 @@
                         .swiper-pagination-bullet{
                             background-color: rgba($color: $black, $alpha: .2);                    
                             &.swiper-pagination-bullet-active{
-                                background-color: var(--tp-theme-primary);
+                                background-color: var(de8043);
                             }
                         }
                     }

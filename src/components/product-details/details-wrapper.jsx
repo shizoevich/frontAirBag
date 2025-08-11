@@ -4,13 +4,12 @@ import { useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 // internal
-import { AskQuestion, WishlistTwo } from '@/svg';
+import { AskQuestion} from '@/svg';
 import DetailsBottomInfo from './details-bottom-info';
 import ProductDetailsCountdown from './product-details-countdown';
 import ProductQuantity from './product-quantity';
 import StockNotification from './stock-notification';
 import { add_cart_product } from '@/redux/features/cartSlice';
-import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { handleModalClose } from '@/redux/features/productModalSlice';
 
 const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBottom = false }) => {
@@ -26,10 +25,7 @@ const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBott
     dispatch(add_cart_product(prd));
   };
 
-  // handle wishlist product
-  const handleWishlistProduct = (prd) => {
-    dispatch(add_to_wishlist(prd));
-  };
+
 
   
 
@@ -113,10 +109,6 @@ const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBott
       </div>
       {/* product-details-action-sm start */}
       <div className="tp-product-details-action-sm">
-        <button disabled={!isAvailable} onClick={() => handleWishlistProduct(productItem)} type="button" className="tp-product-details-action-sm-btn">
-          <WishlistTwo />
-          {t('addWishlist')}
-        </button>
         <button type="button" className="tp-product-details-action-sm-btn">
           <AskQuestion />
           {t('askQuestion')}

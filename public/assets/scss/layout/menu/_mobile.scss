@@ -106,7 +106,7 @@
                         line-height: 28px;
                         text-align: center;
                         border: 1px solid rgba($color: $black, $alpha: .12);
-                        @include tp-transition-mul((background-color .3s ease-in-out, border-color .3s ease-in-out, color .3s ease-in-out));
+                        @include tp-transition-mul((de8043 .3s ease-in-out, border-color .3s ease-in-out, color .3s ease-in-out));
                         & i{
                             @extend %tp-transition;
                         }
@@ -116,8 +116,8 @@
                             }
                         }
                         &:hover{
-                            background-color: var(--tp-theme-primary);
-                            border-color: var(--tp-theme-primary);
+                            background-color: var(de8043);
+                            border-color: var(de8043);
                             color: var(--tp-common-white);
                             & i{
                                 color: var(--tp-common-white);
@@ -125,11 +125,11 @@
                         }
                     }
                     &.expanded{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
     
                         & .dropdown-toggle-btn.dropdown-opened{
-                            background-color: var(--tp-theme-primary);
-                            border-color: var(--tp-theme-primary);
+                            background-color: var(de8043);
+                            border-color: var(de8043);
                             color: var(--tp-common-white);
                             & i{
                                 color: var(--tp-common-white);
@@ -234,12 +234,12 @@
     
             &:hover{
                 & > a{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                     &::after{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
                     }
                     & .dropdown-toggle-btn i{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
                     }
                 }
     
@@ -269,7 +269,7 @@
                     &:hover{
                         & a{
                             & .dropdown-toggle-btn{
-                                color: var(--tp-theme-primary);
+                                color: var(de8043);
                             }
                         }
                     }

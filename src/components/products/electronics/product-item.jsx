@@ -4,10 +4,9 @@ import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from 'next-intl';
 // internal
-import { Cart, QuickView, Wishlist } from "@/svg";
+import { Cart, QuickView } from "@/svg";
 import { handleProductModal } from "@/redux/features/productModalSlice";
 import { add_cart_product } from "@/redux/features/cartSlice";
-import { add_to_wishlist } from "@/redux/features/wishlist-slice";
 import BlurImage from "@/components/common/BlurImage";
 import { getProductImage, getProductId } from "@/utils/image-utils";
 
@@ -15,7 +14,6 @@ const ProductItem = ({ product }) => {
   const t = useTranslations('ProductItem');
   const [isClient, setIsClient] = useState(false);
   const { cart_products } = useSelector((state) => state.cart);
-  const { wishlist } = useSelector((state) => state.wishlist);
   const dispatch = useDispatch();
   
   const { id, category, title, price, images, residue } = product || {};
@@ -33,7 +31,7 @@ const ProductItem = ({ product }) => {
     const currentId = id || product._id;
     return prdId === currentId;
   });
-  const isAddedToWishlist = wishlist.some((prd) => prd.id === id);
+ 
   const isOutOfStock = residue === 0;
 
   // handle add product
@@ -41,10 +39,7 @@ const ProductItem = ({ product }) => {
     dispatch(add_cart_product(prd));
   };
 
-  // handle wishlist product
-  const handleWishlistProduct = (prd) => {
-    dispatch(add_to_wishlist(prd));
-  };
+
 
   return (
     <div className="tp-product-item mb-25 transition-3">
@@ -94,15 +89,6 @@ const ProductItem = ({ product }) => {
             >
               <QuickView />
               <span className="tp-product-tooltip">{t('quickView')}</span>
-            </button>
-            <button
-              type="button"
-              className={`tp-product-action-btn ${isAddedToWishlist ? 'active' : ''} tp-product-add-to-wishlist-btn`}
-              onClick={() => handleWishlistProduct(product)}
-              disabled={isOutOfStock}
-            >
-              <Wishlist />
-              <span className="tp-product-tooltip">{t('addToWishlist')}</span>
             </button>
           </div>
         </div>

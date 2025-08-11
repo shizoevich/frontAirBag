@@ -91,8 +91,8 @@
             &:checked{
                 & ~ label{
                     &::after{
-                        background-color: var(--tp-theme-primary);
-                        border-color: var(--tp-theme-primary);
+                        background-color: var(de8043);
+                        border-color: var(de8043);
                     }
                     &::before{
                         visibility: visible;
@@ -138,7 +138,7 @@
 
             & a{
                 &:hover{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                 }
             }
 
@@ -157,7 +157,7 @@
 
         &:hover{
             color: var(--tp-common-white);
-            background-color: var(--tp-theme-primary);
+            background-color: var(de8043);
         }
     }
     &-info{
@@ -194,7 +194,7 @@
                 color: var(--tp-common-black);
                 & a{
                     &:hover{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
                     }
                 }
             }
@@ -218,8 +218,8 @@
                 color: var(--tp-common-black);
 
                 &:hover{
-                    background-color: var(--tp-theme-primary);
-                    border-color: var(--tp-theme-primary);
+                    background-color: var(de8043);
+                    border-color: var(de8043);
                     color: var(--tp-common-white);
                 }
             }

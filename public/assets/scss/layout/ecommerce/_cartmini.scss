@@ -146,7 +146,7 @@
             height: 10px;
             border-radius: 0;
             &-bar{
-                background-color: var(--tp-theme-primary);
+                background-color: var(de8043);
             }
         }
 
@@ -192,7 +192,7 @@
         font-weight: 500;
         & a{
             &:hover{
-                color: var(--tp-theme-primary);
+                color: var(de8043);
             }
         }
     }
@@ -248,7 +248,7 @@
         color: var(--tp-common-black);
         font-size: 14px;
         &:hover{
-            color: var(--tp-theme-primary);
+            color: var(de8043);
         }
     }
     &__checkout{
@@ -280,15 +280,15 @@
                 padding: 10px 30px;
                 text-align: center;
                 &:hover{
-                    background-color: var(--tp-theme-primary);
+                    background-color: var(de8043);
                     color: var(--tp-common-white);
-                    border-color: var(--tp-theme-primary);
+                    border-color: var(de8043);
                 }
                 &-border{
                     &:hover{
-                        background-color: var(--tp-theme-primary);
+                        background-color: var(de8043);
                         color: var(--tp-common-white);
-                        border-color: var(--tp-theme-primary);
+                        border-color: var(de8043);
                     }
                 }
                 
@@ -298,7 +298,7 @@
     &__price{
         font-size: 14px;
         font-weight: 500;
-        color: var(--tp-theme-primary);
+        color: var(de8043);
     }
     &__quantity{
         font-size: 12px;

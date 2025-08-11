@@ -23,7 +23,7 @@
             width: 100%;
             
             & button{
-                color: var(--tp-theme-primary);
+                color: var(de8043);
                 position: relative;
 
                 &::after{
@@ -33,7 +33,7 @@
                     bottom: 4px;
                     width: 100%;
                     height: 1px;
-                    background-color: var(--tp-theme-primary);
+                    background-color: var(de8043);
                 }
             }
         }
@@ -43,7 +43,7 @@
         font-size: 16px;
         font-weight: 500;
         color: var(--tp-common-white);
-        background-color: var(--tp-theme-primary);
+        background-color: var(de8043);
         height: 50px;
         line-height: 50px;
         padding: 0 30px;
@@ -112,7 +112,7 @@
                     padding-top: 5px;
                     padding-bottom: 5px;
                     &:hover{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
                     }
                 }
             }
@@ -129,8 +129,8 @@
             &:checked{
                 & ~ label{
                     &::after{
-                        background-color: var(--tp-theme-primary);
-                        border-color: var(--tp-theme-primary);
+                        background-color: var(de8043);
+                        border-color: var(de8043);
                     }
                     &::before{
                         visibility: visible;
@@ -176,7 +176,7 @@
 
             & a{
                 &:hover{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                 }
             }
 
@@ -238,7 +238,7 @@
                 &:checked{
                     & ~ label{
                         &::after{
-                            border-color: var(--tp-theme-primary);
+                            border-color: var(de8043);
                         }
                         &::before{
                             opacity: 1;
@@ -277,7 +277,7 @@
                     width: 10px;
                     height: 10px;
                     border-radius: 50%;
-                    background-color: var(--tp-theme-primary);
+                    background-color: var(de8043);
                     visibility: hidden;
                     opacity: 0;
                     @include tp-transition(all, .2s);
@@ -374,8 +374,8 @@
             &:checked{
                 & ~ label{
                     &::after{
-                        background-color: var(--tp-theme-primary);
-                        border-color: var(--tp-theme-primary);
+                        background-color: var(de8043);
+                        border-color: var(de8043);
                     }
                     &::before{
                         visibility: visible;
@@ -421,7 +421,7 @@
 
             & a{
                 &:hover{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                 }
             }
 
@@ -434,7 +434,7 @@
         & a{
             font-weight: 400;
             font-size: 15px;
-            color: var(--tp-theme-primary);
+            color: var(de8043);
             position: relative;
             display: inline-block;
 
@@ -446,7 +446,7 @@
                 bottom: 4px;
                 width: 0%;
                 height: 1px;
-                background-color: var(--tp-theme-primary);
+                background-color: var(de8043);
                 @extend %tp-transition;
             }
 

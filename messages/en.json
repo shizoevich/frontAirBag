@@ -60,9 +60,16 @@
     "yourCartIsEmpty": "Your Cart is empty",
     "goToShop": "Go to Shop",
     "subtotal": "Subtotal:",
+    "total": "Total:",
     "viewCart": "view cart",
     "checkout": "checkout",
-    "popularProducts": "Popular Products"
+    "popularProducts": "Popular Products",
+    "product": "Product",
+    "price": "Price",
+    "quantity": "Quantity",
+    "remove": "Remove",
+    "clearCart": "Clear Cart",
+    "proceedToCheckout": "Proceed to Checkout"
   },
   "HeaderSearchForm": {
     "placeholder": "Search for products..."

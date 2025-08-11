@@ -1,0 +1,181 @@
+/* Переопределение цветовой схемы с голубого на оранжевый (#de8043) */
+
+/* Основные цвета */
+:root {
+  --tp-theme-secondary: #de8043 !important;
+}
+
+/* Кнопки */
+.tp-btn,
+.tp-btn-2,
+.tp-btn-3,
+.tp-btn-4,
+.tp-btn-5,
+.tp-cart-checkout-btn .tp-btn,
+.tp-cart-update-btn .tp-btn {
+  border-color: #de8043 !important;
+}
+
+.tp-btn:hover,
+.tp-btn-2:hover,
+.tp-btn-3:hover,
+.tp-btn-4:hover,
+.tp-btn-5:hover,
+.tp-cart-checkout-btn .tp-btn:hover,
+.tp-cart-update-btn .tp-btn:hover {
+  background-color: #c26a33 !important;
+  border-color: #c26a33 !important;
+}
+
+/* Кнопка "Купить сейчас" - исправление контраста при наведении */
+.tp-product-details-action-btn .tp-btn-buy-now {
+  color: #de8043 !important;
+  border-color: #de8043 !important;
+}
+
+.tp-product-details-action-btn .tp-btn-buy-now:hover {
+  background-color: #de8043 !important;
+  color: #ffffff !important; /* Белый текст при наведении для контраста */
+}
+
+/* Иконки и элементы интерфейса */
+.tp-product-tag a:hover,
+.tp-product-details-review-item p a:hover,
+.tp-product-details-review-item .tp-product-details-review-avata span a:hover,
+.tp-product-details-review-action span button:hover,
+.tp-product-details-review-action span button.active,
+.tp-product-details-review-action span a:hover,
+.tp-product-details-review-action span a.active,
+.tp-product-details-review-input .tp-product-details-review-input-title h4 span,
+.tp-product-details-review-input .tp-product-details-review-input-rating span,
+.tp-product-details-review-input .tp-product-details-review-input-rating span.active,
+.tp-product-details-tab-nav .nav-tabs .nav-link.active,
+.tp-product-details-tab-nav .nav-tabs .nav-link:hover,
+.tp-product-price span,
+.tp-product-category span a:hover,
+.tp-product-rating span,
+.tp-product-action-3 button:hover,
+.tp-product-action-3 button.active,
+.tp-product-action-2 button:hover,
+.tp-product-action-2 button.active,
+.tp-product-action button:hover,
+.tp-product-action button.active,
+.tp-product-thumb-action button:hover,
+.tp-product-thumb-action button.active,
+.tp-cart-plus-minus .tp-cart-minus:hover,
+.tp-cart-plus-minus .tp-cart-plus:hover,
+.tp-product-details-stock span,
+.tp-product-details-categories a:hover,
+.tp-product-details-tags a:hover,
+.tp-product-details-social a:hover,
+.tp-product-details-social a.active,
+.tp-product-details-meta-item a:hover,
+.tp-product-details-meta-item a.active,
+.tp-product-details-meta-item span,
+.tp-product-details-meta-item span a:hover,
+.tp-product-details-meta-item span a.active,
+.tp-product-details-action-btn button:hover,
+.tp-product-details-action-btn button.active,
+.tp-product-details-action-btn a:hover,
+.tp-product-details-action-btn a.active,
+.tp-product-details-action-item button:hover,
+.tp-product-details-action-item button.active,
+.tp-product-details-action-item a:hover,
+.tp-product-details-action-item a.active {
+  color: #de8043 !important;
+}
+
+/* Фоны и границы */
+.tp-product-tag a:hover,
+.tp-product-details-review-item .tp-product-details-review-avata span a:hover,
+.tp-product-details-review-action span button:hover,
+.tp-product-details-review-action span button.active,
+.tp-product-details-review-action span a:hover,
+.tp-product-details-review-action span a.active,
+.tp-product-details-tab-nav .nav-tabs .nav-link.active,
+.tp-product-details-tab-nav .nav-tabs .nav-link:hover,
+.tp-product-action-3 button:hover,
+.tp-product-action-3 button.active,
+.tp-product-action-2 button:hover,
+.tp-product-action-2 button.active,
+.tp-product-action button:hover,
+.tp-product-action button.active,
+.tp-product-thumb-action button:hover,
+.tp-product-thumb-action button.active,
+.tp-cart-plus-minus .tp-cart-minus:hover,
+.tp-cart-plus-minus .tp-cart-plus:hover,
+.tp-product-details-categories a:hover,
+.tp-product-details-tags a:hover,
+.tp-product-details-social a:hover,
+.tp-product-details-social a.active,
+.tp-product-details-meta-item a:hover,
+.tp-product-details-meta-item a.active,
+.tp-product-details-meta-item span a:hover,
+.tp-product-details-meta-item span a.active,
+.tp-product-details-action-btn button:hover,
+.tp-product-details-action-btn button.active,
+.tp-product-details-action-btn a:hover,
+.tp-product-details-action-btn a.active,
+.tp-product-details-action-item button:hover,
+.tp-product-details-action-item button.active,
+.tp-product-details-action-item a:hover,
+.tp-product-details-action-item a.active {
+  border-color: #de8043 !important;
+}
+
+/* Специфичные элементы */
+.tp-product-details-nav-prev:hover,
+.tp-product-details-nav-next:hover {
+  background-color: #de8043 !important;
+  border-color: #de8043 !important;
+}
+
+/* Корзина */
+.tp-cart-checkout-btn .tp-btn,
+.tp-cart-coupon-btn .tp-btn,
+.tp-cart-update-btn .tp-btn {
+  background-color: #de8043 !important;
+  border-color: #de8043 !important;
+}
+
+/* Исправление для rgb(53, 119, 240) */
+[style*="rgb(53, 119, 240)"] {
+  color: #de8043 !important;
+}
+
+[style*="background-color: rgb(53, 119, 240)"] {
+  background-color: #de8043 !important;
+}
+
+[style*="border-color: rgb(53, 119, 240)"] {
+  border-color: #de8043 !important;
+}
+
+/* Дополнительные стили для корзины */
+.tp-cart-area .tp-cart-bottom .tp-cart-checkout-btn .tp-btn {
+  background-color: #de8043 !important;
+}
+
+.tp-cart-area .tp-cart-bottom .tp-cart-checkout-btn .tp-btn:hover {
+  background-color: #c26a33 !important;
+}
+
+/* Стили для мини-корзины */
+.tp-cart-mini-content .tp-cart-checkout-btn .tp-btn {
+  background-color: #de8043 !important;
+}
+
+.tp-cart-mini-content .tp-cart-checkout-btn .tp-btn:hover {
+  background-color: #c26a33 !important;
+}
+
+/* Стили для кнопок в product-details */
+.tp-product-details-action-btn button {
+  background-color: #de8043 !important;
+  border-color: #de8043 !important;
+}
+
+.tp-product-details-action-btn button:hover {
+  background-color: #c26a33 !important;
+  border-color: #c26a33 !important;
+}

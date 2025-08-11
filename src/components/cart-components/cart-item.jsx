@@ -2,6 +2,8 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import Link from "next/link";
+import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 // internal
 import { Close, Minus, Plus } from "@/svg";
 import { add_cart_product, quantityDecrement, remove_product } from "@/redux/features/cartSlice";
@@ -16,6 +18,8 @@ const CartItem = ({product}) => {
   const productImage = getProductImage(product);
 
   const dispatch = useDispatch();
+  const t = useTranslations('Cart');
+  const { locale } = useParams();
 
     // handle add product
     const handleAddProduct = (prd) => {
@@ -35,7 +39,7 @@ const CartItem = ({product}) => {
     <tr>
       {/* img */}
       <td className="tp-cart-img">
-        <Link href={`/product-details/${productId}`}>
+        <Link href={`/${locale}/product-details/${productId}`}>
           <div style={{ width: '70px', height: '100px', position: 'relative' }}>
             <BlurImage image={productImage} alt={title || 'Product Image'} />
           </div>
@@ -43,7 +47,7 @@ const CartItem = ({product}) => {
       </td>
       {/* title */}
       <td className="tp-cart-title">
-        <Link href={`/product-details/${productId}`}>{title}</Link>
+        <Link href={`/${locale}/product-details/${productId}`}>{title}</Link>
       </td>
       {/* price */}
       <td className="tp-cart-price">
@@ -63,9 +67,9 @@ const CartItem = ({product}) => {
       </td>
       {/* action */}
       <td className="tp-cart-action">
-        <button onClick={()=> handleRemovePrd({title,id:_id})} className="tp-cart-action-btn">
+        <button onClick={()=> handleRemovePrd({title,id:productId})} className="tp-cart-action-btn">
           <Close />
-          <span>{" "}Remove</span>
+          <span>{" "}{t('remove')}</span>
         </button>
       </td>
     </tr>

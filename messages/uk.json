@@ -60,9 +60,16 @@
     "yourCartIsEmpty": "Ваш кошик порожній",
     "goToShop": "Перейти до магазину",
     "subtotal": "Проміжний підсумок:",
+    "total": "Всього:",
     "viewCart": "Переглянути кошик",
     "checkout": "Оформити замовлення",
-    "popularProducts": "Популярні товари"
+    "popularProducts": "Популярні товари",
+    "product": "Товар",
+    "price": "Ціна",
+    "quantity": "Кількість",
+    "remove": "Видалити",
+    "clearCart": "Очистити кошик",
+    "proceedToCheckout": "Перейти до оформлення"
   },
   "HeaderSearchForm": {
     "placeholder": "Пошук товарів..."

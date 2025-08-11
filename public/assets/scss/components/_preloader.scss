@@ -111,7 +111,7 @@
 			@include animation((tp-rotate 5s linear infinite));
 			& circle{
 				&:last-child{
-					stroke: var(--tp-theme-primary);
+					stroke: var(de8043);
 					stroke-dashoffset: 0;
 					stroke-dasharray: 1128, 3150;
 					@include animation((tp-loading 4s linear infinite));

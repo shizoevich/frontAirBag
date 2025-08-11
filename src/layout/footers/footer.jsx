@@ -57,7 +57,6 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                     <ul>
                       <li><Link href="/track-order">{t('trackOrders')}</Link></li>
                       <li><Link href="/shipping">{t('shipping')}</Link></li>
-                      <li><Link href="/wishlist">{t('wishlist')}</Link></li>
                       <li><Link href="/profile">{t('myAccount')}</Link></li>
                       <li><Link href="/profile">{t('orderHistory')}</Link></li>
                       <li><Link href="/returns">{t('returns')}</Link></li>

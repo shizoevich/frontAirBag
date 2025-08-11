@@ -26,7 +26,7 @@
       font-weight: 500;
       & a{
         &:hover{
-          color: var(--tp-theme-primary);
+          color: var(de8043);
         }
       }
     }
@@ -65,8 +65,8 @@
             color: var(--tp-common-black);
 
             &:hover{
-                background-color: var(--tp-theme-primary);
-                border-color: var(--tp-theme-primary);
+                background-color: var(de8043);
+                border-color: var(de8043);
                 color: var(--tp-common-white);
             }
         }
@@ -78,7 +78,7 @@
         color: var(--tp-common-black);
   
         &:hover{
-          color: var(--tp-theme-primary);
+          color: var(de8043);
         }
       }
     }

@@ -94,7 +94,7 @@
             color: var(--tp-common-black);
 
             &:hover{
-                color: var(--tp-theme-primary);
+                color: var(de8043);
             }
         }
     }
@@ -141,7 +141,7 @@
 
                 &:hover{
                     color: var(--tp-common-white);
-                    background-color: var(--tp-theme-primary);
+                    background-color: var(de8043);
                 }
             }
         }
@@ -157,8 +157,8 @@
             border: 1px solid rgba($color: $black, $alpha: .1);
 
             &:hover{
-                background-color: var(--tp-theme-primary);
-                border-color: var(--tp-theme-primary);
+                background-color: var(de8043);
+                border-color: var(de8043);
                 color: var(--tp-common-white);
             }
         }
@@ -204,7 +204,7 @@
                     &:checked{
                         & + label{
                             &::after{
-                                border-color: var(--tp-theme-primary);
+                                border-color: var(de8043);
                             }
                             &::before{
                                 opacity: 1;
@@ -224,7 +224,7 @@
                         cursor: pointer;
                     }
                     & span{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
                     }
 
                     &::after{
@@ -246,7 +246,7 @@
                         width: 8px;
                         height: 8px;
                         border-radius: 50%;
-                        background-color: var(--tp-theme-primary);
+                        background-color: var(de8043);
                         visibility: hidden;
                         opacity: 0;
                         @extend %tp-transition;
@@ -271,7 +271,7 @@
             padding: 10px 30px;
             text-align: center;
             &:hover{
-                background-color: var(--tp-theme-primary);
+                background-color: var(de8043);
                 color: var(--tp-common-white);
             }
         }

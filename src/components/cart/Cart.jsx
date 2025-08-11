@@ -2,7 +2,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Link from "next/link";
-import CartItem from "@/components/cart-wishlist/cart-item";
+import CartItem from "@/components/cart-components/cart-item";
 import RenderCartProgress from "@/components/common/render-cart-progress";
 
 const Cart = () => {

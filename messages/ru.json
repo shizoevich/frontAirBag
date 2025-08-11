@@ -60,9 +60,16 @@
     "yourCartIsEmpty": "Ваша корзина пуста",
     "goToShop": "Перейти в магазин",
     "subtotal": "Промежуточный итог:",
+    "total": "Всего:",
     "viewCart": "Посмотреть корзину",
     "checkout": "Оформить заказ",
-    "popularProducts": "Популярные товары"
+    "popularProducts": "Популярные товары",
+    "product": "Товар",
+    "price": "Цена",
+    "quantity": "Количество",
+    "remove": "Удалить",
+    "clearCart": "Очистить корзину",
+    "proceedToCheckout": "Перейти к оформлению"
   },
   "HeaderSearchForm": {
     "placeholder": "Поиск товаров..."

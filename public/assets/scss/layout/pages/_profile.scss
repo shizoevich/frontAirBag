@@ -42,7 +42,7 @@
                 }
 
                 &.active{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                     background-color: rgba($color: $theme-primary , $alpha: .06);
                     &:hover{
                         background-color: rgba($color: $theme-primary, $alpha: .06);
@@ -98,7 +98,7 @@
                 color: var(--tp-common-black-solid);
                 margin-bottom: 10px;
                 & span{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                 }
             }
             & p{
@@ -143,7 +143,7 @@
             }
 
             &:focus{
-                border-color: var(--tp-theme-primary);
+                border-color: var(de8043);
             }
         }
         & textarea{
@@ -253,7 +253,7 @@
                     }
 
                     & th[scope="row"]{
-                        color: var(--tp-theme-primary);
+                        color: var(de8043);
                     }
 
                     & td[data-info*="status done"]{
@@ -277,7 +277,7 @@
                         min-width: 90px;
                         &:hover{
                             color: var(--tp-common-white);
-                            background-color: var(--tp-theme-primary);
+                            background-color: var(de8043);
                         }
                     }
                     
@@ -330,7 +330,7 @@
                     width: 45px;
 
                     & path{
-                        fill: var(--tp-theme-primary);
+                        fill: var(de8043);
                     }
                 }
             }
@@ -381,8 +381,8 @@
             }
 
             .form-check-input:checked {
-                background-color: var(--tp-theme-primary);
-                border-color: var(--tp-theme-primary);
+                background-color: var(de8043);
+                border-color: var(de8043);
                 
             }
         }
@@ -428,7 +428,7 @@
                     line-height: 24px;
                     border: 2px solid var(--tp-common-white);
                     text-align: center;
-                    background-color: var(--tp-theme-primary);
+                    background-color: var(de8043);
                     border-radius: 50%;
                     @extend %tp-transition;
 
@@ -459,7 +459,7 @@
                 margin-bottom: 0;
 
                 & span{
-                    color: var(--tp-theme-primary);
+                    color: var(de8043);
                     font-weight: 500;
                 }
             }
@@ -504,7 +504,7 @@
                     height: 25px;
                     line-height: 20px;
                     border: 2px solid var(--tp-common-white);
-                    background-color: var(--tp-theme-primary);
+                    background-color: var(de8043);
                     color: var(--tp-common-white);
                     border-radius: 50%;
                     font-size: 13px;
@@ -592,8 +592,8 @@
     text-align: center;
 
     &:hover{
-        background-color: var(--tp-theme-primary);
-        border-color: var(--tp-theme-primary);
+        background-color: var(de8043);
+        border-color: var(de8043);
         color: var(--tp-common-white);
     }
 }

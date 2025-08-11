@@ -17,11 +17,11 @@ import HeaderTopRight from "./header-com/header-top-right";
 import HeaderMainRight from "./header-com/header-main-right";
 import CartMiniSidebar from "@/components/common/cart-mini-sidebar";
 import HeaderSearchForm from "@/components/forms/header-search-form";
-import { CartTwo, CategoryMenu, Compare, Menu, Phone, ShippingCar, Wishlist } from "@/svg";
+import { CartTwo, CategoryMenu, Compare, Menu, Phone, ShippingCar } from "@/svg";
 
 const Header = () => {
   const t = useTranslations('Header');
-  const { wishlist } = useSelector((state) => state.wishlist);
+
   const { cartMiniOpen } = useSelector((state) => state.cart);
   const [isOffCanvasOpen, setIsCanvasOpen] = useState(false);
   const [isCategoryActive, setIsCategoryActive] = useState(false);
@@ -199,12 +199,7 @@ const Header = () => {
                       <Compare />
                     </Link>
                   </div>
-                  <div className="tp-header-action-item d-none d-lg-block">
-                    <Link href="/wishlist" className="tp-header-action-btn">
-                      <Wishlist />
-                      <span className="tp-header-action-badge">{wishlist.length}</span>
-                    </Link>
-                  </div>
+
                   <div className="tp-header-action-item">
                     <button onClick={() => dispatch(openCartMini())} type="button" className="tp-header-action-btn cartmini-open-btn">
                       <CartTwo />

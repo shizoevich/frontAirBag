@@ -3,10 +3,9 @@ import { useDispatch } from "react-redux";
 import Link from "next/link";
 import { Rating } from "react-simple-star-rating";
 // internal
-import { Cart, CompareThree, QuickView, Wishlist } from "@/svg";
+import { Cart, CompareThree, QuickView } from "@/svg";
 import { handleProductModal } from "@/redux/features/productModalSlice";
 import { add_cart_product } from "@/redux/features/cartSlice";
-import { add_to_wishlist } from "@/redux/features/wishlist-slice";
 import BlurImage from "@/components/common/BlurImage";
 import { add_to_compare } from "@/redux/features/compareSlice";
 
@@ -43,10 +42,7 @@ const ShopListItem = ({ product }) => {
   const handleAddProduct = (prd) => {
     dispatch(add_cart_product(prd));
   };
-  // handle wishlist product
-  const handleWishlistProduct = (prd) => {
-    dispatch(add_to_wishlist(prd));
-  };
+
 
   // handle compare product
   const handleCompareProduct = (prd) => {
@@ -73,16 +69,6 @@ const ShopListItem = ({ product }) => {
               <QuickView />
               <span className="tp-product-tooltip tp-product-tooltip-right">
                 Quick View
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={()=> handleWishlistProduct(product)}
-              className="tp-product-action-btn-2 tp-product-add-to-wishlist-btn"
-            >
-              <Wishlist />
-              <span className="tp-product-tooltip tp-product-tooltip-right">
-                Add To Wishlist
               </span>
             </button>
             <button

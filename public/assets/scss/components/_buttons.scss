@@ -28,7 +28,7 @@
 		font-family: var(--tp-ff-roboto);
 		font-weight: 500;
 		font-size: 14px;
-		background-color: var(--tp-theme-primary);
+		background-color: var(de8043);
 		padding: 9px 26px 7px;
 		border-radius: 6px;
 		border: 0;
@@ -53,7 +53,7 @@
 	}
 
 	&-blue{ /* for home electronic */
-		background-color: var(--tp-theme-primary);
+		background-color: var(de8043);
 	}
 
 	&-border{
@@ -102,8 +102,8 @@
 			}
 
 			&:hover{
-				background-color: var(--tp-theme-primary);
-				border-color: var(--tp-theme-primary);
+				background-color: var(de8043);
+				border-color: var(de8043);
 				color: var(--tp-common-white);
 			}
 		}
@@ -142,7 +142,7 @@
 	font-size: 14px;
 	font-weight: 600;
 	color: var(--tp-common-white);
-	background: var(--tp-theme-primary);
+	background: var(de8043);
 	text-align: center;
 	font-family: var(--tp-ff-space);
 	padding: 9px 22px;
@@ -202,7 +202,7 @@
 		@extend %tp-svg-y-1;
 	}
 	&:hover{
-		color: var(--tp-theme-primary);
+		color: var(de8043);
 		& svg{
 			@include transform(translate(3px, -1px));
 		}
@@ -229,11 +229,11 @@
 		}
 		&::before{
 			width: 0%;
-			background-color: var(--tp-theme-primary);
+			background-color: var(de8043);
 			z-index: 1;
 		}
 		&:hover{
-			color: var(--tp-theme-primary);
+			color: var(de8043);
 			& svg,
 			& i{
 				@include transform(translate(3px, -1px));
@@ -243,7 +243,7 @@
 				left: 0;
 				right: auto;
 				width: 100%;
-				background-color: var(--tp-theme-primary);
+				background-color: var(de8043);
 			}
 		}
 	}
@@ -262,7 +262,7 @@
 	}
 
 	&:hover{
-		color: var(--tp-theme-primary);
+		color: var(de8043);
 		
 		& span{
 			@include transform(translateX(3px) translateY(0));
@@ -287,7 +287,7 @@
 		width: 0%;
 		height: 1px;
 		bottom: 3px;
-		background-color: var(--tp-theme-primary);
+		background-color: var(de8043);
 		@extend %tp-transition;
 	}
 
@@ -296,7 +296,7 @@
 	}
 
 	&:hover{
-		color: var(--tp-theme-primary);
+		color: var(de8043);
 		&::after{
 			width: 100%;
 			left: 0;
@@ -334,12 +334,12 @@
 	}
 
 	&:hover{
-		color: var(--tp-theme-primary);
+		color: var(de8043);
 		&::after{
 			width: 100%;
 			left: 0;
 			right: auto;
-			background-color: var(--tp-theme-primary);
+			background-color: var(de8043);
 		}
 	}
 }
@@ -386,8 +386,8 @@
 
 	&:hover{
 		color: var(--tp-common-white);
-		background-color: var(--tp-theme-primary);
-		border-color: var(--tp-theme-primary);
+		background-color: var(de8043);
+		border-color: var(de8043);
 	}
 }
 
@@ -424,7 +424,7 @@
 	padding: 5px 20px;
 
 	&:hover{
-		background-color: var(--tp-theme-primary);
+		background-color: var(de8043);
 		color: var(--tp-common-white);
 	}
 
@@ -437,7 +437,7 @@
 	padding: 11px 26px 9px;
 	border: 0;
 	color: var(--tp-common-white);
-	background-color: var(--tp-theme-primary);
+	background-color: var(de8043);
 	&-2{
 		border-radius: 6px;
 		font-family: var(--tp-ff-roboto);
