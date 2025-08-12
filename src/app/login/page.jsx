@@ -5,7 +5,7 @@ import CommonBreadcrumb from "@/components/breadcrumb/common-breadcrumb";
 import LoginArea from "@/components/login-register/login-area";
 
 export const metadata = {
-  title: "Shofy - Login Page",
+  title: "AirBag - Login Page",
 };
 
 export default function LoginPage() {

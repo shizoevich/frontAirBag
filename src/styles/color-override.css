@@ -1,8 +1,8 @@
-/* Переопределение цветовой схемы с голубого на оранжевый (#de8043) */
+/* Переопределение цветовой схемы с голубого на оранжевый (#--tp-theme-primary) */
 
 /* Основные цвета */
 :root {
-  --tp-theme-secondary: #de8043 !important;
+  --tp-theme-secondary: #--tp-theme-primary !important;
 }
 
 /* Кнопки */
@@ -134,20 +134,20 @@
 .tp-cart-checkout-btn .tp-btn,
 .tp-cart-coupon-btn .tp-btn,
 .tp-cart-update-btn .tp-btn {
-  background-color: #de8043 !important;
+  background-color:#de8043 !important;
   border-color: #de8043 !important;
 }
 
 /* Исправление для rgb(53, 119, 240) */
-[style*="rgb(53, 119, 240)"] {
+[style*="rgb(222, 128, 67)"] {
   color: #de8043 !important;
 }
 
-[style*="background-color: rgb(53, 119, 240)"] {
+[style*="background-color: rgb(222, 128, 67)"] {
   background-color: #de8043 !important;
 }
 
-[style*="border-color: rgb(53, 119, 240)"] {
+[style*="border-color: rgb(222, 128, 67)"] {
   border-color: #de8043 !important;
 }
 
@@ -176,6 +176,6 @@
 }
 
 .tp-product-details-action-btn button:hover {
-  background-color: #c26a33 !important;
-  border-color: #c26a33 !important;
+  background-color: #de8043 !important;
+  border-color: #de8043 !important;
 }

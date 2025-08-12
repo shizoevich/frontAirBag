@@ -147,7 +147,6 @@ const Header = () => {
                         </span>
                       </div>
                       <div className="tp-header-contact-content">
-                        <h5>Hotline:</h5>
                         <p>
                           <a href="tel:402-763-282-46">+(402) 763 282 46</a>
                         </p>

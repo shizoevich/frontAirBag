@@ -45,7 +45,7 @@
             top: 28%;
             right: 0;
             @include transform(rotate(180deg));
-            color: var(de8043);
+            color: var(--tp-theme-primary);
             width: auto;
             height: auto;
             font-weight: 500;
@@ -120,7 +120,7 @@
         }
 
         &:not(.collapsed){
-            color: var(de8043);
+            color: var(--tp-theme-primary);
             background-color: transparent;
             box-shadow: none;
 
@@ -145,9 +145,9 @@
         }
 
         &:hover{
-            color: var(de8043);
+            color: var(--tp-theme-primary);
             &::after{
-                color: var(de8043);
+                color: var(--tp-theme-primary);
             }
         }
         

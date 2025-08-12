@@ -26,7 +26,7 @@
 
             & span{
                 font-weight: 500;
-                color: var(de8043);
+                color: var(--tp-theme-primary);
             }
         }
     }
@@ -150,7 +150,7 @@
                     @extend %tp-svg-y-2;
                 }
                 &:hover{
-                    background-color: var(de8043);
+                    background-color: var(--tp-theme-primary);
                     color: var(--tp-common-white);
                     box-shadow: none;
                 }
@@ -173,7 +173,7 @@
                 @include animation(tp-pulse-2 2s infinite);
                 &:hover{
                     color: var(--tp-common-white);
-                    background-color: var(de8043);
+                    background-color: var(--tp-theme-primary);
                 }
             }
         }
@@ -191,7 +191,7 @@
             line-height: 1;
             & a{
                 &:hover{
-                    color: var(de8043);
+                    color: var(--tp-theme-primary);
                 }
             }
         }
@@ -207,8 +207,8 @@
         & span{
             display: inline-block;
             font-size: 15px;
-            color: var(de8043);
-            background-color: rgba($color: #0989FF, $alpha: .06);
+            color: var(--tp-theme-primary);
+            background-color: rgba($color: #de8043 , $alpha: .06);
             line-height: 1;
             padding: 4px 12px;
         }
@@ -362,7 +362,7 @@
                 left: 14px;
                 &:hover{
                     background-color: var(--tp-common-white);
-                    color: var(de8043);
+                    color: var(--tp-theme-primary);
                 }
             }
             &-plus{
@@ -399,7 +399,7 @@
         font-size: 16px;
         font-weight: 500;
         padding: 10px 30px;
-        background-color: var(de8043);
+        background-color: var(--tp-theme-primary);
         color: var(--tp-common-white);
 
         &:hover{
@@ -430,7 +430,7 @@
                 }
 
                 &:hover{
-                    color: var(de8043);
+                    color: var(--tp-theme-primary);
                 }
             }
         }
@@ -472,8 +472,8 @@
             margin-right: 5px;
 
             &:hover{
-                background-color: var(de8043);
-                border-color: var(de8043);
+                background-color: var(--tp-theme-primary);
+                border-color: var(--tp-theme-primary);
                 color: var(--tp-common-white);
             }
         }
@@ -950,8 +950,8 @@
                 &:checked{
                     & ~ label{
                         &::after{
-                            background-color: var(de8043);
-                            border-color: var(de8043);
+                            background-color: var(--tp-theme-primary);
+                            border-color: var(--tp-theme-primary);
                         }
                         &::before{
                             visibility: visible;
@@ -997,7 +997,7 @@
     
                 & a{
                     &:hover{
-                        color: var(de8043);
+                        color: var(--tp-theme-primary);
                     }
                 }
     
@@ -1011,7 +1011,7 @@
             font-weight: 500;
             color: var(--tp-common-white);
             padding: 9px 45px;
-            background-color: var(de8043);
+            background-color: var(--tp-theme-primary);
         }
     }
     &-bottom{
@@ -1032,7 +1032,7 @@
         text-align: center;
         &:hover {
             background: #fff;
-            color: var(de8043);
+            color: var(--tp-theme-primary);
         }
     }
     &-tab{
@@ -1133,7 +1133,7 @@
                 position: absolute;
                 top: 0;
                 left: 0;
-                background-color: var(de8043);
+                background-color: var(--tp-theme-primary);
                 height: 100%;
                 display: inline-block;
             }
@@ -1311,8 +1311,8 @@
                 }
             }
             &-add-to-cart-btn{
-                background-color: var(de8043);
-                border-color: var(de8043);
+                background-color: var(--tp-theme-primary);
+                border-color: var(--tp-theme-primary);
                 color: var(--tp-common-white);
                 
 
@@ -1344,8 +1344,8 @@
                     box-shadow: 0px 1px 3px rgba(1, 15, 28, 0.1);
 
                     &:hover{
-                        background-color: var(de8043);
-                        border-color: var(de8043);
+                        background-color: var(--tp-theme-primary);
+                        border-color: var(--tp-theme-primary);
                         color: var(--tp-common-white);
                     }
                 }

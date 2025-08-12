@@ -5,7 +5,7 @@ import BlogPostboxArea from "@/components/blog/blog-postox/blog-postbox-area";
 import Footer from "@/layout/footers/footer";
 
 export const metadata = {
-  title: "Shofy - Blog Page",
+  title: "AirBag - Blog Page",
 };
 
 export default function BlogPage() {

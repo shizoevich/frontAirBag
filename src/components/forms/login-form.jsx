@@ -3,13 +3,14 @@ import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import { useRouter,redirect } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 // internal
 import { CloseEye, OpenEye } from '@/svg';
 import ErrorMsg from '../common/error-msg';
-import { useLoginUserMutation } from '@/redux/features/auth/authApi';
+import { useLoginMutation } from '@/redux/features/auth/authApi';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import { useTranslations } from 'next-intl';
 
 
 // schema
@@ -19,8 +20,11 @@ const schema = Yup.object().shape({
 });
 const LoginForm = () => {
   const [showPass, setShowPass] = useState(false);
-  const [loginUser, { }] = useLoginUserMutation();
+  const [login, { isLoading }] = useLoginMutation();
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1]; // Получаем текущую локаль из URL
+  const t = useTranslations('Common');
   // react hook form
   const {
     register,
@@ -32,30 +36,35 @@ const LoginForm = () => {
   });
   // onSubmit
   const onSubmit = (data) => {
-    loginUser({
+    login({
       email: data.email,
       password: data.password,
+      remember: data.remember || false
     })
-      .then((data) => {
-        if (data?.data) {
-          notifySuccess("Login successfully");
-          router.push('/checkout' || "/");
-        }
-        else {
-          notifyError(data?.error?.data?.error)
-        }
+      .unwrap()
+      .then((response) => {
+        notifySuccess(t('loginSuccess'));
+        // После успешного логина перенаправляем на главную страницу с учетом локали
+        router.push(`/${locale}`);
       })
-    reset();
+      .catch((error) => {
+        console.error('Login error:', error);
+        notifyError(error?.data?.detail || t('loginFailed'));
+      })
+      .finally(() => {
+        // Сбрасываем только пароль для безопасности
+        reset({ password: '' }, { keepValues: true });
+      });
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="tp-login-input-wrapper">
         <div className="tp-login-input-box">
           <div className="tp-login-input">
-            <input {...register("email", { required: `Email is required!` })} name="email" id="email" type="email" placeholder="shofy@mail.com" />
+            <input {...register("email", { required: t('emailRequired') })} name="email" id="email" type="email" placeholder="AirBag@mail.com" />
           </div>
           <div className="tp-login-input-title">
-            <label htmlFor="email">Your Email</label>
+            <label htmlFor="email">{t('yourEmail')}</label>
           </div>
           <ErrorMsg msg={errors.email?.message} />
         </div>
@@ -63,10 +72,10 @@ const LoginForm = () => {
           <div className="p-relative">
             <div className="tp-login-input">
               <input
-                {...register("password", { required: `Password is required!` })}
+                {...register("password", { required: t('passwordRequired') })}
                 id="password"
                 type={showPass ? "text" : "password"}
-                placeholder="Min. 6 character"
+                placeholder={t('minCharacters', { count: 6 })}
               />
             </div>
             <div className="tp-login-input-eye" id="password-show-toggle">
@@ -75,7 +84,7 @@ const LoginForm = () => {
               </span>
             </div>
             <div className="tp-login-input-title">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">{t('password')}</label>
             </div>
           </div>
           <ErrorMsg msg={errors.password?.message}/>
@@ -83,15 +92,21 @@ const LoginForm = () => {
       </div>
       <div className="tp-login-suggetions d-sm-flex align-items-center justify-content-between mb-20">
         <div className="tp-login-remeber">
-          <input id="remeber" type="checkbox" />
-          <label htmlFor="remeber">Remember me</label>
+          <input id="remeber" type="checkbox" {...register("remember")} />
+          <label htmlFor="remeber">{t('rememberMe')}</label>
         </div>
         <div className="tp-login-forgot">
-          <Link href="/forgot">Forgot Password?</Link>
+          <Link href={`/${locale}/forgot`}>{t('forgotPassword')}</Link>
         </div>
       </div>
       <div className="tp-login-bottom">
-        <button type='submit' className="tp-login-btn w-100">Login</button>
+        <button 
+          type='submit' 
+          className="tp-login-btn w-100" 
+          disabled={isLoading}
+        >
+          {isLoading ? t('loggingIn') : t('login')}
+        </button>
       </div>
     </form>
   );

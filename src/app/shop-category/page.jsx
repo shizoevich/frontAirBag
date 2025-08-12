@@ -5,7 +5,7 @@ import ShopBreadcrumb from "@/components/breadcrumb/shop-breadcrumb";
 import ShopCategoryArea from "@/components/categories/shop-category-area";
 
 export const metadata = {
-  title: "Shofy - Category Page",
+  title: "AirBag - Category Page",
 };
 
 export default function CategoryPage() {

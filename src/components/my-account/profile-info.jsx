@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
@@ -8,57 +8,76 @@ import ErrorMsg from '../common/error-msg';
 import { EmailTwo, LocationTwo, PhoneThree, UserThree } from '@/svg';
 import { useUpdateProfileMutation } from '@/redux/features/auth/authApi';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import { useTranslations } from 'next-intl';
 
-// yup  schema
-const schema = Yup.object().shape({
-  name: Yup.string().required().label("Name"),
-  email: Yup.string().required().email().label("Email"),
-  phone: Yup.string().required().min(11).label("Phone"),
-  address: Yup.string().required().label("Address"),
-  bio: Yup.string().required().min(20).label("Bio"),
+// yup schema
+const getSchema = (t) => Yup.object().shape({
+  username: Yup.string().required().label(t?.('username') || "Username"),
+  email: Yup.string().required().email().label(t?.('email') || "Email"),
+  phone: Yup.string().required().min(10).label(t?.('phone') || "Phone"),
+  address: Yup.string().required().label(t?.('address') || "Address"),
 });
 
 const ProfileInfo = () => {
   const { user } = useSelector((state) => state.auth);
-
-  const [updateProfile, {}] = useUpdateProfileMutation();
-  // react hook form
-  const {register,handleSubmit,formState: { errors },reset} = useForm({
-    resolver: yupResolver(schema),
+  const [isLoading, setIsLoading] = useState(false);
+  const t = useTranslations('Profile');
+  
+  const [updateProfile] = useUpdateProfileMutation();
+  
+  // react hook form с динамической схемой валидации
+  const {register, handleSubmit, formState: { errors }, reset, setValue} = useForm({
+    resolver: yupResolver(getSchema(t)),
   });
+  
+  // Заполняем форму данными пользователя при их получении
+  useEffect(() => {
+    if (user) {
+      setValue('username', user.username || '');
+      setValue('email', user.email || '');
+      setValue('phone', user.phone || '');
+      setValue('address', user.address || '');
+    }
+  }, [user, setValue]);
+  
   // on submit
   const onSubmit = (data) => {
+    setIsLoading(true);
     updateProfile({
-      id:user?._id,
-      name:data.name,
-      email:data.email,
-      phone:data.phone,
-      address:data.address,
-      bio:data.bio,
-    }).then((result) => {
-      if(result?.error){
-        notifyError(result?.error?.data?.message);
-      }
-      else {
-        notifySuccess(result?.data?.message);
-      }
-    })
-    reset();
+      username: data.username,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+    }).unwrap()
+      .then((result) => {
+        notifySuccess(t('profileUpdateSuccess'));
+      })
+      .catch((error) => {
+        notifyError(error?.data?.detail || t('profileUpdateError'));
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
   return (
     <div className="profile__info">
-      <h3 className="profile__info-title">Personal Details</h3>
+      <h3 className="profile__info-title">{t('personalDetails')}</h3>
       <div className="profile__info-content">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="row">
             <div className="col-xxl-6 col-md-6">
               <div className="profile__input-box">
                 <div className="profile__input">
-                  <input {...register("name", { required: `Name is required!` })} name='name' type="text" placeholder="Enter your username" defaultValue={user?.name} />
+                  <input 
+                    {...register("username", { required: t('usernameRequired') })} 
+                    name='username' 
+                    type="text" 
+                    placeholder={t('enterUsername')} 
+                  />
                   <span>
                     <UserThree/>
                   </span>
-                  <ErrorMsg msg={errors.name?.message} />
+                  <ErrorMsg msg={errors.username?.message} />
                 </div>
               </div>
             </div>
@@ -66,7 +85,12 @@ const ProfileInfo = () => {
             <div className="col-xxl-6 col-md-6">
               <div className="profile__input-box">
                 <div className="profile__input">
-                  <input {...register("email", { required: `Email is required!` })} name='email' type="email" placeholder="Enter your email" defaultValue={user?.email} />
+                  <input 
+                    {...register("email", { required: t('emailRequired') })} 
+                    name='email' 
+                    type="email" 
+                    placeholder={t('enterEmail')} 
+                  />
                   <span>
                     <EmailTwo/>
                   </span>
@@ -78,7 +102,12 @@ const ProfileInfo = () => {
             <div className="col-xxl-12">
               <div className="profile__input-box">
                 <div className="profile__input">
-                  <input {...register("phone", { required: true })} name='phone' type="text" placeholder="Enter your number" defaultValue="0123 456 7889" />
+                  <input 
+                    {...register("phone", { required: t('phoneRequired') })} 
+                    name='phone' 
+                    type="text" 
+                    placeholder={t('enterPhone')} 
+                  />
                   <span>
                     <PhoneThree/>
                   </span>
@@ -90,7 +119,12 @@ const ProfileInfo = () => {
             <div className="col-xxl-12">
               <div className="profile__input-box">
                 <div className="profile__input">
-                  <input {...register("address", { required: true })} name='address' type="text" placeholder="Enter your address" defaultValue="3304 Randall Drive" />
+                  <input 
+                    {...register("address", { required: t('addressRequired') })} 
+                    name='address' 
+                    type="text" 
+                    placeholder={t('enterAddress')} 
+                  />
                   <span>
                     <LocationTwo/>
                   </span>
@@ -109,7 +143,13 @@ const ProfileInfo = () => {
             </div>
             <div className="col-xxl-12">
               <div className="profile__btn">
-                <button type="submit" className="tp-btn">Update Profile</button>
+                <button 
+                  type="submit" 
+                  className="tp-btn" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? t('updating') : t('update')}
+                </button>
               </div>
             </div>
           </div>

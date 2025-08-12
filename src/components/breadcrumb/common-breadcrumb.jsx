@@ -1,5 +1,8 @@
 'use client';
 import React from "react";
+import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 const CommonBreadcrumb = ({
   title,
@@ -7,6 +10,8 @@ const CommonBreadcrumb = ({
   center = false,
   bg_clr = false,
 }) => {
+  const t = useTranslations('Common');
+  const { locale } = useParams();
   return (
     <section
       className={`breadcrumb__area ${
@@ -18,12 +23,12 @@ const CommonBreadcrumb = ({
         <div className="row">
           <div className="col-xxl-12">
             <div className="breadcrumb__content p-relative z-index-1">
-              <h3 className="breadcrumb__title">{title}</h3>
+              <h3 className="breadcrumb__title">{t(title.toLowerCase()) || title}</h3>
               <div className="breadcrumb__list">
                 <span>
-                  <a href="#">Home</a>
+                  <Link href={`/${locale}`}>{t('home')}</Link>
                 </span>
-                <span>{subtitle}</span>
+                <span>{t(subtitle.toLowerCase()) || subtitle}</span>
               </div>
             </div>
           </div>

@@ -6,7 +6,7 @@ import ShopArea from "@/components/shop/shop-area";
 
 export async function generateMetadata({ params: { locale } }) {
   return {
-    title: `Shofy - ${locale === 'uk' ? 'Магазин з правою боковою панеллю' : locale === 'ru' ? 'Магазин с правой боковой панелью' : 'Shop Right Sidebar Page'}`,
+    title: `AirBag - ${locale === 'uk' ? 'Магазин з правою боковою панеллю' : locale === 'ru' ? 'Магазин с правой боковой панелью' : 'Shop Right Sidebar Page'}`,
   };
 }
 

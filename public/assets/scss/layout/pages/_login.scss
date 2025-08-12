@@ -27,7 +27,7 @@
             color: #49535B;
             
             & a{
-                color: var(de8043);
+                color: var(--tp-theme-primary);
                 position: relative;
                 display: inline-block;
 
@@ -39,7 +39,7 @@
                     bottom: 4px;
                     width: 0%;
                     height: 1px;
-                    background-color: var(de8043);
+                    background-color: var(--tp-theme-primary);
                     @extend %tp-transition;
                 }
 
@@ -106,7 +106,7 @@
 
             & a{
                 &:hover{
-                    color: var(de8043);
+                    color: var(--tp-theme-primary);
                 }
             }
         }
@@ -184,8 +184,8 @@
             &:checked{
                 & ~ label{
                     &::after{
-                        background-color: var(de8043);
-                        border-color: var(de8043);
+                        background-color: var(--tp-theme-primary);
+                        border-color: var(--tp-theme-primary);
                     }
                     &::before{
                         visibility: visible;
@@ -231,7 +231,7 @@
 
             & a{
                 &:hover{
-                    color: var(de8043);
+                    color: var(--tp-theme-primary);
                 }
             }
 
@@ -244,7 +244,7 @@
         & a{
             font-weight: 400;
             font-size: 15px;
-            color: var(de8043);
+            color: var(--tp-theme-primary);
             position: relative;
             display: inline-block;
 
@@ -256,7 +256,7 @@
                 bottom: 4px;
                 width: 0%;
                 height: 1px;
-                background-color: var(de8043);
+                background-color: var(--tp-theme-primary);
                 @extend %tp-transition;
             }
 
@@ -279,7 +279,7 @@
         display: inline-block;
 
         &:hover{
-            background-color: var(de8043);
+            background-color: var(--tp-theme-primary);
             color: var(--tp-common-white);
         }
     }

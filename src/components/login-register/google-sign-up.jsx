@@ -2,27 +2,23 @@
 import React from "react";
 import Image from "next/image";
 import { GoogleLogin } from "@react-oauth/google";
-import { useRouter,redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 // internal
 import google_icon from "@assets/img/icon/login/google.svg";
-import { useSignUpProviderMutation } from "@/redux/features/auth/authApi";
+// Удаляем неиспользуемый импорт, который вызывает ошибку
 import { notifyError, notifySuccess } from "@/utils/toast";
 
 const GoogleSignUp = () => {
-  const [signUpProvider, {}] = useSignUpProviderMutation();
   const router = useRouter();
+  
   // handleGoogleSignIn
   const handleGoogleSignIn = (user) => {
     if (user) {
-      signUpProvider(user?.credential).then((res) => {
-        if (res?.data) {
-          notifySuccess("Login success!");
-          router.push('/checkout');
-        } else {
-          console.log("result error -->", res.error);
-          notifyError(res.error?.message);
-        }
-      });
+      // Временно отключаем функциональность Google Sign-In
+      // пока не будет реализован соответствующий API endpoint
+      console.log("Google Sign-In credential:", user?.credential);
+      notifySuccess("Google Sign-In functionality will be implemented soon");
+      // router.push('/checkout');
     }
   };
   return (

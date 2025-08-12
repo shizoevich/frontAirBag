@@ -61,8 +61,8 @@ export async function generateStaticParams() {
 // Generate metadata for the page
 export async function generateMetadata({ params }) {
   return {
-    title: 'Shofy - E-commerce App',
-    description: 'Shofy - E-commerce App',
+    title: 'AirBag - E-commerce App',
+    description: 'AirBag - E-commerce App',
     icons: {
       icon: '/favicon.ico',
       shortcut: '/favicon.ico',

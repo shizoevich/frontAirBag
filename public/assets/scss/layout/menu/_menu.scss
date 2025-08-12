@@ -90,9 +90,9 @@
                     }
                     &:hover{
                         & > a{
-                            color: var(de8043);
+                            color: var(--tp-theme-primary);
                             &::after{
-                                color: var(de8043);
+                                color: var(--tp-theme-primary);
                             }
                         }
                         & > .tp-submenu{
@@ -165,9 +165,9 @@
             }
             &:hover{
 				& > a{
-					color: var(de8043);
+					color: var(--tp-theme-primary);
 					&::after{
-						color: var(de8043);
+						color: var(--tp-theme-primary);
 					}
 				}
 				& > .tp-submenu{
@@ -216,7 +216,7 @@
 
                 &:hover{
                     & > a{
-                        color: var(de8043);
+                        color: var(--tp-theme-primary);
                     }
                 }
 
@@ -424,7 +424,7 @@
                     }
                 }
                 &-title{
-                    color: var(de8043);
+                    color: var(--tp-theme-primary);
                 }
             }
         }
@@ -464,7 +464,7 @@
 
         & a{
             &:hover{
-                color: var(de8043);
+                color: var(--tp-theme-primary);
             }
         }
     }

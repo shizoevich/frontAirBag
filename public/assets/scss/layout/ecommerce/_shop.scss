@@ -108,9 +108,9 @@
 .#{$theme-prifix}-shop-item-primary{
     .tp-product-tag-2 a:hover,
     .tp-product-title-2 a:hover {
-        color: var(de8043);
+        color: var(--tp-theme-primary);
     }
     .tp-product-tag-2 a::after {
-        background-color: var(de8043);
+        background-color: var(--tp-theme-primary);
     }
 }

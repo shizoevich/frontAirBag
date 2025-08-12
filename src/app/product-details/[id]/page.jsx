@@ -4,7 +4,7 @@ import ProductDetailsArea from "@/components/product-details/product-details-are
 import Footer from "@/layout/footers/footer";
 
 export const metadata = {
-  title: "Shofy - Product Details Page",
+  title: "AirBag - Product Details Page",
 };
 
 export default async function ProductDetailsPage({ params }) {

@@ -89,13 +89,13 @@
 				&.dropdown-opened{
 					& > a,
 					& > span{
-						color: var(de8043);
+						color: var(--tp-theme-primary);
 
 						&.mean-expand.mean-clicked{
-							color: var(de8043);
+							color: var(--tp-theme-primary);
 							@include transform(rotate(90deg));
 							& i{
-								color: var(de8043);
+								color: var(--tp-theme-primary);
 							}
 						}
 					}
@@ -104,10 +104,10 @@
 				&.has-dropdown{
 					&:hover{
 						& > a{
-							color: var(de8043);
+							color: var(--tp-theme-primary);
 						}
 						& .mean-expand{
-							color: var(de8043);
+							color: var(--tp-theme-primary);
 						}
 					}
 				}
@@ -153,7 +153,7 @@
 						text-align: right;
 					}
 					&:hover{
-						color: var(de8043);
+						color: var(--tp-theme-primary);
 						& i{
 							color: var(--tp-common-white);
 						}
@@ -187,19 +187,19 @@
 							text-align: center;
 						}
 						&:hover{
-							color: var(de8043);
-							border-color: var(de8043);
+							color: var(--tp-theme-primary);
+							border-color: var(--tp-theme-primary);
 							& i{
-								color: var(de8043);
+								color: var(--tp-theme-primary);
 							}
 						}
 
 						&.mean-clicked{
-							color: var(de8043);
+							color: var(--tp-theme-primary);
 							&:hover{
-								color: var(de8043);
+								color: var(--tp-theme-primary);
 								& i{
-									color: var(de8043);
+									color: var(--tp-theme-primary);
 								}
 							}
 						}

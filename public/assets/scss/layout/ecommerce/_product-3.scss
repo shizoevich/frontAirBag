@@ -48,7 +48,7 @@
                 &-title-3{
                     & a{
                         &:hover{
-                            color: var(de8043);
+                            color: var(--tp-theme-primary);
                         }
                     }
                 }
@@ -68,7 +68,7 @@
                     #{$self}{
                         &-add-cart-btn-large{
                             &:hover{
-                                background-color: var(de8043);
+                                background-color: var(--tp-theme-primary);
                             }
                         }
                     }

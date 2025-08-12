@@ -143,7 +143,7 @@
                         &-subtotal{
                             & span{
                                 &:last-child{
-                                    color: var(de8043);
+                                    color: var(--tp-theme-primary);
                                 }
                             }
                         }
@@ -155,7 +155,7 @@
                                     &:checked{
                                         & ~ label{
                                             &::after{
-                                                border-color: var(de8043);
+                                                border-color: var(--tp-theme-primary);
                                             }
                                             &::before{
                                                 opacity: 1;
@@ -170,7 +170,7 @@
                                     padding-right: 27px;
 
                                     & span{
-                                        color: var(de8043);
+                                        color: var(--tp-theme-primary);
                                     }
 
                                     &:hover{
@@ -196,7 +196,7 @@
                                         width: 8px;
                                         height: 8px;
                                         border-radius: 50%;
-                                        background-color: var(de8043);
+                                        background-color: var(--tp-theme-primary);
                                         visibility: hidden;
                                         opacity: 0;
                                         @include tp-transition(all, .2s);

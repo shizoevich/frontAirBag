@@ -1,10 +1,10 @@
 'use client';
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from 'next-intl';
-import { userLoggedOut } from "@/redux/features/auth/authSlice";
+import { useLogoutMutation } from "@/redux/features/auth/authApi";
 import LanguageSwitcher from '@/components/common/language-switcher';
 
 // setting
@@ -12,14 +12,25 @@ function ProfileSetting() {
   const t = useTranslations('HeaderTopRight');
   const [isActive, setIsActive] = useState(false);
   const { user } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1]; // Получаем текущую локаль из URL
 
   // handle logout
   const handleLogout = () => {
-    dispatch(userLoggedOut());
-    router.push('/');
-    setIsActive(false);
+    logout()
+      .unwrap()
+      .then(() => {
+        // Перенаправление на главную страницу с учетом локали
+        router.push(`/${locale}`);
+      })
+      .catch((error) => {
+        console.error('Logout error:', error);
+      })
+      .finally(() => {
+        setIsActive(false);
+      });
   }
 
   return (
@@ -39,8 +50,10 @@ function ProfileSetting() {
           <Link href="/cart" onClick={() => setIsActive(false)}>{t('cart')}</Link>
         </li>
         <li>
-          {!user?.name && <Link href="/login" onClick={() => setIsActive(false)} className="cursor-pointer">{t('login')}</Link>}
-          {user?.name && <a onClick={handleLogout} className="cursor-pointer">{t('logout')}</a>}
+          {!user && <Link href={`/${locale}/login`} onClick={() => setIsActive(false)} className="cursor-pointer">{t('login')}</Link>}
+          {user && <a onClick={handleLogout} className="cursor-pointer" style={{ opacity: isLoggingOut ? 0.7 : 1 }}>
+            {isLoggingOut ? '...' : t('logout')}
+          </a>}
         </li>
       </ul>
     </div>

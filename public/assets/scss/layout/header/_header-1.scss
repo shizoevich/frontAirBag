@@ -131,7 +131,7 @@
                             color: var(--tp-common-black);
     
                             &:hover{
-                                color: var(de8043);
+                                color: var(--tp-theme-primary);
                             }
                         }
                     }
@@ -146,7 +146,7 @@
         }
         &-wrapper{
             position: relative;
-            border: 2px solid var(de8043);
+            border: 2px solid var(--tp-theme-primary);
             margin-left: 10px;
         }
         &-box{
@@ -198,7 +198,7 @@
                 width: 60px;
                 height: 46px;
                 line-height: 46px;
-                background-color: var(de8043);
+                background-color: var(--tp-theme-primary);
                 color: var(--tp-common-white);
 
                 & svg{
@@ -278,7 +278,7 @@
             position: relative;
             display: inline-block;
             &:hover{
-                color: var(de8043);
+                color: var(--tp-theme-primary);
             }
         }
         &-badge{
@@ -302,7 +302,7 @@
     &-contact{
         &-icon{
             & span{
-                color: var(de8043);
+                color: var(--tp-theme-primary);
                 margin-right: 10px;
 
                 & svg{
@@ -328,7 +328,7 @@
                 line-height: 1;
                 & a{
                     &:hover{
-                        color: var(de8043);
+                        color: var(--tp-theme-primary);
                     }
                 }
             }

@@ -42,7 +42,7 @@
 }
 
 .theme-bg{
-	background-color: var(de8043);
+	background-color: var(--tp-theme-primary);
 }
 
 [data-bg-color = "footer-bg-grey"] {
@@ -50,5 +50,5 @@
 }
 
 [data-bg-color = "footer-bg-white"] {
-	de8043 : var(--tp-common-white);
+	--tp-theme-primary : var(--tp-common-white);
 }

@@ -1,10 +1,10 @@
 'use client';
-'use client';
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from 'next-intl';
+import { usePathname } from "next/navigation";
 // internal
 import useCartInfo from "@/hooks/use-cart-info";
 import { CartTwo, Menu, User } from "@/svg";
@@ -17,6 +17,8 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
   const { quantity } = useCartInfo();
   const dispatch = useDispatch();
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1]; // Получаем текущую локаль из URL
   
   // Handle cart button click
   const handleCartClick = () => {
@@ -31,7 +33,7 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
           <div className="tp-header-login-icon">
             <span>
               {userInfo?.imageURL ? (
-                <Link href="/profile">
+                <Link href={`/${locale}/profile`}>
                   <Image
                     src={userInfo.imageURL}
                     alt="user img"
@@ -39,10 +41,10 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
                     height={35}
                   />
                 </Link>
-              ) : userInfo?.name ? (
-                <Link href="/profile">
+              ) : userInfo ? (
+                <Link href={`/${locale}/profile`}>
                   <h2 className="text-uppercase login_text">
-                    {userInfo?.name[0]}
+                    {(userInfo.email || userInfo.username || 'U')[0]}
                   </h2>
                 </Link>
               ) : (
@@ -51,15 +53,15 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
             </span>
           </div>
           <div className="tp-header-login-content d-none d-xl-block">
-            {!userInfo?.name && (
-              <Link href="/login">
+            {!userInfo && (
+              <Link href={`/${locale}/login`}>
                 <span>{t('hello')}</span>
               </Link>
             )}
-            {userInfo?.name && <span>{t('helloWithName', { name: userInfo.name })}</span>}
+            {userInfo && <span>{t('helloWithName', { name: userInfo.email || userInfo.username || 'User' })}</span>}
             <div className="tp-header-login-title">
-              {!userInfo?.name && <Link href="/login">{t('signIn')}</Link>}
-              {userInfo?.name && <Link href="/profile">{t('yourAccount')}</Link>}
+              {!userInfo && <Link href={`/${locale}/login`}>{t('signIn')}</Link>}
+              {userInfo && <Link href={`/${locale}/profile`}>{t('yourAccount')}</Link>}
             </div>
           </div>
         </div>

@@ -18,7 +18,7 @@
             font-size: 14px;
             color: #ffffff;
             font-weight: 500;
-            background: var(de8043);
+            background: var(--tp-theme-primary);
             -webkit-border-radius: 4px;
             -moz-border-radius: 4px;
             border-radius: 4px;
@@ -48,7 +48,7 @@
             }
             & a{
                 &:hover{
-                    color: var(de8043);
+                    color: var(--tp-theme-primary);
                 }
             }
         }

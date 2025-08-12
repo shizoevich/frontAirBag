@@ -6,7 +6,7 @@ import ShopCategoryArea from "@/components/categories/shop-category-area";
 
 export async function generateMetadata({ params: { locale } }) {
   return {
-    title: `Shofy - ${locale === 'uk' ? 'Категорії' : locale === 'ru' ? 'Категории' : 'Category Page'}`,
+    title: `AirBag - ${locale === 'uk' ? 'Категорії' : locale === 'ru' ? 'Категории' : 'Category Page'}`,
   };
 }
 

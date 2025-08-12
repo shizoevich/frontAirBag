@@ -6,7 +6,7 @@ import blogData from "@/data/blog-data";
 
 
 export const metadata = {
-  title: "Shofy - Blog Details Page",
+  title: "AirBag - Blog Details Page",
 };
 
 export default function BlogDetailsPage() {

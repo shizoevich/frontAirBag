@@ -25,7 +25,7 @@
         }
 
         .ui-slider-horizontal .ui-slider-range{
-            background-color: var(de8043);
+            background-color: var(--tp-theme-primary);
         }
 
         .ui-slider .ui-slider-handle {
@@ -36,7 +36,7 @@
             padding: 0;
             margin: 0;
             border-radius: 0;
-            background-color: var(de8043);
+            background-color: var(--tp-theme-primary);
         }
 
         &-info{
@@ -84,8 +84,8 @@
                     &:checked{
                         & ~ label{
                             &::after{
-                                background-color: var(de8043);
-                                border-color: var(de8043);
+                                background-color: var(--tp-theme-primary);
+                                border-color: var(--tp-theme-primary);
                             }
                             &::before{
                                 visibility: visible;
@@ -172,24 +172,24 @@
                         @extend %tp-transition;
                     }
                     &.active{
-                        color: var(de8043);
+                        color: var(--tp-theme-primary);
                         &::after{
-                            background-color: var(de8043);
+                            background-color: var(--tp-theme-primary);
                         }
                         & span{
-                            background-color: var(de8043);
-                            border-color: var(de8043);
+                            background-color: var(--tp-theme-primary);
+                            border-color: var(--tp-theme-primary);
                             color: var(--tp-common-white);
                         }
                     }
                     &:hover{
-                        color: var(de8043);
+                        color: var(--tp-theme-primary);
                         &::after{
-                            background-color: var(de8043);
+                            background-color: var(--tp-theme-primary);
                         }
                         & span{
-                            background-color: var(de8043);
-                            border-color: var(de8043);
+                            background-color: var(--tp-theme-primary);
+                            border-color: var(--tp-theme-primary);
                             color: var(--tp-common-white);
                         }
                     }
@@ -223,8 +223,8 @@
 
                     &:hover{
                         & .tp-shop-widget-checkbox-circle-number{
-                            background-color: var(de8043);
-                            border-color: var(de8043);
+                            background-color: var(--tp-theme-primary);
+                            border-color: var(--tp-theme-primary);
                             color: var(--tp-common-white);
                         }
                     }

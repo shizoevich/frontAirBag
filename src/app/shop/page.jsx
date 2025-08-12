@@ -5,7 +5,7 @@ import ShopBreadcrumb from "@/components/breadcrumb/shop-breadcrumb";
 import ShopArea from "@/components/shop/shop-area";
 
 export const metadata = {
-  title: "Shofy - Shop Page",
+  title: "AirBag - Shop Page",
 };
 
 export default function ShopPage() {

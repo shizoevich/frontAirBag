@@ -15,6 +15,7 @@
     "@reduxjs/toolkit": "^1.9.7",
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^2.2.0",
+    "axios": "^1.11.0",
     "bootstrap": "^5.3.2",
     "dayjs": "^1.11.10",
     "js-cookie": "^3.0.5",

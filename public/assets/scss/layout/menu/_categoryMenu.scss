@@ -10,7 +10,7 @@
         font-weight: 500;
         font-size: 14px;
         color: var(--tp-common-white);
-        background-color: var(de8043);
+        background-color: var(--tp-theme-primary);
         width: 100%;
         padding: 12px 30px;
         text-align: left;
@@ -61,7 +61,7 @@
                 top: 50%;
                 width: 2px;
                 height: 0;
-                background-color: var(de8043);
+                background-color: var(--tp-theme-primary);
                 @include transform(translateY(-50%));
                 visibility: hidden;
                 opacity: 0;
@@ -220,23 +220,23 @@
                     height: 30px;
                 }
                 & > a{
-                    color: var(de8043);
+                    color: var(--tp-theme-primary);
                     &::after{
-                        color: var(de8043);
+                        color: var(--tp-theme-primary);
                     }
 
                     &:not(.mega-menu-title){
                         &::after{
-                            color: var(de8043);
+                            color: var(--tp-theme-primary);
                         }
                     }
                     
                     & span{
-                        color: var(de8043);
+                        color: var(--tp-theme-primary);
                     }
 
                     & .dropdown-toggle-btn{
-                        color: var(de8043);
+                        color: var(--tp-theme-primary);
                     }
                 }
 
@@ -354,12 +354,12 @@
     
             &:hover{
                 & > a{
-                    color: var(de8043);
+                    color: var(--tp-theme-primary);
                     &::after{
-                        color: var(de8043);
+                        color: var(--tp-theme-primary);
                     }
                     & .dropdown-toggle-btn i{
-                        color: var(de8043);
+                        color: var(--tp-theme-primary);
                     }
                 }
     
@@ -387,7 +387,7 @@
                         line-height: 28px;
                         text-align: center;
                         border: 1px solid rgba($color: $black, $alpha: .12);
-                        @include tp-transition-mul((de8043 .3s ease-in-out, border-color .3s ease-in-out, color .3s ease-in-out));
+                        @include tp-transition-mul((--tp-theme-primary .3s ease-in-out, border-color .3s ease-in-out, color .3s ease-in-out));
                         & i{
                             @extend %tp-transition;
                         }
@@ -397,8 +397,8 @@
                             }
                         }
                         &:hover{
-                            background-color: var(de8043);
-                            border-color: var(de8043);
+                            background-color: var(--tp-theme-primary);
+                            border-color: var(--tp-theme-primary);
                             color: var(--tp-common-white);
                             & i{
                                 color: var(--tp-common-white);
@@ -406,11 +406,11 @@
                         }
                     }
                     &.expanded{
-                        color: var(de8043);
+                        color: var(--tp-theme-primary);
     
                         & .dropdown-toggle-btn.dropdown-opened{
-                            background-color: var(de8043);
-                            border-color: var(de8043);
+                            background-color: var(--tp-theme-primary);
+                            border-color: var(--tp-theme-primary);
                             color: var(--tp-common-white);
                             & i{
                                 color: var(--tp-common-white);
@@ -456,7 +456,7 @@
                     &:hover{
                         & a{
                             & .dropdown-toggle-btn{
-                                color: var(de8043);
+                                color: var(--tp-theme-primary);
                             }
                         }
                     }

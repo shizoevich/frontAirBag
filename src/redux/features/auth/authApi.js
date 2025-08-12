@@ -1,52 +1,14 @@
 import { apiSlice } from "@/redux/api/apiSlice";
-import { userLoggedIn } from "./authSlice";
+import { userLoggedIn, userLoggedOut } from "./authSlice";
 import Cookies from "js-cookie";
 
 export const authApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
-    registerUser: builder.mutation({
+    // Авторизация пользователя
+    login: builder.mutation({
       query: (data) => ({
-        url: "api/user/signup",
-        method: "POST",
-        body: data,
-      }),
-    }),
-    // signUpProvider
-    signUpProvider: builder.mutation({
-      query: (token) => ({
-        url: `api/user/register/${token}`,
-        method: "POST",
-      }),
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-
-          Cookies.set(
-            "userInfo",
-            JSON.stringify({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
-            }),
-            { expires: 0.5 }
-          );
-
-          dispatch(
-            userLoggedIn({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
-            })
-          );
-        } catch (err) {
-          // do nothing
-        }
-      },
-    }),
-    // login
-    loginUser: builder.mutation({
-      query: (data) => ({
-        url: "api/user/login",
+        url: "/auth/login/",
         method: "POST",
         body: data,
       }),
@@ -54,138 +16,152 @@ export const authApi = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
-
+          
+          // Сохраняем токены в cookie
+          const { access, refresh } = result.data;
+          
+          // Устанавливаем срок хранения в зависимости от флага remember
+          const expiresInDays = arg.remember ? 30 : 1;
+          
           Cookies.set(
             "userInfo",
             JSON.stringify({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
+              accessToken: access,
+              refreshToken: refresh
             }),
-            { expires: 0.5 }
+            { expires: expiresInDays }
           );
 
+          // Диспатчим действие для обновления состояния
           dispatch(
             userLoggedIn({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
+              accessToken: access,
             })
           );
+          
+          // После успешного логина получаем данные пользователя
+          dispatch(authApi.endpoints.getUser.initiate());
         } catch (err) {
-          // do nothing
+          console.error('Login error:', err);
         }
       },
     }),
-    // get me
+    
+    // Получение данных пользователя
     getUser: builder.query({
-      query: () => "api/user/me",
+      query: () => ({
+        url: "/auth/me/",
+        method: "GET",
+      }),
 
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
+          
+          // Обновляем данные пользователя в store
           dispatch(
             userLoggedIn({
               user: result.data,
             })
           );
         } catch (err) {
-          // do nothing
+          console.error('Get user error:', err);
+          // Если ошибка 401, выполняем logout
+          if (err?.error?.status === 401) {
+            dispatch(userLoggedOut());
+          }
         }
       },
+      providesTags: ['User'],
     }),
-    // confirmEmail
-    confirmEmail: builder.query({
-      query: (token) => `api/user/confirmEmail/${token}`,
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-
-          Cookies.set(
-            "userInfo",
-            JSON.stringify({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
-            }),
-            { expires: 0.5 }
-          );
-
-          dispatch(
-            userLoggedIn({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
-            })
-          );
-        } catch (err) {
-          // do nothing
-        }
-      },
-    }),
-    // reset password
-    resetPassword: builder.mutation({
-      query: (data) => ({
-        url: "api/user/forget-password",
-        method: "PATCH",
-        body: data,
-      }),
-    }),
-    // confirmForgotPassword
-    confirmForgotPassword: builder.mutation({
-      query: (data) => ({
-        url: "api/user/confirm-forget-password",
-        method: "PATCH",
-        body: data,
-      }),
-    }),
-    // change password
-    changePassword: builder.mutation({
-      query: (data) => ({
-        url: "api/user/change-password",
-        method: "PATCH",
-        body: data,
-      }),
-    }),
-    // updateProfile password
-    updateProfile: builder.mutation({
-      query: ({ id, ...data }) => ({
-        url: `/api/user/update-user/${id}`,
-        method: "PUT",
-        body: data,
+    
+    // Обновление access токена
+    refreshToken: builder.mutation({
+      query: (refreshToken) => ({
+        url: "/auth/token/refresh/",
+        method: "POST",
+        body: { refresh: refreshToken },
       }),
 
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
-
+          
+          // Получаем новый access токен
+          const { access } = result.data;
+          
+          // Обновляем токены в cookie
+          const userInfo = JSON.parse(Cookies.get('userInfo') || '{}');
+          
           Cookies.set(
             "userInfo",
             JSON.stringify({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
+              ...userInfo,
+              accessToken: access,
             }),
-            { expires: 0.5 }
+            { expires: 7 }
           );
 
+          // Обновляем токен в store
           dispatch(
             userLoggedIn({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
+              accessToken: access,
             })
           );
         } catch (err) {
-          // do nothing
+          console.error('Refresh token error:', err);
+          // Если ошибка с refresh токеном, выполняем logout
+          dispatch(userLoggedOut());
         }
       },
+    }),
+    
+    // Проверка валидности токена
+    verifyToken: builder.mutation({
+      query: (token) => ({
+        url: "/auth/token/verify/",
+        method: "POST",
+        body: { token },
+      }),
+    }),
+    
+    // Выход пользователя
+    logout: builder.mutation({
+      query: () => ({
+        url: "/auth/logout/", // Если есть такой эндпоинт
+        method: "POST",
+      }),
+      
+      // Даже если запрос не удался, мы всё равно выполняем logout на клиенте
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          await queryFulfilled;
+        } catch (err) {
+          console.error('Logout error:', err);
+        } finally {
+          // В любом случае удаляем токены и данные пользователя
+          Cookies.remove('userInfo');
+          dispatch(userLoggedOut());
+        }
+      },
+    }),
+    
+    // Регистрация пользователя (если нужно)
+    registerUser: builder.mutation({
+      query: (data) => ({
+        url: "/auth/register/", // Укажите правильный эндпоинт для регистрации
+        method: "POST",
+        body: data,
+      }),
     }),
   }),
 });
 
 export const {
-  useLoginUserMutation,
+  useLoginMutation,
   useRegisterUserMutation,
-  useConfirmEmailQuery,
-  useResetPasswordMutation,
-  useConfirmForgotPasswordMutation,
-  useChangePasswordMutation,
-  useUpdateProfileMutation,
-  useSignUpProviderMutation,
+  useGetUserQuery,
+  useRefreshTokenMutation,
+  useVerifyTokenMutation,
+  useLogoutMutation,
 } = authApi;

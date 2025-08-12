@@ -5,7 +5,7 @@ import ShopBreadcrumb from "@/components/breadcrumb/shop-breadcrumb";
 import ShopArea from "@/components/shop/shop-area";
 
 export const metadata = {
-  title: "Shofy - Shop Hidden Sidebar Page",
+  title: "AirBag - Shop Hidden Sidebar Page",
 };
 
 export default function ShopHiddenSidebarPage() {

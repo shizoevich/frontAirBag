@@ -5,7 +5,7 @@ import CommonBreadcrumb from "@/components/breadcrumb/common-breadcrumb";
 import ForgotArea from "@/components/login-register/forgot-area";
 
 export const metadata = {
-  title: "Shofy - Forgot Page",
+  title: "AirBag - Forgot Page",
 };
 
 export default function ForgotPage() {

@@ -63,7 +63,7 @@
 
 /* Стили для выбранной опции */
 .tp-header-search-category .nice-select .list .option.selected {
-  color: var(de8043) !important;
+  color: var(--tp-theme-primary) !important;
 }
 
 /* Стили для нового логотипа - НОРМАЛЬНЫЙ размер как у Shofy */
@@ -185,11 +185,11 @@
 }
 
 .tp-product-details-thumb-item:hover {
-  border-color: var(de8043);
+  border-color: var(--tp-theme-primary);
 }
 
 .product-thumbs-swiper .swiper-slide-thumb-active .tp-product-details-thumb-item {
-  border-color: var(de8043);
+  border-color: var(--tp-theme-primary);
 }
 
 .product-main-swiper {
@@ -259,7 +259,7 @@
 
 .tp-product-details-nav-prev:hover,
 .tp-product-details-nav-next:hover {
-  background: var(de8043);
+  background: var(--tp-theme-primary);
 }
 
 .tp-product-details-nav-prev {

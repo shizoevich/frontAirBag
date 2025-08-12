@@ -194,11 +194,11 @@ const CategoryCarousel = ({
                 onClick={() => handleCategoryClick(categoryId)}
                 style={{
                   cursor: 'pointer',
-                  border: selectedCategory === categoryId ? '2px solid #3577f0' : '1px solid #e9ecef',
+                  border: selectedCategory === categoryId ? '2px solid #de8043' : '1px solid #e9ecef',
                   borderRadius: '8px',
                   transition: 'all 0.3s ease',
                   height: '100%',
-                  boxShadow: selectedCategory === categoryId ? '0 4px 10px rgba(53, 119, 240, 0.3)' : 'none'
+                  boxShadow: selectedCategory === categoryId ? '0 4px 10px rgba(222, 128, 67, 0.3)' : 'none'
                 }}
               >
                 <div className="category-img-wrapper" style={{ 

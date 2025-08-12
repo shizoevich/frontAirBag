@@ -6,7 +6,7 @@ import Footer from "@/layout/footers/footer";
 
 
 export const metadata = {
-  title: "Shofy - Blog Details 2 Page",
+  title: "AirBag - Blog Details 2 Page",
 };
 
 export default function BlogDetailsPageTwo() {

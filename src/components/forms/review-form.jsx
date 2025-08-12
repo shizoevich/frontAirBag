@@ -99,7 +99,7 @@ const ReviewForm = ({product_id}) => {
               name="email"
               id="email"
               type="email"
-              placeholder="shofy@mail.com"
+              placeholder="AirBag@mail.com"
             />
           </div>
           <div className="tp-product-details-review-input-title">

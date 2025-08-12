@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 
 export async function generateMetadata({ params: { locale } }) {
   return {
-    title: `Shofy - ${locale === 'uk' ? 'Магазин' : locale === 'ru' ? 'Магазин' : 'Shop Page'}`,
+    title: `AirBag - ${locale === 'uk' ? 'Магазин' : locale === 'ru' ? 'Магазин' : 'Shop Page'}`,
   };
 }
 
