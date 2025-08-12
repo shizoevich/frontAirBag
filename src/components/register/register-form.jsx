@@ -75,25 +75,32 @@ const RegisterForm = () => {
   // Поиск отделений Новой Почты
   const searchWarehouses = async (cityRef) => {
     try {
-      const response = await axios.post('https://api.novaposhta.ua/v2.0/json/', {
+      const payload = {
         apiKey: '1690358338d20ac90d792f5da5bb1292',
-        modelName: 'Address',
+        modelName: 'AddressGeneral',
         calledMethod: 'getWarehouses',
         methodProperties: {
           CityRef: cityRef,
-          Page: 1,
-          Limit: 50,
-          Language: 'UA'
+          Page: '1',
+          Limit: '50',
+          Language: 'ua',
         },
-      });
-      
+      };
+
+      // Если есть фильтр по отделениям, добавим его
+      if (searchWarehouse && searchWarehouse.trim().length > 0) {
+        payload.methodProperties.FindByString = searchWarehouse.trim();
+      }
+
+      const response = await axios.post('https://api.novaposhta.ua/v2.0/json/', payload);
+
       console.log('Warehouse response:', response.data);
-      
-      if (response.data.success && response.data.data) {
+
+      if (response.data?.success && Array.isArray(response.data.data)) {
         setWarehouses(response.data.data);
         setShowWarehouseDropdown(true);
       } else {
-        console.error('No warehouses found:', response.data);
+        console.error('No warehouses found:', response.data || {});
         setWarehouses([]);
       }
     } catch (error) {
@@ -111,11 +118,19 @@ const RegisterForm = () => {
 
   // Обработка выбора города
   const handleCitySelect = (city) => {
-    setSelectedCity(city.Ref);
+    // В ответе searchSettlements корректный идентификатор города для складов — это DeliveryCity
+    const cityRef = city.DeliveryCity || city.CityRef || city.Ref || city.SettlementRef;
+    setSelectedCity(cityRef || '');
     setValue('city', city.Present);
     setSearchCity(city.Present);
     setShowCityDropdown(false);
-    searchWarehouses(city.Ref);
+    if (cityRef) {
+      searchWarehouses(cityRef);
+    } else {
+      console.warn('CityRef is missing on selected city item:', city);
+      setWarehouses([]);
+      setShowWarehouseDropdown(false);
+    }
   };
 
   // Обработка изменения поля отделения
