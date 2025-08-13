@@ -23,12 +23,12 @@ const CommonBreadcrumb = ({
         <div className="row">
           <div className="col-xxl-12">
             <div className="breadcrumb__content p-relative z-index-1">
-              <h3 className="breadcrumb__title">{t(title.toLowerCase()) || title}</h3>
+              <h3 className="breadcrumb__title">{title}</h3>
               <div className="breadcrumb__list">
                 <span>
                   <Link href={`/${locale}`}>{t('home')}</Link>
                 </span>
-                <span>{t(subtitle.toLowerCase()) || subtitle}</span>
+                <span>{subtitle}</span>
               </div>
             </div>
           </div>

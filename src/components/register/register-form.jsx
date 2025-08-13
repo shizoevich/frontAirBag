@@ -4,10 +4,12 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import ErrorMsg from '../common/error-msg';
 import axios from 'axios';
+import '@/styles/register-form.css';
 
 const RegisterForm = () => {
   const t = useTranslations('Common');
@@ -21,18 +23,52 @@ const RegisterForm = () => {
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [showWarehouseDropdown, setShowWarehouseDropdown] = useState(false);
 
-  // Схема валидации
+  // Схема валидации: обязательны только email и пароль (2 раза)
   const schema = Yup.object().shape({
-    firstName: Yup.string().required(t('firstNameRequired')),
-    lastName: Yup.string().required(t('lastNameRequired')),
-    email: Yup.string().email(t('invalidEmail')).required(t('emailRequired')),
-    phone: Yup.string().required(t('phoneRequired')),
-    password: Yup.string().min(6, t('minCharacters', { count: 6 })).required(t('passwordRequired')),
+    firstName: Yup.string()
+      .trim()
+      .transform(value => value === '' ? undefined : value) // пустое поле превращаем в undefined
+      .test('min-length', t('minCharacters', { count: 2 }), value => {
+        return !value || value.length >= 2;
+      })
+      .test('max-length', t('maxCharacters', { count: 50 }), value => {
+        return !value || value.length <= 50;
+      })
+      .optional(),
+    lastName: Yup.string()
+      .trim()
+      .transform(value => value === '' ? undefined : value)
+      .test('min-length', t('minCharacters', { count: 2 }), value => {
+        return !value || value.length >= 2;
+      })
+      .test('max-length', t('maxCharacters', { count: 50 }), value => {
+        return !value || value.length <= 50;
+      })
+      .optional(),
+    email: Yup.string()
+      .trim()
+      .email(t('invalidEmail'))
+      .required(t('emailRequired')),
+    phone: Yup.string()
+      .trim()
+      .transform(value => value === '' ? undefined : value)
+      .test('phone-format', t('invalidPhone'), value => {
+        return !value || /^\+?[\d\s\-()]{7,20}$/.test(value);
+      })
+      .optional(),
+    password: Yup.string()
+      .min(6, t('minCharacters', { count: 6 }))
+      .max(100, t('maxCharacters', { count: 100 }))
+      .required(t('passwordRequired')),
     confirmPassword: Yup.string()
       .oneOf([Yup.ref('password'), null], t('passwordsMustMatch'))
       .required(t('confirmPasswordRequired')),
-    city: Yup.string().required(t('cityRequired')),
-    warehouse: Yup.string().required(t('warehouseRequired')),
+    city: Yup.string()
+      .transform(value => value === '' ? undefined : value)
+      .optional(),
+    warehouse: Yup.string()
+      .transform(value => value === '' ? undefined : value)
+      .optional(),
   });
 
   const {
@@ -147,6 +183,8 @@ const RegisterForm = () => {
   };
 
   // Отправка формы
+  const locale = useLocale();
+
   const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -157,7 +195,7 @@ const RegisterForm = () => {
       setTimeout(() => {
         notifySuccess(t('registerSuccess'));
         reset();
-        router.push('/login');
+        router.push(`/${locale}/login`);
         setLoading(false);
       }, 1500);
     } catch (error) {
@@ -189,6 +227,9 @@ const RegisterForm = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="tp-login-input-wrapper">
           <div className="tp-login-input-box">
+            <div className="tp-login-input-label">
+              <label>{t('firstName')}</label>
+            </div>
             <div className="tp-login-input">
               <input 
                 {...register('firstName')} 
@@ -200,6 +241,9 @@ const RegisterForm = () => {
           </div>
           
           <div className="tp-login-input-box">
+            <div className="tp-login-input-label">
+              <label>{t('lastName')}</label>
+            </div>
             <div className="tp-login-input">
               <input 
                 {...register('lastName')} 
@@ -211,6 +255,9 @@ const RegisterForm = () => {
           </div>
           
           <div className="tp-login-input-box">
+            <div className="tp-login-input-label">
+              <label>{t('yourEmail')} <span className="required-star">*</span></label>
+            </div>
             <div className="tp-login-input">
               <input 
                 {...register('email')} 
@@ -222,6 +269,9 @@ const RegisterForm = () => {
           </div>
           
           <div className="tp-login-input-box">
+            <div className="tp-login-input-label">
+              <label>{t('phoneNumber')}</label>
+            </div>
             <div className="tp-login-input">
               <input 
                 {...register('phone')} 
@@ -233,6 +283,9 @@ const RegisterForm = () => {
           </div>
           
           <div className="tp-login-input-box">
+            <div className="tp-login-input-label">
+              <label>{t('password')} <span className="required-star">*</span></label>
+            </div>
             <div className="tp-login-input">
               <input 
                 {...register('password')} 
@@ -244,6 +297,9 @@ const RegisterForm = () => {
           </div>
           
           <div className="tp-login-input-box">
+            <div className="tp-login-input-label">
+              <label>{t('confirmPassword')} <span className="required-star">*</span></label>
+            </div>
             <div className="tp-login-input">
               <input 
                 {...register('confirmPassword')} 
@@ -255,6 +311,9 @@ const RegisterForm = () => {
           </div>
           
           <div className="tp-login-input-box">
+            <div className="tp-login-input-label">
+              <label>{t('city')}</label>
+            </div>
             <div className="tp-login-input city-input">
               <input 
                 value={searchCity}
@@ -279,6 +338,9 @@ const RegisterForm = () => {
           </div>
           
           <div className="tp-login-input-box">
+            <div className="tp-login-input-label">
+              <label>{t('warehouse')}</label>
+            </div>
             <div className="tp-login-input warehouse-input">
               <input 
                 value={searchWarehouse}
@@ -304,6 +366,8 @@ const RegisterForm = () => {
             )}
             {errors.warehouse && <ErrorMsg msg={errors.warehouse.message} />}
           </div>
+
+
         </div>
         
         <div className="tp-login-bottom mb-15">

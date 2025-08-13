@@ -3,6 +3,12 @@
   position: relative;
 }
 
+/* Убираем отступ сверху у блока изображения товара */
+.tp-product-details-thumb-wrapper {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
 .tp-product-details-nav-btns {
   display: flex;
   justify-content: space-between;

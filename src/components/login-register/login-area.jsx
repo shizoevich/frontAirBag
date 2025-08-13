@@ -31,18 +31,6 @@ const LoginArea = () => {
                   </p>
                 </div>
                 <div className="tp-login-option">
-                  <div className="tp-login-social mb-10 d-flex flex-wrap align-items-center justify-content-center">
-                    <div className="tp-login-option-item has-google">
-                      <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
-                        <GoogleSignUp/>
-                      </GoogleOAuthProvider>
-                    </div>
-                  </div>
-                  <div className="tp-login-mail text-center mb-40">
-                    <p>
-                      {t('orSignInWith')} <a href="#">{t('email')}</a>
-                    </p>
-                  </div>
                   <LoginForm />
                 </div>
               </div>

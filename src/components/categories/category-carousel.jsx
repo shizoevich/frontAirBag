@@ -9,6 +9,7 @@ import 'swiper/css/grid';
 import 'swiper/css/navigation';
 import ErrorMsg from '../common/error-msg';
 import HomeCateLoader from '../loader/home/home-cate-loader';
+import { useTranslations } from 'next-intl';
 
 // Fallback image URL для категорий, когда изображение не загружается
 const FALLBACK_IMAGE = '/assets/img/category/noimage.png';
@@ -18,9 +19,12 @@ const CategoryCarousel = ({
   isLoading, 
   isError, 
   parentCategoryId, 
-  selectedCategory, 
-  onCategorySelect 
+  selectedSubcategory, 
+  onSelectSubcategory,
+  searchQuery,
+  noResultsMessage
 }) => {
+  const t = useTranslations('Categories');
   const navigationPrevRef = useRef(null);
   const navigationNextRef = useRef(null);
   const [mounted, setMounted] = useState(false);
@@ -32,7 +36,14 @@ const CategoryCarousel = ({
 
   // Handle category selection
   const handleCategoryClick = (categoryId) => {
-    onCategorySelect(categoryId === selectedCategory ? null : categoryId);
+    // Проверяем, что onSelectSubcategory является функцией перед вызовом
+    if (typeof onSelectSubcategory === 'function') {
+      onSelectSubcategory(categoryId === selectedSubcategory ? null : categoryId);
+    } else {
+      console.warn('onSelectSubcategory is not a function or not provided to CategoryCarousel');
+      // Альтернативная логика, если функция не передана
+      // Например, можно использовать локальное состояние
+    }
   };
 
   // Don't render anything during SSR to avoid hydration mismatch
@@ -48,45 +59,22 @@ const CategoryCarousel = ({
   }
 
   if (!isLoading && isError) {
-    content = <ErrorMsg msg="Ошибка загрузки категорий" />;
+    content = <ErrorMsg msg={t('loadingError')} />;
   }
 
   if (!isLoading && !isError && (!categories || categories.length === 0)) {
-    content = <ErrorMsg msg="Категории не найдены" />;
+    content = <ErrorMsg msg={noResultsMessage || t('noBrandsFound')} />;
   }
 
-  if (!isLoading && !isError && categories) {
-    console.log('Структура данных категорий:', categories ? Object.keys(categories) : 'categories is null');
-    console.log('Все категории:', categories?.results || []);
-    
-    // Получаем категории из правильного поля в зависимости от структуры данных
-    let allCategories = [];
-    if (categories?.results && Array.isArray(categories.results)) {
-      allCategories = categories.results;
-    } else if (Array.isArray(categories)) {
-      allCategories = categories;
-    }
-    
-    console.log('Все категории после обработки:', allCategories);
-    console.log('Текущая родительская категория:', parentCategoryId);
-    
+  if (!isLoading && !isError && categories && categories.length > 0) {
     // Фильтруем только подкатегории выбранной родительской категории
-    const subcategories = parentCategoryId 
-      ? allCategories.filter(category => {
-          // Проверяем, является ли категория подкатегорией выбранной родительской категории
-          return category && category.title && category.title.trim() !== '' && 
-                 category.parent_id && String(category.parent_id) === String(parentCategoryId);
-        })
-      : allCategories.filter(category => {
-          // Если родительская категория не выбрана, показываем только марки автомобилей (parent_id === 754099)
-          return category && category.title && category.title.trim() !== '' && 
-                 category.parent_id && String(category.parent_id) === '754099';
-        });
+    const subcategories = categories;
     
     // Add "All Categories" option для подкатегорий
     const allCategoriesOption = {
       id: 'all',
-      title: 'Все подкатегории',
+      title: t('select_car_brand'),
+      name: t('select_car_brand'),
       image: 'noimage.png'
     };
     
@@ -157,15 +145,14 @@ const CategoryCarousel = ({
       >
         {displayCategories.map((category) => {
           const categoryId = category.id === 'all' ? null : (category.id_remonline || category.id);
-          // Используем поле image из структуры данных категории
+          // Используем поле image из структуры данных категории или name для отображения
+          const categoryName = category.title || category.name || '';
           let imageName = category.image || 'noimage.png';
           
           // Для опции "Все подкатегории" используем noimage.png
           if (category.id === 'all') {
             imageName = 'noimage.png';
           }
-          
-          console.log('Category:', category.title, 'Image:', imageName);
           
           // Добавляем проверку на соответствие имени файла изображения с предоставленным JSON
           // Если имя файла не соответствует ни одному из известных имен, используем noimage.png
@@ -181,7 +168,6 @@ const CategoryCarousel = ({
                             'pp-torpedo-1-zapal.jpg', 'pp-torpedo-2-zapal.jpg', 'noimage.png'];
           
           if (!knownImages.includes(imageName)) {
-            console.log(`Изображение ${imageName} не найдено в списке известных изображений, используем noimage.png`);
             imageName = 'noimage.png';
           }
           
@@ -190,15 +176,15 @@ const CategoryCarousel = ({
           return (
             <SwiperSlide key={category.id}>
               <div 
-                className={`category-card text-center p-2 ${selectedCategory === categoryId ? 'active-category' : ''}`}
+                className={`category-card text-center p-2 ${selectedSubcategory === categoryId ? 'active-category' : ''}`}
                 onClick={() => handleCategoryClick(categoryId)}
                 style={{
                   cursor: 'pointer',
-                  border: selectedCategory === categoryId ? '2px solid #de8043' : '1px solid #e9ecef',
+                  border: selectedSubcategory === categoryId ? '2px solid #de8043' : '1px solid #e9ecef',
                   borderRadius: '8px',
                   transition: 'all 0.3s ease',
                   height: '100%',
-                  boxShadow: selectedCategory === categoryId ? '0 4px 10px rgba(222, 128, 67, 0.3)' : 'none'
+                  boxShadow: selectedSubcategory === categoryId ? '0 4px 10px rgba(222, 128, 67, 0.3)' : 'none'
                 }}
               >
                 <div className="category-img-wrapper" style={{ 
@@ -213,12 +199,11 @@ const CategoryCarousel = ({
                     src={imagePath}
                     width={80} 
                     height={80} 
-                    alt={category.title}
+                    alt={categoryName}
                     style={{ objectFit: 'contain' }}
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = FALLBACK_IMAGE;
-                      console.log('Image failed to load:', imagePath, 'Using fallback');
                     }}
                     priority={true}
                     unoptimized={true}
@@ -226,11 +211,11 @@ const CategoryCarousel = ({
                 </div>
                 <h5 className="category-title" style={{ 
                   fontSize: '14px', 
-                  fontWeight: selectedCategory === categoryId ? 'bold' : 'normal',
+                  fontWeight: selectedSubcategory === categoryId ? 'bold' : 'normal',
                   margin: '0',
                   padding: '0'
                 }}>
-                  {category.title}
+                  {categoryName}
                 </h5>
               </div>
             </SwiperSlide>

@@ -77,14 +77,14 @@ export async function generateMetadata({ params }) {
 
 // Root Layout Component
 export default async function RootLayout({ children, params }) {
-  // В App Router Next.js, params должен быть ожидаемым (awaited) перед использованием его свойств
-  const { locale } = await params;
+  // Получаем текущую локаль из params (без await)
+  const { locale } = params || {};
   const messages = await getMessages(locale || 'uk');
 
   return (
-    <html lang={locale} suppressHydrationWarning={true}>
+    <html lang={locale || 'uk'} suppressHydrationWarning={true}>
       <body className={`${body.variable} ${heading.variable} ${p.variable} ${jost.variable} ${roboto.variable} ${oregano.variable} ${charm.variable}`} suppressHydrationWarning={true}>
-        <Providers locale={locale} messages={messages}>
+        <Providers locale={locale || 'uk'} messages={messages}>
           {children}
         </Providers>
       </body>

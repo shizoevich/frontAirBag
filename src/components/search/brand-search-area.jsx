@@ -10,15 +10,21 @@ import { useGetShowCategoryQuery, useGetAllProductsQuery } from "@/redux/feature
 import ReactPaginate from 'react-paginate';
 import CategoryCarousel from "@/components/categories/category-carousel";
 import ParentCategories from "@/components/categories/parent-categories";
+import { useTranslations } from 'next-intl';
 
 // Fallback image URL
 const FALLBACK_IMAGE = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg';
 
 const BrandSearchArea = () => {
+  const t = useTranslations('Categories');
+  const tSearch = useTranslations('SearchArea');
+  const tProducts = useTranslations('AllProductsArea');
+  
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedParentCategory, setSelectedParentCategory] = useState(754099); // По умолчанию выбрана категория Covers (автомобили)
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const itemsPerPage = 12; // Number of products per page
   
   useEffect(() => {
@@ -47,18 +53,10 @@ const BrandSearchArea = () => {
       : Array.isArray(categoriesData?.results) 
         ? categoriesData.results 
         : [];
-        
-  console.log('Raw categoriesData:', categoriesData);
-  console.log('Processed allCategories:', allCategories);
-  console.log('Parent category IDs to find:', [754099, 754100, 754101]);
   
   // Проверяем, есть ли родительские категории в данных
   const parentCats = allCategories.filter(cat => [754099, 754100, 754101].includes(Number(cat.id)));
-  console.log('Found parent categories:', parentCats);
 
-  // Ensure productsData is always an array
-  console.log('Raw productsData:', productsData);
-  
   // Обрабатываем разные форматы данных API
   let safeProductsData = [];
   
@@ -69,17 +67,25 @@ const BrandSearchArea = () => {
   } else if (productsData?.data && Array.isArray(productsData.data)) {
     safeProductsData = productsData.data;
   }
-  
-  console.log('Processed products data:', safeProductsData);
+
+  // Получаем все подкатегории для выбранной родительской категории (марки автомобилей)
+  const carBrands = allCategories.filter(cat => 
+    String(cat.parent_id) === String(selectedParentCategory)
+  );
+
+  // Фильтрация брендов по поисковому запросу
+  const filteredBrands = searchQuery 
+    ? carBrands.filter(brand => 
+        brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (brand.description && brand.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    : carBrands;
 
   // Filter products by selected subcategory or parent category
   const filteredProducts = selectedSubcategory 
     ? safeProductsData.filter(product => {
         // Check all possible category ID formats
         const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
-        
-        // Log for debugging
-        console.log('Product category ID:', categoryId, 'Selected subcategory:', selectedSubcategory);
         
         // More robust comparison
         if (!categoryId && !selectedSubcategory) return true;
@@ -110,8 +116,6 @@ const BrandSearchArea = () => {
         })
       : safeProductsData; // Если ничего не выбрано, показываем все товары
   
-  console.log('Filtered products:', filteredProducts);
-  
   // Calculate pagination
   const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
   const offset = currentPage * itemsPerPage;
@@ -127,6 +131,7 @@ const BrandSearchArea = () => {
     setSelectedParentCategory(categoryId);
     setSelectedSubcategory(null); // Reset subcategory when parent category changes
     setCurrentPage(0); // Reset pagination
+    setSearchQuery(''); // Reset search query
   };
   
   // Handle subcategory selection
@@ -135,13 +140,31 @@ const BrandSearchArea = () => {
     setCurrentPage(0); // Reset pagination
   };
 
+  // Handle search query change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Get selected category name
+  const getSelectedCategoryName = () => {
+    if (selectedSubcategory) {
+      const subcat = allCategories.find(cat => String(cat.id) === String(selectedSubcategory));
+      return subcat?.name || '';
+    } else if (selectedParentCategory) {
+      const parentCat = allCategories.find(cat => String(cat.id) === String(selectedParentCategory));
+      return parentCat?.name || '';
+    }
+    return '';
+  };
+
   return (
     <section className="tp-product-area pb-90">
       <div className="container">
         <div className="row">
           <div className="col-xl-12">
             <div className="tp-section-title-wrapper-2 mb-40">
-              <h3 className="tp-section-title-2">Поиск по бренду</h3>
+              <h3 className="tp-section-title-2">{t('car_brands')}</h3>
+              <p className="text-muted">{t('search_parts_by_car_brand')}</p>
             </div>
           </div>
         </div>
@@ -161,10 +184,12 @@ const BrandSearchArea = () => {
         <div className="row mb-40">
           <div className="col-xl-12">
             <CategoryCarousel 
-              categories={allCategories} 
+              categories={filteredBrands} 
               parentCategoryId={selectedParentCategory} 
               selectedSubcategory={selectedSubcategory} 
               onSelectSubcategory={handleSubcategoryChange} 
+              searchQuery={searchQuery}
+              noResultsMessage={t('noBrandsFound')}
             />
           </div>
         </div>
@@ -181,15 +206,21 @@ const BrandSearchArea = () => {
                   aria-labelledby="all-tab"
                   tabIndex="0"
                 >
+                  {selectedSubcategory && (
+                    <div className="mb-20">
+                      <h4>{getSelectedCategoryName()}</h4>
+                    </div>
+                  )}
+                  
                   <div className="row">
                     {productsLoading && !productsError && (
                       <HomePrdLoader loading={productsLoading} />
                     )}
                     {!productsLoading && productsError && (
-                      <ErrorMsg msg="Ошибка загрузки товаров" />
+                      <ErrorMsg msg={t('loadingError')} />
                     )}
                     {!productsLoading && !productsError && currentProducts.length === 0 && (
-                      <ErrorMsg msg="Товары не найдены" />
+                      <ErrorMsg msg={tProducts('noProductsFound')} />
                     )}
                     {!productsLoading && !productsError && currentProducts.length > 0 && 
                       currentProducts.map((item) => (
@@ -204,12 +235,12 @@ const BrandSearchArea = () => {
                   {pageCount > 1 && (
                     <div className="tp-pagination mt-20">
                       <ReactPaginate
-                        breakLabel="..."
-                        nextLabel="→"
+                        breakLabel={tSearch('breakLabel')}
+                        nextLabel={tSearch('nextPage')}
                         onPageChange={handlePageClick}
                         pageRangeDisplayed={3}
                         pageCount={pageCount}
-                        previousLabel="←"
+                        previousLabel={tSearch('previousPage')}
                         renderOnZeroPageCount={null}
                         containerClassName="tp-pagination-nav"
                         pageLinkClassName="tp-pagination-link"

@@ -43,9 +43,9 @@
     &-thumb{
         &-wrapper{
             position: relative; /* Ensure this is the positioning context for arrows */
-            position: sticky;
-            top: 120px;
-            margin-right: 20px;
+            position: static;
+            top: 0;
+            margin-right: 0;
             flex: 0 0 auto;
             @media #{$md, $sm, $xs}{
                 position: initial;

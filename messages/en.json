@@ -1,38 +1,38 @@
 {
   "Header": {
     "contact_us": "Contact Us",
-    "shippingInfo": "🚚 Free shipping on orders over 2000 ₴ | 🛡️ Quality guarantee for all Airbag parts"
+    "shippingInfo": " Free shipping on orders over 2000 | Quality guarantee for all Airbag parts"
   },
   "menu": {
-    "home": "🏠 Home",
-    "catalog": "🔧 Catalog",
-    "carBrands": "🚘 Car Brands",
+    "home": " Home",
+    "catalog": " Catalog",
+    "carBrands": " Car Brands",
     "selectCarBrand": "Select Car Brand",
     "carMats": "Car Mats by Brands",
     "searchByBrand": "Search Parts by Car Brand",
-    "airbagComponents": "🛡️ Airbag SRS Components",
+    "airbagComponents": " Airbag SRS Components",
     "connectors": "Connectors - Plugs and connectors for airbags",
     "mounts": "Mounts - Mounting elements and brackets",
     "resistors": "Resistors - Resistors for SRS diagnostics",
     "airbags": "Airbags - Pneumatic bags (Airbag)",
     "beltParts": "Belt Parts - Hardware and seat belt components",
-    "pyrotechnics": "💥 Pyrotechnics",
+    "pyrotechnics": " Pyrotechnics",
     "pyroBelts": "PP in Belts - Pyrotechnics in seat belts",
     "pyroSeats": "PP in Legs/Seat - Pyrotechnics in seats and lower cabin",
     "pyroCurtains": "PP in Curtains - Curtain pyrotechnics (side protection)",
     "pyroSteering": "PP in steering wheel 1 igniter / 2 igniters - Pyrotechnics in steering airbag",
     "pyroDashboard": "PP in dashboard 1 igniter / 2 igniters - Pyrotechnics in passenger airbag",
-    "myAccount": "📊 My Account",
+    "myAccount": " My Account",
     "cart": "Cart",
     "wishlist": "Wishlist",
     "checkout": "Checkout",
     "myOrders": "My Orders",
-    "search": "🔍 Search",
+    "search": " Search",
     "searchCatalog": "Search Catalog",
     "searchByVin": "Search by VIN",
     "searchByBrandMenu": "Search by Brand",
-    "contacts": "📞 Contacts",
-    "discounts": "💰 Discounts"
+    "contacts": " Contacts",
+    "discounts": " Discounts"
   },
   "features": {
     "fastDelivery": "Fast Delivery",
@@ -102,7 +102,7 @@
     "phoneNumber": "+38 012 345 67 89",
     "emailAddress": "support@example.com",
     "address": "Ukraine, Kyiv, Prykladna St, 1",
-    "copyright": "© {year} All Rights Reserved | Next.js Template by ThemePure"
+    "copyright": " {year} All Rights Reserved | Next.js Template by ThemePure"
   },
   "ProductItem": {
     "outOfStock": "Out of Stock",
@@ -169,7 +169,9 @@
   },
   "SearchPage": {
     "title": "AirBag - Search Products",
-    "searchProducts": "Search Products"
+    "searchProducts": "Search Products",
+    "brandTitle": "AirBag - Search Parts by Car Brand",
+    "brandProducts": "Search Parts by Car Brand"
   },
   "HomeHeroSlider": {
     "startingAt": "Starting at",
@@ -218,7 +220,9 @@
     "city": "City",
     "cityRequired": "City is required",
     "warehouse": "Nova Poshta Warehouse",
-    "warehouseRequired": "Warehouse is required"
+    "warehouseRequired": "Warehouse is required",
+    "maxCharacters": "Max. {count} characters",
+    "invalidPhone": "Invalid phone number format"
   },
   "Profile": {
     "personalDetails": "Personal Details",
@@ -238,5 +242,50 @@
     "updating": "Updating...",
     "profileUpdateSuccess": "Profile updated successfully",
     "profileUpdateError": "Error updating profile"
+  },
+  "Categories": {
+    "car_brands": "Car Brands",
+    "select_car_brand": "Select Car Brand",
+    "search_brands": "Search Car Brands",
+    "car_mats_by_brand": "Car Mats by Car Brands",
+    "search_parts_by_car_brand": "Find parts for your car by brand. We offer a wide selection of original and aftermarket parts for various car brands.",
+    "loadingError": "Error loading data",
+    "noBrandsFound": "No car brands found",
+    "airbag_components": "Airbag SRS Components",
+    "airbag_components_subtitle": "Parts and components for safety systems",
+    "search_components": "Search Components",
+    "noComponentsFound": "No components found",
+    "airbag_components_seo_title": "Airbag SRS Safety System Components",
+    "airbag_components_seo_description": "Wide selection of components for vehicle safety systems. We offer quality parts for repair and maintenance of airbags.",
+    "connectors_description": "Connectors and plugs for airbags and other SRS components",
+    "fasteners_description": "Mounting elements and brackets for secure component fixation",
+    "resistors_description": "Resistors for diagnostics and airbag simulation",
+    "airbags_description": "Pneumatic bags (Airbag) of various types and sizes",
+    "belt_parts_description": "Hardware and components for seat belts",
+    "pyrotechnics": "Pyrotechnics",
+    "pyrotechnics_subtitle": "Pyrotechnic devices for safety systems",
+    "search_pyrotechnics": "Search Pyrotechnics",
+    "noPyrotechnicsFound": "No pyrotechnics found",
+    "pyrotechnics_seo_title": "Pyrotechnics for Vehicle Safety Systems",
+    "pyrotechnics_seo_description": "Wide range of pyrotechnics for various vehicle safety systems. We offer quality pyrotechnic devices for seat belts, airbags, and other SRS components.",
+    "belt_pyrotechnics_description": "Pyrotechnics for seat belts, ensuring quick activation in emergency situations",
+    "leg_pyrotechnics_description": "Pyrotechnics for driver and passenger leg protection",
+    "seat_pyrotechnics_description": "Pyrotechnics for seats, providing additional protection",
+    "curtain_pyrotechnics_description": "Curtain pyrotechnics for side protection during side impacts",
+    "steering_pyrotechnics_description": "Pyrotechnics for steering wheel airbag with one or two igniters",
+    "dashboard_pyrotechnics_description": "Pyrotechnics for passenger airbag in dashboard with one or two igniters"
+  },
+  "Contact": {
+    "title": "Contacts",
+    "email": "Email",
+    "emailAddress": "info@airbag.com",
+    "phone": "Phone",
+    "phoneNumber": "+380123456789",
+    "delivery": "Delivery",
+    "deliveryInfo": "Free delivery for orders over 2000 UAH",
+    "workingHours": "Working hours",
+    "workingDays": "Mon-Fri: 9:00-18:00",
+    "weekend": "Sat-Sun: closed",
+    "socialNetworks": "Find us on social networks"
   }
 }

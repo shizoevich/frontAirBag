@@ -3,11 +3,23 @@ import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
 import CommonBreadcrumb from "@/components/breadcrumb/common-breadcrumb";
 import LoginArea from "@/components/login-register/login-area";
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-export async function generateMetadata({ params: { locale } }) {
+export async function generateMetadata({ params }) {
+  // Получаем локаль асинхронно
+  const locale = params.locale;
+  
+  // Получаем переводы для заголовка
+  let title = 'Login';
+  
+  if (locale === 'uk') {
+    title = 'Вхід';
+  } else if (locale === 'ru') {
+    title = 'Вход';
+  }
+  
   return {
-    title: `AirBag - ${locale === 'uk' ? 'Вхід' : locale === 'ru' ? 'Вход' : 'Login'} Page`,
+    title: `AirBag - ${title} Page`,
   };
 }
 

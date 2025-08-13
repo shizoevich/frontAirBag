@@ -1,6 +1,7 @@
 'use client'
 import React from "react";
 import Image from "next/image";
+import { useTranslations } from 'next-intl';
 // internal
 import ContactForm from "../forms/contact-form";
 import contact_icon_1 from "@assets/img/contact/contact-icon-1.png";
@@ -8,6 +9,7 @@ import contact_icon_2 from "@assets/img/contact/contact-icon-2.png";
 import contact_icon_3 from "@assets/img/contact/contact-icon-3.png";
 
 const ContactArea = () => {
+  const t = useTranslations('Contact');
   return (
     <>
       <section className="tp-contact-area pb-100">
@@ -16,12 +18,9 @@ const ContactArea = () => {
             <div className="row">
               <div className="col-xl-9 col-lg-8">
                 <div className="tp-contact-wrapper">
-                  <h3 className="tp-contact-title">Sent A Message</h3>
-
+                  <h3 className="tp-contact-title">{t('sendMessage')}</h3>
                   <div className="tp-contact-form">
-                    {/* form start */}
                     <ContactForm />
-                    {/* form end */}
                     <p className="ajax-response"></p>
                   </div>
                 </div>
@@ -36,10 +35,12 @@ const ContactArea = () => {
                     </div>
                     <div className="tp-contact-info-content">
                       <p data-info="mail">
-                        <a href="mailto:contact@AirBag.com">contact@AirBag.com</a>
+                        <span>{t('email')}</span>
+                        <a href={`mailto:${t('emailAddress')}`}>{t('emailAddress')}</a>
                       </p>
                       <p data-info="phone">
-                        <a href="tel:670-413-90-762">+670 413 90 762</a>
+                        <span>{t('phone')}</span>
+                        <a href={`tel:${t('phoneNumber')}`}>{t('phoneNumber')}</a>
                       </p>
                     </div>
                   </div>
@@ -51,12 +52,13 @@ const ContactArea = () => {
                     </div>
                     <div className="tp-contact-info-content">
                       <p>
-                        <a
-                          href="https://www.google.com/maps/place/New+York,+NY,+USA/@40.6976637,-74.1197638,11z/data=!3m1!4b1!4m6!3m5!1s0x89c24fa5d33f083b:0xc80b8f06e177fe62!8m2!3d40.7127753!4d-74.0059728!16zL20vMDJfMjg2"
-                          target="_blank"
-                        >
-                          84 sleepy hollow st. <br /> jamaica, New York 1432
-                        </a>
+                        <span>{t('delivery')}</span>
+                        <span>{t('deliveryInfo')}</span>
+                      </p>
+                      <p>
+                        <span>{t('workingHours')}</span>
+                        <span>{t('workingDays')}</span><br/>
+                        <span>{t('weekend')}</span>
                       </p>
                     </div>
                   </div>
@@ -69,18 +71,20 @@ const ContactArea = () => {
                     <div className="tp-contact-info-content">
                       <div className="tp-contact-social-wrapper mt-5">
                         <h4 className="tp-contact-social-title">
-                          Find on social media
+                          {t('socialNetworks')}
                         </h4>
-
                         <div className="tp-contact-social-icon">
-                          <a href="#">
+                          <a href="https://t.me/AirBagAD_bot" target="_blank" rel="noopener noreferrer" aria-label="Telegram">
+                            <i className="fa-brands fa-telegram"></i>
+                          </a>
+                          <a href="https://tiktok.com/@airbag_ad" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+                            <i className="fa-brands fa-tiktok"></i>
+                          </a>
+                          <a href="https://instagram.com/dmytro_gekalo" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                            <i className="fa-brands fa-instagram"></i>
+                          </a>
+                          <a href="https://facebook.com/dmytro.gekalo" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                             <i className="fa-brands fa-facebook-f"></i>
-                          </a>
-                          <a href="#">
-                            <i className="fa-brands fa-twitter"></i>
-                          </a>
-                          <a href="#">
-                            <i className="fa-brands fa-linkedin-in"></i>
                           </a>
                         </div>
                       </div>
