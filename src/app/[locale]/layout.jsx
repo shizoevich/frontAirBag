@@ -77,8 +77,8 @@ export async function generateMetadata({ params }) {
 
 // Root Layout Component
 export default async function RootLayout({ children, params }) {
-  // Получаем текущую локаль из params (без await)
-  const { locale } = params || {};
+  // Получаем текущую локаль из params (с await)
+  const { locale } = await params || {};
   const messages = await getMessages(locale || 'uk');
 
   return (

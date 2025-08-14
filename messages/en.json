@@ -1,7 +1,7 @@
 {
   "Header": {
     "contact_us": "Contact Us",
-    "shippingInfo": " Free shipping on orders over 2000 | Quality guarantee for all Airbag parts"
+    "shippingInfo": " Quality guarantee for all Airbag parts"
   },
   "menu": {
     "home": " Home",
@@ -99,8 +99,8 @@
     "contactUs": "Contact Us",
     "talkToUsTitle": "Talk To Us",
     "gotQuestions": "Got Questions? Call us",
-    "phoneNumber": "+38 012 345 67 89",
-    "emailAddress": "support@example.com",
+    "phoneNumber": "+38 098 998 9828",
+    "emailAddress": "Noxnew@hotmail.com",
     "address": "Ukraine, Kyiv, Prykladna St, 1",
     "copyright": " {year} All Rights Reserved | Next.js Template by ThemePure"
   },
@@ -276,16 +276,37 @@
     "dashboard_pyrotechnics_description": "Pyrotechnics for passenger airbag in dashboard with one or two igniters"
   },
   "Contact": {
-    "title": "Contacts",
+    "title": "Contact",
+    "subtitle": "🏎️ Everything for AirBag SRS Safety Restoration",
+    "pageTitle": "Contact - AirBag",
+    "pageDescription": "Contact us for more information about our products and services",
     "email": "Email",
-    "emailAddress": "info@airbag.com",
+    "emailAddress": "noxnew@hotmail.com",
     "phone": "Phone",
-    "phoneNumber": "+380123456789",
+    "phoneNumber": "+38 (098) 998-98-28",
     "delivery": "Delivery",
-    "deliveryInfo": "Free delivery for orders over 2000 UAH",
-    "workingHours": "Working hours",
-    "workingDays": "Mon-Fri: 9:00-18:00",
-    "weekend": "Sat-Sun: closed",
-    "socialNetworks": "Find us on social networks"
+    "deliveryInfo": "Nova Poshta, shipping within 1-3 days",
+    "workingHours": "Working Hours",
+    "workingDays": "Mon-Sat: 9:00 AM – 7:00 PM",
+    "weekend": "Sun: Closed",
+    "socialNetworks": "Find us on social networks",
+    "socialDescription": "Follow us on social networks to stay up to date with the latest news and promotions",
+    "socialLabels": {
+      "telegram": "Telegram",
+      "tiktok": "TikTok",
+      "instagram": "Instagram",
+      "facebook": "Facebook"
+    },
+    "mapTitle": "Our Location",
+    "mapDescription": "We are located in the city center, convenient location for visiting",
+    "mapAriaLabel": "Map with the location of our office",
+    "viewOnMap": "View on Map",
+    "sendMessage": "Send Message",
+    "yourName": "Your Name",
+    "yourEmail": "Your Email",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send",
+    "findUs": "Find Us"
   }
 }

@@ -16,11 +16,11 @@ const FALLBACK_IMAGE = '/assets/img/category/noimage.png';
 
 const CategoryCarousel = ({ 
   categories = [], 
-  isLoading, 
-  isError, 
-  parentCategoryId, 
-  selectedSubcategory, 
-  onSelectSubcategory,
+  isLoading = false, 
+  isError = false, 
+  parentCategoryId = null,
+  selectedSubcategory = null,
+  onCategorySelect = null,
   searchQuery,
   noResultsMessage
 }) => {
@@ -36,11 +36,11 @@ const CategoryCarousel = ({
 
   // Handle category selection
   const handleCategoryClick = (categoryId) => {
-    // Проверяем, что onSelectSubcategory является функцией перед вызовом
-    if (typeof onSelectSubcategory === 'function') {
-      onSelectSubcategory(categoryId === selectedSubcategory ? null : categoryId);
+    // Проверяем, что onCategorySelect является функцией перед вызовом
+    if (typeof onCategorySelect === 'function') {
+      onCategorySelect(categoryId === selectedSubcategory ? null : categoryId);
     } else {
-      console.warn('onSelectSubcategory is not a function or not provided to CategoryCarousel');
+      console.warn('onCategorySelect is not a function or not provided to CategoryCarousel');
       // Альтернативная логика, если функция не передана
       // Например, можно использовать локальное состояние
     }
@@ -68,7 +68,11 @@ const CategoryCarousel = ({
 
   if (!isLoading && !isError && categories && categories.length > 0) {
     // Фильтруем только подкатегории выбранной родительской категории
-    const subcategories = categories;
+    const subcategories = parentCategoryId 
+      ? categories.filter(cat => cat && Number(cat.parent_id) === Number(parentCategoryId))
+      : categories;
+    
+    console.log(`Filtering subcategories for parent ID ${parentCategoryId}:`, subcategories);
     
     // Add "All Categories" option для подкатегорий
     const allCategoriesOption = {
@@ -144,15 +148,10 @@ const CategoryCarousel = ({
         className="category-carousel"
       >
         {displayCategories.map((category) => {
-          const categoryId = category.id === 'all' ? null : (category.id_remonline || category.id);
+          const categoryId = category.id === 'all' ? null : Number(category.id);
           // Используем поле image из структуры данных категории или name для отображения
           const categoryName = category.title || category.name || '';
           let imageName = category.image || 'noimage.png';
-          
-          // Для опции "Все подкатегории" используем noimage.png
-          if (category.id === 'all') {
-            imageName = 'noimage.png';
-          }
           
           // Добавляем проверку на соответствие имени файла изображения с предоставленным JSON
           // Если имя файла не соответствует ни одному из известных имен, используем noimage.png
@@ -171,7 +170,13 @@ const CategoryCarousel = ({
             imageName = 'noimage.png';
           }
           
-          const imagePath = `/assets/img/category/${imageName}`;
+          // Формируем путь к изображению категории
+          let imagePath = `/assets/img/category/${imageName}`;
+          
+          // Проверяем, есть ли у нас полный URL в поле image
+          if (imageName && imageName.startsWith('http')) {
+            imagePath = imageName;
+          }
           
           return (
             <SwiperSlide key={category.id}>

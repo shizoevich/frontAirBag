@@ -105,7 +105,27 @@ const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBott
             </Link>
           </div>
         </div>
-        <button onClick={() => handleAddProduct(productItem)} disabled={!isAvailable} className="tp-product-details-add-to-cart-btn w-100">{t('addToCart')}</button>
+        <button
+  onClick={() => handleAddProduct(productItem)}
+  disabled={!isAvailable}
+  style={{
+    backgroundColor: '#de8043',
+    color: '#000',
+    transition: 'background-color 0.3s ease, color 0.3s ease',
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.backgroundColor = '#000';
+    e.currentTarget.style.color = '#fff';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.backgroundColor = '#de8043';
+    e.currentTarget.style.color = '#000';
+  }}
+  className="tp-product-details-add-to-cart-btn w-100"
+>
+  {t('addToCart')}
+</button>
+
       </div>
       {/* product-details-action-sm start */}
       <div className="tp-product-details-action-sm">

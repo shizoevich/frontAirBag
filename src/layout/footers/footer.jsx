@@ -70,7 +70,6 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                   <div className="tp-footer-widget-content">
                     <ul>
                       <li><Link href="/about">{t('ourStory')}</Link></li>
-                      <li><Link href="/careers">{t('careers')}</Link></li>
                       <li><Link href="/policy">{t('privacyPolicy')}</Link></li>
                       <li><Link href="/terms">{t('termsAndConditions')}</Link></li>
                       <li><Link href="/blog">{t('latestNews')}</Link></li>
@@ -95,7 +94,7 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                           </span>
                         </div>
                         <div className="tp-footer-contact-content">
-                          <p><a href="mailto:support@example.com">{t('emailAddress')}</a></p>
+                          <p><a href="mailto:Noxnew@hotmail.com">{t('emailAddress')}</a></p>
                         </div>
                       </div>
                       <div className="tp-footer-contact-item d-flex align-items-start">

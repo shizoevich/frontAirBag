@@ -1,21 +1,34 @@
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
-import ContactBreadcrumb from "@/components/breadcrumb/contact-breadcrumb";
-import ContactArea from "@/components/contact/contact-area";
-import ContactMap from "@/components/contact/contact-map";
 import Footer from "@/layout/footers/footer";
+import ContactInfo from "@/components/contact/contact-info";
+import { getTranslations } from 'next-intl/server';
 
-export const metadata = {
-  title: "AirBag - Contact Page",
-};
+export async function generateMetadata({ params }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Contact' });
+
+  
+  return {
+    title: t('pageTitle'),
+    description: t('pageDescription'),
+    openGraph: {
+      title: t('pageTitle'),
+      description: t('pageDescription'),
+      type: 'website',
+      locale: locale,
+      siteName: 'AirBag',
+    }
+  };
+}
 
 export default function ContactPage() {
   return (
     <Wrapper>
       <Header />
-      <ContactBreadcrumb />
-      <ContactArea/>
-      <ContactMap/>
+      <main className="main">
+        <ContactInfo />
+      </main>
       <Footer primary_style={true} />
     </Wrapper>
   );

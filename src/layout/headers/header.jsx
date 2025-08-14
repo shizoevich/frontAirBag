@@ -141,15 +141,15 @@ const Header = () => {
                   </div>
                   <div className="col-xl-3 col-lg-3">
                     <div className="tp-header-contact d-flex align-items-center justify-content-end">
-                      <div className="tp-header-contact-icon">
-                        <span>
+                      <div className="tp-header-contact-icon" style={{marginRight: '12px'}}>
+                        <span style={{fontSize: '24px', color: '#de8043', display: 'flex', alignItems: 'center'}}>
                           <Phone />
                         </span>
                       </div>
-                      <div className="tp-header-contact-content">
-                        <p>
-                          <a href="tel:402-763-282-46">+(402) 763 282 46</a>
-                        </p>
+                      <div className="tp-footer-talk" style={{display: 'flex', alignItems: 'center'}}>
+                        <h4 style={{margin: 0, lineHeight: 1}}>
+                          <a href="tel:+380989989828">+38 098 998 9828</a>
+                        </h4>
                       </div>
                     </div>
                   </div>

@@ -3,6 +3,7 @@ import React from 'react';
 import { useTranslations } from 'next-intl';
 import ErrorMsg from '@/components/common/error-msg';
 import HomeCateLoader from '../loader/home/home-cate-loader';
+import Image from 'next/image';
 
 const ParentCategories = ({ 
   categories = [], 
@@ -13,24 +14,22 @@ const ParentCategories = ({
 }) => {
   const t = useTranslations('ParentCategories');
   
-  // Отладка переводов
-  console.log('Translation for selectCategory:', t('selectCategory'));
-  console.log('Translation function t:', typeof t);
-  // Находим родительские категории по ID (Covers, Комплектующие Airbag SRS, Пиропатроны)
-  const parentCategoryIds = [754099, 754100, 754101]; // ID родительских категорий
+  // Идентификаторы родительских категорий (Covers, Комплектующие Airbag SRS, Пиропатроны)
+  const parentCategoryIds = [754099, 754100, 754101];
   
   console.log('All categories in parent-categories.jsx:', categories);
   
-  // Преобразуем ID в строки для более надежного сравнения
-  const parentCategoryIdsStr = parentCategoryIds.map(id => String(id));
-  
-  // Добавляем жестко закодированные родительские категории, если их нет в данных
+  // Фильтруем только родительские категории из полученных данных
   let parentCategories = categories.filter(cat => {
     if (!cat) return false;
-    const catId = String(cat.id || '');
-    const isParent = parentCategoryIdsStr.includes(catId);
-    console.log(`Category ${cat.title || 'unknown'} (ID: ${catId}) is parent: ${isParent}`);
-    return isParent;
+    return parentCategoryIds.includes(Number(cat.id));
+  });
+  
+  // Сортируем родительские категории в нужном порядке
+  parentCategories = parentCategories.sort((a, b) => {
+    const indexA = parentCategoryIds.indexOf(Number(a.id));
+    const indexB = parentCategoryIds.indexOf(Number(b.id));
+    return indexA - indexB;
   });
   
   // Если родительские категории не найдены, создаем их вручную
@@ -47,7 +46,8 @@ const ParentCategories = ({
   const allCategoriesOption = {
     id: 'all',
     title: t('all_categories'),
-    parent_id: null
+    parent_id: null,
+    image: "noimage.png"
   };
   
   const displayCategories = [allCategoriesOption, ...parentCategories];
@@ -71,8 +71,9 @@ const ParentCategories = ({
       <div className="parent-categories-wrapper">
         <div className="parent-categories-list d-flex flex-wrap">
           {displayCategories.map((category) => {
-            const categoryId = category.id === 'all' ? null : (category.id_remonline || category.id);
+            const categoryId = category.id === 'all' ? null : Number(category.id);
             const isActive = selectedParentCategory === categoryId;
+            const imagePath = category.image ? `/assets/img/category/${category.image}` : '/assets/img/category/noimage.png';
             
             return (
               <div 
@@ -81,20 +82,21 @@ const ParentCategories = ({
                 onClick={() => onParentCategorySelect(categoryId)}
               >
                 <div 
-                  className="parent-category-btn"
+                  className="parent-category-btn d-flex align-items-center"
                   style={{
-                    padding: '8px 16px',
-                    margin: '0 8px 8px 0',
+                    padding: '10px 16px',
+                    margin: '0 12px 12px 0',
                     cursor: 'pointer',
-                    borderRadius: '4px',
-                    backgroundColor: isActive ? '#de8043' : 'transparent',
-                    border: isActive ? 'none' : '1px solidrgb(0, 0, 0)',
-                    color: isActive ? 'black' : '#000',
+                    borderRadius: '8px',
+                    backgroundColor: isActive ? '#de8043' : '#f8f9fa',
+                    border: isActive ? 'none' : '1px solid #dee2e6',
+                    color: isActive ? '#fff' : '#212529',
                     fontWeight: isActive ? 'bold' : 'normal',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    boxShadow: isActive ? '0 4px 8px rgba(0,0,0,0.1)' : 'none'
                   }}
                 >
-                  {category.title}
+                  <span>{category.title}</span>
                 </div>
               </div>
             );
