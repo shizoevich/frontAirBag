@@ -36,9 +36,15 @@ const CategoryCarousel = ({
 
   // Handle category selection
   const handleCategoryClick = (categoryId) => {
+    console.log('CategoryCarousel: handleCategoryClick called with categoryId:', categoryId);
+    console.log('CategoryCarousel: current selectedSubcategory:', selectedSubcategory);
+    console.log('CategoryCarousel: onCategorySelect type:', typeof onCategorySelect);
+    
     // Проверяем, что onCategorySelect является функцией перед вызовом
     if (typeof onCategorySelect === 'function') {
-      onCategorySelect(categoryId === selectedSubcategory ? null : categoryId);
+      const newCategoryId = categoryId === selectedSubcategory ? null : categoryId;
+      console.log('CategoryCarousel: calling onCategorySelect with:', newCategoryId);
+      onCategorySelect(newCategoryId);
     } else {
       console.warn('onCategorySelect is not a function or not provided to CategoryCarousel');
       // Альтернативная логика, если функция не передана
@@ -148,6 +154,7 @@ const CategoryCarousel = ({
         className="category-carousel"
       >
         {displayCategories.map((category) => {
+          // Преобразуем ID категории к числу для корректного сравнения
           const categoryId = category.id === 'all' ? null : Number(category.id);
           // Используем поле image из структуры данных категории или name для отображения
           const categoryName = category.title || category.name || '';
@@ -181,15 +188,15 @@ const CategoryCarousel = ({
           return (
             <SwiperSlide key={category.id}>
               <div 
-                className={`category-card text-center p-2 ${selectedSubcategory === categoryId ? 'active-category' : ''}`}
+                className={`category-card text-center p-2 ${selectedSubcategory && Number(selectedSubcategory) === Number(categoryId) ? 'active-category' : ''}`}
                 onClick={() => handleCategoryClick(categoryId)}
                 style={{
                   cursor: 'pointer',
-                  border: selectedSubcategory === categoryId ? '2px solid #de8043' : '1px solid #e9ecef',
+                  border: selectedSubcategory && Number(selectedSubcategory) === Number(categoryId) ? '2px solid #de8043' : '1px solid #e9ecef',
                   borderRadius: '8px',
                   transition: 'all 0.3s ease',
                   height: '100%',
-                  boxShadow: selectedSubcategory === categoryId ? '0 4px 10px rgba(222, 128, 67, 0.3)' : 'none'
+                  boxShadow: selectedSubcategory && Number(selectedSubcategory) === Number(categoryId) ? '0 4px 10px rgba(222, 128, 67, 0.3)' : 'none'
                 }}
               >
                 <div className="category-img-wrapper" style={{ 
@@ -216,7 +223,7 @@ const CategoryCarousel = ({
                 </div>
                 <h5 className="category-title" style={{ 
                   fontSize: '14px', 
-                  fontWeight: selectedSubcategory === categoryId ? 'bold' : 'normal',
+                  fontWeight: selectedSubcategory && Number(selectedSubcategory) === Number(categoryId) ? 'bold' : 'normal',
                   margin: '0',
                   padding: '0'
                 }}>

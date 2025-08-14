@@ -6,6 +6,8 @@ import HomePrdLoader from "@/components/loader/home/home-prd-loader";
 import { useGetShowCategoryQuery, useGetAllProductsQuery } from "@/redux/features/categoryApi";
 import ReactPaginate from 'react-paginate';
 import { useTranslations } from 'next-intl';
+import CategoryCarousel from "@/components/categories/category-carousel";
+import ParentCategories from "@/components/categories/parent-categories";
 
 const CategoryProductsArea = ({ categorySlug }) => {
   const tSearch = useTranslations('SearchArea');
@@ -14,6 +16,8 @@ const CategoryProductsArea = ({ categorySlug }) => {
   
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [selectedParentCategory, setSelectedParentCategory] = useState(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const itemsPerPage = 12; // Количество товаров на странице
   
   useEffect(() => {
@@ -69,27 +73,57 @@ const CategoryProductsArea = ({ categorySlug }) => {
   // Получаем ID категории по slug
   const categoryId = getCategoryIdBySlug(categorySlug);
   
-  // Фильтруем товары по выбранной категории
-  const filteredProducts = categoryId 
+  // Фильтруем товары по выбранной категории или подкатегории
+  const filteredProducts = selectedSubcategory 
     ? safeProductsData.filter(product => {
         // Проверяем все возможные форматы ID категории
-        const productCategoryId = product.category?.id_remonline || product.category?.id || product.category_id;
+        const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
         
-        if (!productCategoryId) return false;
+        // Более надежное сравнение
+        if (!categoryId && !selectedSubcategory) return true;
+        if (!categoryId) return false;
         
-        // Находим категорию товара
-        const productCategory = allCategories.find(cat => 
-          String(cat.id) === String(productCategoryId) || 
-          String(cat.id_remonline) === String(productCategoryId)
-        );
+        const productCategoryId = String(categoryId).trim();
+        const selectedCategoryId = String(selectedSubcategory).trim();
         
-        if (!productCategory) return false;
-        
-        // Проверяем, принадлежит ли товар к выбранной категории или её подкатегориям
-        return String(productCategory.id) === String(categoryId) || 
-               String(productCategory.parent_id) === String(categoryId);
+        return productCategoryId === selectedCategoryId;
       })
-    : safeProductsData;
+    : selectedParentCategory 
+      ? safeProductsData.filter(product => {
+          // Если выбрана родительская категория, но не выбрана подкатегория,
+          // показываем товары всех подкатегорий этой родительской категории
+          const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
+          if (!categoryId) return false;
+          
+          // Находим категорию товара
+          const productCategory = allCategories.find(cat => {
+            const catId = cat.id_remonline || cat.id;
+            return String(catId).trim() === String(categoryId).trim();
+          });
+          
+          // Проверяем, является ли категория товара подкатегорией выбранной родительской категории
+          return productCategory && String(productCategory.parent_id) === String(selectedParentCategory);
+        })
+      : categoryId 
+        ? safeProductsData.filter(product => {
+            // Проверяем все возможные форматы ID категории
+            const productCategoryId = product.category?.id_remonline || product.category?.id || product.category_id;
+            
+            if (!productCategoryId) return false;
+            
+            // Находим категорию товара
+            const productCategory = allCategories.find(cat => 
+              String(cat.id) === String(productCategoryId) || 
+              String(cat.id_remonline) === String(productCategoryId)
+            );
+            
+            if (!productCategory) return false;
+            
+            // Проверяем, принадлежит ли товар к выбранной категории или её подкатегориям
+            return String(productCategory.id) === String(categoryId) || 
+                   String(productCategory.parent_id) === String(categoryId);
+          })
+        : safeProductsData;
   
   // Расчет пагинации
   const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -99,6 +133,19 @@ const CategoryProductsArea = ({ categorySlug }) => {
   // Обработка изменения страницы
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
+  };
+
+  // Обработка изменения родительской категории
+  const handleParentCategoryChange = (categoryId) => {
+    setSelectedParentCategory(categoryId);
+    setSelectedSubcategory(null); // Сбрасываем подкатегорию при изменении родительской категории
+    setCurrentPage(0); // Возвращаемся на первую страницу при изменении категории
+  };
+  
+  // Обработка изменения подкатегории
+  const handleSubcategoryChange = (categoryId) => {
+    setSelectedSubcategory(categoryId === selectedSubcategory ? null : categoryId);
+    setCurrentPage(0); // Возвращаемся на первую страницу при изменении подкатегории
   };
 
   // Получаем название категории
@@ -128,6 +175,35 @@ const CategoryProductsArea = ({ categorySlug }) => {
             <div className="tp-section-title-wrapper-2 mb-40">
               <h3 className="tp-section-title-2">{getCategoryName()}</h3>
               <p className="text-muted">{getCategoryDescription()}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Родительские категории (без фото) */}
+        <div className="row">
+          <div className="col-xl-12">
+            <ParentCategories 
+              categories={allCategories}
+              isLoading={catLoading}
+              isError={catError}
+              selectedCategory={selectedParentCategory}
+              onCategorySelect={handleParentCategoryChange}
+            />
+          </div>
+        </div>
+        
+        {/* Подкатегории в карусели (с фото) */}
+        <div className="row">
+          <div className="col-12">
+            <div className="tp-product-tab mb-45 tp-tab">
+              <CategoryCarousel
+                categories={allCategories}
+                isLoading={catLoading}
+                isError={catError}
+                parentCategoryId={selectedParentCategory}
+                selectedSubcategory={selectedSubcategory}
+                onCategorySelect={handleSubcategoryChange}
+              />
             </div>
           </div>
         </div>

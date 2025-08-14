@@ -1,9 +1,8 @@
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
-import ShopBreadcrumb from "@/components/breadcrumb/shop-breadcrumb";
-import ShopArea from "@/components/shop/shop-area";
-import { useTranslations } from 'next-intl';
+import CommonBreadcrumb from "@/components/breadcrumb/common-breadcrumb";
+import CategoryProductsArea from "@/components/categories/category-products-area";
 
 export async function generateMetadata({ params: { locale } }) {
   return {
@@ -11,12 +10,13 @@ export async function generateMetadata({ params: { locale } }) {
   };
 }
 
-export default function ShopPage() {
+export default function ShopPage({ params }) {
+  const { locale } = params;
   return (
     <Wrapper>
       <Header />
-      <ShopBreadcrumb title="Shop Grid" subtitle="Shop Grid" />
-      <ShopArea/>
+      <CommonBreadcrumb title="Shop Grid" subtitle="Shop Grid" />
+      <CategoryProductsArea />
       <Footer primary_style={true} />
     </Wrapper>
   );
