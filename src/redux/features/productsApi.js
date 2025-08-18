@@ -8,13 +8,21 @@ export const productsApi = apiSlice.injectEndpoints({
       query: ({ limit = 12, offset = 0, categoryId, parentCategoryId, searchText } = {}) => {
         let url = `/goods/?limit=${limit}&offset=${offset}`;
         if (categoryId) {
-          url += `&category__id_remonline=${categoryId}`;
+          // For parent categories like Covers (754099), search by category__parent_id
+          // For subcategories, search by category__id_remonline
+          const parentCategoryIds = [754099, 754100, 754101]; // Known parent category IDs
+          if (parentCategoryIds.includes(categoryId)) {
+            url += `&category__parent_id=${categoryId}`;
+          } else {
+            url += `&category__id_remonline=${categoryId}`;
+          }
         } else if (parentCategoryId) {
           url += `&category__parent_id=${parentCategoryId}`;
         }
         if (searchText) {
           url += `&title__icontains=${encodeURIComponent(searchText)}`;
         }
+        console.log('Products API URL:', url);
         return url;
       },
       providesTags: ['products']
@@ -23,6 +31,38 @@ export const productsApi = apiSlice.injectEndpoints({
     // Получение всех товаров без пагинации (для фильтров и т.д.)
     getAllProductsNoLimit: builder.query({
       query: () => '/goods/',
+      providesTags: ['products']
+    }),
+
+    // Debug endpoint to test category filtering with different field names
+    getProductsByCategory: builder.query({
+      query: (categoryId) => {
+        const url = `/goods/?category=${categoryId}`;
+        console.log('Debug category API URL:', url);
+        return url;
+      },
+      providesTags: ['products']
+    }),
+
+    // Get all products to debug category relationships
+    getAllProductsDebug: builder.query({
+      query: () => {
+        const url = `/goods/?limit=100`;
+        console.log('Debug: Getting all products to check categories');
+        return url;
+      },
+      transformResponse: (response) => {
+        const products = response.results || response.data || response || [];
+        console.log('Debug: All products with categories:', products.map(p => ({
+          id: p.id,
+          title: p.title,
+          category: p.category,
+          category_id: p.category_id,
+          category__id_remonline: p.category__id_remonline,
+          good_category: p.good_category
+        })));
+        return response;
+      },
       providesTags: ['products']
     }),
 
@@ -134,11 +174,12 @@ getProductCategories: builder.query({
 export const {
   useGetAllProductsQuery,
   useGetAllProductsNoLimitQuery,
+  useGetProductsByCategoryQuery,
+  useGetAllProductsDebugQuery,
   useGetProductByIdQuery,
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
-  useGetProductsByCategoryQuery,
   useGetProductCategoriesQuery,
   useGetFeaturedProductsQuery,
   useGetNewArrivalsQuery,

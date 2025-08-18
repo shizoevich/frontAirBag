@@ -6,14 +6,55 @@ import { ShapeLine } from "@/svg";
 import ProductItem from "../products/electronics/product-item";
 import ErrorMsg from "@/components/common/error-msg";
 import HomePrdLoader from "@/components/loader/home/home-prd-loader";
-import { useGetShowCategoryQuery, useGetAllProductsQuery } from "@/redux/features/categoryApi";
+import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
+import { useGetAllProductsQuery } from "@/redux/features/productsApi";
 import ReactPaginate from 'react-paginate';
-import CategoryCarousel from "@/components/categories/category-carousel";
-import ParentCategories from "@/components/categories/parent-categories";
 import { useTranslations } from 'next-intl';
 
 // Fallback image URL
 const FALLBACK_IMAGE = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg';
+
+// Function to get brand image based on brand name
+const getBrandImage = (brandName) => {
+  if (!brandName) return FALLBACK_IMAGE;
+  
+  const brandLower = brandName.toLowerCase();
+  
+  // Map of brand names to their logo images
+  const brandImages = {
+    'jeep': '/assets/img/brands/jeep.png',
+    'hyundai': '/assets/img/brands/hyundai.png',
+    'lexus': '/assets/img/brands/lexus.png',
+    'audi': '/assets/img/brands/audi.png',
+    'acura': '/assets/img/brands/acura.png',
+    'bmw': '/assets/img/brands/bmw.png',
+    'dodge': '/assets/img/brands/dodge.png',
+    'buick': '/assets/img/brands/buick.png',
+    'chevrolet': '/assets/img/brands/chevrolet.png',
+    'ford': '/assets/img/brands/ford.png',
+    'honda': '/assets/img/brands/honda.png',
+    'lincoln': '/assets/img/brands/lincoln.png',
+    'mitsubishi': '/assets/img/brands/mitsubishi.png',
+    'mazda': '/assets/img/brands/mazda.png',
+    'nissan': '/assets/img/brands/nissan.png',
+    'subaru': '/assets/img/brands/subaru.png',
+    'toyota': '/assets/img/brands/toyota.png',
+    'vw': '/assets/img/brands/volkswagen.png',
+    'tesla': '/assets/img/brands/tesla.png',
+    'infiniti': '/assets/img/brands/infiniti.png',
+    'porsche': '/assets/img/brands/porsche.png',
+    'land rover': '/assets/img/brands/landrover.png',
+    'mustang': '/assets/img/brands/mustang.png',
+    'cadillac': '/assets/img/brands/cadillac.png',
+    'mercedes': '/assets/img/brands/mercedes.png',
+    'merсedes': '/assets/img/brands/mercedes.png', // Handle cyrillic 'с'
+    'mini cooper': '/assets/img/brands/mini.png',
+    'gmc': '/assets/img/brands/gmc.png',
+    'fiat': '/assets/img/brands/fiat.png'
+  };
+  
+  return brandImages[brandLower] || FALLBACK_IMAGE;
+};
 
 const BrandSearchArea = () => {
   const t = useTranslations('Categories');
@@ -22,10 +63,11 @@ const BrandSearchArea = () => {
   
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [selectedParentCategory, setSelectedParentCategory] = useState(754099); // По умолчанию выбрана категория Covers (автомобили)
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const itemsPerPage = 12; // Number of products per page
+  
+  // Всегда показываем товары из категории Covers (754099)
+  const selectedCategoryId = selectedSubcategory || 754099;
   
   useEffect(() => {
     setMounted(true);
@@ -38,12 +80,16 @@ const BrandSearchArea = () => {
     isError: catError
   } = useGetShowCategoryQuery();
 
-  // Get all products
+  // Get products with pagination and filtering
   const {
     data: productsData = [],
     isLoading: productsLoading,
     isError: productsError
-  } = useGetAllProductsQuery();
+  } = useGetAllProductsQuery({
+    limit: itemsPerPage,
+    offset: currentPage * itemsPerPage,
+    categoryId: selectedCategoryId
+  });
 
   // Convert categories data to array
   const allCategories = Array.isArray(categoriesData) 
@@ -53,109 +99,46 @@ const BrandSearchArea = () => {
       : Array.isArray(categoriesData?.results) 
         ? categoriesData.results 
         : [];
-  
-  // Проверяем, есть ли родительские категории в данных
-  const parentCats = allCategories.filter(cat => [754099, 754100, 754101].includes(Number(cat.id)));
 
-  // Обрабатываем разные форматы данных API
-  let safeProductsData = [];
-  
-  if (Array.isArray(productsData)) {
-    safeProductsData = productsData;
-  } else if (productsData?.results && Array.isArray(productsData.results)) {
-    safeProductsData = productsData.results;
-  } else if (productsData?.data && Array.isArray(productsData.data)) {
-    safeProductsData = productsData.data;
-  }
-
-  // Получаем все подкатегории для выбранной родительской категории (марки автомобилей)
+  // Получаем только марки автомобилей (подкатегории Covers - parent_id = 754099)
   const carBrands = allCategories.filter(cat => 
-    String(cat.parent_id) === String(selectedParentCategory)
+    cat && String(cat.parent_id) === '754099'
   );
 
-  // Фильтрация брендов по поисковому запросу
-  const filteredBrands = searchQuery 
-    ? carBrands.filter(brand => 
-        brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (brand.description && brand.description.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
-    : carBrands;
+  // Обрабатываем данные товаров
+  const safeProductsData = Array.isArray(productsData) 
+    ? productsData 
+    : Array.isArray(productsData?.results) 
+      ? productsData.results 
+      : [];
 
-  // Filter products by selected subcategory or parent category
-  const filteredProducts = selectedSubcategory 
-    ? safeProductsData.filter(product => {
-        // Check all possible category ID formats
-        const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
-        
-        // More robust comparison
-        if (!categoryId && !selectedSubcategory) return true;
-        if (!categoryId) return false;
-        
-        const productCategoryId = String(categoryId).trim();
-        const selectedCategoryId = String(selectedSubcategory).trim();
-        
-        return productCategoryId === selectedCategoryId;
-      })
-    : selectedParentCategory 
-      ? safeProductsData.filter(product => {
-          // Если выбрана родительская категория, но не выбрана подкатегория,
-          // показываем товары всех подкатегорий этой родительской категории
-          const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
-          if (!categoryId) return false;
-          
-          // Находим категорию товара
-          const productCategory = allCategories.find(cat => 
-            String(cat.id) === String(categoryId) || 
-            String(cat.id_remonline) === String(categoryId)
-          );
-          
-          if (!productCategory) return false;
-          
-          // Проверяем, является ли категория товара подкатегорией выбранной родительской категории
-          return String(productCategory.parent_id) === String(selectedParentCategory);
-        })
-      : safeProductsData; // Если ничего не выбрано, показываем все товары
-  
-  // Calculate pagination
-  const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
-  const offset = currentPage * itemsPerPage;
-  const currentProducts = filteredProducts.slice(offset, offset + itemsPerPage);
-  
+  // Общее количество товаров для пагинации
+  const totalProducts = productsData?.count || safeProductsData.length;
+  const totalPages = Math.ceil(totalProducts / itemsPerPage);
+
   // Handle page change
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
   };
-  
-  // Handle parent category selection
-  const handleParentCategoryChange = (categoryId) => {
-    setSelectedParentCategory(categoryId);
-    setSelectedSubcategory(null); // Reset subcategory when parent category changes
-    setCurrentPage(0); // Reset pagination
-    setSearchQuery(''); // Reset search query
-  };
-  
-  // Handle subcategory selection
-  const handleSubcategoryChange = (categoryId) => {
-    setSelectedSubcategory(categoryId);
-    setCurrentPage(0); // Reset pagination
-  };
 
-  // Handle search query change
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
+  // Handle category selection
+  const handleCategorySelect = (categoryId) => {
+    setSelectedSubcategory(categoryId);
+    setCurrentPage(0); // Reset to first page when category changes
   };
 
   // Get selected category name
   const getSelectedCategoryName = () => {
     if (selectedSubcategory) {
-      const subcat = allCategories.find(cat => String(cat.id) === String(selectedSubcategory));
-      return subcat?.name || '';
-    } else if (selectedParentCategory) {
-      const parentCat = allCategories.find(cat => String(cat.id) === String(selectedParentCategory));
-      return parentCat?.name || '';
+      const category = allCategories.find(cat => String(cat.id) === String(selectedSubcategory));
+      return category ? category.title : '';
     }
-    return '';
+    return t('all_covers');
   };
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <section className="tp-product-area pb-90">
@@ -169,28 +152,56 @@ const BrandSearchArea = () => {
           </div>
         </div>
         
-        {/* Родительские категории */}
+        {/* Карусель марок автомобилей */}
         <div className="row mb-40">
           <div className="col-xl-12">
-            <ParentCategories 
-              categories={allCategories} 
-              selectedParentCategory={selectedParentCategory} 
-              onSelectParentCategory={handleParentCategoryChange} 
-            />
-          </div>
-        </div>
-        
-        {/* Карусель подкатегорий (марки автомобилей) */}
-        <div className="row mb-40">
-          <div className="col-xl-12">
-            <CategoryCarousel 
-              categories={filteredBrands} 
-              parentCategoryId={selectedParentCategory} 
-              selectedSubcategory={selectedSubcategory} 
-              onSelectSubcategory={handleSubcategoryChange} 
-              searchQuery={searchQuery}
-              noResultsMessage={t('noBrandsFound')}
-            />
+            <div className="tp-category-carousel">
+              <div className="row">
+                {/* Кнопка "Все накладки" */}
+                <div className="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-20">
+                  <div 
+                    className={`tp-category-item text-center cursor-pointer ${!selectedSubcategory ? 'active' : ''}`}
+                    onClick={() => handleCategorySelect(null)}
+                  >
+                    <div className="tp-category-thumb">
+                      <Image 
+                        src={FALLBACK_IMAGE} 
+                        alt="All Covers"
+                        width={100}
+                        height={100}
+                        className="rounded"
+                      />
+                    </div>
+                    <div className="tp-category-content">
+                      <h4 className="tp-category-title">{t('all_covers')}</h4>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Марки автомобилей */}
+                {carBrands.map((brand) => (
+                  <div key={brand.id} className="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-20">
+                    <div 
+                      className={`tp-category-item text-center cursor-pointer ${selectedSubcategory === brand.id ? 'active' : ''}`}
+                      onClick={() => handleCategorySelect(brand.id)}
+                    >
+                      <div className="tp-category-thumb">
+                        <Image 
+                          src={getBrandImage(brand.title)} 
+                          alt={brand.title}
+                          width={100}
+                          height={100}
+                          className="rounded"
+                        />
+                      </div>
+                      <div className="tp-category-content">
+                        <h4 className="tp-category-title">{brand.title}</h4>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
         
@@ -206,11 +217,12 @@ const BrandSearchArea = () => {
                   aria-labelledby="all-tab"
                   tabIndex="0"
                 >
-                  {selectedSubcategory && (
-                    <div className="mb-20">
-                      <h4>{getSelectedCategoryName()}</h4>
-                    </div>
-                  )}
+                  <div className="mb-20">
+                    <h4>{getSelectedCategoryName()}</h4>
+                    <p className="text-muted">
+                      {totalProducts > 0 ? `${tProducts('showing')} ${totalProducts} ${tProducts('products')}` : ''}
+                    </p>
+                  </div>
                   
                   <div className="row">
                     {productsLoading && !productsError && (
@@ -219,11 +231,11 @@ const BrandSearchArea = () => {
                     {!productsLoading && productsError && (
                       <ErrorMsg msg={t('loadingError')} />
                     )}
-                    {!productsLoading && !productsError && currentProducts.length === 0 && (
+                    {!productsLoading && !productsError && safeProductsData.length === 0 && (
                       <ErrorMsg msg={tProducts('noProductsFound')} />
                     )}
-                    {!productsLoading && !productsError && currentProducts.length > 0 && 
-                      currentProducts.map((item) => (
+                    {!productsLoading && !productsError && safeProductsData.length > 0 && 
+                      safeProductsData.map((item) => (
                         <div key={item.id} className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
                           <ProductItem product={item} />
                         </div>
@@ -232,14 +244,14 @@ const BrandSearchArea = () => {
                   </div>
                   
                   {/* Pagination */}
-                  {pageCount > 1 && (
+                  {totalPages > 1 && (
                     <div className="tp-pagination mt-20">
                       <ReactPaginate
                         breakLabel={tSearch('breakLabel')}
                         nextLabel={tSearch('nextPage')}
                         onPageChange={handlePageClick}
                         pageRangeDisplayed={3}
-                        pageCount={pageCount}
+                        pageCount={totalPages}
                         previousLabel={tSearch('previousPage')}
                         renderOnZeroPageCount={null}
                         containerClassName="tp-pagination-nav"
@@ -247,6 +259,7 @@ const BrandSearchArea = () => {
                         previousLinkClassName="tp-pagination-link"
                         nextLinkClassName="tp-pagination-link"
                         activeLinkClassName="active"
+                        forcePage={currentPage}
                       />
                     </div>
                   )}

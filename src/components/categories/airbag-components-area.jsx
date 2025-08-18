@@ -19,7 +19,7 @@ const AirbagComponentsArea = () => {
     setSearchTerm(e.target.value);
   };
 
-  // Получаем только подкатегории Airbag SRS (parent_id === 754100)
+  // Получаем только накладки (covers) и марки автомобилей
   const getAirbagComponents = () => {
     if (!categories) return [];
     
@@ -31,12 +31,22 @@ const AirbagComponentsArea = () => {
       allCategories = categories;
     }
     
-    // Фильтруем только подкатегории Airbag SRS (parent_id === 754100)
-    return allCategories.filter(category => 
-      category && 
-      category.parent_id && 
-      String(category.parent_id) === '754100'
-    );
+    // Фильтруем только накладки (covers - ID: 754099) и марки автомобилей
+    return allCategories.filter(category => {
+      if (!category) return false;
+      
+      // Показываем категорию Covers (ID: 754099)
+      if (String(category.id) === '754099') {
+        return true;
+      }
+      
+      // Показываем подкатегории Covers (parent_id === 754099) - это марки автомобилей
+      if (category.parent_id && String(category.parent_id) === '754099') {
+        return true;
+      }
+      
+      return false;
+    });
   };
   
   // Фильтруем компоненты по поисковому запросу

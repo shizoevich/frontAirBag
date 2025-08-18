@@ -10,7 +10,7 @@ import ProductItem from "./electronics/product-item";
 import ErrorMsg from "@/components/common/error-msg";
 import HomePrdLoader from "@/components/loader/home/home-prd-loader";
 import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
-import { useGetAllProductsQuery, useGetAllProductsNoLimitQuery } from "@/redux/features/productsApi";
+import { useGetAllProductsQuery, useGetAllProductsNoLimitQuery, useGetAllProductsDebugQuery } from "@/redux/features/productsApi";
 import ReactPaginate from 'react-paginate';
 import CategoryCarousel from "@/components/categories/category-carousel";
 import ParentCategories from "@/components/categories/parent-categories";
@@ -77,6 +77,12 @@ const AllProductsArea = () => {
     data: allProductsData,
     isLoading: allProductsLoading
   } = useGetAllProductsNoLimitQuery();
+
+  // Debug: Get all products to check category structure
+  const {
+    data: debugProductsData,
+    isLoading: debugLoading
+  } = useGetAllProductsDebugQuery();
 
   // Convert categories data to array
   const allCategories = Array.isArray(categoriesData) 

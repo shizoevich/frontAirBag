@@ -16,9 +16,7 @@ const menu_data = [
         titleKey: 'menu.carBrands',
         link: '/search/brand',
         mega_menus: [
-          { titleKey: 'menu.selectCarBrand', link: '/search/brand' },
-          { titleKey: 'menu.carMats', link: '/shop/covers' },
-          { titleKey: 'menu.searchByBrand', link: '/search/by-brand' },
+          { titleKey: 'menu.searchByBrand', link: '/search/brand' },
         ]
       },
       {
