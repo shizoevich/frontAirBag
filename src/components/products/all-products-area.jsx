@@ -274,11 +274,14 @@ const AllProductsArea = () => {
                   pageCount={pageCount}
                   previousLabel={tPagination('previousPage')}
                   renderOnZeroPageCount={null}
+                  forcePage={currentPage}
                   containerClassName="tp-pagination-style mb-20 text-center"
                   pageLinkClassName="tp-pagination-link"
                   previousLinkClassName="tp-pagination-link"
                   nextLinkClassName="tp-pagination-link"
                   activeLinkClassName="active"
+                  breakClassName="break-me"
+                  disabledClassName="disabled"
                 />
               </div>
             </div>

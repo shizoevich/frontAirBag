@@ -13,10 +13,12 @@ export default function SearchArea({ translations, initialSearchText, initialCat
   const [currentPage, setCurrentPage] = useState(0); // для ReactPaginate (0-based)
   const itemsPerPage = 12;
   
-  // Запрос на получение товаров с пагинацией
+  // Запрос на получение товаров с пагинацией и фильтрацией
   const { data: productsData, isError, isLoading } = useGetAllProductsQuery({
     limit: itemsPerPage,
-    offset: currentPage * itemsPerPage
+    offset: currentPage * itemsPerPage,
+    categoryId: categoryId || undefined,
+    searchText: searchText || undefined
   });
   
   // Запрос на получение всех товаров для фильтрации
@@ -68,26 +70,8 @@ export default function SearchArea({ translations, initialSearchText, initialCat
   }
 
   if (!isLoading && !isError && products.length > 0) {
-    // Используем товары текущей страницы для отображения
+    // Используем товары текущей страницы для отображения (фильтрация уже произошла на сервере)
     let product_items = products;
-    
-    // Для фильтрации и подсчета общего количества используем все товары
-    let filtered_all_products = allProducts;
-
-    if (searchText) {
-      filtered_all_products = allProducts.filter((prd) => {
-        const titleMatch = prd.title.toLowerCase().includes(searchText.toLowerCase());
-        const categoryMatch = prd.category?.title?.toLowerCase().includes(searchText.toLowerCase());
-        return titleMatch || categoryMatch;
-      });
-    }
-    
-    if (categoryId && categoryId !== "Select Category") {
-      filtered_all_products = filtered_all_products.filter(prd => {
-        const prdCategoryId = prd.category?.id_remonline || prd.category_id;
-        return prdCategoryId === categoryId || prdCategoryId === parseInt(categoryId);
-      });
-    }
     
     // Price low to high - сортировка на клиенте для текущей страницы
     if (shortValue === "price-asc") {
@@ -105,8 +89,8 @@ export default function SearchArea({ translations, initialSearchText, initialCat
     } else {
       // Используем товары, полученные с сервера с пагинацией
       const paginatedItems = product_items;
-      // Используем общее количество из API или из отфильтрованного списка
-      const totalCount = productsData?.count || filtered_all_products.length;
+      // Используем общее количество из API
+      const totalCount = productsData?.count || 0;
       const pageCount = Math.ceil(totalCount / itemsPerPage);
       
       content = (
@@ -173,11 +157,14 @@ export default function SearchArea({ translations, initialSearchText, initialCat
                         pageCount={pageCount}
                         previousLabel={translations.previousPage}
                         renderOnZeroPageCount={null}
+                        forcePage={currentPage}
                         containerClassName="tp-pagination-style mb-20 text-center"
                         pageLinkClassName="tp-pagination-link"
                         previousLinkClassName="tp-pagination-link"
                         nextLinkClassName="tp-pagination-link"
                         activeLinkClassName="active"
+                        breakClassName="break-me"
+                        disabledClassName="disabled"
                       />
                     </div>
                   )}

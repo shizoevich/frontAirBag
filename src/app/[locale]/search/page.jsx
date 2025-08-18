@@ -1,6 +1,6 @@
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
-import Area from "@/components/search/search-area";
+import SearchArea from "@/components/search/search-area";
 import Footer from "@/layout/footers/footer";
 import { getTranslations } from 'next-intl/server';
 
@@ -25,11 +25,12 @@ export default async function SearchPage({ params, searchParams }) {
   const categoryId = resolvedSearchParams?.categoryId || null;
 
   // Pre-translate all needed strings for client component
+  // Для строк с переменными передаем шаблоны, а переменные будут подставляться в клиентском компоненте
   const translations = {
     error: t_search('error'),
     noProductsFound: t_search('noProductsFound'),
-    noResults: t_search('noResults'),
-    showingResults: t_search('showingResults'),
+    noResults: t_search.raw('noResults'), // Передаем шаблон с переменными
+    showingResults: t_search.raw('showingResults'), // Передаем шаблон с переменными
     shortByPrice: t_search('shortByPrice'),
     priceLowToHigh: t_search('priceLowToHigh'),
     priceHighToLow: t_search('priceHighToLow'),
