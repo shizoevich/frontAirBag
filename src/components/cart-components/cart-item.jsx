@@ -11,7 +11,7 @@ import BlurImage from "@/components/common/BlurImage";
 import { getProductImage, getProductId } from "@/utils/image-utils";
 
 const CartItem = ({product}) => {
-  const { title, price, category, status, orderQuantity = 0 } = product || {};
+  const { title, price_minor, category, status, orderQuantity = 0 } = product || {};
   
   // Используем утилиты для получения ID и изображения
   const productId = getProductId(product);
@@ -51,7 +51,7 @@ const CartItem = ({product}) => {
       </td>
       {/* price */}
       <td className="tp-cart-price">
-        <span>{(price * orderQuantity).toFixed(2)}₴</span>
+        <span>{((Number(price_minor || 0) / 100) * orderQuantity).toFixed(2)}₴</span>
       </td>
       {/* quantity */}
       <td className="tp-cart-quantity">

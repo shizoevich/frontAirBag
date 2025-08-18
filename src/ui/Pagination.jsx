@@ -4,13 +4,17 @@ import { PaginationNext, PaginationPrev } from "@/svg";
 
 const Pagination = ({
   items = [],
+  totalItems = 0,
   countOfPage = 12,
   paginatedData,
   currPage,
   setCurrPage,
+  isServerPagination = false,
 }) => {
   const pageStart = (currPage - 1) * countOfPage;
-  const totalPage = Math.ceil(items.length / countOfPage);
+  const totalPage = isServerPagination 
+    ? Math.ceil(totalItems / countOfPage)
+    : Math.ceil(items.length / countOfPage);
 
   function setPage(idx) {
     if (idx <= 0 || idx > totalPage) {
@@ -18,13 +22,20 @@ const Pagination = ({
     }
     setCurrPage(idx);
     window.scrollTo(0, 0);
-    paginatedData(items, pageStart, countOfPage);
+    
+    // Вызываем paginatedData только для клиентской пагинации
+    if (!isServerPagination && paginatedData) {
+      paginatedData(items, pageStart, countOfPage);
+    }
   }
 
   useEffect(() => {
-    paginatedData(items, pageStart, countOfPage);
+    // Вызываем paginatedData только для клиентской пагинации
+    if (!isServerPagination && paginatedData) {
+      paginatedData(items, pageStart, countOfPage);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, pageStart, countOfPage]);
+  }, [items, pageStart, countOfPage, isServerPagination]);
 
   return (
     <nav>

@@ -40,7 +40,7 @@ const CheckoutOrderArea = ({ checkoutData }) => {
               <p>
                 {item.title} <span> x {item.orderQuantity}</span>
               </p>
-              <span>${item.price.toFixed(2)}</span>
+              <span>${(Number(item.price_minor || 0) / 100).toFixed(2)}</span>
             </li>
           ))}
 

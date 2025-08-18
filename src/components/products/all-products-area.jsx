@@ -8,7 +8,8 @@ import { ShapeLine } from "@/svg";
 import ProductItem from "./electronics/product-item";
 import ErrorMsg from "@/components/common/error-msg";
 import HomePrdLoader from "@/components/loader/home/home-prd-loader";
-import { useGetShowCategoryQuery, useGetAllProductsQuery } from "@/redux/features/categoryApi";
+import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
+import { useGetAllProductsQuery, useGetAllProductsNoLimitQuery } from "@/redux/features/productsApi";
 import ReactPaginate from 'react-paginate';
 import CategoryCarousel from "@/components/categories/category-carousel";
 import ParentCategories from "@/components/categories/parent-categories";
@@ -20,7 +21,7 @@ const AllProductsArea = () => {
   const t = useTranslations('AllProductsArea');
   const tPagination = useTranslations('SearchArea');
   const [mounted, setMounted] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0); // Для ReactPaginate (0-based)
   const [selectedParentCategory, setSelectedParentCategory] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const itemsPerPage = 12; // Number of products per page
@@ -36,12 +37,21 @@ const AllProductsArea = () => {
     isError: catError
   } = useGetShowCategoryQuery();
 
-  // Get all products
+  // Get all products with pagination
   const {
     data: productsData = [],
     isLoading: productsLoading,
     isError: productsError
-  } = useGetAllProductsQuery();
+  } = useGetAllProductsQuery({
+    limit: itemsPerPage,
+    offset: currentPage * itemsPerPage
+  });
+  
+  // Get all products for filtering (without pagination)
+  const {
+    data: allProductsData,
+    isLoading: allProductsLoading
+  } = useGetAllProductsNoLimitQuery();
 
   // Convert categories data to array
   const allCategories = Array.isArray(categoriesData) 
@@ -63,7 +73,7 @@ const AllProductsArea = () => {
   // Ensure productsData is always an array
   console.log('Raw productsData:', productsData);
   
-  // Обрабатываем разные форматы данных API
+  // Обрабатываем разные форматы данных API для текущей страницы
   let safeProductsData = [];
   
   if (Array.isArray(productsData)) {
@@ -74,18 +84,26 @@ const AllProductsArea = () => {
     safeProductsData = productsData.data;
   }
   
+  // Обрабатываем данные всех товаров для фильтрации
+  let allProducts = [];
+  
+  if (allProductsData) {
+    if (Array.isArray(allProductsData)) {
+      allProducts = allProductsData;
+    } else if (allProductsData?.results && Array.isArray(allProductsData.results)) {
+      allProducts = allProductsData.results;
+    } else if (allProductsData?.data && Array.isArray(allProductsData.data)) {
+      allProducts = allProductsData.data;
+    }
+  }
+  
   console.log('Processed products data:', safeProductsData);
 
-  // Filter products by selected subcategory or parent category
-  const filteredProducts = selectedSubcategory 
-    ? safeProductsData.filter(product => {
-        // Check all possible category ID formats
+  // Мы будем использовать фильтрацию на стороне сервера через параметры API
+  // Но для подсчета общего количества товаров с фильтрами нам нужны все товары
+  const filteredAllProducts = selectedSubcategory 
+    ? allProducts.filter(product => {
         const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
-        
-        // Log for debugging
-        console.log('Product category ID:', categoryId, 'Selected subcategory:', selectedSubcategory);
-        
-        // More robust comparison
         if (!categoryId && !selectedSubcategory) return true;
         if (!categoryId) return false;
         
@@ -95,29 +113,28 @@ const AllProductsArea = () => {
         return productCategoryId === selectedCategoryId;
       })
     : selectedParentCategory 
-      ? safeProductsData.filter(product => {
-          // Если выбрана родительская категория, но не выбрана подкатегория,
-          // показываем товары всех подкатегорий этой родительской категории
+      ? allProducts.filter(product => {
           const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
           if (!categoryId) return false;
           
-          // Находим категорию товара
           const productCategory = allCategories.find(cat => {
             const catId = cat.id_remonline || cat.id;
             return String(catId).trim() === String(categoryId).trim();
           });
           
-          // Проверяем, является ли категория товара подкатегорией выбранной родительской категории
           return productCategory && String(productCategory.parent_id) === String(selectedParentCategory);
         })
-      : safeProductsData;
+      : allProducts;
+      
+  // Для текущей страницы используем данные из API с пагинацией
+  const filteredProducts = safeProductsData;
 
-  // Calculate pagination
-  const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
-  const offset = currentPage * itemsPerPage;
-  const currentProducts = filteredProducts.slice(offset, offset + itemsPerPage);
+  // Calculate pagination using total count from API or filtered count
+  const totalCount = productsData?.count || filteredAllProducts.length;
+  const pageCount = Math.ceil(totalCount / itemsPerPage);
+  const currentProducts = filteredProducts; // Уже получены с пагинацией с сервера
 
-  // Handle page change
+  // Handle page change - обновляем currentPage для запроса с пагинацией
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
     // Scroll to top of product section

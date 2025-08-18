@@ -1,6 +1,5 @@
 import { getTranslations } from 'next-intl/server';
 import Wrapper from "@/layout/wrapper";
-import CommonBreadcrumb from "@/components/breadcrumb/common-breadcrumb";
 
 export async function generateMetadata({ params, searchParams }) {
   const { locale } = await params;
@@ -22,7 +21,6 @@ export default async function StepByStepSearchPage({ params, searchParams }) {
 
   return (
     <Wrapper>
-      <CommonBreadcrumb title={t_page('searchProducts')} subtitle={t_page('searchProducts')} />
       <div style={{ padding: '20px' }}>
         <h1>{t_page('searchProducts')}</h1>
         <p>Locale: {locale}</p>

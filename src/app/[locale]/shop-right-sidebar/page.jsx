@@ -14,7 +14,7 @@ export default function ShopRightSidebarPage() {
   return (
     <Wrapper>
       <Header />
-      <ShopBreadcrumb title="Shop Grid" subtitle="Shop Grid" />
+      <ShopBreadcrumb/>
       <ShopArea shop_right={true}/>
       <Footer primary_style={true} />
     </Wrapper>

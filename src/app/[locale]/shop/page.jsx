@@ -1,7 +1,6 @@
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
-import CommonBreadcrumb from "@/components/breadcrumb/common-breadcrumb";
 import CategoryProductsArea from "@/components/categories/category-products-area";
 
 export async function generateMetadata({ params: { locale } }) {
@@ -15,7 +14,6 @@ export default function ShopPage({ params }) {
   return (
     <Wrapper>
       <Header />
-      <CommonBreadcrumb title="Shop Grid" subtitle="Shop Grid" />
       <CategoryProductsArea />
       <Footer primary_style={true} />
     </Wrapper>

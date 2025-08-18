@@ -28,7 +28,7 @@ const HomeHeroSlider = () => {
   const sliderData = [
     {
       id: 1,
-      pre_title: { text: t('startingAt'), price: 274 },
+      pre_title: { text: t('startingAt'), price_minor: 274 },
       title: t('bestTablet'),
       subtitle: {
         text_1: t('exclusiveOffer'),
@@ -40,7 +40,7 @@ const HomeHeroSlider = () => {
     },
     {
       id: 2,
-      pre_title: { text: t('startingAt'), price: 999 },
+      pre_title: { text: t('startingAt'), price_minor: 999 },
       title: t('bestNotebook'),
       subtitle: {
         text_1: t('exclusiveOffer'),
@@ -52,7 +52,7 @@ const HomeHeroSlider = () => {
     },
     {
       id: 3,
-      pre_title: { text: t('startingAt'), price: 999 },
+      pre_title: { text: t('startingAt'), price_minor: 999 },
       title: t('bestSmartwatch'),
       subtitle: {
         text_1: t('exclusiveOffer'),
@@ -116,7 +116,7 @@ const HomeHeroSlider = () => {
                   <div className="col-xl-5 col-lg-6 col-md-6">
                     <div className="tp-slider-content p-relative z-index-1">
                       <span>
-                        {item.pre_title.text} <b>${item.pre_title.price}</b>
+                        {item.pre_title.text} <b>${item.pre_title.price_minor}</b>
                       </span>
                       <h3 className="tp-slider-title">{item.title}</h3>
                       <p>

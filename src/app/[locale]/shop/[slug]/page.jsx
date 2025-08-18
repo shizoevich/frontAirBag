@@ -2,11 +2,11 @@ import React from "react";
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
-import CommonBreadcrumb from "@/components/breadcrumb/common-breadcrumb";
 import ShopSubcategoryArea from "@/components/shop/shop-subcategory-area";
 import { getTranslations } from 'next-intl/server';
 
-export async function generateMetadata({ params: { locale, slug } }) {
+export async function generateMetadata({ params }) {
+  const { locale, slug } = await params;
   const t = await getTranslations({ locale, namespace: 'Categories' });
   
   // Определяем заголовок страницы в зависимости от slug подкатегории
@@ -18,7 +18,13 @@ export async function generateMetadata({ params: { locale, slug } }) {
     'mounts': 'mounts_seo_title',
     'resistors': 'resistors_seo_title',
     'airbags': 'airbags_seo_title',
-    'belt-parts': 'belt_parts_seo_title'
+    'belt-parts': 'belt_parts_seo_title',
+    'pyro-belts': 'pyro_belts_seo_title',
+    'pyro-seats': 'pyro_seats_seo_title',
+    'pyro-curtains': 'pyro_curtains_seo_title',
+    'pyro-steering': 'pyro_steering_seo_title',
+    'pyro-dashboard': 'pyro_dashboard_seo_title',
+    'covers': 'covers_seo_title'
   };
   
   if (slugToTitleKey[slug]) {
@@ -37,7 +43,8 @@ export async function generateMetadata({ params: { locale, slug } }) {
   };
 }
 
-export default function ShopSubcategoryPage({ params: { slug } }) {
+export default async function ShopSubcategoryPage({ params }) {
+  const { slug } = await params;
   // Преобразуем slug в более читаемый формат для отображения
   const formatSlug = (slug) => {
     return slug
@@ -53,7 +60,6 @@ export default function ShopSubcategoryPage({ params: { slug } }) {
   return (
     <Wrapper>
       <Header />
-      <CommonBreadcrumb title={title} subtitle={subtitle} />
       <ShopSubcategoryArea subcategorySlug={slug} />
       <Footer primary_style={true} />
     </Wrapper>

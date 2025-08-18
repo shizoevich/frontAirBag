@@ -88,13 +88,13 @@ const useCheckoutSubmit = () => {
     );
     const discountProductTotal = result?.reduce(
       (preValue, currentValue) =>
-        preValue + currentValue.price * currentValue.orderQuantity,
+        preValue + currentValue.price_minor * currentValue.orderQuantity,
       0
     );
     let totalValue = "";
     let subTotal = Number((total + shippingCost).toFixed(2));
     let discountTotal = Number(
-      discountProductTotal * (discountPercentage / 100)
+      discountProductTotal * (discountPercentage)
     );
     totalValue = Number(subTotal - discountTotal);
     setDiscountAmount(discountTotal);
@@ -113,7 +113,7 @@ const useCheckoutSubmit = () => {
   useEffect(() => {
     if (cartTotal) {
       createPaymentIntent({
-        price: parseInt(cartTotal),
+        price_minor: parseInt(cartTotal),
       })
         .then((data) => {
           setClientSecret(data?.data?.clientSecret);

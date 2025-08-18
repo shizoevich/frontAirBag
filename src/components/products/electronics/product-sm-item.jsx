@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import BlurImage from "@/components/common/BlurImage";
 
 const ProductSmItem = ({ product }) => {
-  const {_id, img, images, imageURLs, category, title, price, reviews } = product || {};
+  const {_id, img, images, imageURLs, category, title, price_minor, reviews } = product || {};
   
   // Получаем изображение из API с правильной логикой
   let productImage = '/assets/img/product/3/product-1.jpg'; // заглушка по умолчанию
@@ -47,7 +47,7 @@ const ProductSmItem = ({ product }) => {
           </h3>
         </div>
         <div className="tp-product-price-wrapper">
-          <span className="tp-product-price">{price.toFixed(2)} ₴</span>
+          <span className="tp-product-price">{(Number(price_minor || 0) / 100).toFixed(2)} ₴</span>
         </div>
       </div>
     </div>

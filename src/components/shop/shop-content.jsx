@@ -12,22 +12,22 @@ import ShopTopRight from "./shop-top-right";
 import ResetButton from "./shop-filter/reset-button";
 import ProductItem from "../products/electronics/product-item";
 
-const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar}) => {
+const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar,totalCount,itemsPerPage}) => {
   const {priceFilterValues,selectHandleFilter,currPage,setCurrPage} = otherProps;
   const {setPriceValue} = priceFilterValues || {};
   const [filteredRows, setFilteredRows] = useState(products);
   const [pageStart, setPageStart] = useState(0);
   const [countOfPage, setCountOfPage] = useState(12);
 
-  const paginatedData = (items, startPage, pageCount) => {
-    setFilteredRows(items);
-    setPageStart(startPage);
-    setCountOfPage(pageCount);
-  };
+  // При серверной пагинации нам не нужно фильтровать данные на клиенте
+  // Просто устанавливаем текущие товары
+  useEffect(() => {
+    setFilteredRows(products);
+  }, [products]);
 
   // max price
   const maxPrice = all_products.reduce((max, product) => {
-    return product.price > max ? product.price : max;
+    return product.price_minor > max ? product.price_minor : max;
   }, 0);
   return (
     <>
@@ -62,15 +62,8 @@ const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar
                   <div className="row">
                     <div className="col-xl-6">
                       <ShopTopLeft
-                        showing={
-                          products.length === 0
-                            ? 0
-                            : filteredRows.slice(
-                                pageStart,
-                                pageStart + countOfPage
-                              ).length
-                        }
-                        total={all_products.length}
+                        showing={products.length}
+                        total={totalCount}
                       />
                     </div>
                     <div className="col-xl-6">
@@ -90,9 +83,7 @@ const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar
                         tabIndex="0"
                       >
                         <div className="row">
-                          {filteredRows
-                            .slice(pageStart, pageStart + countOfPage)
-                            .map((item,i) => (
+                          {filteredRows.map((item,i) => (
                               <div
                                 key={i}
                                 className="col-xl-4 col-md-6 col-sm-6"
@@ -112,9 +103,7 @@ const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar
                         <div className="tp-shop-list-wrapper tp-shop-item-primary mb-70">
                           <div className="row">
                             <div className="col-xl-12">
-                              {filteredRows
-                                .slice(pageStart, pageStart + countOfPage)
-                                .map((item,i) => (
+                              {filteredRows.map((item,i) => (
                                   <ShopListItem key={i} product={item} />
                                 ))}
                             </div>
@@ -128,11 +117,11 @@ const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar
                   <div className="tp-shop-pagination mt-20">
                     <div className="tp-pagination">
                       <Pagination
-                        items={products}
-                        countOfPage={12}
-                        paginatedData={paginatedData}
+                        totalItems={totalCount}
+                        countOfPage={itemsPerPage}
                         currPage={currPage}
                         setCurrPage={setCurrPage}
+                        isServerPagination={true}
                       />
                     </div>
                   </div>

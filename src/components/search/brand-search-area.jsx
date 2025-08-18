@@ -162,7 +162,7 @@ const BrandSearchArea = () => {
       <div className="container">
         <div className="row">
           <div className="col-xl-12">
-            <div className="tp-section-title-wrapper-2 mb-40">
+            <div className="tp-section-title-wrapper-2 mb-40 pt-40">
               <h3 className="tp-section-title-2">{t('car_brands')}</h3>
               <p className="text-muted">{t('search_parts_by_car_brand')}</p>
             </div>

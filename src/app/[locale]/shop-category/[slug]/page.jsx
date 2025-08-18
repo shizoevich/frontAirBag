@@ -2,7 +2,6 @@ import React from "react";
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
-import CommonBreadcrumb from "@/components/breadcrumb/common-breadcrumb";
 import CategoryProductsArea from "@/components/categories/category-products-area";
 import { getTranslations } from 'next-intl/server';
 
@@ -41,7 +40,6 @@ export default function CategorySlugPage({ params: { slug, locale } }) {
   return (
     <Wrapper>
       <Header />
-      <CommonBreadcrumb title={title} subtitle={subtitle} />
       <CategoryProductsArea categorySlug={slug} />
       <Footer primary_style={true} />
     </Wrapper>

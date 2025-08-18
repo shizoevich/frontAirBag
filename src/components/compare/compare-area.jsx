@@ -79,7 +79,7 @@ const CompareArea = () => {
                         {compareItems.map(item => (
                           <td key={item._id}>
                             <div className="tp-compare-price">
-                              <span>${item.price.toFixed(2)}</span>
+                              <span>${(Number(item.price_minor || 0) / 100).toFixed(2)}</span>
                             </div>
                           </td>
                         ))}

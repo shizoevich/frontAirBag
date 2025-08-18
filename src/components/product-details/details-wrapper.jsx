@@ -14,7 +14,7 @@ import { handleModalClose } from '@/redux/features/productModalSlice';
 
 const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBottom = false }) => {
   const t = useTranslations('ProductDetails');
-  const { sku, img, title, imageURLs, category, description, discount, price, status, tags, offerDate, residue = 0 } = productItem || {};
+  const { sku, img, title, imageURLs, category, description, discount, price_minor, status, tags, offerDate, residue = 0 } = productItem || {};
   // Определяем доступность товара на основе residue
   const isAvailable = residue > 0;
   const [textMore, setTextMore] = useState(false);
@@ -55,13 +55,13 @@ const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBott
       <div className="tp-product-details-price-wrapper mb-20">
         {discount > 0 ? (
           <>
-            <span className="tp-product-details-price old-price">${price}</span>
+            <span className="tp-product-details-price old-price">${price_minor}</span>
             <span className="tp-product-details-price new-price">
-              {" "}{(Number(price) - (Number(price) * Number(discount)) / 100).toFixed(2)}₴
+              {" "}{(Number(price_minor || 0) / 100 - (Number(price_minor || 0) / 100 * Number(discount))).toFixed(2)}₴
             </span>
           </>
         ) : (
-          <span className="tp-product-details-price new-price">{price ? price.toFixed(2) : '0.00'}₴</span>
+          <span className="tp-product-details-price new-price">{(Number(price_minor || 0) / 100).toFixed(2)}₴</span>
         )}
       </div>
 

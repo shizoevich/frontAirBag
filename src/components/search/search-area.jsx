@@ -3,17 +3,25 @@ import { useState } from "react";
 import NiceSelect from "@/ui/nice-select";
 import ErrorMsg from "@/components/common/error-msg";
 import SearchPrdLoader from "@/components/loader/search-prd-loader";
-import { useGetAllProductsQuery } from "@/redux/features/productsApi";
+import { useGetAllProductsQuery, useGetAllProductsNoLimitQuery } from "@/redux/features/productsApi";
 import ProductItem from "@/components/products/electronics/product-item";
 import ReactPaginate from 'react-paginate';
 
 export default function SearchArea({ translations, initialSearchText, initialCategoryId }) {
   const searchText = initialSearchText;
   const categoryId = initialCategoryId;
-  const { data: productsData, isError, isLoading } = useGetAllProductsQuery();
-  const [shortValue, setShortValue] = useState("");
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0); // для ReactPaginate (0-based)
   const itemsPerPage = 12;
+  
+  // Запрос на получение товаров с пагинацией
+  const { data: productsData, isError, isLoading } = useGetAllProductsQuery({
+    limit: itemsPerPage,
+    offset: currentPage * itemsPerPage
+  });
+  
+  // Запрос на получение всех товаров для фильтрации
+  const { data: allProductsData } = useGetAllProductsNoLimitQuery();
+  const [shortValue, setShortValue] = useState("");
 
   // selectShortHandler
   const shortHandler = (e) => {
@@ -37,6 +45,7 @@ export default function SearchArea({ translations, initialSearchText, initialCat
     content = <ErrorMsg msg={translations.error} />;
   }
 
+  // Получаем товары текущей страницы
   const products = Array.isArray(productsData) 
     ? productsData 
     : Array.isArray(productsData?.data) 
@@ -44,17 +53,29 @@ export default function SearchArea({ translations, initialSearchText, initialCat
       : Array.isArray(productsData?.results) 
         ? productsData.results 
         : [];
+        
+  // Получаем все товары для фильтрации
+  const allProducts = Array.isArray(allProductsData) 
+    ? allProductsData 
+    : Array.isArray(allProductsData?.data) 
+      ? allProductsData.data 
+      : Array.isArray(allProductsData?.results) 
+        ? allProductsData.results 
+        : [];
 
   if (!isLoading && !isError && products.length === 0) {
     content = <ErrorMsg msg={translations.noProductsFound} />;
   }
 
   if (!isLoading && !isError && products.length > 0) {
-    let all_products = products;
-    let product_items = all_products;
+    // Используем товары текущей страницы для отображения
+    let product_items = products;
+    
+    // Для фильтрации и подсчета общего количества используем все товары
+    let filtered_all_products = allProducts;
 
     if (searchText) {
-      product_items = all_products.filter((prd) => {
+      filtered_all_products = allProducts.filter((prd) => {
         const titleMatch = prd.title.toLowerCase().includes(searchText.toLowerCase());
         const categoryMatch = prd.category?.title?.toLowerCase().includes(searchText.toLowerCase());
         return titleMatch || categoryMatch;
@@ -62,17 +83,17 @@ export default function SearchArea({ translations, initialSearchText, initialCat
     }
     
     if (categoryId && categoryId !== "Select Category") {
-      product_items = product_items.filter(prd => {
+      filtered_all_products = filtered_all_products.filter(prd => {
         const prdCategoryId = prd.category?.id_remonline || prd.category_id;
         return prdCategoryId === categoryId || prdCategoryId === parseInt(categoryId);
       });
     }
     
-    // Price low to high
+    // Price low to high - сортировка на клиенте для текущей страницы
     if (shortValue === "price-asc") {
-      product_items = [...product_items].sort((a, b) => Number(a.price) - Number(b.price));
+      product_items = [...product_items].sort((a, b) => Number(a.price_minor) - Number(b.price_minor));
     } else if (shortValue === "price-desc") {
-      product_items = [...product_items].sort((a, b) => Number(b.price) - Number(a.price));
+      product_items = [...product_items].sort((a, b) => Number(b.price_minor) - Number(a.price_minor));
     }
     
     if (product_items.length === 0) {
@@ -82,10 +103,11 @@ export default function SearchArea({ translations, initialSearchText, initialCat
         </div>
       );
     } else {
-      // Apply pagination
-      const offset = currentPage * itemsPerPage;
-      const paginatedItems = product_items.slice(offset, offset + itemsPerPage);
-      const pageCount = Math.ceil(product_items.length / itemsPerPage);
+      // Используем товары, полученные с сервера с пагинацией
+      const paginatedItems = product_items;
+      // Используем общее количество из API или из отфильтрованного списка
+      const totalCount = productsData?.count || filtered_all_products.length;
+      const pageCount = Math.ceil(totalCount / itemsPerPage);
       
       content = (
         <section className="tp-shop-area pb-120">
@@ -98,7 +120,7 @@ export default function SearchArea({ translations, initialSearchText, initialCat
                       <div className="col-xl-6">
                         <div className="tp-shop-top-left d-flex align-items-center">
                           <div className="tp-shop-top-result">
-                            <p>Показано {offset + 1}-{Math.min(offset + itemsPerPage, product_items.length)} з {product_items.length} товарів</p>
+                            <p>Показано {currentPage * itemsPerPage + 1}-{Math.min((currentPage + 1) * itemsPerPage, totalCount)} з {totalCount} товарів</p>
                           </div>
                         </div>
                       </div>

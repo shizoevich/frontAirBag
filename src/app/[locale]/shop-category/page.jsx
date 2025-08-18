@@ -14,7 +14,7 @@ export default function CategoryPage() {
   return (
     <Wrapper>
       <Header />
-      <ShopBreadcrumb title="Shop Grid" subtitle="Shop Grid" />
+      <ShopBreadcrumb/>
       <ShopArea hidden_sidebar={true} />
       <Footer primary_style={true} />
     </Wrapper>

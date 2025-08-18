@@ -114,6 +114,38 @@
   "ProductModal": {
     "contentLabel": "Product Details"
   },
+  "Profile": {
+    "profilePage": "My Profile",
+    "personalDetails": "Personal Details",
+    "accountCreated": "Account created",
+    "email": "Email",
+    "phone": "Phone",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "novaPostAddress": "Nova Post Address",
+    "city": "City",
+    "warehouse": "Warehouse",
+    "notSpecified": "Not specified",
+    "editProfile": "Edit Profile",
+    "myOrders": "My Orders",
+    "editProfileInfo": "Edit Profile Information",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "errorLoadingProfile": "Error loading profile",
+    "profileUpdateSuccess": "Profile updated successfully",
+    "profileUpdateError": "Error updating profile",
+    "username": "Username",
+    "address": "Address",
+    "usernameRequired": "Username is required",
+    "emailRequired": "Email is required",
+    "phoneRequired": "Phone is required",
+    "addressRequired": "Address is required",
+    "enterUsername": "Enter your username",
+    "enterEmail": "Enter your email",
+    "enterPhone": "Enter your phone",
+    "enterAddress": "Enter your address"
+  },
+  
   "ProductDetails": {
     "inStock": "In Stock",
     "outOfStock": "Out of Stock",
@@ -224,18 +256,8 @@
     "maxCharacters": "Max. {count} characters",
     "invalidPhone": "Invalid phone number format"
   },
-  "Profile": {
-    "personalDetails": "Personal Details",
-    "username": "Username",
-    "email": "Email",
-    "phone": "Phone",
-    "address": "Address",
-    "usernameRequired": "Username is required",
-    "emailRequired": "Email is required",
-    "phoneRequired": "Phone is required",
-    "addressRequired": "Address is required",
-    "enterUsername": "Enter your username",
-    "enterEmail": "Enter your email",
+  
+  "ProfileExtra": {
     "enterPhone": "Enter your phone number",
     "enterAddress": "Enter your address",
     "update": "Update Profile",
@@ -273,7 +295,40 @@
     "seat_pyrotechnics_description": "Pyrotechnics for seats, providing additional protection",
     "curtain_pyrotechnics_description": "Curtain pyrotechnics for side protection during side impacts",
     "steering_pyrotechnics_description": "Pyrotechnics for steering wheel airbag with one or two igniters",
-    "dashboard_pyrotechnics_description": "Pyrotechnics for passenger airbag in dashboard with one or two igniters"
+    "dashboard_pyrotechnics_description": "Pyrotechnics for passenger airbag in dashboard with one or two igniters",
+    
+    "connectors_seo_title": "Connectors and Plugs for Airbag SRS Safety Systems",
+    "connectors_seo_description": "Wide selection of connectors and plugs for vehicle safety systems. Quality connectors for airbags and other SRS components.",
+    
+    "mounts_seo_title": "Mounts for Airbag SRS Safety Systems",
+    "mounts_seo_description": "Reliable mounts and mounting elements for vehicle safety systems. Brackets and fasteners for Airbag SRS components.",
+    
+    "resistors_seo_title": "Resistors and Simulators for Airbag SRS Safety Systems",
+    "resistors_seo_description": "Resistors for diagnostics and airbag simulation. Quality simulators for vehicle safety systems.",
+    
+    "airbags_seo_title": "Airbags for Vehicles",
+    "airbags_seo_description": "Pneumatic bags (Airbag) of various types and sizes for vehicle safety systems. Quality airbags for different car brands.",
+    
+    "belt_parts_seo_title": "Seat Belt Parts for Vehicles",
+    "belt_parts_seo_description": "Hardware and components for seat belts. Quality parts for repair and maintenance of vehicle seat belts.",
+    
+    "pyro_belts_seo_title": "Pyrotechnics in Seat Belts",
+    "pyro_belts_seo_description": "Pyrotechnics for seat belts, ensuring quick activation in emergency situations. Quality pyrotechnic devices for safety systems.",
+    
+    "pyro_seats_seo_title": "Pyrotechnics in Legs/Seats",
+    "pyro_seats_seo_description": "Pyrotechnics for driver and passenger leg protection, as well as seat pyrotechnics. Additional protection in emergency situations.",
+    
+    "pyro_curtains_seo_title": "Pyrotechnics in Curtains (Side)",
+    "pyro_curtains_seo_description": "Curtain pyrotechnics for side protection during side impacts. Pyrotechnic devices for side airbags.",
+    
+    "pyro_steering_seo_title": "Pyrotechnics in Steering Wheel (1-2 igniters)",
+    "pyro_steering_seo_description": "Pyrotechnics for steering wheel airbag with one or two igniters. Quality pyrotechnic devices for driver airbag.",
+    
+    "pyro_dashboard_seo_title": "Pyrotechnics in Dashboard (1-2 igniters)",
+    "pyro_dashboard_seo_description": "Pyrotechnics for passenger airbag in dashboard with one or two igniters. Pyrotechnic devices for instrument panel.",
+    
+    "covers_seo_title": "Covers and Overlays for Safety Systems",
+    "covers_seo_description": "Covers, overlays and decorative elements for vehicle safety systems. Quality accessories for Airbag SRS components."
   },
   "Contact": {
     "title": "Contact",
@@ -281,7 +336,7 @@
     "pageTitle": "Contact - AirBag",
     "pageDescription": "Contact us for more information about our products and services",
     "email": "Email",
-    "emailAddress": "noxnew@hotmail.com",
+    "emailAddress": "Noxnew@hotmail.com",
     "phone": "Phone",
     "phoneNumber": "+38 (098) 998-98-28",
     "delivery": "Delivery",
@@ -308,5 +363,109 @@
     "message": "Message",
     "send": "Send",
     "findUs": "Find Us"
+  },
+  "PrivacyPolicy": {
+    "metaTitle": "Privacy Policy - AirBag",
+    "metaDescription": "AirBag website privacy policy. Information about the collection, use and protection of your personal data.",
+    "title": "Privacy Policy",
+    "subtitle": "We value your trust and strive to protect your personal information. This Privacy Policy explains what data we collect, how we use it and store it.",
+    "section1": {
+      "title": "1. Information Collection",
+      "description": "We may collect the following data:",
+      "items": {
+        "item1": "First and last name",
+        "item2": "Contact phone number",
+        "item3": "Email address",
+        "item4": "Delivery address",
+        "item5": "Telegram ID (in case of interaction through Telegram bot)",
+        "item6": "Google account data (when using Google login)",
+        "item7": "Other data necessary for order processing"
+      }
+    },
+    "section2": {
+      "title": "2. Use of Information",
+      "description": "We use the received data for:",
+      "items": {
+        "item1": "Processing and delivery of orders",
+        "item2": "Communication with you regarding your order",
+        "item3": "Providing consultations and technical support",
+        "item4": "Improving the service and website operation",
+        "item5": "Authorization and personalization of your account"
+      }
+    },
+    "section3": {
+      "title": "3. Google Authorization",
+      "description1": "If you choose to log in via Google, we will receive from Google only the data that you confirm during login (for example, name, email, profile photo).",
+      "description2": "We do not store or have access to your Google passwords."
+    },
+    "section4": {
+      "title": "4. Telegram ID",
+      "description1": "When interacting with our Telegram bot, we may store your Telegram ID for identification and communication purposes.",
+      "description2": "This data is not shared with third parties, except in cases provided by law."
+    },
+    "section5": {
+      "title": "5. Information Protection",
+      "description": "We take all necessary technical and organizational measures to protect your personal data from unauthorized access, modification or deletion."
+    },
+    "section6": {
+      "title": "6. Third Party Disclosure",
+      "description": "We do not share your personal data with third parties, except in cases where it is necessary to fulfill an order (delivery services, payment services) or provided by Ukrainian legislation."
+    },
+    "section7": {
+      "title": "7. Cookies",
+      "description": "Our website may use cookies to improve user experience. You can disable cookies in your browser settings."
+    }
+  },
+  "Terms": {
+    "metaTitle": "Terms and Conditions - AirBag",
+    "metaDescription": "Terms and conditions of using AirBag website. Information about ordering, payment, delivery, and return policies.",
+    "title": "Terms and Conditions",
+    "subtitle": "Welcome to our online store! Please read these terms and conditions carefully before placing an order.",
+    "section1": {
+      "title": "1. General Provisions",
+      "description1": "1.1. By using our website, you agree to these terms and conditions.",
+      "description2": "1.2. The administration reserves the right to change the terms without prior notice.",
+      "description3": "1.3. Updated terms are published on this page."
+    },
+    "section2": {
+      "title": "2. Order Placement",
+      "description1": "2.1. Orders can be placed through the website or Telegram bot.",
+      "description2": "2.2. Valid contact information must be provided to confirm the order.",
+      "description3": "2.3. We reserve the right to contact you to clarify details."
+    },
+    "section3": {
+      "title": "3. Payment and Delivery",
+      "description1": "3.1. Payment is made according to the terms available on the website.",
+      "description2": "3.2. Delivery is carried out by Nova Poshta within 1-3 business days after order confirmation.",
+      "description3": "3.3. Delivery costs are paid by the customer according to the carrier's rates."
+    },
+    "section4": {
+      "title": "4. Returns and Exchanges",
+      "description1": "4.1. Returns or exchanges are possible within 14 days from the receipt of the goods, if they have not been used and are preserved in their original condition.",
+      "description2": "4.2. Delivery costs for returns/exchanges are paid by the buyer, except in cases of defects or our mistake.",
+      "description3": "4.3. To arrange a return, please contact our support service."
+    },
+    "section5": {
+      "title": "5. Liability of the Parties",
+      "description": "5.1. The seller is not responsible for:",
+      "items": {
+        "item1": "delivery delays due to the carrier;",
+        "item2": "incorrect data provided by the buyer when placing an order;",
+        "item3": "damage to goods caused by the delivery service."
+      }
+    },
+    "section6": {
+      "title": "6. Personal Data",
+      "description1": "6.1. All personal data is processed in accordance with the Privacy Policy.",
+      "description2": "6.2. By using the site, you agree to the processing of your data for the purpose of order processing and delivery.",
+      "privacyPolicyLink": "Privacy Policy"
+    },
+    "section7": {
+      "title": "7. Contacts",
+      "description": "For all inquiries, please contact:",
+      "phone": "+38 (098) 998-98-28",
+      "email": "Noxnew@hotmail.com",
+      "telegram": "Telegram bot"
+    }
   }
 }

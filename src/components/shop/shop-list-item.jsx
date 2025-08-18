@@ -10,7 +10,7 @@ import BlurImage from "@/components/common/BlurImage";
 import { add_to_compare } from "@/redux/features/compareSlice";
 
 const ShopListItem = ({ product }) => {
-  const { _id, img, images, imageURLs, category, title, reviews, price, discount, tags, description } = product || {};
+  const { _id, img, images, imageURLs, category, title, reviews, price_minor, discount, tags, description } = product || {};
   
   // Получаем изображение из API с правильной логикой
   let productImage = '/assets/img/product/3/product-1.jpg'; // заглушка по умолчанию
@@ -98,13 +98,13 @@ const ShopListItem = ({ product }) => {
           <div className="tp-product-price-wrapper-2">
             {discount > 0 ? (
               <>
-                <span className="tp-product-price-2 new-price">${price}</span>
+                <span className="tp-product-price-2 new-price">${price_minor}</span>
                 <span className="tp-product-price-2 old-price">
-                  {" "} ${(Number(price) - (Number(price) * Number(discount)) / 100).toFixed(2)}
+                  {" "} ${(Number(price_minor || 0) / 100 - (Number(price_minor || 0) / 100 * Number(discount))).toFixed(2)}
                 </span>
               </>
             ) : (
-              <span className="tp-product-price-2 new-price">${price}</span>
+              <span className="tp-product-price-2 new-price">${price_minor}</span>
             )}
           </div>
           <p>

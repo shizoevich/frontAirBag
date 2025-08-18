@@ -16,7 +16,7 @@ const ProductItem = ({ product }) => {
   const { cart_products } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   
-  const { id, category, title, price, images, residue } = product || {};
+  const { id, category, title, price_minor, images, residue } = product || {};
 
   useEffect(() => {
     setIsClient(true);
@@ -112,7 +112,7 @@ const ProductItem = ({ product }) => {
           </h3>
         </div>
         <div className="tp-product-price-wrapper">
-          <span className="tp-product-price new-price">{price?.toFixed(2)} ₴</span>
+          <span className="tp-product-price new-price">{(price_minor/100)?.toFixed(2)} ₴</span>
         </div>
       </div>
     </div>

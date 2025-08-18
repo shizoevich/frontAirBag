@@ -40,7 +40,7 @@ const ProfileArea = () => {
     </div>
   }
   if (!isLoading && !isError) {
-   content = <section className="profile__area pt-120 pb-120">
+   content = <section className="profile__area pt-20 pb-120">
       <div className="container">
         <div className="profile__inner p-relative">
           <ProfileShape />

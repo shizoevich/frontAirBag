@@ -55,17 +55,6 @@ const menu_data = [
     ]
   },
   {
-    id: 3,
-    sub_menu: true,
-    title: '🔍 Поиск',
-    link: '/search',
-    sub_menus: [
-      { title: 'Поиск по каталогу', link: '/shop' },
-      { title: 'Поиск по VIN', link: '/search/vin' },
-      { title: 'Поиск по марке', link: '/search/brand' },
-    ],
-  },
-  {
     id: 4,
     single_link: true,
     titleKey: 'menu.contacts',
@@ -98,17 +87,6 @@ export const mobile_menu = [
       { title: '🚘 Марки автомобилей', link: '/search/brand' },
       { title: '🛡️ Комплектующие Airbag SRS', link: '/shop-category/airbag-components' },
       { title: '💥 Пиропатроны', link: '/shop-category/pyrotechnics' },
-    ],
-  },
-  {
-    id: 3,
-    sub_menu: true,
-    title: '🔍 Поиск',
-    link: '/search',
-    sub_menus: [
-      { title: 'Поиск по каталогу', link: '/shop' },
-      { title: 'Поиск по VIN', link: '/search/vin' },
-      { title: 'Поиск по марке', link: '/search/brand' },
     ],
   },
   {

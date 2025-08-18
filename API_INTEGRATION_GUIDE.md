@@ -100,7 +100,7 @@ import {
 ### Environment Variables
 Убедитесь, что в `.env.local` указан правильный базовый URL:
 ```
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8010/api/v2
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v2
 ```
 
 ### Redux Store

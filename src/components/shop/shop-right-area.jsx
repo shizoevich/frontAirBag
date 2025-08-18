@@ -31,7 +31,7 @@ const ShopRightArea = ({
 
   // max price
   const maxPrice = all_products.reduce((max, product) => {
-    return product.price > max ? product.price : max;
+    return product.price_minor > max ? product.price_minor : max;
   }, 0);
   return (
     <>

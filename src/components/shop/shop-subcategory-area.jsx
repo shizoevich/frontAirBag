@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import ProductItem from "../products/electronics/product-item";
 import ErrorMsg from "@/components/common/error-msg";
 import HomePrdLoader from "@/components/loader/home/home-prd-loader";
-import { useGetShowCategoryQuery, useGetAllProductsQuery } from "@/redux/features/categoryApi";
+import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
+import { useGetProductsByCategoryQuery } from "@/redux/features/productsApi";
 import ReactPaginate from 'react-paginate';
 import { useTranslations } from 'next-intl';
 
@@ -20,21 +21,46 @@ const ShopSubcategoryArea = ({ subcategorySlug }) => {
     setMounted(true);
   }, []);
 
-  // Получаем категории для фильтрации
+  // Получаем категории для отображения информации
   const {
     data: categoriesData,
     isLoading: catLoading,
     isError: catError
   } = useGetShowCategoryQuery();
 
-  // Получаем все товары
+  // Маппинг slug на ID категорий
+  const slugToIdMap = {
+    'connectors': 753917, // ID для "Коннекторы"
+    'mounts': 753918, // ID для "Крепления"
+    'resistors': 753919, // ID для "Обманки ( Резисторы )"
+    'airbags': 753897, // ID для "Парашюты ( Мешки )"
+    'belt-parts': 753899, // ID для "Запчасти для Ремней"
+    'pyro-belts': 753920, // ID для "ПП в Ремни"
+    'pyro-seats': 753898, // ID для "ПП в Ноги/Сиденье"
+    'pyro-curtains': 753924, // ID для "ПП в Шторы"
+    'pyro-steering': 753925, // ID для "2 запала" (руль)
+    'pyro-dashboard': 753927, // ID для "2 запала" (панель)
+    'covers': 754099 // ID для "Covers"
+  };
+  
+  // Получаем ID подкатегории по slug
+  const subcategoryId = slugToIdMap[subcategorySlug] || null;
+  console.log('Selected subcategoryId:', subcategoryId);
+  
+  // Получаем товары по категории с серверной пагинацией
   const {
     data: productsData = [],
     isLoading: productsLoading,
     isError: productsError
-  } = useGetAllProductsQuery();
+  } = useGetProductsByCategoryQuery({
+    id_remonline: subcategoryId,
+    limit: itemsPerPage,
+    offset: currentPage * itemsPerPage
+  }, {
+    skip: !subcategoryId // Пропускаем запрос, если ID категории не найден
+  });
 
-  // Преобразуем данные категорий в массив
+  // Преобразуем данные категорий в массив для отображения информации
   const allCategories = Array.isArray(categoriesData) 
     ? categoriesData 
     : Array.isArray(categoriesData?.data) 
@@ -45,120 +71,40 @@ const ShopSubcategoryArea = ({ subcategorySlug }) => {
   
   // Обрабатываем разные форматы данных API
   let safeProductsData = [];
+  let totalCount = 0;
   
   if (Array.isArray(productsData)) {
     safeProductsData = productsData;
+    totalCount = productsData.length;
   } else if (productsData?.results && Array.isArray(productsData.results)) {
     safeProductsData = productsData.results;
+    totalCount = productsData.count || productsData.results.length;
   } else if (productsData?.data && Array.isArray(productsData.data)) {
     safeProductsData = productsData.data;
+    totalCount = productsData.count || productsData.data.length;
   }
 
   // Отладочная информация для категорий и товаров
   useEffect(() => {
     if (mounted && !productsLoading && !catLoading) {
       console.log('Slug:', subcategorySlug);
-      console.log('All Categories:', allCategories);
-      console.log('All Products:', safeProductsData);
+      console.log('Category ID:', subcategoryId);
+      console.log('Products data:', productsData);
+      console.log('Current page products:', safeProductsData);
     }
-  }, [mounted, productsLoading, catLoading, subcategorySlug, allCategories, safeProductsData]);
+  }, [mounted, productsLoading, catLoading, subcategorySlug, subcategoryId, productsData, safeProductsData]);
   
-  // Находим ID подкатегории по slug и имени
-  const getSubcategoryIdBySlug = (slug) => {
-    // Сначала проверяем по имени (более надежный способ)
-    const categoryByName = allCategories.find(cat => {
-      const catName = cat.name?.toLowerCase() || '';
-      
-      // Маппинг slug на возможные имена категорий
-      const slugToNameMap = {
-        'connectors': ['коннекторы', 'конектори', 'connectors', 'роз\'єми', 'Коннекторы'],
-        'mounts': ['крепления', 'кріплення', 'mounts', 'Крепления'],
-        'resistors': ['резисторы', 'резистори', 'обманки', 'resistors', 'Обманки ( Резисторы )'],
-        'airbags': ['подушки', 'подушки безопасности', 'airbags', 'парашути', 'Парашюты ( Мешки )'],
-        'belt-parts': ['запчасти ремней', 'запчастини ременів', 'belt parts', 'Запчасти для Ремней']
-      };
-      
-      // Проверяем, соответствует ли имя категории одному из возможных имен для данного slug
-      return slugToNameMap[slug]?.some(possibleName => 
-        catName.includes(possibleName.toLowerCase())
-      ) || false;
-    });
-    
-    if (categoryByName) {
-      console.log(`Found category by name for slug ${slug}:`, categoryByName);
-      return categoryByName.id || categoryByName.id_remonline;
-    }
-    
-    // Если не нашли по имени, используем жестко заданные ID из тестовых данных API
-    const slugToIdMap = {
-      'connectors': 753917, // ID для "Коннекторы"
-      'mounts': 753918, // ID для "Крепления"
-      'resistors': 753919, // ID для "Обманки ( Резисторы )"
-      'airbags': 753897, // ID для "Парашюты ( Мешки )"
-      'belt-parts': 753899 // ID для "Запчасти для Ремней"
-    };
-    
-    const hardcodedId = slugToIdMap[slug] || null;
-    console.log(`Using hardcoded ID for slug ${slug}:`, hardcodedId);
-    return hardcodedId;
-  };
+  // Расчет пагинации на основе данных с сервера
+  const pageCount = Math.ceil(totalCount / itemsPerPage);
   
-  // Получаем ID подкатегории по slug
-  const subcategoryId = getSubcategoryIdBySlug(subcategorySlug);
-  console.log('Selected subcategoryId:', subcategoryId);
-  
-  // Фильтруем товары по выбранной подкатегории или по имени категории
-  const filteredProducts = subcategorySlug 
-    ? safeProductsData.filter(product => {
-        // Проверяем все возможные форматы ID категории
-        const productCategoryId = product.category?.id_remonline || product.category?.id || product.category_id;
-        const productCategoryName = product.category?.name || '';
-        
-        // Если у нас есть ID подкатегории, фильтруем по нему
-        if (subcategoryId && productCategoryId) {
-          // Находим категорию товара
-          const productCategory = allCategories.find(cat => 
-            String(cat.id) === String(productCategoryId) || 
-            String(cat.id_remonline) === String(productCategoryId)
-          );
-          
-          if (productCategory) {
-            // Проверяем, принадлежит ли товар к выбранной подкатегории или её подкатегориям
-            const matchesById = String(productCategory.id) === String(subcategoryId) || 
-                               String(productCategory.parent_id) === String(subcategoryId);
-            
-            if (matchesById) return true;
-          }
-        }
-        
-        // Если не нашли по ID, пробуем фильтровать по имени категории
-        const slugToNameMap = {
-          'connectors': ['коннекторы', 'конектори', 'connectors', 'роз\'єми', 'Коннекторы'],
-          'mounts': ['крепления', 'кріплення', 'mounts', 'Крепления'],
-          'resistors': ['резисторы', 'резистори', 'обманки', 'resistors', 'Обманки ( Резисторы )'],
-          'airbags': ['подушки', 'подушки безопасности', 'airbags', 'парашути', 'Парашюты ( Мешки )'],
-          'belt-parts': ['запчасти ремней', 'запчастини ременів', 'belt parts', 'Запчасти для Ремней']
-        };
-        
-        const possibleNames = slugToNameMap[subcategorySlug] || [];
-        const matchesByName = possibleNames.some(name => 
-          productCategoryName.toLowerCase().includes(name.toLowerCase())
-        );
-        
-        return matchesByName;
-      })
-    : safeProductsData;
-    
-  console.log('Filtered Products:', filteredProducts);
-  
-  // Расчет пагинации
-  const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
-  const offset = currentPage * itemsPerPage;
-  const currentProducts = filteredProducts.slice(offset, offset + itemsPerPage);
+  // Используем товары текущей страницы, полученные с сервера
+  const currentProducts = safeProductsData;
   
   // Обработка изменения страницы
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
+    // При изменении страницы прокручиваем страницу вверх
+    window.scrollTo(0, 0);
   };
 
   // Получаем название подкатегории
@@ -172,13 +118,19 @@ const ShopSubcategoryArea = ({ subcategorySlug }) => {
       if (category?.name) return category.name;
     }
     
-    // Если не нашли по ID, ищем по slug
+    // Если не нашли по ID, используем маппинг slug на названия
     const slugToNameMap = {
       'connectors': 'Коннекторы',
       'mounts': 'Крепления',
       'resistors': 'Обманки ( Резисторы )',
       'airbags': 'Парашюты ( Мешки )',
-      'belt-parts': 'Запчасти для Ремней'
+      'belt-parts': 'Запчасти для Ремней',
+      'pyro-belts': 'ПП в Ремни',
+      'pyro-seats': 'ПП в Ноги/Сиденье',
+      'pyro-curtains': 'ПП в Шторы',
+      'pyro-steering': 'ПП в Руль (2 запала)',
+      'pyro-dashboard': 'ПП в Панель (2 запала)',
+      'covers': 'Covers'
     };
     
     return slugToNameMap[subcategorySlug] || subcategorySlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -191,7 +143,13 @@ const ShopSubcategoryArea = ({ subcategorySlug }) => {
       'mounts': 'mounts_seo_description',
       'resistors': 'resistors_seo_description',
       'airbags': 'airbags_seo_description',
-      'belt-parts': 'belt_parts_seo_description'
+      'belt-parts': 'belt_parts_seo_description',
+      'pyro-belts': 'pyro_belts_seo_description',
+      'pyro-seats': 'pyro_seats_seo_description',
+      'pyro-curtains': 'pyro_curtains_seo_description',
+      'pyro-steering': 'pyro_steering_seo_description',
+      'pyro-dashboard': 'pyro_dashboard_seo_description',
+      'covers': 'covers_seo_description'
     };
     
     if (slugToDescKey[subcategorySlug]) {
@@ -210,7 +168,7 @@ const ShopSubcategoryArea = ({ subcategorySlug }) => {
       <div className="container">
         <div className="row">
           <div className="col-xl-12">
-            <div className="tp-section-title-wrapper-2 mb-40">
+            <div className="tp-section-title-wrapper-2 mb-40 pt-40">
               <h3 className="tp-section-title-2">{getSubcategoryName()}</h3>
               <p className="text-muted">{getSubcategoryDescription()}</p>
             </div>
@@ -243,8 +201,7 @@ const ShopSubcategoryArea = ({ subcategorySlug }) => {
                           <p className="text-muted">Отладочная информация:</p>
                           <p className="text-muted">Slug: {subcategorySlug}</p>
                           <p className="text-muted">Категория ID: {subcategoryId || 'не найден'}</p>
-                          <p className="text-muted">Всего товаров: {safeProductsData.length}</p>
-                          <p className="text-muted">Всего категорий: {allCategories.length}</p>
+                          <p className="text-muted">Всего товаров в категории: {totalCount}</p>
                         </div>
                       </div>
                     )}

@@ -1,7 +1,6 @@
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
-import CommonBreadcrumb from "@/components/breadcrumb/common-breadcrumb";
-import SearchArea from "@/components/search/search-area";
+import Area from "@/components/search/search-area";
 import Footer from "@/layout/footers/footer";
 import { getTranslations } from 'next-intl/server';
 
@@ -42,7 +41,6 @@ export default async function SearchPage({ params, searchParams }) {
   return (
     <Wrapper>
       <Header />
-      <CommonBreadcrumb title={t_page('searchProducts')} subtitle={t_page('searchProducts')} />
       <SearchArea 
         translations={translations}
         initialSearchText={searchText}

@@ -108,8 +108,8 @@ const OrderArea = ({ orderId }) => {
                         <td>{i + 1}</td>
                         <td>{item.title}</td>
                         <td>{item.orderQuantity}</td>
-                        <td>${item.price}</td>
-                        <td>${item.price * item.orderQuantity}</td>
+                        <td>${item.price_minor}</td>
+                        <td>${item.price_minor * item.orderQuantity}</td>
                       </tr>
                     ))}
                   </tbody>

@@ -3,8 +3,14 @@ import { apiSlice } from "../api/apiSlice";
 export const productsApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
-    // Получение всех товаров
+    // Получение всех товаров с пагинацией
     getAllProducts: builder.query({
+      query: ({ limit = 12, offset = 0 } = {}) => `/goods/?limit=${limit}&offset=${offset}`,
+      providesTags: ['products']
+    }),
+    
+    // Получение всех товаров без пагинации (для фильтров и т.д.)
+    getAllProductsNoLimit: builder.query({
       query: () => '/goods/',
       providesTags: ['products']
     }),
@@ -44,17 +50,18 @@ export const productsApi = apiSlice.injectEndpoints({
       invalidatesTags: ['products']
     }),
 
-    // Получение товаров по категории (по id_remonline)
+    // Получение товаров по категории (по id_remonline) с пагинацией
     getProductsByCategory: builder.query({
-      query: (id_remonline) => {
-        console.log(`Запрос товаров по категории id_remonline=${id_remonline}`);
-        return `/goods/?category__id_remonline=${id_remonline}`;
+      query: (params) => {
+        const { id_remonline, limit = 12, offset = 0 } = params;
+        console.log(`Запрос товаров по категории id_remonline=${id_remonline}, limit=${limit}, offset=${offset}`);
+        return `/goods/?category__id_remonline=${id_remonline}&limit=${limit}&offset=${offset}`;
       },
       transformResponse: (response) => {
         console.log('Ответ API товаров по категории:', response);
         return response;
       },
-      providesTags: (result, error, id_remonline) => [{ type: 'products', id: id_remonline }],
+      providesTags: (result, error, params) => [{ type: 'products', id: params.id_remonline }],
     }),
     
     // Получение рекомендуемых товаров по категории
@@ -115,6 +122,7 @@ getProductCategories: builder.query({
 
 export const {
   useGetAllProductsQuery,
+  useGetAllProductsNoLimitQuery,
   useGetProductByIdQuery,
   useCreateProductMutation,
   useUpdateProductMutation,

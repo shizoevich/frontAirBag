@@ -112,18 +112,6 @@ export const mobile_menu = [
     ],
   },
   {
-    id: 3,
-    sub_menu: true,
-    title: '🔍 Поиск',
-    titleKey: 'search',
-    link: '/search',
-    sub_menus: [
-      { title: 'Поиск по каталогу', titleKey: 'search_catalog', link: '/shop' },
-      { title: 'Поиск по VIN', titleKey: 'search_vin', link: '/search/vin' },
-      { title: 'Поиск по марке', titleKey: 'search_by_brand', link: '/search/brand' },
-    ],
-  },
-  {
     id: 4,
     sub_menu: true,
     title: '📊 Мой аккаунт',

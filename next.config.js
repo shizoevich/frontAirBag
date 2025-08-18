@@ -27,6 +27,23 @@ const nextConfig = {
       }
     ],
   },
+  webpack: (config, { isServer }) => {
+    // Исправление проблем с модулями Swiper
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    
+    return config;
+  },
+  transpilePackages: ['swiper'],
+  experimental: {
+    esmExternals: 'loose',
+  },
 }
 
 module.exports = withNextIntl(nextConfig);

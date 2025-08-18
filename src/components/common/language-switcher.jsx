@@ -29,7 +29,7 @@ const LanguageSwitcher = () => {
       <div className="offcanvas__lang d-flex align-items-center justify-content-md-end">
         <div className="offcanvas__lang-wrapper">
           <span onClick={() => setIsOpen(!isOpen)} className="offcanvas__lang-selected-lang tp-lang-toggle" id="tp-offcanvas-lang-toggle">
-            {languages[locale]} <IoMdArrowDropdown style={{ verticalAlign: 'middle', marginLeft: '3px' }} />
+            {languages[locale]}
           </span>
           <ul className={`offcanvas__lang-list tp-lang-list ${isOpen ? 'tp-lang-list-open' : ''}`} style={{ top: '100%', bottom: 'auto' }}>
             {Object.keys(languages).map((lang) => (

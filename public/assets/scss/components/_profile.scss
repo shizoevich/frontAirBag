@@ -1,0 +1,151 @@
+/*----------------------------------------*/
+/*  PROFILE STYLES
+/*----------------------------------------*/
+
+.profile {
+  &__area {
+    background-color: #f8f9fa;
+  }
+
+  &__info {
+    transition: all 0.3s ease;
+    
+    &:hover {
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    &-title {
+      font-weight: 600;
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background-color: var(--tp-theme-primary);
+      }
+    }
+  }
+
+  &__meta {
+    &-title {
+      font-weight: 600;
+    }
+    
+    &-content {
+      p {
+        color: #6c757d;
+      }
+    }
+  }
+
+  &__avatar {
+    position: relative;
+    
+    .edit-avatar {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background-color: var(--tp-theme-primary);
+      color: #fff;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background-color: var(--tp-theme-secondary);
+      }
+    }
+  }
+
+  &__info-card {
+    &-item {
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  &__edit-form {
+    transition: all 0.3s ease;
+    
+    h4 {
+      font-weight: 600;
+    }
+    
+    .form-label {
+      color: #495057;
+    }
+    
+    .form-control {
+      border: 1px solid #ced4da;
+      padding: 12px 15px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      
+      &:focus {
+        border-color: var(--tp-theme-primary);
+        box-shadow: 0 0 0 0.2rem rgba(var(--tp-theme-primary-rgb), 0.25);
+      }
+      
+      &.bg-light {
+        background-color: #f8f9fa !important;
+      }
+    }
+    
+    .text-muted {
+      font-size: 12px;
+      margin-top: 5px;
+      display: block;
+    }
+  }
+
+  &__btn {
+    .tp-btn {
+      border-radius: 6px;
+      font-weight: 500;
+      padding: 12px 20px;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-3px);
+      }
+      
+      i {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 767px) {
+  .profile {
+    &__meta {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      
+      &-content {
+        margin-top: 15px;
+      }
+    }
+    
+    &__info-card {
+      &-item {
+        margin-bottom: 15px;
+      }
+    }
+  }
+}

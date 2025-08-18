@@ -154,6 +154,31 @@ export const authApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    
+    // Обновление профиля пользователя
+    updateProfile: builder.mutation({
+      query: (data) => ({
+        url: "/auth/me/",
+        method: "PATCH",
+        body: data,
+      }),
+      
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          
+          // Обновляем данные пользователя в store
+          dispatch(
+            userLoggedIn({
+              user: result.data,
+            })
+          );
+        } catch (err) {
+          console.error('Update profile error:', err);
+        }
+      },
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -164,4 +189,5 @@ export const {
   useRefreshTokenMutation,
   useVerifyTokenMutation,
   useLogoutMutation,
+  useUpdateProfileMutation,
 } = authApi;

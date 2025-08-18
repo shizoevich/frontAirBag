@@ -4,7 +4,7 @@ import {useSearchParams, useRouter} from 'next/navigation';
 import ShopLoader from "../loader/shop/shop-loader";
 import ErrorMsg from "../common/error-msg";
 import ShopFilterOffCanvas from "../common/shop-filter-offcanvas";
-import { useGetAllProductsQuery } from "@/redux/features/productsApi";
+import { useGetAllProductsQuery, useGetAllProductsNoLimitQuery } from "@/redux/features/productsApi";
 import ShopContent from "./shop-content";
 
 const ShopArea = ({shop_right=false,hidden_sidebar=false}) => {
@@ -17,20 +17,25 @@ const ShopArea = ({shop_right=false,hidden_sidebar=false}) => {
   const subCategory = searchParams.get('subCategory');
   const filterColor = searchParams.get('color');
   const status = searchParams.get('status');
-  const { data: products, isError, isLoading } = useGetAllProductsQuery();
+  const [itemsPerPage] = useState(12);
+  const { data: products, isError, isLoading } = useGetAllProductsQuery({
+    limit: itemsPerPage,
+    offset: (currPage - 1) * itemsPerPage
+  });
+  const { data: allProducts, isLoading: isLoadingAll } = useGetAllProductsNoLimitQuery();
   const [priceValue, setPriceValue] = useState([0, 0]);
   const [selectValue, setSelectValue] = useState("");
   const [currPage, setCurrPage] = useState(1);
 
-  // Load the maximum price once the products have been loaded
+  // Load the maximum price once all products have been loaded
   useEffect(() => {
-    if (!isLoading && !isError && products?.data?.length > 0) {
-      const maxPrice = products.data.reduce((max, product) => {
-        return product.price > max ? product.price : max;
+    if (!isLoadingAll && !isError && allProducts?.data?.length > 0) {
+      const maxPrice = allProducts.data.reduce((max, product) => {
+        return product.price_minor > max ? product.price_minor : max;
       }, 0);
       setPriceValue([0, maxPrice]);
     }
-  }, [isLoading, isError, products]);
+  }, [isLoadingAll, isError, allProducts]);
 
   // handleChanges
   const handleChanges = (val) => {
@@ -65,12 +70,12 @@ const ShopArea = ({shop_right=false,hidden_sidebar=false}) => {
       <ErrorMsg msg="There was an error" />
     </div>;
   }
-  if (!isLoading && !isError && products?.data?.length === 0) {
+  if (!isLoading && !isError && products?.results?.length === 0) {
     content = <ErrorMsg msg="No Products found!" />;
   }
-  if (!isLoading && !isError && products?.data?.length > 0) {
+  if (!isLoading && !isError && products?.results?.length > 0) {
     // products
-    let product_items = products.data;
+    let product_items = products.results;
     // select short filtering
     if (selectValue) {
       if (selectValue === "Default Sorting") {
@@ -78,11 +83,11 @@ const ShopArea = ({shop_right=false,hidden_sidebar=false}) => {
       } else if (selectValue === "Low to High") {
         product_items = products.data
           .slice()
-          .sort((a, b) => Number(a.price) - Number(b.price));
+          .sort((a, b) => Number(a.price_minor) - Number(b.price_minor));
       } else if (selectValue === "High to Low") {
         product_items = products.data
           .slice()
-          .sort((a, b) => Number(b.price) - Number(a.price));
+          .sort((a, b) => Number(b.price_minor) - Number(a.price_minor));
       } else if (selectValue === "New Added") {
         product_items = products.data
           .slice()
@@ -147,8 +152,8 @@ const ShopArea = ({shop_right=false,hidden_sidebar=false}) => {
     }
 
     if(minPrice && maxPrice){
-      product_items = product_items.filter((p) => Number(p.price) >= Number(minPrice) && 
-      Number(p.price) <= Number(maxPrice))
+      product_items = product_items.filter((p) => Number(p.price_minor) >= Number(minPrice) && 
+      Number(p.price_minor) <= Number(maxPrice))
     }
     
 
@@ -156,11 +161,13 @@ const ShopArea = ({shop_right=false,hidden_sidebar=false}) => {
       <>
 
       <ShopContent 
-        all_products={products.data}
+        all_products={allProducts?.data || []}
         products={product_items}
         otherProps={otherProps}
         shop_right={shop_right}
         hidden_sidebar={hidden_sidebar}
+        totalCount={products.count || 0}
+        itemsPerPage={itemsPerPage}
       />
         
          <ShopFilterOffCanvas

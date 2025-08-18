@@ -3,12 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { notifyError, notifySuccess } from '@/utils/toast';
+import { useLocale, useTranslations } from 'next-intl';
 import ErrorMsg from '../common/error-msg';
-import axios from 'axios';
+import { notifyError, notifySuccess } from '@/utils/toast';
+import { useRegisterUserMutation } from '@/redux/features/auth/authApi';
 import '@/styles/register-form.css';
 
 const RegisterForm = () => {
@@ -23,51 +22,45 @@ const RegisterForm = () => {
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [showWarehouseDropdown, setShowWarehouseDropdown] = useState(false);
 
-  // Схема валидации: обязательны только email и пароль (2 раза)
+  // Схема валидации в соответствии с API /auth/register/
   const schema = Yup.object().shape({
-    firstName: Yup.string()
-      .trim()
-      .transform(value => value === '' ? undefined : value) // пустое поле превращаем в undefined
-      .test('min-length', t('minCharacters', { count: 2 }), value => {
-        return !value || value.length >= 2;
-      })
-      .test('max-length', t('maxCharacters', { count: 50 }), value => {
-        return !value || value.length <= 50;
-      })
-      .optional(),
-    lastName: Yup.string()
+    name: Yup.string()
       .trim()
       .transform(value => value === '' ? undefined : value)
-      .test('min-length', t('minCharacters', { count: 2 }), value => {
-        return !value || value.length >= 2;
-      })
-      .test('max-length', t('maxCharacters', { count: 50 }), value => {
-        return !value || value.length <= 50;
-      })
+      .max(255, t('maxCharacters', { count: 255 }))
+      .nullable()
+      .optional(),
+    last_name: Yup.string()
+      .trim()
+      .transform(value => value === '' ? undefined : value)
+      .max(255, t('maxCharacters', { count: 255 }))
+      .nullable()
       .optional(),
     email: Yup.string()
       .trim()
       .email(t('invalidEmail'))
+      .max(100, t('maxCharacters', { count: 100 }))
+      .min(1, t('minCharacters', { count: 1 }))
       .required(t('emailRequired')),
     phone: Yup.string()
       .trim()
       .transform(value => value === '' ? undefined : value)
-      .test('phone-format', t('invalidPhone'), value => {
-        return !value || /^\+?[\d\s\-()]{7,20}$/.test(value);
-      })
+      .max(20, t('maxCharacters', { count: 20 }))
+      .nullable()
       .optional(),
     password: Yup.string()
-      .min(6, t('minCharacters', { count: 6 }))
-      .max(100, t('maxCharacters', { count: 100 }))
+      .min(1, t('minCharacters', { count: 1 }))
       .required(t('passwordRequired')),
-    confirmPassword: Yup.string()
+    confirm_password: Yup.string()
       .oneOf([Yup.ref('password'), null], t('passwordsMustMatch'))
       .required(t('confirmPasswordRequired')),
     city: Yup.string()
       .transform(value => value === '' ? undefined : value)
+      .nullable()
       .optional(),
     warehouse: Yup.string()
       .transform(value => value === '' ? undefined : value)
+      .nullable()
       .optional(),
   });
 
@@ -81,23 +74,34 @@ const RegisterForm = () => {
     resolver: yupResolver(schema),
   });
 
+  // Используем RTK Query для регистрации
+  const [registerUser, { isLoading: isRegistering }] = useRegisterUserMutation();
+
   // Поиск городов через API Новой Почты
-  const searchCities = async (query) => {
-    if (query.length < 2) return;
+  const fetchCities = async () => {
+    if (searchCity.length < 2) return;
     
     try {
-      const response = await axios.post('https://api.novaposhta.ua/v2.0/json/', {
-        apiKey: '1690358338d20ac90d792f5da5bb1292',
-        modelName: 'Address',
-        calledMethod: 'searchSettlements',
-        methodProperties: {
-          CityName: query,
-          Limit: 20,
+      const response = await fetch('https://api.novaposhta.ua/v2.0/json/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          apiKey: '1690358338d20ac90d792f5da5bb1292',
+          modelName: 'Address',
+          calledMethod: 'searchSettlements',
+          methodProperties: {
+            CityName: searchCity,
+            Limit: 20,
+          },
+        }),
       });
       
-      if (response.data.success && response.data.data[0]?.Addresses) {
-        setCities(response.data.data[0].Addresses);
+      const data = await response.json();
+      
+      if (data.success && data.data[0]?.Addresses) {
+        setCities(data.data[0].Addresses);
         setShowCityDropdown(true);
       } else {
         setCities([]);
@@ -109,14 +113,14 @@ const RegisterForm = () => {
   };
 
   // Поиск отделений Новой Почты
-  const searchWarehouses = async (cityRef) => {
+  const fetchWarehouses = async () => {
     try {
       const payload = {
         apiKey: '1690358338d20ac90d792f5da5bb1292',
         modelName: 'AddressGeneral',
         calledMethod: 'getWarehouses',
         methodProperties: {
-          CityRef: cityRef,
+          CityRef: selectedCity,
           Page: '1',
           Limit: '50',
           Language: 'ua',
@@ -128,15 +132,23 @@ const RegisterForm = () => {
         payload.methodProperties.FindByString = searchWarehouse.trim();
       }
 
-      const response = await axios.post('https://api.novaposhta.ua/v2.0/json/', payload);
+      const response = await fetch('https://api.novaposhta.ua/v2.0/json/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
 
-      console.log('Warehouse response:', response.data);
+      const data = await response.json();
 
-      if (response.data?.success && Array.isArray(response.data.data)) {
-        setWarehouses(response.data.data);
+      console.log('Warehouse response:', data);
+
+      if (data.success && Array.isArray(data.data)) {
+        setWarehouses(data.data);
         setShowWarehouseDropdown(true);
       } else {
-        console.error('No warehouses found:', response.data || {});
+        console.error('No warehouses found:', data || {});
         setWarehouses([]);
       }
     } catch (error) {
@@ -149,8 +161,26 @@ const RegisterForm = () => {
   const handleCityChange = (e) => {
     const query = e.target.value;
     setSearchCity(query);
-    searchCities(query);
   };
+
+  useEffect(() => {
+    // Загружаем города при монтировании компонента
+    if (searchCity.length >= 2) {
+      fetchCities();
+    }
+  }, [searchCity]);
+
+  useEffect(() => {
+    // Загружаем отделения при выборе города
+    if (selectedCity) {
+      fetchWarehouses();
+    }
+  }, [selectedCity, searchWarehouse]);
+  
+  // Используем isRegistering из RTK Query для отслеживания статуса запроса
+  useEffect(() => {
+    setLoading(isRegistering);
+  }, [isRegistering]);
 
   // Обработка выбора города
   const handleCitySelect = (city) => {
@@ -161,7 +191,8 @@ const RegisterForm = () => {
     setSearchCity(city.Present);
     setShowCityDropdown(false);
     if (cityRef) {
-      searchWarehouses(cityRef);
+      // Вызываем fetchWarehouses вместо searchWarehouses
+      fetchWarehouses();
     } else {
       console.warn('CityRef is missing on selected city item:', city);
       setWarehouses([]);
@@ -188,19 +219,65 @@ const RegisterForm = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      // Здесь будет вызов API для регистрации
-      console.log('Registration data:', data);
+      // Формируем данные для отправки в API
+      // Формируем адрес Новой Почты из города и отделения, если они выбраны
+      let novaPostAddress = null;
+      if (data.city && data.warehouse) {
+        novaPostAddress = `${data.city}, ${data.warehouse}`;
+      }
       
-      // Имитация успешной регистрации
-      setTimeout(() => {
-        notifySuccess(t('registerSuccess'));
-        reset();
-        router.push(`/${locale}/login`);
-        setLoading(false);
-      }, 1500);
+      // Формируем данные для отправки в API
+      // Удаляем пустые или undefined поля, чтобы не отправлять их на сервер
+      const registerData = {
+        email: data.email,
+        password: data.password,
+        confirm_password: data.confirm_password
+      };
+      
+      // Добавляем опциональные поля только если они заполнены
+      if (data.name) registerData.name = data.name;
+      if (data.last_name) registerData.last_name = data.last_name;
+      if (data.phone) registerData.phone = data.phone;
+      if (novaPostAddress) registerData.nova_post_address = novaPostAddress;
+      
+      console.log('Registration data:', registerData);
+      
+      // Используем RTK Query для регистрации
+      const response = await registerUser(registerData).unwrap();
+      
+      notifySuccess(t('registerSuccess'));
+      reset();
+      router.push(`/${locale}/login`);
     } catch (error) {
       console.error('Registration error:', error);
-      notifyError(t('registerFailed'));
+      
+      // Обрабатываем различные типы ошибок от API
+      if (error.data) {
+        // Если есть структурированный ответ с ошибками
+        const errorData = error.data;
+        
+        if (errorData.email) {
+          notifyError(`Email: ${errorData.email.join(', ')}`);
+        } else if (errorData.password) {
+          notifyError(`Пароль: ${errorData.password.join(', ')}`);
+        } else if (errorData.non_field_errors) {
+          notifyError(errorData.non_field_errors.join(', '));
+        } else if (errorData.detail) {
+          notifyError(errorData.detail);
+        } else {
+          // Если есть другие поля с ошибками, показываем первое найденное
+          const firstErrorField = Object.keys(errorData)[0];
+          if (firstErrorField) {
+            notifyError(`${firstErrorField}: ${errorData[firstErrorField].join(', ')}`);
+          } else {
+            notifyError(t('registerFailed'));
+          }
+        }
+      } else {
+        // Если нет структурированных данных об ошибке
+        notifyError(t('registerFailed'));
+      }
+      
       setLoading(false);
     }
   };
@@ -232,12 +309,12 @@ const RegisterForm = () => {
             </div>
             <div className="tp-login-input">
               <input 
-                {...register('firstName')} 
+                {...register('name')} 
                 placeholder={t('firstName')} 
                 type="text" 
               />
             </div>
-            {errors.firstName && <ErrorMsg msg={errors.firstName.message} />}
+            {errors.name && <ErrorMsg msg={errors.name.message} />}
           </div>
           
           <div className="tp-login-input-box">
@@ -246,12 +323,12 @@ const RegisterForm = () => {
             </div>
             <div className="tp-login-input">
               <input 
-                {...register('lastName')} 
+                {...register('last_name')} 
                 placeholder={t('lastName')} 
                 type="text" 
               />
             </div>
-            {errors.lastName && <ErrorMsg msg={errors.lastName.message} />}
+            {errors.last_name && <ErrorMsg msg={errors.last_name.message} />}
           </div>
           
           <div className="tp-login-input-box">
@@ -302,12 +379,12 @@ const RegisterForm = () => {
             </div>
             <div className="tp-login-input">
               <input 
-                {...register('confirmPassword')} 
+                {...register('confirm_password')} 
                 placeholder={t('confirmPassword')} 
                 type="password" 
               />
             </div>
-            {errors.confirmPassword && <ErrorMsg msg={errors.confirmPassword.message} />}
+            {errors.confirm_password && <ErrorMsg msg={errors.confirm_password.message} />}
           </div>
           
           <div className="tp-login-input-box">
