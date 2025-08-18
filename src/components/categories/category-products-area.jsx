@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from 'next/navigation';
 import ProductItem from "../products/electronics/product-item";
 import ErrorMsg from "@/components/common/error-msg";
 import HomePrdLoader from "@/components/loader/home/home-prd-loader";
@@ -13,6 +14,7 @@ const CategoryProductsArea = ({ categorySlug }) => {
   const tSearch = useTranslations('SearchArea');
   const tProducts = useTranslations('AllProductsArea');
   const tCategories = useTranslations('Categories');
+  const searchParams = useSearchParams();
   
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
@@ -20,9 +22,28 @@ const CategoryProductsArea = ({ categorySlug }) => {
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const itemsPerPage = 12; // Количество товаров на странице
   
+  // Получаем параметры из URL
+  const urlCategoryId = searchParams?.get('categoryId');
+  const urlCategoryName = searchParams?.get('categoryName');
+  
   useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    // Если есть categoryId в URL, устанавливаем его как выбранную категорию
+    if (urlCategoryId) {
+      const categoryId = parseInt(urlCategoryId);
+      // Проверяем, является ли это родительской категорией
+      if ([754099, 754100, 754101].includes(categoryId)) {
+        setSelectedParentCategory(categoryId);
+        setSelectedSubcategory(null);
+      } else {
+        // Это подкатегория
+        setSelectedSubcategory(categoryId);
+        setSelectedParentCategory(null);
+      }
+      setCurrentPage(0); // Сбрасываем на первую страницу
+    }
+  }, [urlCategoryId]);
 
   // Получаем категории для фильтрации
   const {
@@ -73,57 +94,40 @@ const CategoryProductsArea = ({ categorySlug }) => {
   // Получаем ID категории по slug
   const categoryId = getCategoryIdBySlug(categorySlug);
   
-  // Фильтруем товары по выбранной категории или подкатегории
-  const filteredProducts = selectedSubcategory 
+  // Определяем ID выбранной категории (из URL или состояния)
+  const selectedCategoryId = urlCategoryId || selectedSubcategory || selectedParentCategory;
+  
+  console.log('Selected category ID:', selectedCategoryId);
+  console.log('Available products:', safeProductsData.length);
+  
+  // Фильтруем товары по выбранной категории
+  const filteredProducts = selectedCategoryId 
     ? safeProductsData.filter(product => {
-        // Проверяем все возможные форматы ID категории
-        const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
+        // Получаем ID категории товара
+        const productCategoryId = product.category?.id_remonline || product.category?.id || product.category_id;
         
-        // Более надежное сравнение
-        if (!categoryId && !selectedSubcategory) return true;
-        if (!categoryId) return false;
+        if (!productCategoryId) return false;
         
-        const productCategoryId = String(categoryId).trim();
-        const selectedCategoryId = String(selectedSubcategory).trim();
+        // Прямое сравнение ID категории товара с выбранной категорией
+        if (String(productCategoryId).trim() === String(selectedCategoryId).trim()) {
+          return true;
+        }
         
-        return productCategoryId === selectedCategoryId;
+        // Если выбрана родительская категория, показываем товары всех её подкатегорий
+        const productCategory = allCategories.find(cat => {
+          const catId = cat.id_remonline || cat.id;
+          return String(catId).trim() === String(productCategoryId).trim();
+        });
+        
+        if (productCategory && productCategory.parent_id) {
+          return String(productCategory.parent_id).trim() === String(selectedCategoryId).trim();
+        }
+        
+        return false;
       })
-    : selectedParentCategory 
-      ? safeProductsData.filter(product => {
-          // Если выбрана родительская категория, но не выбрана подкатегория,
-          // показываем товары всех подкатегорий этой родительской категории
-          const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
-          if (!categoryId) return false;
-          
-          // Находим категорию товара
-          const productCategory = allCategories.find(cat => {
-            const catId = cat.id_remonline || cat.id;
-            return String(catId).trim() === String(categoryId).trim();
-          });
-          
-          // Проверяем, является ли категория товара подкатегорией выбранной родительской категории
-          return productCategory && String(productCategory.parent_id) === String(selectedParentCategory);
-        })
-      : categoryId 
-        ? safeProductsData.filter(product => {
-            // Проверяем все возможные форматы ID категории
-            const productCategoryId = product.category?.id_remonline || product.category?.id || product.category_id;
-            
-            if (!productCategoryId) return false;
-            
-            // Находим категорию товара
-            const productCategory = allCategories.find(cat => 
-              String(cat.id) === String(productCategoryId) || 
-              String(cat.id_remonline) === String(productCategoryId)
-            );
-            
-            if (!productCategory) return false;
-            
-            // Проверяем, принадлежит ли товар к выбранной категории или её подкатегориям
-            return String(productCategory.id) === String(categoryId) || 
-                   String(productCategory.parent_id) === String(categoryId);
-          })
-        : safeProductsData;
+    : safeProductsData;
+    
+  console.log('Filtered products:', filteredProducts.length);
   
   // Расчет пагинации
   const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -150,11 +154,25 @@ const CategoryProductsArea = ({ categorySlug }) => {
 
   // Получаем название категории
   const getCategoryName = () => {
-    if (categoryId) {
-      const category = allCategories.find(cat => String(cat.id) === String(categoryId));
-      return category?.name || categorySlug;
+    // Если есть название из URL параметров, используем его
+    if (urlCategoryName) {
+      return decodeURIComponent(urlCategoryName);
     }
-    return categorySlug;
+    
+    // Если выбрана подкатегория
+    if (selectedSubcategory) {
+      const category = allCategories.find(cat => String(cat.id) === String(selectedSubcategory));
+      return category?.title || 'Категория';
+    }
+    
+    // Если выбрана родительская категория
+    if (selectedParentCategory) {
+      const category = allCategories.find(cat => String(cat.id) === String(selectedParentCategory));
+      return category?.title || 'Категория';
+    }
+    
+    // Fallback
+    return categorySlug || 'Все товары';
   };
 
   // Получаем описание категории

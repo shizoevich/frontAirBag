@@ -1,6 +1,7 @@
 'use client';
 'use client';
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from 'next/navigation';
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from 'next-intl';
@@ -20,15 +21,37 @@ const FALLBACK_IMAGE = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQ
 const AllProductsArea = () => {
   const t = useTranslations('AllProductsArea');
   const tPagination = useTranslations('SearchArea');
+  const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(0); // Для ReactPaginate (0-based)
   const [selectedParentCategory, setSelectedParentCategory] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const itemsPerPage = 12; // Number of products per page
   
+  // Получаем параметры из URL
+  const urlCategoryId = searchParams?.get('categoryId');
+  const urlCategoryName = searchParams?.get('categoryName');
+  
+  // Определяем выбранную категорию (из URL или из состояния)
+  const selectedCategoryId = urlCategoryId ? parseInt(urlCategoryId) : selectedSubcategory || selectedParentCategory;
+  
+  // Родительские категории (известные ID)
+  const parentCategoryIds = [754099, 754100, 754101]; // Covers, Комплектующие Airbag SRS, Пиропатроны
+  
+  // Определяем, является ли выбранная категория родительской
+  const isParentCategory = selectedCategoryId && parentCategoryIds.includes(selectedCategoryId);
+  
   useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    // Если есть categoryId в URL, устанавливаем его как выбранную категорию
+    if (urlCategoryId) {
+      const categoryId = parseInt(urlCategoryId);
+      setSelectedSubcategory(categoryId);
+      setSelectedParentCategory(null);
+      setCurrentPage(0); // Сбрасываем на первую страницу
+    }
+  }, [urlCategoryId]);
 
   // Get categories for filter
   const {
@@ -37,14 +60,16 @@ const AllProductsArea = () => {
     isError: catError
   } = useGetShowCategoryQuery();
 
-  // Get all products with pagination
+  // Get products with pagination
   const {
     data: productsData = [],
     isLoading: productsLoading,
     isError: productsError
   } = useGetAllProductsQuery({
     limit: itemsPerPage,
-    offset: currentPage * itemsPerPage
+    offset: currentPage * itemsPerPage,
+    categoryId: isParentCategory ? undefined : selectedCategoryId, // Для подкатегорий
+    parentCategoryId: isParentCategory ? selectedCategoryId : undefined // Для родительских категорий
   });
   
   // Get all products for filtering (without pagination)
@@ -98,41 +123,52 @@ const AllProductsArea = () => {
   }
   
   console.log('Processed products data:', safeProductsData);
-
-  // Мы будем использовать фильтрацию на стороне сервера через параметры API
-  // Но для подсчета общего количества товаров с фильтрами нам нужны все товары
-  const filteredAllProducts = selectedSubcategory 
+  console.log('Selected category ID for filtering:', selectedCategoryId);
+  console.log('URL category ID:', urlCategoryId);
+  console.log('Selected subcategory:', selectedSubcategory);
+  
+  // Фильтруем товары по выбранной категории
+  const filteredAllProducts = selectedCategoryId 
     ? allProducts.filter(product => {
         const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
-        if (!categoryId && !selectedSubcategory) return true;
         if (!categoryId) return false;
         
-        const productCategoryId = String(categoryId).trim();
-        const selectedCategoryId = String(selectedSubcategory).trim();
+        const productCategoryId = parseInt(categoryId);
+        const targetCategoryId = parseInt(selectedCategoryId);
         
-        return productCategoryId === selectedCategoryId;
-      })
-    : selectedParentCategory 
-      ? allProducts.filter(product => {
-          const categoryId = product.category?.id_remonline || product.category?.id || product.category_id;
-          if (!categoryId) return false;
-          
+        if (isParentCategory) {
+          // Для родительской категории ищем товары, чьи категории имеют этот parent_id
           const productCategory = allCategories.find(cat => {
             const catId = cat.id_remonline || cat.id;
-            return String(catId).trim() === String(categoryId).trim();
+            return parseInt(catId) === productCategoryId;
           });
           
-          return productCategory && String(productCategory.parent_id) === String(selectedParentCategory);
-        })
-      : allProducts;
+          console.log(`Parent category filter: product category ${productCategoryId}, parent_id: ${productCategory?.parent_id}, target parent: ${targetCategoryId}`);
+          
+          return productCategory && parseInt(productCategory.parent_id) === targetCategoryId;
+        } else {
+          // Для подкатегории сравниваем напрямую
+          console.log(`Subcategory filter: comparing product category ${productCategoryId} with target ${targetCategoryId}`);
+          return productCategoryId === targetCategoryId;
+        }
+      })
+    : allProducts;
       
   // Для текущей страницы используем данные из API с пагинацией
   const filteredProducts = safeProductsData;
 
-  // Calculate pagination using total count from API or filtered count
-  const totalCount = productsData?.count || filteredAllProducts.length;
+  // Calculate pagination - если есть фильтрация, используем отфильтрованные товары
+  const totalCount = selectedCategoryId ? filteredAllProducts.length : (productsData?.count || 0);
   const pageCount = Math.ceil(totalCount / itemsPerPage);
-  const currentProducts = filteredProducts; // Уже получены с пагинацией с сервера
+  
+  // Если есть фильтрация по категории, используем клиентскую пагинацию отфильтрованных товаров
+  const currentProducts = selectedCategoryId 
+    ? filteredAllProducts.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage)
+    : filteredProducts; // Серверная пагинация для всех товаров
+    
+  console.log('Total count:', totalCount);
+  console.log('Page count:', pageCount);
+  console.log('Current products count:', currentProducts.length);
 
   // Handle page change - обновляем currentPage для запроса с пагинацией
   const handlePageClick = (event) => {

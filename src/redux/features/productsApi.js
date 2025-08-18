@@ -5,7 +5,15 @@ export const productsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Получение всех товаров с пагинацией
     getAllProducts: builder.query({
-      query: ({ limit = 12, offset = 0 } = {}) => `/goods/?limit=${limit}&offset=${offset}`,
+      query: ({ limit = 12, offset = 0, categoryId, parentCategoryId } = {}) => {
+        let url = `/goods/?limit=${limit}&offset=${offset}`;
+        if (categoryId) {
+          url += `&category__id_remonline=${categoryId}`;
+        } else if (parentCategoryId) {
+          url += `&category__parent_id=${parentCategoryId}`;
+        }
+        return url;
+      },
       providesTags: ['products']
     }),
     
