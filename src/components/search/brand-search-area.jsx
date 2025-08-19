@@ -14,46 +14,62 @@ import { useTranslations } from 'next-intl';
 // Fallback image URL
 const FALLBACK_IMAGE = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg';
 
-// Function to get brand image based on brand name
+// Function to get brand image based on brand name (same logic as CategoryCarousel)
 const getBrandImage = (brandName) => {
-  if (!brandName) return FALLBACK_IMAGE;
+  if (!brandName) return '/assets/img/category/noimage.png';
   
   const brandLower = brandName.toLowerCase();
   
-  // Map of brand names to their logo images
+  // Map of brand names to their actual image files (same as CategoryCarousel)
   const brandImages = {
-    'jeep': '/assets/img/brands/jeep.png',
-    'hyundai': '/assets/img/brands/hyundai.png',
-    'lexus': '/assets/img/brands/lexus.png',
-    'audi': '/assets/img/brands/audi.png',
-    'acura': '/assets/img/brands/acura.png',
-    'bmw': '/assets/img/brands/bmw.png',
-    'dodge': '/assets/img/brands/dodge.png',
-    'buick': '/assets/img/brands/buick.png',
-    'chevrolet': '/assets/img/brands/chevrolet.png',
-    'ford': '/assets/img/brands/ford.png',
-    'honda': '/assets/img/brands/honda.png',
-    'lincoln': '/assets/img/brands/lincoln.png',
-    'mitsubishi': '/assets/img/brands/mitsubishi.png',
-    'mazda': '/assets/img/brands/mazda.png',
-    'nissan': '/assets/img/brands/nissan.png',
-    'subaru': '/assets/img/brands/subaru.png',
-    'toyota': '/assets/img/brands/toyota.png',
-    'vw': '/assets/img/brands/volkswagen.png',
-    'tesla': '/assets/img/brands/tesla.png',
-    'infiniti': '/assets/img/brands/infiniti.png',
-    'porsche': '/assets/img/brands/porsche.png',
-    'land rover': '/assets/img/brands/landrover.png',
-    'mustang': '/assets/img/brands/mustang.png',
-    'cadillac': '/assets/img/brands/cadillac.png',
-    'mercedes': '/assets/img/brands/mercedes.png',
-    'merсedes': '/assets/img/brands/mercedes.png', // Handle cyrillic 'с'
-    'mini cooper': '/assets/img/brands/mini.png',
-    'gmc': '/assets/img/brands/gmc.png',
-    'fiat': '/assets/img/brands/fiat.png'
+    'jeep': 'jeep.jpg',
+    'hyundai': 'hundai.jpg', // Note: file is named 'hundai.jpg' not 'hyundai.jpg'
+    'lexus': 'lexus.jpg',
+    'audi': 'audi.jpg',
+    'acura': 'acura.jpg',
+    'bmw': 'bmw.jpg',
+    'dodge': 'dodge.jpg',
+    'buick': 'buick.jpg',
+    'chevrolet': 'chevrolet.jpg',
+    'ford': 'ford.jpg',
+    'honda': 'honda.jpg',
+    'lincoln': 'lincoln.jpg',
+    'mitsubishi': 'mitsubishi.jpg',
+    'mazda': 'mazda.jpg',
+    'nissan': 'nissan.jpg',
+    'subaru': 'subaru.jpg',
+    'toyota': 'toyota.jpg',
+    'vw': 'vw.jpg',
+    'tesla': 'tesla.jpg',
+    'infiniti': 'infinity.jpg', // Note: file is named 'infinity.jpg' not 'infiniti.jpg'
+    'porsche': 'porsche.jpg',
+    'land rover': 'land_rover.jpg',
+    'mustang': 'mustang.jpg',
+    'cadillac': 'cadillac.jpg',
+    'mercedes': 'mercedes.jpg',
+    'merсedes': 'mercedes.jpg', // Handle cyrillic 'с'
+    'mini cooper': 'mini_cooper.jpg',
+    'gmc': 'gmc.jpg',
+    'fiat': 'fiat.jpg'
   };
   
-  return brandImages[brandLower] || FALLBACK_IMAGE;
+  // List of known images (same as CategoryCarousel)
+  const knownImages = ['acura.jpg', 'audi.jpg', 'bmw.jpg', 'buick.jpg', 'cadillac.jpg', 
+                      'chevrolet.jpg', 'dodge.jpg', 'fiat.jpg', 'ford.jpg', 'gmc.jpg', 
+                      'honda.jpg', 'hundai.jpg', 'infinity.jpg', 'jaguar.jpg', 'jeep.jpg', 
+                      'kia.jpg', 'land_rover.jpg', 'lexus.jpg', 'lincoln.jpg', 'mazda.jpg', 
+                      'mercedes.jpg', 'mini_cooper.jpg', 'mitsubishi.jpg', 'mustang.jpg', 
+                      'nissan.jpg', 'porsche.jpg', 'subaru.jpg', 'tesla.jpg', 'toyota.jpg', 
+                      'volvo.jpg', 'vw.jpg', 'noimage.png'];
+  
+  let imageName = brandImages[brandLower] || 'noimage.png';
+  
+  // Check if the image exists in known images
+  if (!knownImages.includes(imageName)) {
+    imageName = 'noimage.png';
+  }
+  
+  return `/assets/img/category/${imageName}`;
 };
 
 const BrandSearchArea = () => {
