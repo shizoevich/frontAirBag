@@ -7,6 +7,7 @@ import productModalSlice from "./features/productModalSlice";
 import shopFilterSlice from "./features/shop-filter-slice";
 import couponSlice from "./features/coupon/couponSlice";
 import orderSlice from "./features/order/orderSlice";
+import { authMiddleware } from "./middleware/authMiddleware";
 
 const store = configureStore({
   reducer: {
@@ -20,7 +21,10 @@ const store = configureStore({
     order:orderSlice,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(apiSlice.middleware),
+    getDefaultMiddleware()
+      .concat(apiSlice.middleware)
+      .prepend(authMiddleware.middleware),
 });
 
 export default store;
+export { store };

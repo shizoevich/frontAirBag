@@ -38,7 +38,7 @@ const ProductDetailsArea = ({ id }) => {
       category: product.category || { id: '0', name: 'Uncategorized' },
       title: product.title || 'No title',
       // Добавляем дефолтные значения для обязательных полей
-      price_minor: product.price_minor/ 100 ?? 0,
+      price_minor: product.price_minor ?? 0,
       images: product.images || [],
       description: product.description || '',
     };

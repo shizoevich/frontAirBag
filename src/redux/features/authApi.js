@@ -30,6 +30,12 @@ export const authApi = apiSlice.injectEndpoints({
         body: { token },
       }),
     }),
+
+    // Получение информации о текущем пользователе
+    getMe: builder.query({
+      query: () => '/auth/me/',
+      providesTags: ['User'],
+    }),
   }),
 });
 
@@ -37,4 +43,5 @@ export const {
   useLoginMutation,
   useRefreshTokenMutation,
   useVerifyTokenMutation,
+  useGetMeQuery,
 } = authApi;

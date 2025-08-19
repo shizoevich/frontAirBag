@@ -172,7 +172,7 @@ const CategoryProductsArea = ({ categorySlug }) => {
     }
     
     // Fallback
-    return categorySlug || 'Все товары';
+    return categorySlug;
   };
 
   // Получаем описание категории
@@ -204,8 +204,8 @@ const CategoryProductsArea = ({ categorySlug }) => {
               categories={allCategories}
               isLoading={catLoading}
               isError={catError}
-              selectedCategory={selectedParentCategory}
-              onCategorySelect={handleParentCategoryChange}
+              selectedParentCategory={selectedParentCategory}
+              onParentCategorySelect={handleParentCategoryChange}
             />
           </div>
         </div>

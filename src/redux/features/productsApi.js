@@ -47,7 +47,7 @@ export const productsApi = apiSlice.injectEndpoints({
     // Get all products to debug category relationships
     getAllProductsDebug: builder.query({
       query: () => {
-        const url = `/goods/?limit=100`;
+        const url = `/goods/?limit=12`;
         console.log('Debug: Getting all products to check categories');
         return url;
       },

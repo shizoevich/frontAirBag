@@ -1,7 +1,7 @@
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
-import CategoryProductsArea from "@/components/categories/category-products-area";
+import AllProductsArea from "@/components/products/all-products-area";
 
 export async function generateMetadata({ params: { locale } }) {
   return {
@@ -14,7 +14,7 @@ export default function ShopPage({ params }) {
   return (
     <Wrapper>
       <Header />
-      <CategoryProductsArea />
+      <AllProductsArea />
       <Footer primary_style={true} />
     </Wrapper>
   );

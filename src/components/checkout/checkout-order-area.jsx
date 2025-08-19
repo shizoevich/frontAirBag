@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 // internal
 import useCartInfo from "@/hooks/use-cart-info";
 import ErrorMsg from "../common/error-msg";
+import DiscountForm from "../discount/discount-form";
 
 const CheckoutOrderArea = ({ checkoutData }) => {
   const {
@@ -100,7 +101,7 @@ const CheckoutOrderArea = ({ checkoutData }) => {
            {/* discount */}
            <li className="tp-order-info-list-subtotal">
             <span>Discount</span>
-            <span>${discountAmount.toFixed(2)}</span>
+            <span>-${discountAmount.toFixed(2)}</span>
           </li>
 
           {/* total */}
@@ -110,6 +111,18 @@ const CheckoutOrderArea = ({ checkoutData }) => {
           </li>
         </ul>
       </div>
+      
+      {/* Discount Form */}
+      <div className="tp-checkout-discount-wrapper mb-4">
+        <DiscountForm 
+          currentTotal={total + shippingCost}
+          onDiscountApplied={(discount, amount, newTotal) => {
+            // This would be handled by parent component
+            console.log('Discount applied:', { discount, amount, newTotal });
+          }}
+        />
+      </div>
+      
       <div className="tp-checkout-payment">
         <div className="tp-checkout-payment-item">
           <input
