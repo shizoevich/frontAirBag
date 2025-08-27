@@ -358,61 +358,35 @@
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  min-width: 48px !important;
-  height: 48px !important;
-  padding: 12px 16px !important;
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  color: #555555 !important;
-  background-color: #ffffff !important;
-  border: 2px solid #e5e5e5 !important;
-  border-radius: 8px !important;
+  width: 40px !important;
+  height: 40px !important;
+  border: 1px solid #e0e0e0 !important;
+  color: #666 !important;
   text-decoration: none !important;
+  margin: 0 2px !important;
+  border-radius: 4px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
   transition: all 0.3s ease !important;
-  cursor: pointer !important;
-  user-select: none !important;
 }
 
-/* Эффект при наведении */
 .tp-pagination-link:hover {
-  color: #ffffff !important;
-  background-color: #0989ff !important;
-  border-color: #0989ff !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(9, 137, 255, 0.3) !important;
+  background-color: #f5f5f5 !important;
+  border-color: #ccc !important;
+  color: #333 !important;
 }
 
-/* Активная страница (текущая) */
 .tp-pagination-link.active {
-  color: #ffffff !important;
-  background-color: #0989ff !important;
-  border-color: #0989ff !important;
-  box-shadow: 0 4px 16px rgba(9, 137, 255, 0.4) !important;
-  transform: scale(1.1) !important;
-  font-weight: 700 !important;
+  background-color: #007bff !important;
+  border-color: #007bff !important;
+  color: white !important;
+  pointer-events: none !important;
 }
 
-/* Активная страница при наведении */
-.tp-pagination-link.active:hover {
-  background-color: #0770d9 !important;
-  border-color: #0770d9 !important;
-  transform: scale(1.1) translateY(-1px) !important;
-}
-
-/* Стили для кнопок "Предыдущая" и "Следующая" */
-.tp-pagination-link:first-child,
-.tp-pagination-link:last-child {
-  font-weight: 700 !important;
-  color: #0989ff !important;
-  border-color: #0989ff !important;
-  background-color: #f8fbff !important;
-}
-
-.tp-pagination-link:first-child:hover,
-.tp-pagination-link:last-child:hover {
-  color: #ffffff !important;
-  background-color: #0989ff !important;
-  border-color: #0989ff !important;
+.tp-pagination-link.disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
 }
 
 /* Стили для разделителя (...) */

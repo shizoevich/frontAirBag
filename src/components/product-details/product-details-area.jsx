@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PrdDetailsLoader from "../loader/prd-details-loader";
 import ErrorMsg from "../common/error-msg";
-import ProductDetailsBreadcrumb from "../breadcrumb/product-details-breadcrumb";
 import { useGetProductByIdQuery } from "@/redux/features/productsApi";
 import ProductDetailsContent from "./product-details-content";
 
@@ -84,10 +83,6 @@ const ProductDetailsArea = ({ id }) => {
   // Успешная загрузка
   return (
     <>
-      <ProductDetailsBreadcrumb 
-        category={safeProduct.category.name} 
-        title={safeProduct.title} 
-      />
       <ProductDetailsContent productItem={safeProduct} />
     </>
   );

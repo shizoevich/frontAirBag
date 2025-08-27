@@ -12,11 +12,21 @@ import { useRegisterUserMutation } from "@/redux/features/auth/authApi";
 
 // schema
 const schema = Yup.object().shape({
-  name: Yup.string().required().label("Name"),
-  email: Yup.string().required().email().label("Email"),
-  password: Yup.string().required().min(6).label("Password"),
+  name: Yup.string()
+    .required("Имя обязательно для заполнения")
+    .min(2, "Имя должно содержать минимум 2 символа")
+    .label("Name"),
+  email: Yup.string()
+    .required("Email обязателен для заполнения")
+    .email("Введите корректный email адрес")
+    .label("Email"),
+  password: Yup.string()
+    .required("Пароль обязателен для заполнения")
+    .min(6, "Пароль должен содержать минимум 6 символов")
+    .matches(/^(?=.*[a-zA-Z])(?=.*\d)/, "Пароль должен содержать буквы и цифры")
+    .label("Password"),
   remember: Yup.bool()
-    .oneOf([true], "You must agree to the terms and conditions to proceed.")
+    .oneOf([true], "Необходимо согласиться с условиями использования")
     .label("Terms and Conditions"),
 });
 
@@ -34,15 +44,43 @@ const RegisterForm = () => {
       name: data.name,
       email: data.email,
       password: data.password,
-    }).then((result) => {
-      if (result?.error) {
-        notifyError("Register Failed");
-      } else {
-        notifySuccess(result?.data?.message);
+      confirm_password: data.password,
+    })
+      .unwrap()
+      .then((result) => {
+        notifySuccess(result?.message || "Регистрация прошла успешно!");
         router.push('/checkout');
-      }
-    });
-    reset();
+      })
+      .catch((error) => {
+        console.error('Registration error:', error);
+        
+        // Обработка различных типов ошибок
+        let errorMessage = "Ошибка регистрации";
+        
+        if (error?.data) {
+          if (error.data.email) {
+            errorMessage = `Email: ${error.data.email[0]}`;
+          } else if (error.data.password) {
+            errorMessage = `Пароль: ${error.data.password[0]}`;
+          } else if (error.data.name) {
+            errorMessage = `Имя: ${error.data.name[0]}`;
+          } else if (error.data.non_field_errors) {
+            errorMessage = error.data.non_field_errors[0];
+          } else if (error.data.detail) {
+            errorMessage = error.data.detail;
+          }
+        } else if (error?.status === 400) {
+          errorMessage = "Проверьте правильность введенных данных";
+        } else if (error?.status >= 500) {
+          errorMessage = "Ошибка сервера. Попробуйте позже";
+        }
+        
+        notifyError(errorMessage);
+      })
+      .finally(() => {
+        // Сбрасываем только пароль для безопасности
+        reset({ password: '' }, { keepValues: true });
+      });
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

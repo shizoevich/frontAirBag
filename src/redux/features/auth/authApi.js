@@ -128,33 +128,124 @@ export const authApi = apiSlice.injectEndpoints({
     // Выход пользователя
     logout: builder.mutation({
       query: () => ({
-        url: "/auth/logout/", // Если есть такой эндпоинт
+        url: "/auth/logout/", // Эндпоинт для logout
         method: "POST",
       }),
       
       // Даже если запрос не удался, мы всё равно выполняем logout на клиенте
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        // Сначала очищаем клиентские данные
+        Cookies.remove('userInfo');
+        dispatch(userLoggedOut());
+        
         try {
           await queryFulfilled;
+          console.log('Server logout successful');
         } catch (err) {
-          console.error('Logout error:', err);
-        } finally {
-          // В любом случае удаляем токены и данные пользователя
-          Cookies.remove('userInfo');
-          dispatch(userLoggedOut());
+          console.log('Server logout failed, but client logout completed:', err?.status || 'Unknown error');
+          // Не показываем ошибку пользователю, так как клиентский logout уже выполнен
         }
       },
     }),
     
-    // Регистрация пользователя (если нужно)
-    registerUser: builder.mutation({
+    // Регистрация пользователя
+    register: builder.mutation({
       query: (data) => ({
-        url: "/auth/register/", // Укажите правильный эндпоинт для регистрации
+        url: "/auth/register/",
         method: "POST",
         body: data,
       }),
+      
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          console.log("Registration successful:", result);
+          
+          // Если была передана guest_id, это конверсия гостя в клиента
+          if (arg.guest_id) {
+            console.log("Guest-to-client conversion completed");
+            
+            // После конверсии нужно выполнить логин для получения новых токенов
+            const loginResult = await dispatch(
+              authApi.endpoints.login.initiate({
+                email: arg.email,
+                password: arg.password,
+                remember: true,
+              })
+            ).unwrap();
+            
+            console.log("Post-conversion login successful:", loginResult);
+          }
+        } catch (err) {
+          console.error('Registration error:', err);
+        }
+      },
     }),
-    
+
+    // Создание гостевого аккаунта
+    createGuest: builder.mutation({
+      query: (data) => ({
+        url: "/auth/guest/", // Специальный эндпоинт для создания гостя
+        method: "POST",
+        body: {
+          name: data.name || "Test",
+          last_name: data.last_name || "Guest",
+          phone: data.phone || "",
+          nova_post_address: data.nova_post_address || ""
+        },
+      }),
+      
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          console.log("Guest creation successful:", result);
+          
+          // Ожидаем, что эндпоинт /auth/guest/ вернет токены напрямую
+          const { access, refresh, guest_id } = result.data;
+          
+          if (access && refresh) {
+            // Сохраняем гостевые токены
+            const guestData = {
+              accessToken: access,
+              refreshToken: refresh,
+              isGuest: true,
+              guestId: guest_id,
+            };
+            
+            Cookies.set(
+              "userInfo",
+              JSON.stringify(guestData),
+              { expires: 365 } // Гостевые токены на год (бессрочные refresh)
+            );
+            
+            console.log("Guest tokens saved:", guestData);
+            
+            // Обновляем состояние Redux
+            dispatch(
+              userLoggedIn({
+                accessToken: access,
+                user: null, // Гость не имеет полных данных пользователя
+                isGuest: true,
+                guestId: guest_id,
+              })
+            );
+            
+            console.log("Guest state updated in Redux");
+          } else {
+            throw new Error("Гостевые токены не были получены");
+          }
+
+        } catch (err) {
+          console.error('Guest creation error:', err);
+          console.error('Error details:', {
+            message: err?.message,
+            status: err?.status,
+            data: err?.data
+          });
+          throw err;
+        }
+      },
+    }),
     // Обновление профиля пользователя
     updateProfile: builder.mutation({
       query: (data) => ({
@@ -185,6 +276,7 @@ export const authApi = apiSlice.injectEndpoints({
 export const {
   useLoginMutation,
   useRegisterUserMutation,
+  useCreateGuestMutation,
   useGetUserQuery,
   useRefreshTokenMutation,
   useVerifyTokenMutation,

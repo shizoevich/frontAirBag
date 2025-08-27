@@ -22,14 +22,17 @@ function ProfileSetting() {
     logout()
       .unwrap()
       .then(() => {
-        // Перенаправление на главную страницу с учетом локали
-        router.push(`/${locale}`);
+        // Logout всегда успешен на клиенте
+        console.log('Logout completed successfully');
       })
-      .catch((error) => {
-        console.error('Logout error:', error);
+      .catch(() => {
+        // Игнорируем ошибки сервера, так как клиентский logout уже выполнен
+        console.log('Logout completed (server error ignored)');
       })
       .finally(() => {
         setIsActive(false);
+        // Перенаправление на главную страницу с учетом локали
+        router.push(`/${locale}`);
       });
   }
 

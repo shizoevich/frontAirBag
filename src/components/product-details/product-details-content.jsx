@@ -5,6 +5,7 @@ import DetailsWrapper from "./details-wrapper";
 import { useDispatch } from "react-redux";
 import DetailsTabNav from "./details-tab-nav";
 import RelatedProducts from "./related-products";
+import ProductsBoughtTogether from "./products-bought-together";
 
 const ProductDetailsContent = ({ productItem }) => {
   const { _id, img, images, imageURLs, videoId, status } = productItem || {};
@@ -37,7 +38,7 @@ const ProductDetailsContent = ({ productItem }) => {
 
   return (
     <section className="tp-product-details-area">
-      <div className="tp-product-details-top pb-115 pt-0">
+      <div className="tp-product-details-top pb-115 pt-50">
         <div className="container">
           <div className="row">
             <div className="col-xl-7 col-lg-6">
@@ -67,20 +68,9 @@ const ProductDetailsContent = ({ productItem }) => {
         </div>
       </div>
 
-      {/* related products start */}
-      <section className="tp-related-product pt-0 pb-0">
-        <div className="container">
-          <div className="row">
-            <div className="tp-section-title-wrapper-6 text-center mb-40">
-              <h3 className="tp-section-title-6">Related Products</h3>
-            </div>
-          </div>
-          <div className="row">
-            <RelatedProducts id={_id} />
-          </div>
-        </div>
-      </section>
-      {/* related products end */}
+      {/* products bought together start */}
+      <ProductsBoughtTogether togetherBuyProducts={productItem?.together_buy} />
+      {/* products bought together end */}
     </section>
   );
 };

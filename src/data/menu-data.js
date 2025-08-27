@@ -41,15 +41,7 @@ const menu_data = [
           { titleKey: 'menu.pyroDashboard', link: '/shop/pyro-dashboard' },
         ]
       },
-      {
-        titleKey: 'menu.myAccount',
-        link: '/profile',
-        mega_menus: [
-          { titleKey: 'menu.cart', link: '/cart' },
-          { titleKey: 'menu.checkout', link: '/checkout' },
-          { titleKey: 'menu.myOrders', link: '/order' },
-        ]
-      },
+
     ]
   },
   {
@@ -63,6 +55,20 @@ const menu_data = [
     single_link: true,
     titleKey: 'menu.discounts',
     link: '/coupon',
+  },
+  {
+    id: 6,
+    user_account: true,
+    titleKey: 'menu.myAccount',
+    link: '/profile',
+    account_pages: [
+      { titleKey: 'menu.cart', link: '/cart', showAlways: true },
+      { titleKey: 'menu.checkout', link: '/checkout', showAlways: true },
+      { titleKey: 'menu.myOrders', link: '/order', showAlways: true },
+      { titleKey: 'menu.login', link: '/login', showForGuests: true },
+      { titleKey: 'menu.register', link: '/register', showForGuests: true },
+      { titleKey: 'menu.logout', link: '/logout', showForAuth: true },
+    ]
   },
 ]
 

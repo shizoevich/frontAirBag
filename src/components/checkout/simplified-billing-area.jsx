@@ -119,16 +119,24 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
     // В ответе searchSettlements корректный идентификатор города для складов — это DeliveryCity
     const cityRef = city.DeliveryCity || city.CityRef || city.Ref || city.SettlementRef;
     setSelectedCity(cityRef || '');
+    setSelectedCityName(city.Present);
     setValue('city', city.Present);
     setSearchCity(city.Present);
     setShowCityDropdown(false);
+    
+    // Сбрасываем выбранное отделение при смене города
+    setSelectedWarehouse('');
+    setSelectedWarehouseName('');
+    setSearchWarehouse('');
+    setValue('warehouse', '');
+    setWarehouses([]);
+    setShowWarehouseDropdown(false);
+    
     if (cityRef) {
       // Вызываем fetchWarehouses вместо searchWarehouses
       fetchWarehouses();
     } else {
       console.warn('CityRef is missing on selected city item:', city);
-      setWarehouses([]);
-      setShowWarehouseDropdown(false);
     }
   };
 
@@ -140,10 +148,31 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
 
   // Обработка выбора отделения
   const handleWarehouseSelect = (warehouse) => {
+    setSelectedWarehouse(warehouse.Ref);
+    setSelectedWarehouseName(warehouse.Description);
     setValue('warehouse', warehouse.Description);
     setSearchWarehouse(warehouse.Description);
     setShowWarehouseDropdown(false);
+    
+    // Формируем полный адрес для сохранения
+    const fullAddress = `${selectedCityName}, ${warehouse.Description}`;
+    setValue('novaPostAddress', fullAddress);
   };
+
+  // Обработка кликов вне выпадающих списков
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.tp-register-input-dropdown')) {
+        setShowCityDropdown(false);
+        setShowWarehouseDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     // Загружаем города при монтировании компонента
@@ -297,10 +326,13 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
               <div className="tp-checkout-input">
                 <label>{t('order_notes')}</label>
                 <textarea
-                  {...register('orderNote')}
+                  {...register('orderNotes')}
                   placeholder={t('order_notes')}
                   rows="5"
                 ></textarea>
+                {errors?.orderNotes && (
+                  <span className="error-msg">{errors.orderNotes.message}</span>
+                )}
               </div>
             </div>
           </div>

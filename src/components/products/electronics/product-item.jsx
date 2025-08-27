@@ -95,10 +95,10 @@ const ProductItem = ({ product }) => {
       </div>
       
       {/* product content */}
-      <div className="tp-product-content" style={{ height: '120px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div className="tp-product-content" style={{ height: '160px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
           <div className="tp-product-category">
-            <a href="#">{category?.title}</a>
+            <a href="#">{category?.name}</a>
           </div>
           <h3 className="tp-product-title" style={{ 
             height: '48px', 
@@ -108,11 +108,54 @@ const ProductItem = ({ product }) => {
             WebkitBoxOrient: 'vertical',
             lineHeight: '24px'
           }}>
-            <Link href={`/product-details/${id}`}>{title}</Link>
+            <Link href={`/product-details/${id || ''}`}>{title}</Link>
           </h3>
         </div>
-        <div className="tp-product-price-wrapper">
-          <span className="tp-product-price new-price">{(price_minor/100)?.toFixed(2)} ₴</span>
+        <div className="d-flex flex-column gap-2">
+          <div className="tp-product-price-wrapper">
+            <span className="tp-product-price">{(Number(price_minor || 0) / 100).toFixed(2)} ₴</span>
+          </div>
+          <div>
+            {isAddedToCart ? (
+              <Link
+                href="/cart"
+                className="tp-btn-sm w-100 d-inline-block text-center"
+                style={{
+                  fontSize: '14px',
+                  padding: '8px 15px',
+                  backgroundColor: '#010F1C',
+                  color: '#fff',
+                  borderRadius: '4px'
+                }}
+              >
+                <span style={{ marginRight: '5px', display: 'inline-block', verticalAlign: 'middle' }}>
+                  <Cart width={16} height={16} />
+                </span>
+                {t('viewCart')}
+              </Link>
+            ) : (
+              <button
+                onClick={() => handleAddProduct(product)}
+                type="button"
+                className="tp-btn-sm w-100"
+                disabled={isOutOfStock}
+                style={{
+                  fontSize: '14px',
+                  padding: '8px 15px',
+                  backgroundColor: isOutOfStock ? '#ccc' : '#9e54a1',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: isOutOfStock ? 'not-allowed' : 'pointer'
+                }}
+              >
+                <span style={{ marginRight: '5px', display: 'inline-block', verticalAlign: 'middle' }}>
+                  <Cart width={16} height={16} />
+                </span>
+                {t('addToCart')}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

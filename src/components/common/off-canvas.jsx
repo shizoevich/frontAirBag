@@ -59,10 +59,6 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
               </div>
             </div>
             <div className="offcanvas__category pb-40">
-              <button onClick={() => setIsCategoryActive(!isCategoryActive)} className="tp-offcanvas-category-toggle">
-                <i className="fa-solid fa-bars"></i>
-                {t('all_categories')}
-              </button>
               <div className="tp-category-mobile-menu">
                 <nav className={`tp-category-menu-content ${isCategoryActive ? "active" : ""}`}>
                   {/* Убрали передачу categoryType */}

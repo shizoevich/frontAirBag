@@ -1,12 +1,34 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { useCreateOrderMutation } from "@/redux/features/ordersApi";
-import { useGetMeQuery } from "@/redux/features/authApi";
+import { useGetUserQuery, useCreateGuestMutation } from "@/redux/features/auth/authApi";
 import { clearCart } from "@/redux/features/cartSlice";
 import { notifySuccess, notifyError } from "@/utils/toast";
+import Cookies from "js-cookie";
+
+// Валидационная схема для checkout формы
+const checkoutSchema = Yup.object().shape({
+  firstName: Yup.string()
+    .required("Имя обязательно для заполнения")
+    .min(2, "Имя должно содержать минимум 2 символа"),
+  lastName: Yup.string()
+    .required("Фамилия обязательна для заполнения")
+    .min(2, "Фамилия должна содержать минимум 2 символа"),
+  phone: Yup.string()
+    .required("Телефон обязателен для заполнения")
+    .matches(/^[\+]?[0-9\(\)\-\s]+$/, "Введите корректный номер телефона"),
+  city: Yup.string()
+    .required("Выберите город"),
+  warehouse: Yup.string()
+    .required("Выберите отделение Новой Почты"),
+  orderNotes: Yup.string()
+    .max(500, "Комментарий не должен превышать 500 символов")
+});
 
 const useOrderCheckout = () => {
   const [shippingCost, setShippingCost] = useState(0);
@@ -23,10 +45,14 @@ const useOrderCheckout = () => {
   const router = useRouter();
   const { cart_products } = useSelector((state) => state.cart);
   const { user, accessToken } = useSelector((state) => state.auth);
-  const { data: userData } = useGetMeQuery(undefined, { skip: !accessToken });
+  const { data: userData } = useGetUserQuery(undefined, { skip: !accessToken });
   const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
+  const [createGuest, { isLoading: isCreatingGuest }] = useCreateGuestMutation();
 
-  const { register, handleSubmit, setValue, formState: { errors }, watch } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors }, watch } = useForm({
+    resolver: yupResolver(checkoutSchema),
+    mode: 'onChange', // Валидация при изменении полей
+  });
 
   let couponRef = useRef("");
 
@@ -92,6 +118,47 @@ const useOrderCheckout = () => {
         }))
       };
 
+      // Если пользователь не авторизован, создаем гостевой аккаунт
+      if (!accessToken) {
+        console.log("Creating guest account for order...");
+        const guestData = {
+          name: data.firstName,
+          last_name: data.lastName,
+          phone: data.phone,
+          nova_post_address: novaPostAddress
+        };
+        
+        try {
+          const guestResult = await createGuest(guestData).unwrap();
+          console.log("Guest account created successfully:", guestResult);
+          
+          // Проверяем, что токены были сохранены
+          const userInfo = Cookies.get('userInfo');
+          console.log("Tokens after guest creation:", userInfo);
+          
+          if (!userInfo) {
+            throw new Error("Токены гостя не были сохранены");
+          }
+          
+          // Даем время для обновления токенов в Redux store и cookies
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Проверяем еще раз
+          const finalUserInfo = Cookies.get('userInfo');
+          console.log("Final tokens check:", finalUserInfo);
+          
+        } catch (guestError) {
+          console.error("Failed to create guest account:", guestError);
+          console.error("Guest error details:", {
+            message: guestError?.message,
+            status: guestError?.status,
+            data: guestError?.data
+          });
+          
+          throw new Error("Не удалось создать гостевой аккаунт. Попробуйте еще раз.");
+        }
+      }
+
       // Создаем заказ
       const result = await createOrder(orderData).unwrap();
       
@@ -120,7 +187,40 @@ const useOrderCheckout = () => {
       
     } catch (error) {
       console.error("Ошибка создания заказа:", error);
-      notifyError("Ошибка при создании заказа. Попробуйте еще раз.");
+      console.error("Error details:", {
+        message: error?.message,
+        status: error?.status,
+        data: error?.data,
+        originalStatus: error?.originalStatus,
+        error: error?.error
+      });
+      
+      // Более детальное сообщение об ошибке
+      let errorMessage = "Ошибка при создании заказа. Попробуйте еще раз.";
+      
+      if (error?.data) {
+        if (error.data.detail) {
+          errorMessage = error.data.detail;
+        } else if (error.data.message) {
+          errorMessage = error.data.message;
+        } else if (error.data.non_field_errors) {
+          errorMessage = error.data.non_field_errors[0];
+        } else if (error.data.phone) {
+          errorMessage = `Телефон: ${error.data.phone[0]}`;
+        } else if (error.data.nova_post_address) {
+          errorMessage = `Адрес доставки: ${error.data.nova_post_address[0]}`;
+        }
+      } else if (error?.status === 400) {
+        errorMessage = "Проверьте правильность заполнения всех полей";
+      } else if (error?.status === 401) {
+        errorMessage = "Ошибка авторизации. Попробуйте войти в аккаунт";
+      } else if (error?.status >= 500) {
+        errorMessage = "Ошибка сервера. Попробуйте позже";
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      notifyError(errorMessage);
     } finally {
       setIsCheckoutSubmit(false);
     }

@@ -2,17 +2,25 @@
 import React, {useState, useEffect} from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { mobile_menu } from "@/data/menu-data";
+import menu_data from "@/data/menu-data";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { closeCartMini } from "@/redux/features/cartSlice";
 import { useTranslations } from 'next-intl';
+import { useLogoutMutation } from '@/redux/features/auth/authApi';
 
 const MobileMenus = ({setIsCanvasOpen}) => {
   const [isActiveMenu, setIsActiveMenu] = useState("");
   const router = useRouter();
   const dispatch = useDispatch();
   const t = useTranslations('menu');
+  const { user, accessToken, isGuest } = useSelector((state) => state.auth);
+  const [logout] = useLogoutMutation();
+
+  // Определяем статус пользователя для отображения соответствующих пунктов меню
+  const isAuthenticated = !!accessToken;
+  const isAuthenticatedUser = isAuthenticated && !isGuest;
+  const isGuestOrUnauthenticated = !isAuthenticated || isGuest;
 
   // handleOpenSubMenu
   const handleOpenSubMenu = (title) => {
@@ -30,22 +38,44 @@ const MobileMenus = ({setIsCanvasOpen}) => {
     dispatch(closeCartMini()); // Close cart mini if open
     router.push(link);
   }
+
+  // Обработка выхода из системы
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    try {
+      await logout().unwrap();
+    } catch (error) {
+      // Игнорируем ошибки сервера при logout
+    }
+    setIsCanvasOpen(false);
+    router.push('/');
+  };
+
+  // Фильтрация пунктов меню аккаунта в зависимости от статуса авторизации
+  const filterAccountPages = (pages) => {
+    return pages.filter(page => {
+      if (page.showAlways) return true;
+      if (page.showForGuests && isGuestOrUnauthenticated) return true;
+      if (page.showForAuth && isAuthenticatedUser) return true;
+      return false;
+    });
+  };
   return (
     <>
       <nav className="tp-main-menu-content">
-        {mobile_menu.map((menu, i) => (
-          <ul key={i}>
-            {menu.homes ? (
-              <li className={`has-dropdown has-mega-menu ${isActiveMenu === menu.title ? 'dropdown-opened':''}`}>
-                <a className={`${isActiveMenu === menu.title ? 'expanded':''}`}>
-                  Home
-                  <button onClick={()=> handleOpenSubMenu(menu.title)} className={`dropdown-toggle-btn ${isActiveMenu === menu.title ? 'dropdown-opened':''}`}>
+        <ul>
+          {menu_data.map((menu) =>
+            menu.homes ? (
+              <li key={menu.id} className={`has-dropdown has-mega-menu ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
+                <a className={`${isActiveMenu === menu.titleKey ? 'expanded':''}`}>
+                  {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
+                  <button onClick={()=> handleOpenSubMenu(menu.titleKey)} className={`dropdown-toggle-btn ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
                     <i className="fa-regular fa-angle-right"></i>
                   </button>
                 </a>
-                <div className={`home-menu tp-submenu tp-mega-menu ${isActiveMenu === menu.title ? 'active':''}`}>
+                <div className={`home-menu tp-submenu tp-mega-menu ${isActiveMenu === menu.titleKey ? 'active':''}`}>
                   <div className="row row-cols-1 row-cols-lg-4 row-cols-xl-5">
-                    {menu.home_pages.map((home, i) => (
+                    {menu.home_pages && menu.home_pages.map((home, i) => (
                       <div key={i} className="col">
                         <div className="home-menu-item">
                           <Link href={home.link} onClick={() => handleNavigation(home.link)}>
@@ -62,29 +92,75 @@ const MobileMenus = ({setIsCanvasOpen}) => {
                   </div>
                 </div>
               </li>
-            ) : menu.sub_menu ? (
-              <li key={menu.id} className={`has-dropdown ${isActiveMenu === menu.title ? 'dropdown-opened':''}`}>
-                <a className={`${isActiveMenu === menu.title ? 'expanded':''}`}>
+            ) : menu.products ? (
+              <li key={menu.id} className={`has-dropdown ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
+                <a className={`${isActiveMenu === menu.titleKey ? 'expanded':''}`}>
                   {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
-                  <button onClick={()=> handleOpenSubMenu(menu.title)} className={`dropdown-toggle-btn ${isActiveMenu === menu.title ? 'dropdown-opened':''}`}>
+                  <button onClick={()=> handleOpenSubMenu(menu.titleKey)} className={`dropdown-toggle-btn ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
                     <i className="fa-regular fa-angle-right"></i>
                   </button>
                 </a>
-                <ul className={`tp-submenu ${isActiveMenu === menu.title ? 'active':''}`}>
+                <ul className={`tp-submenu ${isActiveMenu === menu.titleKey ? 'active':''}`}>
+                  {menu.product_pages.map((p, i) => (
+                    <li key={i}>
+                      <Link href={p.link} onClick={() => handleNavigation(p.link)}>
+                        {p.titleKey ? t(p.titleKey.replace('menu.', '')) : p.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ) : menu.user_account ? (
+              <li key={menu.id} className={`has-dropdown ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
+                <a className={`${isActiveMenu === menu.titleKey ? 'expanded':''}`}>
+                  {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
+                  <button onClick={()=> handleOpenSubMenu(menu.titleKey)} className={`dropdown-toggle-btn ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
+                    <i className="fa-regular fa-angle-right"></i>
+                  </button>
+                </a>
+                <ul className={`tp-submenu ${isActiveMenu === menu.titleKey ? 'active':''}`}>
+                  {filterAccountPages(menu.account_pages).map((page, i) => (
+                    <li key={i}>
+                      {page.titleKey === 'menu.logout' ? (
+                        <a href="#" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+                          {t(page.titleKey.replace('menu.', ''))}
+                        </a>
+                      ) : (
+                        <Link href={page.link} onClick={() => handleNavigation(page.link)}>
+                          {t(page.titleKey.replace('menu.', ''))}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ) : menu.sub_menu ? (
+              <li key={menu.id} className={`has-dropdown ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
+                <a className={`${isActiveMenu === menu.titleKey ? 'expanded':''}`}>
+                  {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
+                  <button onClick={()=> handleOpenSubMenu(menu.titleKey)} className={`dropdown-toggle-btn ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
+                    <i className="fa-regular fa-angle-right"></i>
+                  </button>
+                </a>
+                <ul className={`tp-submenu ${isActiveMenu === menu.titleKey ? 'active':''}`}>
                   {menu.sub_menus.map((b, i) => (
                     <li key={i}>
-                      <Link href={b.link} onClick={() => handleNavigation(b.link)}>{b.titleKey ? t(b.titleKey.replace('menu.', '')) : b.title}</Link>
+                      <Link href={b.link} onClick={() => handleNavigation(b.link)}>
+                        {b.titleKey ? t(b.titleKey.replace('menu.', '')) : b.title}
+                      </Link>
                     </li>
                   ))}
                 </ul>
               </li>
             ) : (
               <li key={menu.id}>
-                <Link href={menu.link} onClick={() => handleNavigation(menu.link)}>{menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
+                <Link href={menu.link} onClick={() => handleNavigation(menu.link)}>
+                  {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
+                </Link>
               </li>
-            )}
-          </ul>
-        ))}
+            )
+          )}
+        </ul>
       </nav>
     </>
   );

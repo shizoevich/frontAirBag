@@ -9,15 +9,19 @@ const getUserFromCookies = () => {
       const parsedInfo = JSON.parse(userInfo);
       return {
         accessToken: parsedInfo.accessToken,
-        user: parsedInfo.user || undefined
+        user: parsedInfo.user || null,
+        isGuest: parsedInfo.isGuest || false,
+        guestId: parsedInfo.guestId || null
       };
     }
   } catch (error) {
     console.error('Error parsing user info from cookies:', error);
   }
   return {
-    accessToken: undefined,
-    user: undefined
+    accessToken: null,
+    user: null,
+    isGuest: false,
+    guestId: null
   };
 };
 
@@ -34,11 +38,23 @@ const authSlice = createSlice({
       }
       if (payload.user !== undefined) {
         state.user = payload.user;
+        // Если пользователь получен из API, проверяем is_guest флаг
+        if (payload.user && payload.user.is_guest !== undefined) {
+          state.isGuest = payload.user.is_guest;
+        }
+      }
+      if (payload.isGuest !== undefined) {
+        state.isGuest = payload.isGuest;
+      }
+      if (payload.guestId !== undefined) {
+        state.guestId = payload.guestId;
       }
     },
     userLoggedOut: (state) => {
-      state.accessToken = undefined;
-      state.user = undefined;
+      state.accessToken = null;
+      state.user = null;
+      state.isGuest = false;
+      state.guestId = null;
       Cookies.remove('userInfo');
     },
   },

@@ -31,7 +31,7 @@ const LanguageSwitcher = () => {
           <span onClick={() => setIsOpen(!isOpen)} className="offcanvas__lang-selected-lang tp-lang-toggle" id="tp-offcanvas-lang-toggle">
             {languages[locale]}
           </span>
-          <ul className={`offcanvas__lang-list tp-lang-list ${isOpen ? 'tp-lang-list-open' : ''}`} style={{ top: '100%', bottom: 'auto' }}>
+          <ul className={`offcanvas__lang-list tp-lang-list ${isOpen ? 'tp-lang-list-open' : ''}`} style={{ bottom: '100%', top: 'auto' }}>
             {Object.keys(languages).map((lang) => (
               <li key={lang} onClick={() => handleLanguageChange(lang)} style={{ cursor: 'pointer' }}>
                 {languages[lang]}

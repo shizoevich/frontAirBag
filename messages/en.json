@@ -1,38 +1,43 @@
 {
   "Header": {
     "contact_us": "Contact Us",
-    "shippingInfo": " Quality guarantee for all Airbag parts"
+    "shippingInfo": " Quality guarantee for all Airbag parts",
+    "catalog": "Catalog"
   },
   "menu": {
-    "home": " Home",
-    "catalog": " Catalog",
-    "carBrands": " Car Brands",
+    "home": "Home",
+    "catalog": "Catalog",
+    "carBrandsAndAccount": "Car Brands & Account",
+    "carBrands": "Car Brands",
     "selectCarBrand": "Select Car Brand",
     "carMats": "Car Mats by Brands",
     "searchByBrand": "Search Parts by Car Brand",
-    "airbagComponents": " Airbag SRS Components",
+    "airbagComponents": "Airbag SRS Components",
     "connectors": "Connectors - Plugs and connectors for airbags",
     "mounts": "Mounts - Mounting elements and brackets",
     "resistors": "Resistors - Resistors for SRS diagnostics",
     "airbags": "Airbags - Pneumatic bags (Airbag)",
     "beltParts": "Belt Parts - Hardware and seat belt components",
-    "pyrotechnics": " Pyrotechnics",
+    "pyrotechnics": "Pyrotechnics",
     "pyroBelts": "PP in Belts - Pyrotechnics in seat belts",
     "pyroSeats": "PP in Legs/Seat - Pyrotechnics in seats and lower cabin",
     "pyroCurtains": "PP in Curtains - Curtain pyrotechnics (side protection)",
     "pyroSteering": "PP in steering wheel 1 igniter / 2 igniters - Pyrotechnics in steering airbag",
     "pyroDashboard": "PP in dashboard 1 igniter / 2 igniters - Pyrotechnics in passenger airbag",
-    "myAccount": " My Account",
+    "myAccount": "My Account",
     "cart": "Cart",
     "wishlist": "Wishlist",
     "checkout": "Checkout",
     "myOrders": "My Orders",
-    "search": " Search",
+    "search": "Search",
     "searchCatalog": "Search Catalog",
     "searchByVin": "Search by VIN",
     "searchByBrandMenu": "Search by Brand",
-    "contacts": " Contacts",
-    "discounts": " Discounts"
+    "contacts": "Contacts",
+    "discounts": "Discounts",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
   },
   "features": {
     "fastDelivery": "Fast Delivery",
@@ -110,6 +115,9 @@
     "addToCart": "Add to Cart",
     "quickView": "Quick View",
     "addToWishlist": "Add To Wishlist"
+  },
+  "ProductDetails": {
+    "boughtTogether": "Products Bought Together"
   },
   "ProductModal": {
     "contentLabel": "Product Details"
@@ -529,11 +537,31 @@
       "description": "Our website may use cookies to improve user experience. You can disable cookies in your browser settings."
     }
   },
+  "PreCheckout": {
+    "title": "Checkout",
+    "chooseOption": "Choose your checkout method",
+    "registrationBenefits": "Register to get discounts, track orders and save purchase history",
+    "register": "Register",
+    "continueAsGuest": "Continue as Guest",
+    "processing": "Processing...",
+    "name": "Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "registerAndContinue": "Register and Continue",
+    "registering": "Registering...",
+    "back": "Back",
+    "passwordMismatch": "Passwords do not match",
+    "registrationSuccess": "Registration successful!",
+    "registrationError": "Registration error. Please try again."
+  },
   "Terms": {
     "metaTitle": "Terms and Conditions - AirBag",
-    "metaDescription": "Terms and conditions of using AirBag website. Information about ordering, payment, delivery, and return policies.",
+    "metaDescription": "Terms and conditions for using the AirBag website. Information about ordering, payment, delivery and product returns.",
     "title": "Terms and Conditions",
-    "subtitle": "Welcome to our online store! Please read these terms and conditions carefully before placing an order.",
+    "subtitle": "Welcome to our online store! Please carefully read the terms and conditions of using the site before placing an order.",
     "section1": {
       "title": "1. General Provisions",
       "description1": "1.1. By using our website, you agree to these terms and conditions.",

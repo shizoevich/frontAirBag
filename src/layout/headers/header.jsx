@@ -122,7 +122,7 @@ const Header = () => {
             <div className="container">
               <div className="tp-mega-menu-wrapper p-relative">
                 <div className="row align-items-center">
-                  <div className="col-xl-3 col-lg-3">
+                  <div className="col-xl-1 col-lg-0">
                     {/* category start */}
                     <div className="tp-header-category tp-category-menu tp-header-category-toggle">
 
@@ -132,14 +132,14 @@ const Header = () => {
                     </div>
                     {/* category end */}
                   </div>
-                  <div className="col-xl-6 col-lg-6">
+                  <div className="col-xl-7 col-lg-7">
                     <div className="main-menu menu-style-1">
                       <nav className="tp-main-menu-content">
                         <Menus />
                       </nav>
                     </div>
                   </div>
-                  <div className="col-xl-3 col-lg-3">
+                  <div className="col-xl-4 col-lg-4">
                     <div className="tp-header-contact d-flex align-items-center justify-content-end">
                       <div className="tp-header-contact-icon" style={{marginRight: '12px'}}>
                         <span style={{fontSize: '24px', color: '#de8043', display: 'flex', alignItems: 'center'}}>
@@ -165,7 +165,7 @@ const Header = () => {
         <div className="container">
           <div className="tp-mega-menu-wrapper p-relative">
             <div className="row align-items-center">
-              <div className="col-xl-3 col-lg-3 col-md-3 col-6">
+              <div className="col-xl-2 col-lg-2 col-md-3 col-6">
                 <div className="logo">
                   <Link href="/">
                     <Image 
@@ -184,7 +184,7 @@ const Header = () => {
                   </Link>
                 </div>
               </div>
-              <div className="col-xl-6 col-lg-6 col-md-6 d-none d-md-block">
+              <div className="col-xl-7 col-lg-7 col-md-6 d-none d-md-block">
                 <div className="tp-header-sticky-menu main-menu menu-style-1 d-none d-lg-block">
                   <nav id="mobile-menu">
                     <Menus />

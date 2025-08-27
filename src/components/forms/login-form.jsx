@@ -15,8 +15,14 @@ import { useTranslations } from 'next-intl';
 
 // schema
 const schema = Yup.object().shape({
-  email: Yup.string().required().email().label("Email"),
-  password: Yup.string().required().min(6).label("Password"),
+  email: Yup.string()
+    .required("Email обязателен для заполнения")
+    .email("Введите корректный email адрес")
+    .label("Email"),
+  password: Yup.string()
+    .required("Пароль обязателен для заполнения")
+    .min(6, "Пароль должен содержать минимум 6 символов")
+    .label("Password"),
 });
 const LoginForm = () => {
   const [showPass, setShowPass] = useState(false);
@@ -49,7 +55,29 @@ const LoginForm = () => {
       })
       .catch((error) => {
         console.error('Login error:', error);
-        notifyError(error?.data?.detail || t('loginFailed'));
+        
+        // Обработка различных типов ошибок
+        let errorMessage = t('loginFailed');
+        
+        if (error?.data) {
+          if (error.data.detail) {
+            errorMessage = error.data.detail;
+          } else if (error.data.non_field_errors) {
+            errorMessage = error.data.non_field_errors[0];
+          } else if (error.data.email) {
+            errorMessage = `Email: ${error.data.email[0]}`;
+          } else if (error.data.password) {
+            errorMessage = `Пароль: ${error.data.password[0]}`;
+          }
+        } else if (error?.status === 401) {
+          errorMessage = "Неверный email или пароль";
+        } else if (error?.status === 400) {
+          errorMessage = "Проверьте правильность введенных данных";
+        } else if (error?.status >= 500) {
+          errorMessage = "Ошибка сервера. Попробуйте позже";
+        }
+        
+        notifyError(errorMessage);
       })
       .finally(() => {
         // Сбрасываем только пароль для безопасности
