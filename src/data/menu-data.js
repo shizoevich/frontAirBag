@@ -96,7 +96,7 @@ export const mobile_menu = [
   {
     id: 4,
     sub_menu: true,
-    title: '📊 Мой аккаунт',
+    title: 'Мой аккаунт',
     link: '/profile',
     sub_menus: [
       { title: 'Корзина', link: '/cart' },
@@ -107,13 +107,13 @@ export const mobile_menu = [
   {
     id: 5,
     single_link: true,
-    title: '📞 Контакты',
+    title: 'Контакты',
     link: '/contact',
   },
   {
     id: 6,
     single_link: true,
-    title: '💰 Скидки',
+    title: 'Скидки',
     link: '/coupon',
   },
 ]

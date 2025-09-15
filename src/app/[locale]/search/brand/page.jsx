@@ -4,7 +4,8 @@ import BrandSearchArea from "@/components/search/brand-search-area";
 import Footer from "@/layout/footers/footer";
 import { getTranslations } from 'next-intl/server';
 
-export async function generateMetadata({ params: { locale } }) {
+export async function generateMetadata({ params }) {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'SearchPage' });
   
   return {
@@ -12,7 +13,8 @@ export async function generateMetadata({ params: { locale } }) {
   };
 }
 
-export default async function BrandSearchPage({ params: { locale } }) {
+export default async function BrandSearchPage({ params }) {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'SearchPage' });
   
   return (

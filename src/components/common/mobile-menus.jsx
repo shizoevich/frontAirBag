@@ -6,7 +6,7 @@ import menu_data from "@/data/menu-data";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { closeCartMini } from "@/redux/features/cartSlice";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useLogoutMutation } from '@/redux/features/auth/authApi';
 
 const MobileMenus = ({setIsCanvasOpen}) => {
@@ -14,6 +14,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const t = useTranslations('menu');
+  const locale = useLocale();
   const { user, accessToken, isGuest } = useSelector((state) => state.auth);
   const [logout] = useLogoutMutation();
 
@@ -21,6 +22,15 @@ const MobileMenus = ({setIsCanvasOpen}) => {
   const isAuthenticated = !!accessToken;
   const isAuthenticatedUser = isAuthenticated && !isGuest;
   const isGuestOrUnauthenticated = !isAuthenticated || isGuest;
+
+  // Функция для добавления локали к ссылкам
+  const getLocalizedLink = (link) => {
+    if (!link) return '#';
+    if (link.startsWith('/')) {
+      return `/${locale}${link}`;
+    }
+    return link;
+  };
 
   // handleOpenSubMenu
   const handleOpenSubMenu = (title) => {
@@ -36,7 +46,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
   const handleNavigation = (link) => {
     setIsCanvasOpen(false); // Close mobile menu
     dispatch(closeCartMini()); // Close cart mini if open
-    router.push(link);
+    router.push(getLocalizedLink(link));
   }
 
   // Обработка выхода из системы
@@ -78,7 +88,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
                     {menu.home_pages && menu.home_pages.map((home, i) => (
                       <div key={i} className="col">
                         <div className="home-menu-item">
-                          <Link href={home.link} onClick={() => handleNavigation(home.link)}>
+                          <Link href={getLocalizedLink(home.link)} onClick={() => handleNavigation(home.link)}>
                             <div className="home-menu-thumb p-relative fix">
                               <Image src={home.img || '/assets/img/product/placeholder.jpg'} alt="home img" width={200} height={150} />
                             </div>
@@ -103,7 +113,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
                 <ul className={`tp-submenu ${isActiveMenu === menu.titleKey ? 'active':''}`}>
                   {menu.product_pages.map((p, i) => (
                     <li key={i}>
-                      <Link href={p.link} onClick={() => handleNavigation(p.link)}>
+                      <Link href={getLocalizedLink(p.link)} onClick={() => handleNavigation(p.link)}>
                         {p.titleKey ? t(p.titleKey.replace('menu.', '')) : p.title}
                       </Link>
                     </li>
@@ -126,7 +136,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
                           {t(page.titleKey.replace('menu.', ''))}
                         </a>
                       ) : (
-                        <Link href={page.link} onClick={() => handleNavigation(page.link)}>
+                        <Link href={getLocalizedLink(page.link)} onClick={() => handleNavigation(page.link)}>
                           {t(page.titleKey.replace('menu.', ''))}
                         </Link>
                       )}
@@ -145,7 +155,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
                 <ul className={`tp-submenu ${isActiveMenu === menu.titleKey ? 'active':''}`}>
                   {menu.sub_menus.map((b, i) => (
                     <li key={i}>
-                      <Link href={b.link} onClick={() => handleNavigation(b.link)}>
+                      <Link href={getLocalizedLink(b.link)} onClick={() => handleNavigation(b.link)}>
                         {b.titleKey ? t(b.titleKey.replace('menu.', '')) : b.title}
                       </Link>
                     </li>
@@ -154,7 +164,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
               </li>
             ) : (
               <li key={menu.id}>
-                <Link href={menu.link} onClick={() => handleNavigation(menu.link)}>
+                <Link href={getLocalizedLink(menu.link)} onClick={() => handleNavigation(menu.link)}>
                   {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
                 </Link>
               </li>

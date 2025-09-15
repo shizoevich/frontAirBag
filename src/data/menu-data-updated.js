@@ -10,12 +10,12 @@ const menu_data = [
   {
     id: 2,
     products: true,
-    title: '🔧 Каталог',
+    title: 'Каталог',
     titleKey: 'catalog',
     link: '/shop',
     product_pages: [
       {
-        title: '🚘 Марки автомобилей',
+        title: 'Марки автомобилей',
         titleKey: 'car_brands',
         link: '/search/brand',
         mega_menus: [
@@ -49,7 +49,7 @@ const menu_data = [
         ]
       },
       {
-        title: '📊 Мой аккаунт',
+        title: 'Мой аккаунт',
         titleKey: 'my_account',
         link: '/profile',
         mega_menus: [
@@ -63,7 +63,7 @@ const menu_data = [
   {
     id: 3,
     sub_menu: true,
-    title: '🔍 Поиск',
+    title: 'Поиск',
     titleKey: 'search',
     link: '/search',
     sub_menus: [
@@ -75,14 +75,14 @@ const menu_data = [
   {
     id: 4,
     single_link: true,
-    title: '📞 Контакты',
+    title: 'Контакты',
     titleKey: 'contacts',
     link: '/contact',
   },
   {
     id: 5,
     single_link: true,
-    title: '💰 Скидки',
+    title: 'Скидки',
     titleKey: 'discounts',
     link: '/coupon',
   },
@@ -102,19 +102,19 @@ export const mobile_menu = [
   {
     id: 2,
     sub_menu: true,
-    title: '🔧 Каталог',
+    title: 'Каталог',
     titleKey: 'catalog',
     link: '/shop',
     sub_menus: [
-      { title: '🚘 Марки автомобилей', titleKey: 'car_brands', link: '/search/brand' },
-      { title: '🛡️ Комплектующие Airbag SRS', titleKey: 'airbag_components', link: '/shop-category/airbag-components' },
-      { title: '💥 Пиропатроны', titleKey: 'squibs', link: '/shop-category/pyrotechnics' },
+      { title: 'Марки автомобилей', titleKey: 'car_brands', link: '/search/brand' },
+      { title: 'Комплектующие Airbag SRS', titleKey: 'airbag_components', link: '/shop-category/airbag-components' },
+      { title: 'Пиропатроны', titleKey: 'squibs', link: '/shop-category/pyrotechnics' },
     ],
   },
   {
     id: 4,
     sub_menu: true,
-    title: '📊 Мой аккаунт',
+    title: 'Мой аккаунт',
     titleKey: 'my_account',
     link: '/profile',
     sub_menus: [
@@ -126,14 +126,14 @@ export const mobile_menu = [
   {
     id: 5,
     single_link: true,
-    title: '📞 Контакты',
+    title: 'Контакты',
     titleKey: 'contacts',
     link: '/contact',
   },
   {
     id: 6,
     single_link: true,
-    title: '💰 Скидки',
+    title: 'Скидки',
     titleKey: 'discounts',
     link: '/coupon',
   },

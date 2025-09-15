@@ -2,7 +2,7 @@
 
 import { useLocale } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { IoMdArrowDropdown } from 'react-icons/io';
 
 const languages = {
@@ -16,6 +16,22 @@ const LanguageSwitcher = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    // Проверяем размер экрана при монтировании компонента
+    checkScreenSize();
+
+    // Добавляем слушатель изменения размера окна
+    window.addEventListener('resize', checkScreenSize);
+
+    // Очищаем слушатель при размонтировании
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   const handleLanguageChange = (newLocale) => {
     // remove the current locale from the pathname
@@ -31,7 +47,11 @@ const LanguageSwitcher = () => {
           <span onClick={() => setIsOpen(!isOpen)} className="offcanvas__lang-selected-lang tp-lang-toggle" id="tp-offcanvas-lang-toggle">
             {languages[locale]}
           </span>
-          <ul className={`offcanvas__lang-list tp-lang-list ${isOpen ? 'tp-lang-list-open' : ''}`} style={{ bottom: '100%', top: 'auto' }}>
+          <ul className={`offcanvas__lang-list tp-lang-list ${isOpen ? 'tp-lang-list-open' : ''}`} style={{ 
+            // На мобильных устройствах открывается вверх, на десктопе - вниз
+            bottom: isMobile ? '100%' : 'auto',
+            top: isMobile ? 'auto' : '100%'
+          }}>
             {Object.keys(languages).map((lang) => (
               <li key={lang} onClick={() => handleLanguageChange(lang)} style={{ cursor: 'pointer' }}>
                 {languages[lang]}
