@@ -24,6 +24,15 @@ export async function generateMetadata({ params: { locale, slug } }) {
   };
 }
 
+// Generate static params for static export
+export async function generateStaticParams() {
+  // Return main category slugs for static generation
+  return [
+    { slug: 'airbag-components' },
+    { slug: 'pyrotechnics' },
+  ];
+}
+
 export default function CategorySlugPage({ params: { slug, locale } }) {
   // Преобразуем slug в более читаемый формат для отображения
   const formatSlug = (slug) => {

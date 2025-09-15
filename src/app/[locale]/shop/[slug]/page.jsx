@@ -43,6 +43,24 @@ export async function generateMetadata({ params }) {
   };
 }
 
+// Generate static params for static export
+export async function generateStaticParams() {
+  // Return common subcategory slugs for static generation
+  return [
+    { slug: 'connectors' },
+    { slug: 'mounts' },
+    { slug: 'resistors' },
+    { slug: 'airbags' },
+    { slug: 'belt-parts' },
+    { slug: 'pyro-belts' },
+    { slug: 'pyro-seats' },
+    { slug: 'pyro-curtains' },
+    { slug: 'pyro-steering' },
+    { slug: 'pyro-dashboard' },
+    { slug: 'covers' },
+  ];
+}
+
 export default async function ShopSubcategoryPage({ params }) {
   const { slug } = await params;
   // Преобразуем slug в более читаемый формат для отображения
