@@ -116,9 +116,6 @@
     "quickView": "Quick View",
     "addToWishlist": "Add To Wishlist"
   },
-  "ProductDetails": {
-    "boughtTogether": "Products Bought Together"
-  },
   "ProductModal": {
     "contentLabel": "Product Details"
   },
@@ -153,8 +150,8 @@
     "enterPhone": "Enter your phone",
     "enterAddress": "Enter your address"
   },
-  
   "ProductDetails": {
+    "boughtTogether": "Products Bought Together",
     "inStock": "In Stock",
     "outOfStock": "Out of Stock",
     "availableItems": "Available: {count} pcs.",

@@ -50,8 +50,19 @@ const LoginForm = () => {
       .unwrap()
       .then((response) => {
         notifySuccess(t('loginSuccess'));
-        // После успешного логина перенаправляем на главную страницу с учетом локали
-        router.push(`/${locale}`);
+        
+        // Проверяем, есть ли параметр redirect в URL или localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect') || localStorage.getItem('redirectAfterLogin');
+        
+        if (redirectUrl) {
+          // Очищаем сохраненный redirect
+          localStorage.removeItem('redirectAfterLogin');
+          router.push(redirectUrl);
+        } else {
+          // По умолчанию перенаправляем на главную страницу с учетом локали
+          router.push(`/${locale}`);
+        }
       })
       .catch((error) => {
         console.error('Login error:', error);

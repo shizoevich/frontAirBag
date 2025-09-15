@@ -41,9 +41,6 @@ const nextConfig = {
     return config;
   },
   transpilePackages: ['swiper'],
-  experimental: {
-    esmExternals: 'loose',
-  },
 }
 
 module.exports = withNextIntl(nextConfig);

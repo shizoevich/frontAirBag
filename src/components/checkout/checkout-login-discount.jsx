@@ -1,10 +1,11 @@
 'use client';
 import React from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 
 const CheckoutLoginDiscount = ({ user, accessToken }) => {
   const t = useTranslations('Checkout');
+  const locale = useLocale();
 
   return (
     <div className="tp-checkout-login-form-reveal-wrapper">
@@ -23,10 +24,10 @@ const CheckoutLoginDiscount = ({ user, accessToken }) => {
                     <span className="fw-medium">{t('discount_message')}</span>
                   </div>
                   <div className="tp-checkout-discount-actions">
-                    <Link href="/login" className="btn btn-sm btn-outline-primary me-2">
+                    <Link href={`/${locale}/login?redirect=/${locale}/checkout`} className="btn btn-sm btn-outline-primary me-2">
                       Увійти
                     </Link>
-                    <Link href="/register" className="btn btn-sm btn-primary">
+                    <Link href={`/${locale}/register?redirect=/${locale}/checkout`} className="btn btn-sm btn-primary">
                       Зареєструватися
                     </Link>
                   </div>

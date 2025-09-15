@@ -7,13 +7,14 @@ import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import ErrorMsg from '../common/error-msg';
 import { notifyError, notifySuccess } from '@/utils/toast';
-import { useRegisterUserMutation } from '@/redux/features/auth/authApi';
+import { useRegisterMutation, useLoginMutation } from '@/redux/features/auth/authApi';
 import '@/styles/register-form.css';
 
 const RegisterForm = () => {
   const t = useTranslations('Common');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const isLoading = loading || isRegistering || isLoggingIn;
   const [cities, setCities] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
   const [selectedCity, setSelectedCity] = useState('');
@@ -74,8 +75,9 @@ const RegisterForm = () => {
     resolver: yupResolver(schema),
   });
 
-  // Используем RTK Query для регистрации
-  const [registerUser, { isLoading: isRegistering }] = useRegisterUserMutation();
+  // Используем RTK Query для регистрации и входа
+  const [registerUser, { isLoading: isRegistering }] = useRegisterMutation();
+  const [login, { isLoading: isLoggingIn }] = useLoginMutation();
 
   // Поиск городов через API Новой Почты
   const fetchCities = async () => {
@@ -246,8 +248,34 @@ const RegisterForm = () => {
       const response = await registerUser(registerData).unwrap();
       
       notifySuccess(t('registerSuccess'));
+      
+      // Автоматически выполняем вход после успешной регистрации
+      try {
+        await login({
+          email: data.email,
+          password: data.password,
+          remember: false
+        }).unwrap();
+        
+        // Проверяем, есть ли параметр redirect в URL или localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect') || localStorage.getItem('redirectAfterLogin');
+        
+        if (redirectUrl) {
+          // Очищаем сохраненный redirect
+          localStorage.removeItem('redirectAfterLogin');
+          router.push(redirectUrl);
+        } else {
+          // По умолчанию перенаправляем на главную страницу
+          router.push(`/${locale}`);
+        }
+      } catch (loginError) {
+        console.error('Auto-login after registration failed:', loginError);
+        // Если автоматический вход не удался, перенаправляем на страницу входа
+        router.push(`/${locale}/login`);
+      }
+      
       reset();
-      router.push(`/${locale}/login`);
     } catch (error) {
       console.error('Registration error:', error);
       
@@ -448,8 +476,8 @@ const RegisterForm = () => {
         </div>
         
         <div className="tp-login-bottom mb-15">
-          <button type="submit" className="tp-login-btn w-100">
-            {loading ? t('registering') : t('register')}
+          <button type="submit" className="tp-login-btn w-100" disabled={isLoading}>
+            {isLoading ? t('registering') : t('register')}
           </button>
         </div>
       </form>

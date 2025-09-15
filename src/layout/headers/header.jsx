@@ -118,7 +118,7 @@ const Header = () => {
           </div>
 
           {/* header bottom start */}
-          <div className="tp-header-bottom tp-header-bottom-border d-none d-lg-block">
+          <div className="tp-header-bottom tp-header-bottom-border d-none d-lg-block pt-10">
             <div className="container">
               <div className="tp-mega-menu-wrapper p-relative">
                 <div className="row align-items-center">

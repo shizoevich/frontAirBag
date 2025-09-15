@@ -30,7 +30,7 @@ export default async function StepByStepSearchPage({ params, searchParams }) {
         <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ccc' }}>
           <h2>Step-by-Step Test</h2>
           <p>Testing with Wrapper + CommonBreadcrumb</p>
-          <p>If this works, we'll add Header and Footer next.</p>
+          <p>If this works, we&apos;ll add Header and Footer next.</p>
         </div>
       </div>
     </Wrapper>

@@ -15,7 +15,7 @@ export default function CategoryPage() {
     <Wrapper>
       <Header />
       <ShopBreadcrumb/>
-      <ShopArea hidden_sidebar={true} />
+      <ShopCategoryArea />
       <Footer primary_style={true} />
     </Wrapper>
   );

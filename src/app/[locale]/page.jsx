@@ -1,6 +1,5 @@
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
-import BannerArea from "@/components/banner/banner-area";
 import CtaArea from "@/components/cta/cta-area";
 import FeatureArea from "@/components/features/feature-area";
 import InstagramArea from "@/components/instagram/instagram-area";
@@ -16,8 +15,7 @@ export default function HomePage() {
       <Header/>
       <FeatureArea/>
       <AllProductsArea/>
-      <BannerArea/>
-      <NewArrivals/>
+      {/*<NewArrivals/>*/}
       <CtaArea/>
       <Footer/>
     </Wrapper>

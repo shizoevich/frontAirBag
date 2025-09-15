@@ -115,9 +115,6 @@
     "quickView": "Швидкий перегляд",
     "outOfStock": "Немає в наявності"
   },
-  "ProductDetails": {
-    "boughtTogether": "Товари, які купують разом"
-  },
   "ProductModal": {
     "contentLabel": "Деталі товару"
   },
@@ -152,8 +149,8 @@
     "enterPhone": "Введіть телефон",
     "enterAddress": "Введіть адресу"
   },
-  
   "ProductDetails": {
+    "boughtTogether": "Товари, які купують разом",
     "inStock": "В наявності",
     "outOfStock": "Немає в наявності",
     "availableItems": "Доступно: {count} шт.",

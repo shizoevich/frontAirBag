@@ -7,7 +7,7 @@ const FeatureArea = () => {
   const t = useTranslations('features');
   
   return (
-    <section className="tp-feature-area tp-feature-border-radius pb-70">
+    <section className="tp-feature-area tp-feature-border-radius pt-30 pb-70">
         <div className="container">
           <div className="row gx-1 gy-1 gy-xl-0">
             {feature_data.map((item,i) => (

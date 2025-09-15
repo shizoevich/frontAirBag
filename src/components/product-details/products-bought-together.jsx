@@ -12,7 +12,7 @@ const ProductsBoughtTogether = ({ togetherBuyProducts }) => {
   }
 
   return (
-    <section className="tp-bought-together-product pt-95 pb-120">
+    <section className="tp-bought-together-product pt-20 pb-50">
       <div className="container">
         <div className="row">
           <div className="col-xl-12">
