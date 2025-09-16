@@ -4,10 +4,12 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.js');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // Включаем статический экспорт только для production build
+  ...(process.env.NODE_ENV === 'production' && process.env.EXPORT_MODE === 'true' ? { output: 'export' } : {}),
   trailingSlash: true,
   images: {
-    unoptimized: true,
+    // Отключаем оптимизацию изображений только для статического экспорта
+    unoptimized: process.env.NODE_ENV === 'production' && process.env.EXPORT_MODE === 'true',
     domains: ['storage.remonline.app', 't3.ftcdn.net'],
     // Опционально: настройки для форматов и качества
     formats: ['image/avif', 'image/webp'],

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "next build"
+    "export": "EXPORT_MODE=true next build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",

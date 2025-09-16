@@ -9,14 +9,23 @@ export const metadata = {
 
 // Generate static params for static export
 export async function generateStaticParams() {
-  // Return some sample product IDs for static generation
-  // In a real app, you would fetch these from your API
-  return [
-    { id: '1' },
-    { id: '2' },
-    { id: '3' },
+  // Return product IDs for static generation
+  // Generate IDs from 1 to 50 to cover most product links
+  const productIds = [];
+  
+  // Add numeric IDs from 1 to 50
+  for (let i = 1; i <= 50; i++) {
+    productIds.push({ id: i.toString() });
+  }
+  
+  // Add some common string IDs
+  productIds.push(
     { id: 'sample' },
-  ];
+    { id: 'demo' },
+    { id: 'test' }
+  );
+  
+  return productIds;
 }
 
 export default async function ProductDetailsPage({ params }) {
