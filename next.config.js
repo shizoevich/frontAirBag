@@ -5,7 +5,12 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.js');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Включаем статический экспорт только для production build
-  ...(process.env.NODE_ENV === 'production' && process.env.EXPORT_MODE === 'true' ? { output: 'export' } : {}),
+  ...(process.env.NODE_ENV === 'production' && process.env.EXPORT_MODE === 'true' ? { 
+    output: 'export',
+    distDir: 'out',
+    basePath: '',
+    assetPrefix: '',
+  } : {}),
   trailingSlash: true,
   images: {
     // Отключаем оптимизацию изображений только для статического экспорта

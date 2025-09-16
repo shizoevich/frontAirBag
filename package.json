@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "EXPORT_MODE=true next build"
+    "export": "EXPORT_MODE=true next build && find out -name '*.txt' -type f -delete"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",

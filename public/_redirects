@@ -1,0 +1,12 @@
+# Netlify redirects for Next.js static export
+
+# Redirect root to default locale
+/ /uk/ 301
+
+# Handle locale redirects
+/en/* /en/:splat 200
+/ru/* /ru/:splat 200
+/uk/* /uk/:splat 200
+
+# Fallback for SPA routing
+/* /404.html 404
