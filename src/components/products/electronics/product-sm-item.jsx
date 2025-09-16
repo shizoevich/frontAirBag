@@ -94,7 +94,7 @@ const ProductSmItem = ({ product }) => {
                 style={{
                   fontSize: '13px',
                   padding: '6px 12px',
-                  backgroundColor: '#9e54a1',
+                  backgroundColor: '#de8043',
                   color: '#fff',
                   borderRadius: '4px'
                 }}
@@ -113,7 +113,7 @@ const ProductSmItem = ({ product }) => {
                 style={{
                   fontSize: '13px',
                   padding: '6px 12px',
-                  backgroundColor: isOutOfStock ? '#ccc' : '#9e54a1',
+                  backgroundColor: isOutOfStock ? '#ccc' : '#de8043',
                   color: '#fff',
                   border: 'none',
                   borderRadius: '4px',

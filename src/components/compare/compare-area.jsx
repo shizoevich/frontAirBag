@@ -4,11 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { Rating } from "react-simple-star-rating";
+import { useLocale } from 'next-intl';
 // internal
 import { add_cart_product } from "@/redux/features/cartSlice";
 import { remove_compare_product } from "@/redux/features/compareSlice";
 
 const CompareArea = () => {
+  const locale = useLocale();
   const { compareItems } = useSelector((state) => state.compare);
   const dispatch = useDispatch();
 
@@ -51,7 +53,7 @@ const CompareArea = () => {
                                 height={176}
                               />
                               <h4 className="tp-compare-product-title">
-                                <Link href={`/product-details/${item._id}`}>
+                                <Link href={`/${locale}/product-details/${item._id}`}>
                                   {item.title}
                                 </Link>
                               </h4>

@@ -58,7 +58,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
       // Игнорируем ошибки сервера при logout
     }
     setIsCanvasOpen(false);
-    router.push('/');
+    router.push(getLocalizedLink('/'));
   };
 
   // Фильтрация пунктов меню аккаунта в зависимости от статуса авторизации
@@ -112,10 +112,21 @@ const MobileMenus = ({setIsCanvasOpen}) => {
                 </a>
                 <ul className={`tp-submenu ${isActiveMenu === menu.titleKey ? 'active':''}`}>
                   {menu.product_pages.map((p, i) => (
-                    <li key={i}>
+                    <li key={i} className="has-dropdown">
                       <Link href={getLocalizedLink(p.link)} onClick={() => handleNavigation(p.link)}>
                         {p.titleKey ? t(p.titleKey.replace('menu.', '')) : p.title}
                       </Link>
+                      {p.mega_menus && p.mega_menus.length > 0 && (
+                        <ul className="tp-submenu">
+                          {p.mega_menus.map((subItem, subIndex) => (
+                            <li key={subIndex}>
+                              <Link href={getLocalizedLink(subItem.link)} onClick={() => handleNavigation(subItem.link)}>
+                                {subItem.titleKey ? t(subItem.titleKey.replace('menu.', '')) : subItem.title}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </li>
                   ))}
                 </ul>

@@ -127,28 +127,32 @@ const CategoryCarousel = ({
         }}
         breakpoints={{
           1400: {
-            slidesPerView: 5,
+            slidesPerView: 6,
             grid: { rows: 2 }
           },
           1200: {
-            slidesPerView: 4,
+            slidesPerView: 5,
             grid: { rows: 2 }
           },
           992: {
-            slidesPerView: 3,
+            slidesPerView: 4,
             grid: { rows: 2 }
           },
           768: {
-            slidesPerView: 3,
-            grid: { rows: 2 }
+            slidesPerView: 4,
+            grid: { rows: 1 }
           },
           576: {
-            slidesPerView: 2,
-            grid: { rows: 2 }
+            slidesPerView: 4,
+            grid: { rows: 1 }
+          },
+          480: {
+            slidesPerView: 4,
+            grid: { rows: 1 }
           },
           0: {
-            slidesPerView: 1,
-            grid: { rows: 2 }
+            slidesPerView: 4,
+            grid: { rows: 1 }
           },
         }}
         className="category-carousel"

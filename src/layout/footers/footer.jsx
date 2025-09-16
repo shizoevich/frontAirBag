@@ -2,7 +2,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 // internal
 import logo from '@assets/img/logo/auto-delivery-logo-nobg.png';
 import pay from '@assets/img/footer/footer-pay.png';
@@ -11,6 +11,16 @@ import { Email, Location } from '@/svg';
 
 const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
   const t = useTranslations('Footer');
+  const locale = useLocale();
+
+  // Функция для добавления локали к ссылкам
+  const getLocalizedLink = (link) => {
+    if (!link) return '#';
+    if (link.startsWith('/')) {
+      return `/${locale}${link}`;
+    }
+    return link;
+  };
   return (
     <footer>
       <div className={`tp-footer-area ${primary_style?'tp-footer-style-2 tp-footer-style-primary tp-footer-style-6':''} ${style_2 ?'tp-footer-style-2':style_3 ? 'tp-footer-style-2 tp-footer-style-3': ''}`}
@@ -22,7 +32,7 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                 <div className="tp-footer-widget footer-col-1 mb-50">
                   <div className="tp-footer-widget-content">
                     <div className="tp-footer-logo text-center mb-3">
-                      <Link href="/">
+                      <Link href={getLocalizedLink("/")}>
                         <Image 
                           src={logo} 
                           alt="logo" 
@@ -55,11 +65,11 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                   <h4 className="tp-footer-widget-title">{t('myAccountTitle')}</h4>
                   <div className="tp-footer-widget-content">
                     <ul>
-                      <li><Link href="/track-order">{t('trackOrders')}</Link></li>
-                      <li><Link href="/shipping">{t('shipping')}</Link></li>
-                      <li><Link href="/profile">{t('myAccount')}</Link></li>
-                      <li><Link href="/profile">{t('orderHistory')}</Link></li>
-                      <li><Link href="/returns">{t('returns')}</Link></li>
+                      <li><Link href={getLocalizedLink("/track-order")}>{t('trackOrders')}</Link></li>
+                      <li><Link href={getLocalizedLink("/shipping")}>{t('shipping')}</Link></li>
+                      <li><Link href={getLocalizedLink("/profile")}>{t('myAccount')}</Link></li>
+                      <li><Link href={getLocalizedLink("/profile")}>{t('orderHistory')}</Link></li>
+                      <li><Link href={getLocalizedLink("/returns")}>{t('returns')}</Link></li>
                     </ul>
                   </div>
                 </div>
@@ -70,10 +80,10 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                   <div className="tp-footer-widget-content">
                     <ul>
                       {/*<li><Link href="/about">{t('ourStory')}</Link></li>*/}
-                      <li><Link href="/privacy-policy">{t('privacyPolicy')}</Link></li>
-                      <li><Link href="/terms">{t('termsAndConditions')}</Link></li>
+                      <li><Link href={getLocalizedLink("/privacy-policy")}>{t('privacyPolicy')}</Link></li>
+                      <li><Link href={getLocalizedLink("/terms")}>{t('termsAndConditions')}</Link></li>
                       {/*<li><Link href="/blog">{t('latestNews')}</Link></li>*/}
-                      <li><Link href="/contact">{t('contactUs')}</Link></li>
+                      <li><Link href={getLocalizedLink("/contact")}>{t('contactUs')}</Link></li>
                     </ul>
                   </div>
                 </div>

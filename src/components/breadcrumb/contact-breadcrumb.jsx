@@ -2,9 +2,20 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLocale } from 'next-intl';
 
 const ContactBreadcrumb = () => {
   const pathname = usePathname();
+  const locale = useLocale();
+
+  // Функция для добавления локали к ссылкам
+  const getLocalizedLink = (link) => {
+    if (!link) return '#';
+    if (link.startsWith('/')) {
+      return `/${locale}${link}`;
+    }
+    return link;
+  };
   
   // Преобразуем путь в массив сегментов и удаляем пустые сегменты
   const pathSegments = pathname.split('/').filter(segment => segment);
@@ -34,12 +45,12 @@ const ContactBreadcrumb = () => {
               </h3>
               <div className="breadcrumb__list">
                 <span>
-                  <Link href="/">Главная</Link>
+                  <Link href={getLocalizedLink("/")}>Главная</Link>
                 </span>
                 {breadcrumbs.map((breadcrumb, index) => (
                   <span key={index}>
                     {index < breadcrumbs.length - 1 ? (
-                      <Link href={breadcrumb.path}>{breadcrumb.title}</Link>
+                      <Link href={getLocalizedLink(breadcrumb.path)}>{breadcrumb.title}</Link>
                     ) : (
                       breadcrumb.title
                     )}

@@ -214,7 +214,7 @@ const UserInfoModal = ({ isOpen, onClose, onSubmit, user }) => {
         .tp-checkout-input input:focus,
         .tp-checkout-input textarea:focus {
           outline: none;
-          border-color: #0989ff;
+          border-color: #de8043;
         }
         
         .error-message {

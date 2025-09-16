@@ -1,5 +1,7 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useLocale } from 'next-intl';
 import NiceSelect from "@/ui/nice-select";
 import ErrorMsg from "@/components/common/error-msg";
 import SearchPrdLoader from "@/components/loader/search-prd-loader";
@@ -7,19 +9,49 @@ import { useGetAllProductsQuery, useGetAllProductsNoLimitQuery } from "@/redux/f
 import ProductItem from "@/components/products/electronics/product-item";
 import ReactPaginate from 'react-paginate';
 
-export default function SearchArea({ translations, initialSearchText, initialCategoryId }) {
-  const searchText = initialSearchText;
-  const categoryId = initialCategoryId;
+export default function SearchArea({ translations }) {
+  const searchParams = useSearchParams();
+  const locale = useLocale();
+  const [searchText, setSearchText] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [currentPage, setCurrentPage] = useState(0); // для ReactPaginate (0-based)
+  const [isMobile, setIsMobile] = useState(false);
   const itemsPerPage = 12;
+
+  // Извлекаем параметры поиска из URL
+  useEffect(() => {
+    const urlSearchText = searchParams.get('searchText') || "";
+    const urlCategoryId = searchParams.get('categoryId') || "";
+    
+    setSearchText(urlSearchText);
+    setCategoryId(urlCategoryId);
+  }, [searchParams]);
+
+  // Отслеживаем размер экрана для адаптивной пагинации
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
   
   // Запрос на получение товаров с пагинацией и фильтрацией
-  const { data: productsData, isError, isLoading } = useGetAllProductsQuery({
+  const queryParams = {
     limit: itemsPerPage,
     offset: currentPage * itemsPerPage,
     categoryId: categoryId || undefined,
     searchText: searchText || undefined
-  });
+  };
+  
+  // Debug logging
+  console.log('Search query params:', queryParams);
+  console.log('Current searchText:', searchText);
+  console.log('Current categoryId:', categoryId);
+  
+  const { data: productsData, isError, isLoading } = useGetAllProductsQuery(queryParams);
   
   // Запрос на получение всех товаров для фильтрации
   const { data: allProductsData } = useGetAllProductsNoLimitQuery();
@@ -56,6 +88,12 @@ export default function SearchArea({ translations, initialSearchText, initialCat
         ? productsData.results 
         : [];
         
+  // Debug logging for API response
+  console.log('API Response - productsData:', productsData);
+  console.log('API Response - products array:', products);
+  console.log('API Response - products count:', products.length);
+  console.log('API Response - total count:', productsData?.count);
+        
   // Получаем все товары для фильтрации
   const allProducts = Array.isArray(allProductsData) 
     ? allProductsData 
@@ -65,8 +103,80 @@ export default function SearchArea({ translations, initialSearchText, initialCat
         ? allProductsData.results 
         : [];
 
-  if (!isLoading && !isError && products.length === 0) {
-    content = <ErrorMsg msg={translations.noProductsFound} />;
+  // Проверяем, есть ли поисковый запрос и нет ли результатов
+  const hasSearchQuery = searchText && searchText.trim().length > 0;
+  
+  // Проверяем, возвращает ли API отфильтрованные результаты или все товары
+  // Если есть поисковый запрос, но API возвращает много товаров (>50), 
+  // вероятно API игнорирует поиск и возвращает все товары
+  const apiIgnoredSearch = hasSearchQuery && products.length > 50;
+  
+  // Дополнительная проверка: если есть поисковый запрос, но ни один товар не содержит искомый текст
+  const noRelevantResults = hasSearchQuery && products.length > 0 && 
+    !products.some(product => 
+      product.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+      product.description?.toLowerCase().includes(searchText.toLowerCase())
+    );
+  
+  const hasNoResults = !isLoading && !isError && (
+    (hasSearchQuery && products.length === 0) || 
+    (hasSearchQuery && productsData?.count === 0) ||
+    apiIgnoredSearch ||
+    noRelevantResults
+  );
+  
+  // Debug logging for search logic
+  console.log('Search Logic Debug:');
+  console.log('- hasSearchQuery:', hasSearchQuery);
+  console.log('- apiIgnoredSearch:', apiIgnoredSearch);
+  console.log('- noRelevantResults:', noRelevantResults);
+  console.log('- hasNoResults:', hasNoResults);
+  
+  if (hasNoResults) {
+    content = (
+      <section className="tp-error-area pt-110 pb-110">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-xl-8 col-lg-10 col-md-12">
+              <div className="tp-error-content text-center">
+                <div className="tp-error-thumb mb-45">
+                  <img 
+                    src="/assets/img/error/error.png" 
+                    alt="no products found" 
+                    style={{ maxWidth: '300px', width: '100%', height: 'auto' }}
+                  />
+                </div>
+
+                <h3 className="tp-error-title mb-25">Товарів не знайдено</h3>
+                <p className="mb-35" style={{ fontSize: '16px', color: '#55585B' }}>
+                  {searchText 
+                    ? `На жаль, за запитом "${searchText}" товарів не знайдено. Спробуйте змінити пошуковий запит або переглянути всі товари.`
+                    : 'На жаль, товарів не знайдено. Спробуйте змінити фільтри або переглянути всі товари.'
+                  }
+                </p>
+
+                <div className="tp-error-btn-wrapper d-flex flex-wrap justify-content-center gap-3">
+                  <button 
+                    className="tp-error-btn"
+                    onClick={() => {
+                      setSearchText("");
+                      setCategoryId("");
+                      window.history.pushState({}, '', `/${locale}/search`);
+                      window.location.reload();
+                    }}
+                  >
+                    Очистити фільтри
+                  </button>
+                  <a href={`/${locale}/`} className="tp-error-btn tp-error-btn-border">
+                    На головну
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   if (!isLoading && !isError && products.length > 0) {
@@ -94,12 +204,12 @@ export default function SearchArea({ translations, initialSearchText, initialCat
       const pageCount = Math.ceil(totalCount / itemsPerPage);
       
       content = (
-        <section className="tp-shop-area pb-120">
+        <section className="tp-shop-area pb-120 ">
           <div className="container">
             <div className="row">
               <div className="col-xl-12 col-lg-12">
                 <div className="tp-shop-main-wrapper">
-                  <div className="tp-shop-top mb-45">
+                  <div className="tp-shop-top mb-45 pt-40">
                     <div className="row">
                       <div className="col-xl-6">
                         <div className="tp-shop-top-left d-flex align-items-center">
@@ -150,15 +260,16 @@ export default function SearchArea({ translations, initialSearchText, initialCat
                   {pageCount > 1 && (
                     <div className="tp-pagination mt-35">
                       <ReactPaginate
-                        breakLabel={translations.breakLabel}
-                        nextLabel={translations.nextPage}
+                        breakLabel={isMobile ? "..." : translations.breakLabel}
+                        nextLabel={isMobile ? ">" : translations.nextPage}
+                        previousLabel={isMobile ? "<" : translations.previousPage}
                         onPageChange={handlePageClick}
-                        pageRangeDisplayed={3}
+                        pageRangeDisplayed={isMobile ? 1 : 3}
+                        marginPagesDisplayed={isMobile ? 1 : 2}
                         pageCount={pageCount}
-                        previousLabel={translations.previousPage}
                         renderOnZeroPageCount={null}
                         forcePage={currentPage}
-                        containerClassName="tp-pagination-style mb-20 text-center"
+                        containerClassName={`tp-pagination-style mb-20 text-center ${isMobile ? 'mobile-pagination' : ''}`}
                         pageLinkClassName="tp-pagination-link"
                         previousLinkClassName="tp-pagination-link"
                         nextLinkClassName="tp-pagination-link"

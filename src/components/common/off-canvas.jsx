@@ -3,19 +3,34 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 // internal
-import { CloseTwo } from '@/svg';
+import { CloseTwo, Search } from '@/svg';
 import logo from '@assets/img/logo/auto-delivery-logo-nobg.png';
 import contact_img from '@assets/img/icon/contact.png';
 import MobileCategory from '@/layout/headers/header-com/mobile-category';
-import MobileMenus from './mobile-menus';
-import LanguageSwitcher from './language-switcher'; // Импортируем новый компонент
+import MobileMenus from "./mobile-menus";
+import LanguageSwitcher from './language-switcher'; 
+
+import useSearchFormSubmit from "@/hooks/use-search-form-submit";
 
 const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
   const t = useTranslations('OffCanvas');
-  const [isCategoryActive, setIsCategoryActive] = useState(false);
+  const tSearch = useTranslations('HeaderSearchForm');
+  const locale = useLocale();
   const router = useRouter();
+  
+  // Mobile search functionality
+  const { setSearchText, handleSubmit, searchText } = useSearchFormSubmit();
+
+  // Функция для добавления локали к ссылкам
+  const getLocalizedLink = (link) => {
+    if (!link) return '#';
+    if (link.startsWith('/')) {
+      return `/${locale}${link}`;
+    }
+    return link;
+  };
   
   // Close offcanvas when route changes
   useEffect(() => {
@@ -41,7 +56,7 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
           <div className="offcanvas__content">
             <div className="offcanvas__top mb-70 d-flex justify-content-between align-items-center">
               <div className="offcanvas__logo logo">
-                <Link href="/" onClick={() => setIsCanvasOpen(false)}>
+                <Link href={getLocalizedLink("/")} onClick={() => setIsCanvasOpen(false)}>
                   <Image 
                     src={logo} 
                     alt="logo" 
@@ -58,14 +73,49 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
                 </Link>
               </div>
             </div>
-            <div className="offcanvas__category pb-40">
-              <div className="tp-category-mobile-menu">
-                <nav className={`tp-category-menu-content ${isCategoryActive ? "active" : ""}`}>
-                  {/* Убрали передачу categoryType */}
-                  <MobileCategory isCategoryActive={isCategoryActive} />
-                </nav>
-              </div>
+            
+            {/* Mobile Search */}
+            <div className="offcanvas__search mb-40">
+              <form onSubmit={(e) => {
+                handleSubmit(e);
+                setIsCanvasOpen(false);
+              }}>
+                <div className="tp-header-search-wrapper d-flex align-items-center">
+                  <div className="tp-header-search-box flex-grow-1">
+                    <input
+                      onChange={(e) => setSearchText(e.target.value)}
+                      value={searchText}
+                      type="text"
+                      placeholder={tSearch('placeholder')}
+                      style={{
+                        width: '100%',
+                        padding: '12px 15px',
+                        fontSize: '14px',
+                        outline: 'none'
+                      }}
+                    />
+                  </div>
+                  <div className="tp-header-search-btn">
+                    <button 
+                      type="submit"
+                      style={{
+                        padding: '12px 15px',
+                        backgroundColor: '#de8043',
+                        border: 'none',
+                        color: 'white',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <Search />
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
+            
             <div className="tp-main-menu-mobile fix d-lg-none mb-40">
               <MobileMenus setIsCanvasOpen={setIsCanvasOpen} />
             </div>
@@ -83,7 +133,7 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
               </div>
             </div>
             <div className="offcanvas__btn">
-              <Link href="/contact" onClick={() => setIsCanvasOpen(false)} className="tp-btn-2 tp-btn-border-2">{t('contact_us')}</Link>
+              <Link href={getLocalizedLink("/contact")} onClick={() => setIsCanvasOpen(false)} className="tp-btn-2 tp-btn-border-2">{t('contact_us')}</Link>
             </div>
           </div>
           <div className="offcanvas__bottom">

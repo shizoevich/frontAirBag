@@ -28,7 +28,7 @@ const Menus = () => {
     } catch (error) {
       // Игнорируем ошибки сервера при logout
     }
-    router.push('/');
+    router.push(getLocalizedLink('/'));
   };
 
   // Фильтрация пунктов меню аккаунта в зависимости от статуса авторизации

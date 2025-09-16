@@ -1,5 +1,7 @@
+'use client';
 import Link from "next/link";
 import Image from "next/image";
+import { useLocale } from 'next-intl';
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
@@ -10,6 +12,16 @@ export const metadata = {
 };
 
 export default function NotFound() {
+  const locale = useLocale();
+
+  // Функция для добавления локали к ссылкам
+  const getLocalizedLink = (link) => {
+    if (!link) return '#';
+    if (link.startsWith('/')) {
+      return `/${locale}${link}`;
+    }
+    return link;
+  };
   return (
     <Wrapper>
       <Header />
@@ -29,7 +41,7 @@ export default function NotFound() {
                   looking for was not found.
                 </p>
 
-                <Link href="/" className="tp-error-btn">
+                <Link href={getLocalizedLink("/")} className="tp-error-btn">
                   Back to Home
                 </Link>
               </div>

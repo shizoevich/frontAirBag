@@ -169,7 +169,7 @@ const ShopSubcategoryArea = ({ subcategorySlug }) => {
         <div className="row">
           <div className="col-xl-12">
             <div className="tp-section-title-wrapper-2 mb-40 pt-40">
-              <h3 className="tp-section-title-2">{getSubcategoryName()}</h3>
+             
               <p className="text-muted">{getSubcategoryDescription()}</p>
             </div>
           </div>

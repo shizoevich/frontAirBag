@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 // internal
 import { Cart, QuickView } from "@/svg";
 import { handleProductModal } from "@/redux/features/productModalSlice";
@@ -12,6 +12,7 @@ import { getProductImage, getProductId } from "@/utils/image-utils";
 
 const ProductItem = ({ product }) => {
   const t = useTranslations('ProductItem');
+  const locale = useLocale();
   const [isClient, setIsClient] = useState(false);
   const { cart_products } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
@@ -44,7 +45,7 @@ const ProductItem = ({ product }) => {
   return (
     <div className="tp-product-item mb-25 transition-3">
       <div className="tp-product-thumb p-relative fix">
-        <Link href={`/product-details/${id || ''}`}>
+        <Link href={`/${locale}/product-details/${id || ''}`}>
           <div style={{
             width: '100%',
             height: '300px',
@@ -108,7 +109,7 @@ const ProductItem = ({ product }) => {
             WebkitBoxOrient: 'vertical',
             lineHeight: '24px'
           }}>
-            <Link href={`/product-details/${id || ''}`}>{title}</Link>
+            <Link href={`/${locale}/product-details/${id || ''}`}>{title}</Link>
           </h3>
         </div>
         <div className="d-flex flex-column gap-2">
@@ -142,7 +143,7 @@ const ProductItem = ({ product }) => {
                 style={{
                   fontSize: '14px',
                   padding: '8px 15px',
-                  backgroundColor: isOutOfStock ? '#ccc' : '#9e54a1',
+                  backgroundColor: isOutOfStock ? '#ccc' : '#de8043',
                   color: '#fff',
                   border: 'none',
                   borderRadius: '4px',

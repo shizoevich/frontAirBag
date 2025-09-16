@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 // internal
 import Menus from "./header-com/menus";
 import useSticky from "@/hooks/use-sticky";
@@ -21,6 +21,7 @@ import { CartTwo, CategoryMenu, Compare, Menu, Phone, ShippingCar } from "@/svg"
 
 const Header = () => {
   const t = useTranslations('Header');
+  const locale = useLocale();
 
   const { cartMiniOpen } = useSelector((state) => state.cart);
   const [isOffCanvasOpen, setIsCanvasOpen] = useState(false);
@@ -28,6 +29,15 @@ const Header = () => {
   const { quantity } = useCartInfo();
   const { sticky } = useSticky();
   const dispatch = useDispatch();
+
+  // Функция для добавления локали к ссылкам
+  const getLocalizedLink = (link) => {
+    if (!link) return '#';
+    if (link.startsWith('/')) {
+      return `/${locale}${link}`;
+    }
+    return link;
+  };
   
   // Close category menu when clicking outside
   useEffect(() => {
@@ -88,7 +98,7 @@ const Header = () => {
               <div className="row align-items-center">
                 <div className="col-xl-2 col-lg-2 col-md-4 col-6">
                   <div className="logo">
-                    <Link href="/">
+                    <Link href={getLocalizedLink("/")}>
                       <Image 
                         src={logo} 
                         alt="logo" 
@@ -167,7 +177,7 @@ const Header = () => {
             <div className="row align-items-center">
               <div className="col-xl-2 col-lg-2 col-md-3 col-6">
                 <div className="logo">
-                  <Link href="/">
+                  <Link href={getLocalizedLink("/")}>
                     <Image 
                       src={logo} 
                       alt="logo" 
@@ -194,7 +204,7 @@ const Header = () => {
               <div className="col-xl-3 col-lg-3 col-md-3 col-6">
                 <div className="tp-header-action d-flex align-items-center justify-content-end ml-50">
                   <div className="tp-header-action-item d-none d-lg-block">
-                    <Link href="/compare" className="tp-header-action-btn">
+                    <Link href={getLocalizedLink("/compare")} className="tp-header-action-btn">
                       <Compare />
                     </Link>
                   </div>

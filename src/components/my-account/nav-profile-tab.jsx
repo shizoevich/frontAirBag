@@ -1,18 +1,30 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocale } from 'next-intl';
 // internal
 import { Box, DeliveryTwo, Processing, Truck } from "@/svg";
 import { userLoggedOut } from "@/redux/features/auth/authSlice";
 
 const NavProfileTab = ({ orderData }) => {
   const {user} = useSelector(state => state.auth)
+  const locale = useLocale();
   const dispatch = useDispatch();
   const router = useRouter();
+
+  // Функция для добавления локали к ссылкам
+  const getLocalizedLink = (link) => {
+    if (!link) return '#';
+    if (link.startsWith('/')) {
+      return `/${locale}${link}`;
+    }
+    return link;
+  };
+
   // handle logout
   const handleLogout = () => {
     dispatch(userLoggedOut());
-    router.push('/')
+    router.push(getLocalizedLink('/'))
   }
   return (
     <div className="profile__main">

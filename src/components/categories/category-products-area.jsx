@@ -191,8 +191,6 @@ const CategoryProductsArea = ({ categorySlug }) => {
         <div className="row">
           <div className="col-xl-12">
             <div className="tp-section-title-wrapper-2 mb-40">
-              <h3 className="tp-section-title-2">{getCategoryName()}</h3>
-              <p className="text-muted">{getCategoryDescription()}</p>
             </div>
           </div>
         </div>

@@ -3,19 +3,28 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useLogoutMutation } from "@/redux/features/auth/authApi";
 import LanguageSwitcher from '@/components/common/language-switcher';
 
 // setting
 function ProfileSetting() {
   const t = useTranslations('HeaderTopRight');
+  const locale = useLocale();
   const [isActive, setIsActive] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const router = useRouter();
   const pathname = usePathname();
-  const locale = pathname.split('/')[1]; // Получаем текущую локаль из URL
+
+  // Функция для добавления локали к ссылкам
+  const getLocalizedLink = (link) => {
+    if (!link) return '#';
+    if (link.startsWith('/')) {
+      return `/${locale}${link}`;
+    }
+    return link;
+  };
 
   // handle logout
   const handleLogout = () => {
@@ -47,13 +56,13 @@ function ProfileSetting() {
       </span>
       <ul className={isActive ? "tp-setting-list-open" : ""}>
         <li>
-          <Link href="/profile" onClick={() => setIsActive(false)}>{t('my_profile')}</Link>
+          <Link href={getLocalizedLink("/profile")} onClick={() => setIsActive(false)}>{t('my_profile')}</Link>
         </li>
         <li>
-          <Link href="/orders" onClick={() => setIsActive(false)}>{t('my_orders')}</Link>
+          <Link href={getLocalizedLink("/orders")} onClick={() => setIsActive(false)}>{t('my_orders')}</Link>
         </li>
         <li>
-          <Link href="/cart" onClick={() => setIsActive(false)}>{t('cart')}</Link>
+          <Link href={getLocalizedLink("/cart")} onClick={() => setIsActive(false)}>{t('cart')}</Link>
         </li>
         <li>
           {!user && <Link href={`/${locale}/login`} onClick={() => setIsActive(false)} className="cursor-pointer">{t('login')}</Link>}
