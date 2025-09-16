@@ -14,7 +14,6 @@ const RegisterForm = () => {
   const t = useTranslations('Common');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const isLoading = loading || isRegistering || isLoggingIn;
   const [cities, setCities] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
   const [selectedCity, setSelectedCity] = useState('');
@@ -78,6 +77,9 @@ const RegisterForm = () => {
   // Используем RTK Query для регистрации и входа
   const [registerUser, { isLoading: isRegistering }] = useRegisterMutation();
   const [login, { isLoading: isLoggingIn }] = useLoginMutation();
+  
+  // Общий статус загрузки
+  const isLoading = loading || isRegistering || isLoggingIn;
 
   // Поиск городов через API Новой Почты
   const fetchCities = async () => {
