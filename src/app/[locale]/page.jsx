@@ -6,6 +6,7 @@ import InstagramArea from "@/components/instagram/instagram-area";
 import NewArrivals from "@/components/products/electronics/new-arrivals";
 import ProductBanner from "@/components/products/electronics/product-banner";
 import AllProductsArea from "@/components/products/all-products-area";
+import MobileSearch from "@/components/search/mobile-search";
 import Footer from "@/layout/footers/footer";
 
 
@@ -14,6 +15,7 @@ export default function HomePage() {
     <Wrapper>
       <Header/>
       <FeatureArea/>
+      <MobileSearch/>
       <AllProductsArea/>
       {/*<NewArrivals/>*/}
       <CtaArea/>

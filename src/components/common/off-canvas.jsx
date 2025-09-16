@@ -5,23 +5,17 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 // internal
-import { CloseTwo, Search } from '@/svg';
+import { CloseTwo } from '@/svg';
 import logo from '@assets/img/logo/auto-delivery-logo-nobg.png';
 import contact_img from '@assets/img/icon/contact.png';
 import MobileCategory from '@/layout/headers/header-com/mobile-category';
 import MobileMenus from "./mobile-menus";
 import LanguageSwitcher from './language-switcher'; 
 
-import useSearchFormSubmit from "@/hooks/use-search-form-submit";
-
 const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
   const t = useTranslations('OffCanvas');
-  const tSearch = useTranslations('HeaderSearchForm');
   const locale = useLocale();
   const router = useRouter();
-  
-  // Mobile search functionality
-  const { setSearchText, handleSubmit, searchText } = useSearchFormSubmit();
 
   // Функция для добавления локали к ссылкам
   const getLocalizedLink = (link) => {
@@ -72,48 +66,6 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
                   />
                 </Link>
               </div>
-            </div>
-            
-            {/* Mobile Search */}
-            <div className="offcanvas__search mb-40">
-              <form onSubmit={(e) => {
-                handleSubmit(e);
-                setIsCanvasOpen(false);
-              }}>
-                <div className="tp-header-search-wrapper d-flex align-items-center">
-                  <div className="tp-header-search-box flex-grow-1">
-                    <input
-                      onChange={(e) => setSearchText(e.target.value)}
-                      value={searchText}
-                      type="text"
-                      placeholder={tSearch('placeholder')}
-                      style={{
-                        width: '100%',
-                        padding: '12px 15px',
-                        fontSize: '14px',
-                        outline: 'none'
-                      }}
-                    />
-                  </div>
-                  <div className="tp-header-search-btn">
-                    <button 
-                      type="submit"
-                      style={{
-                        padding: '12px 15px',
-                        backgroundColor: '#de8043',
-                        border: 'none',
-                        color: 'white',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <Search />
-                    </button>
-                  </div>
-                </div>
-              </form>
             </div>
             
             <div className="tp-main-menu-mobile fix d-lg-none mb-40">
