@@ -503,7 +503,6 @@
   
   .mobile-search-wrapper {
     border-radius: 8px;
-    padding: 15px;
   }
   
   .mobile-search-input {
@@ -552,6 +551,7 @@
     border-radius: 6px;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-left: 0px !important;
   }
 }
 
@@ -579,10 +579,6 @@
   
   .mobile-search-area {
     padding-top: 15px;
-    
-    .mobile-search-wrapper {
-      padding: 12px;
-    }
     
     .mobile-search-input {
       padding: 10px 12px !important;

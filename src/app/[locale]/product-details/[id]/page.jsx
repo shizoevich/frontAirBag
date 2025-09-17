@@ -7,26 +7,33 @@ export const metadata = {
   title: "AirBag - Product Details Page",
 };
 
-// Generate static params for static export
+// Generate static params - только для статического экспорта
 export async function generateStaticParams() {
-  // Return product IDs for static generation
-  // Generate IDs from 1 to 50 to cover most product links
-  const productIds = [];
-  
-  // Add numeric IDs from 1 to 50
-  for (let i = 1; i <= 50; i++) {
-    productIds.push({ id: i.toString() });
+  // Если используется статический экспорт, генерируем ограниченный набор
+  if (process.env.STATIC_EXPORT === 'true') {
+    const productIds = [];
+    
+    // Add numeric IDs from 1 to 50
+    for (let i = 1; i <= 50; i++) {
+      productIds.push({ id: i.toString() });
+    }
+    
+    // Add some common string IDs
+    productIds.push(
+      { id: 'sample' },
+      { id: 'demo' },
+      { id: 'test' }
+    );
+    
+    return productIds;
   }
   
-  // Add some common string IDs
-  productIds.push(
-    { id: 'sample' },
-    { id: 'demo' },
-    { id: 'test' }
-  );
-  
-  return productIds;
+  // Для ISR возвращаем пустой массив - страницы будут генерироваться по запросу
+  return [];
 }
+
+// Включаем ISR с revalidation каждые 60 секунд
+export const revalidate = 60;
 
 export default async function ProductDetailsPage({ params }) {
   const { id } = await params;
