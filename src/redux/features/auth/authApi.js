@@ -64,6 +64,27 @@ export const authApi = apiSlice.injectEndpoints({
               user: result.data,
             })
           );
+          
+          // Обновляем cookie с полной информацией о пользователе
+          const existingCookie = Cookies.get('userInfo');
+          if (existingCookie) {
+            try {
+              const cookieData = JSON.parse(existingCookie);
+              const updatedCookieData = {
+                ...cookieData,
+                user: result.data,
+                isGuest: result.data.is_guest || false,
+                guestId: result.data.guest_id || null
+              };
+              
+              // Сохраняем обновленные данные в cookie с тем же сроком действия
+              Cookies.set('userInfo', JSON.stringify(updatedCookieData), { 
+                expires: cookieData.expires || 1 
+              });
+            } catch (cookieError) {
+              console.error('Error updating cookie with user data:', cookieError);
+            }
+          }
         } catch (err) {
           console.error('Get user error:', err);
           // Если ошибка 401, выполняем logout

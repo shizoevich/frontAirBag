@@ -1,7 +1,7 @@
 'use client';
-'use client';
 import { useState, useEffect } from "react";
 import { useTranslations } from 'next-intl';
+import { useRouter, usePathname } from "next/navigation";
 // internal
 import { Search } from "@/svg";
 import NiceSelect from "@/ui/nice-select";
@@ -11,6 +11,8 @@ import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
 const HeaderSearchForm = () => {
   const tForm = useTranslations('HeaderSearchForm');
   const t = useTranslations('ParentCategories');
+  const router = useRouter();
+  const pathname = usePathname();
   const { setSearchText, setCategory, handleSubmit, searchText } = useSearchFormSubmit();
   const [categoryOptions, setCategoryOptions] = useState([
     { value: "Select Category", text: t('selectCategory') }
@@ -46,9 +48,26 @@ const HeaderSearchForm = () => {
     }
   }, [categoriesData, isLoading]);
 
-  // selectHandle
+  // selectHandle - автоматически запускаем поиск после выбора категории
   const selectCategoryHandle = (e) => {
     setCategory(e.value);
+    
+    // Если выбрана реальная категория (не "Select Category"), запускаем поиск автоматически
+    if (e.value !== "Select Category") {
+      // Создаем прямой переход на страницу поиска без сброса полей
+      const queryParams = [];
+      if (searchText) {
+        queryParams.push(`searchText=${searchText}`);
+      }
+      queryParams.push(`categoryId=${e.value}`);
+
+      // Extract current locale from pathname
+      const locale = pathname.split('/')[1] || 'uk';
+      const route = `/${locale}/search?${queryParams.join('&')}`;
+      
+      // Используем Next.js router для немедленного перехода
+      router.push(route);
+    }
   };
 
   return (

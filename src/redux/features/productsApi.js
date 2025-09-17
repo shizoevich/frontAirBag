@@ -28,9 +28,14 @@ export const productsApi = apiSlice.injectEndpoints({
       providesTags: ['products']
     }),
     
-    // Получение всех товаров без пагинации (для фильтров и т.д.)
+    // Получение всех товаров с поддержкой пагинации
     getAllProductsNoLimit: builder.query({
-      query: () => '/goods/',
+      query: ({ page = 1, limit = 12 } = {}) => {
+        const params = new URLSearchParams();
+        if (page) params.append('page', page);
+        if (limit) params.append('limit', limit);
+        return `/goods/?${params.toString()}`;
+      },
       providesTags: ['products']
     }),
 
@@ -168,20 +173,35 @@ getProductCategories: builder.query({
       },
       providesTags: ['RelatedProducts'],
     }),
+
+    // Получение товаров по списку ID (для "товары, которые покупают вместе")
+    getProductsByIds: builder.query({
+      query: (ids) => {
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+          return `/goods/?limit=0`; // Возвращаем пустой результат
+        }
+        // Создаем запрос с фильтрацией по id_remonline (так как together_buy содержит id_remonline)
+        const idsQuery = ids.map(id => `id_remonline=${id}`).join('&');
+        console.log('getProductsByIds - API URL:', `/goods/?${idsQuery}`);
+        return `/goods/?${idsQuery}`;
+      },
+      transformResponse: (response) => {
+        const products = response.results || response.data || response || [];
+        return {
+          data: products
+        };
+      },
+      providesTags: ['BoughtTogetherProducts'],
+    }),
   }),
 });
 
 export const {
   useGetAllProductsQuery,
   useGetAllProductsNoLimitQuery,
-  useGetProductsByCategoryQuery,
   useGetAllProductsDebugQuery,
+  useGetProductsByIdsQuery,
   useGetProductByIdQuery,
-  useCreateProductMutation,
-  useUpdateProductMutation,
-  useDeleteProductMutation,
-  useGetProductCategoriesQuery,
-  useGetFeaturedProductsQuery,
-  useGetNewArrivalsQuery,
   useGetRelatedProductsQuery,
+  useGetNewArrivalsQuery,
 } = productsApi;

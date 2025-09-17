@@ -1,5 +1,5 @@
 'use client';
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,15 +10,21 @@ import useCartInfo from "@/hooks/use-cart-info";
 import { CartTwo, Menu, User } from "@/svg";
 import { openCartMini } from "@/redux/features/cartSlice";
 import { useRouter } from "next/navigation";
+import { useGetUserQuery } from "@/redux/features/auth/authApi";
 
 const HeaderMainRight = ({ setIsCanvasOpen }) => {
   const t = useTranslations('HeaderMainRight');
-  const { user: userInfo } = useSelector((state) => state.auth);
+  const { user: userInfo, accessToken } = useSelector((state) => state.auth);
   const { quantity } = useCartInfo();
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
   const locale = pathname.split('/')[1]; // Получаем текущую локаль из URL
+  
+  // Загружаем данные пользователя, если есть токен, но нет данных пользователя
+  const { data: userData, error: userError } = useGetUserQuery(undefined, {
+    skip: !accessToken || !!userInfo // Пропускаем запрос, если нет токена или уже есть данные пользователя
+  });
   
   // Handle cart button click
   const handleCartClick = () => {

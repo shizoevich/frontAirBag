@@ -119,8 +119,8 @@ const useOrderCheckout = () => {
       };
 
       // Добавляем description только если оно не пустое
-      if (data.orderNote && data.orderNote.trim() !== "") {
-        orderData.description = data.orderNote.trim();
+      if (data.orderNotes && data.orderNotes.trim() !== "") {
+        orderData.description = data.orderNotes.trim();
       }
 
       // Детальное логирование данных заказа
