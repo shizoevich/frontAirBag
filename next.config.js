@@ -4,14 +4,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.js');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Поддержка статического экспорта только при явном указании STATIC_EXPORT=true
-  // По умолчанию используем ISR для динамической генерации страниц товаров
-  ...(process.env.STATIC_EXPORT === 'true' ? { 
-    output: 'export',
-    distDir: 'out',
-    basePath: '',
-    assetPrefix: '',
-  } : {}),
+
   trailingSlash: true,
   sassOptions: {
     // Подавляем предупреждения Sass о устаревших функциях Bootstrap

@@ -118,10 +118,7 @@ export const cartSlice = createSlice({
       state.orderQuantity = 1;
     },
     clearCart:(state) => {
-      const isClearCart = window.confirm('Are you sure you want to remove all items ?');
-      if(isClearCart){
-        state.cart_products = []
-      }
+      state.cart_products = [];
       setLocalStorage("cart_products", state.cart_products);
     },
     openCartMini:(state,{payload}) => {
