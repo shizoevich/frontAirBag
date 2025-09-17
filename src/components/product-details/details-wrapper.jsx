@@ -36,12 +36,6 @@ const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBott
       </div>
       <h3 className="tp-product-details-title">{title}</h3>
 
-      {/* inventory details */}
-      <div className="tp-product-details-inventory d-flex align-items-center mb-10">
-        <div className="tp-product-details-stock mb-10">
-          <span>{isAvailable ? t('inStock') : t('outOfStock')}</span>
-        </div>
-      </div>
       
       {/* stock notification */}
       <StockNotification availableQuantity={residue} requestedQuantity={0} />
@@ -100,31 +94,54 @@ const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBott
           <ProductQuantity maxQuantity={residue} />
           {/* product quantity */}
           <div className="tp-product-details-add-to-cart mb-15 w-100">
-            <Link href="/cart" onClick={() => dispatch(handleModalClose())}>
-              <button disabled={!isAvailable} className="tp-product-details-buy-now-btn w-100">{t('buyNow')}</button>
-            </Link>
+            {isAvailable ? (
+              <Link href="/cart" onClick={() => dispatch(handleModalClose())}>
+                <button className="tp-product-details-buy-now-btn w-100">{t('buyNow')}</button>
+              </Link>
+            ) : (
+              <button 
+                disabled 
+                className="tp-product-details-buy-now-btn w-100 out-of-stock-btn"
+                style={{
+                  backgroundColor: '#9e9e9e',
+                  color: '#666',
+                  cursor: 'not-allowed',
+                  opacity: 0.6,
+                  border: '1px solid #ccc'
+                }}
+              >
+                {t('buyNow')}
+              </button>
+            )}
           </div>
         </div>
         <button
-  onClick={() => handleAddProduct(productItem)}
-  disabled={!isAvailable}
-  style={{
-    backgroundColor: '#de8043',
-    color: '#000',
-    transition: 'background-color 0.3s ease, color 0.3s ease',
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.backgroundColor = '#000';
-    e.currentTarget.style.color = '#fff';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.backgroundColor = '#de8043';
-    e.currentTarget.style.color = '#000';
-  }}
-  className="tp-product-details-add-to-cart-btn w-100"
->
-  {t('addToCart')}
-</button>
+          onClick={() => isAvailable && handleAddProduct(productItem)}
+          disabled={!isAvailable}
+          style={{
+            backgroundColor: isAvailable ? '#de8043' : '#9e9e9e',
+            color: isAvailable ? '#000' : '#666',
+            transition: 'background-color 0.3s ease, color 0.3s ease',
+            cursor: isAvailable ? 'pointer' : 'not-allowed',
+            opacity: isAvailable ? 1 : 0.6,
+            border: isAvailable ? 'none' : '1px solid #ccc'
+          }}
+          onMouseEnter={(e) => {
+            if (isAvailable) {
+              e.currentTarget.style.backgroundColor = '#000';
+              e.currentTarget.style.color = '#fff';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (isAvailable) {
+              e.currentTarget.style.backgroundColor = '#de8043';
+              e.currentTarget.style.color = '#000';
+            }
+          }}
+          className={`tp-product-details-add-to-cart-btn w-100 ${!isAvailable ? 'out-of-stock-btn' : ''}`}
+        >
+          {isAvailable ? t('addToCart') : t('addToCart')}
+        </button>
 
       </div>
       {/* product-details-action-sm start */}

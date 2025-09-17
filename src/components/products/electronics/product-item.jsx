@@ -57,8 +57,15 @@ const ProductItem = ({ product }) => {
               alt={title || "product image"}
             />
           </div>
+          {/* Out of Stock Badge - красная плашка поверх фотографии */}
+          {isOutOfStock && (
+            <div className="tp-product-out-of-stock-badge">
+              <span className="out-of-stock-text">{t('outOfStock')}</span>
+            </div>
+          )}
+          
           <div className="tp-product-badge">
-            {isOutOfStock && <span className="product-hot">{t('outOfStock')}</span>}
+            {/* Другие badges если нужны */}
           </div>
         </Link>
 
@@ -135,26 +142,29 @@ const ProductItem = ({ product }) => {
                 {t('viewCart')}
               </Link>
             ) : (
-              <button
-                onClick={() => handleAddProduct(product)}
-                type="button"
-                className="tp-btn-sm w-100"
-                disabled={isOutOfStock}
-                style={{
-                  fontSize: '14px',
-                  padding: '8px 15px',
-                  backgroundColor: isOutOfStock ? '#ccc' : '#de8043',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: isOutOfStock ? 'not-allowed' : 'pointer'
-                }}
-              >
-                <span style={{ marginRight: '5px', display: 'inline-block', verticalAlign: 'middle' }}>
-                  <Cart width={16} height={16} />
-                </span>
-                {t('addToCart')}
-              </button>
+              <>
+                <button
+                  onClick={() => !isOutOfStock && handleAddProduct(product)}
+                  type="button"
+                  className={`tp-btn-sm w-100 ${isOutOfStock ? 'out-of-stock-btn' : ''}`}
+                  disabled={isOutOfStock}
+                  style={{
+                    fontSize: '14px',
+                    padding: '8px 15px',
+                    backgroundColor: isOutOfStock ? '#9e9e9e' : '#de8043',
+                    color: isOutOfStock ? '#666' : '#fff',
+                    border: isOutOfStock ? '1px solid #ccc' : 'none',
+                    borderRadius: '4px',
+                    cursor: isOutOfStock ? 'not-allowed' : 'pointer',
+                    opacity: isOutOfStock ? 0.6 : 1
+                  }}
+                >
+                  <span style={{ marginRight: '5px', display: 'inline-block', verticalAlign: 'middle' }}>
+                    <Cart width={16} height={16} />
+                  </span>
+                  {isOutOfStock ? t('outOfStock') : t('addToCart')}
+                </button>
+              </>
             )}
           </div>
         </div>

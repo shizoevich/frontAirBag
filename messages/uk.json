@@ -113,7 +113,8 @@
     "addToCart": "Додати в кошик",
     "viewCart": "Переглянути кошик",
     "quickView": "Швидкий перегляд",
-    "outOfStock": "Немає в наявності"
+    "outOfStock": "Немає в наявності",
+    "notAvailable": "Товара немає в наявності"
   },
   "ProductModal": {
     "contentLabel": "Деталі товару"
@@ -153,6 +154,7 @@
     "boughtTogether": "Товари, які купують разом",
     "inStock": "В наявності",
     "outOfStock": "Немає в наявності",
+    "notAvailable": "Товара немає в наявності",
     "availableItems": "Доступно: {count} шт.",
     "seeLess": "Згорнути",
     "seeMore": "Показати більше",
