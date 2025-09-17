@@ -241,6 +241,7 @@
     "register": "Register",
     "registering": "Registering...",
     "registerSuccess": "Registration successful",
+    "registerSuccessMessage": "User successfully created! Welcome to AirBag!",
     "registerFailed": "Registration failed",
     "registerToAirBag": "Register to AirBag.",
     "alreadyHaveAccount": "Already have an account?",
@@ -260,7 +261,17 @@
     "warehouse": "Nova Poshta Warehouse",
     "warehouseRequired": "Warehouse is required",
     "maxCharacters": "Max. {count} characters",
-    "invalidPhone": "Invalid phone number format"
+    "invalidPhone": "Invalid phone number format",
+    "invalidCredentials": "Invalid login or password",
+    "userAlreadyExists": "User with this phone or email already exists",
+    "emailAlreadyExists": "User with this email already exists",
+    "phoneAlreadyExists": "User with this phone already exists",
+    "serverError": "Server error. Please try again later",
+    "checkInputData": "Please check the entered data",
+    "registrationError": "Registration error",
+    "authenticationError": "Authentication error",
+    "passwordLettersAndNumbers": "Password must contain letters and numbers",
+    "agreeToTerms": "You must agree to the terms of service"
   },
   
   "ProfileExtra": {
@@ -605,5 +616,16 @@
       "email": "Noxnew@hotmail.com",
       "telegram": "Telegram bot"
     }
+  },
+  "OrderSuccess": {
+    "title": "Order Successfully Placed!",
+    "description": "Thank you for your order! We will contact you shortly to confirm delivery details.",
+    "nextSteps": "What's next?",
+    "step1": "We will process your order within 1-2 business days",
+    "step2": "Our manager will contact you for confirmation",
+    "step3": "We'll ship the goods to your selected Nova Poshta branch",
+    "step4": "We'll notify you when ready for pickup",
+    "continueShopping": "Continue Shopping",
+    "backToHome": "Back to Home"
   }
 }

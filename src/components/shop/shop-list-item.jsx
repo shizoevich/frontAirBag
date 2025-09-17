@@ -100,13 +100,13 @@ const ShopListItem = ({ product }) => {
           <div className="tp-product-price-wrapper-2">
             {discount > 0 ? (
               <>
-                <span className="tp-product-price-2 new-price">${price_minor}</span>
-                <span className="tp-product-price-2 old-price">
-                  {" "} ${(Number(price_minor || 0) / 100 - (Number(price_minor || 0) / 100 * Number(discount))).toFixed(2)}
+                <span className="tp-product-price-2 old-price">₴{(Number(price_minor || 0) / 100).toFixed(2)}</span>
+                <span className="tp-product-price-2 new-price">
+                  {" "}₴{(Number(price_minor || 0) / 100 - (Number(price_minor || 0) / 100 * Number(discount))).toFixed(2)}
                 </span>
               </>
             ) : (
-              <span className="tp-product-price-2 new-price">${price_minor}</span>
+              <span className="tp-product-price-2 new-price">₴{(Number(price_minor || 0) / 100).toFixed(2)}</span>
             )}
           </div>
           <p>

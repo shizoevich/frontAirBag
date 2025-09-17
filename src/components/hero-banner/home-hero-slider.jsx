@@ -116,7 +116,7 @@ const HomeHeroSlider = () => {
                   <div className="col-xl-5 col-lg-6 col-md-6">
                     <div className="tp-slider-content p-relative z-index-1">
                       <span>
-                        {item.pre_title.text} <b>${item.pre_title.price_minor}</b>
+                        {item.pre_title.text} <b>₴{(item.pre_title.price_minor / 100).toFixed(2)}</b>
                       </span>
                       <h3 className="tp-slider-title">{item.title}</h3>
                       <p>

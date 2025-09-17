@@ -108,8 +108,8 @@ const OrderArea = ({ orderId }) => {
                         <td>{i + 1}</td>
                         <td>{item.title}</td>
                         <td>{item.orderQuantity}</td>
-                        <td>${item.price_minor}</td>
-                        <td>${item.price_minor * item.orderQuantity}</td>
+                        <td>₴{(Number(item.price_minor || 0) / 100).toFixed(2)}</td>
+                        <td>₴{((Number(item.price_minor || 0) / 100) * item.orderQuantity).toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>

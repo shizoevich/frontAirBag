@@ -13,24 +13,27 @@ import { notifyError, notifySuccess } from '@/utils/toast';
 import { useTranslations } from 'next-intl';
 
 
-// schema
-const schema = Yup.object().shape({
-  email: Yup.string()
-    .required("Email обязателен для заполнения")
-    .email("Введите корректный email адрес")
-    .label("Email"),
-  password: Yup.string()
-    .required("Пароль обязателен для заполнения")
-    .min(6, "Пароль должен содержать минимум 6 символов")
-    .label("Password"),
-});
 const LoginForm = () => {
   const [showPass, setShowPass] = useState(false);
+  const [loginError, setLoginError] = useState('');
   const [login, { isLoading }] = useLoginMutation();
   const router = useRouter();
   const pathname = usePathname();
   const locale = pathname.split('/')[1]; // Получаем текущую локаль из URL
   const t = useTranslations('Common');
+
+  // Динамическая схема валидации с переводами
+  const schema = Yup.object().shape({
+    email: Yup.string()
+      .required(t('emailRequired'))
+      .email(t('invalidEmail'))
+      .label("Email"),
+    password: Yup.string()
+      .required(t('passwordRequired'))
+      .min(6, t('minCharacters', { count: 6 }))
+      .label("Password"),
+  });
+
   // react hook form
   const {
     register,
@@ -42,6 +45,8 @@ const LoginForm = () => {
   });
   // onSubmit
   const onSubmit = (data) => {
+    setLoginError(''); // Очищаем предыдущие ошибки
+    
     login({
       email: data.email,
       password: data.password,
@@ -65,29 +70,53 @@ const LoginForm = () => {
         }
       })
       .catch((error) => {
-        console.error('Login error:', error);
+        console.error('Login error details:', {
+          error,
+          errorData: error?.data,
+          errorStatus: error?.status,
+          errorMessage: error?.message,
+          fullError: JSON.stringify(error, null, 2)
+        });
         
-        // Обработка различных типов ошибок
-        let errorMessage = t('loginFailed');
+        // Обработка различных типов ошибок с мультиязычными сообщениями
+        let errorMessage = t('authenticationError');
         
+        // RTK Query ошибки имеют структуру { status, data, error }
         if (error?.data) {
           if (error.data.detail) {
-            errorMessage = error.data.detail;
+            // Проверяем на стандартные ошибки аутентификации
+            if (error.data.detail.includes('Invalid credentials') || 
+                error.data.detail.includes('Unable to log in') ||
+                error.data.detail.includes('No active account')) {
+              errorMessage = t('invalidCredentials');
+            } else {
+              errorMessage = error.data.detail;
+            }
           } else if (error.data.non_field_errors) {
-            errorMessage = error.data.non_field_errors[0];
+            const serverError = error.data.non_field_errors[0];
+            if (serverError.includes('Invalid credentials') || 
+                serverError.includes('Unable to log in')) {
+              errorMessage = t('invalidCredentials');
+            } else {
+              errorMessage = serverError;
+            }
           } else if (error.data.email) {
             errorMessage = `Email: ${error.data.email[0]}`;
           } else if (error.data.password) {
-            errorMessage = `Пароль: ${error.data.password[0]}`;
+            errorMessage = `${t('password')}: ${error.data.password[0]}`;
           }
-        } else if (error?.status === 401) {
-          errorMessage = "Неверный email или пароль";
+        } else if (error?.status === 401 || error?.status === 'PARSING_ERROR') {
+          errorMessage = t('invalidCredentials');
         } else if (error?.status === 400) {
-          errorMessage = "Проверьте правильность введенных данных";
+          errorMessage = t('checkInputData');
         } else if (error?.status >= 500) {
-          errorMessage = "Ошибка сервера. Попробуйте позже";
+          errorMessage = t('serverError');
+        } else if (error?.error) {
+          // Обработка сетевых ошибок
+          errorMessage = t('serverError');
         }
         
+        setLoginError(errorMessage);
         notifyError(errorMessage);
       })
       .finally(() => {
@@ -146,6 +175,23 @@ const LoginForm = () => {
         >
           {isLoading ? t('loggingIn') : t('login')}
         </button>
+        {loginError && (
+          <div className="tp-login-error mt-3">
+            <div className="alert alert-danger" style={{ 
+              backgroundColor: '#f8d7da', 
+              borderColor: '#f5c6cb', 
+              color: '#721c24',
+              fontSize: '14px',
+              padding: '10px 15px',
+              borderRadius: '6px',
+              border: '1px solid #f5c6cb',
+              marginBottom: 0
+            }}>
+              <i className="fas fa-exclamation-triangle me-2" style={{ fontSize: '16px' }}></i>
+              <span>{loginError}</span>
+            </div>
+          </div>
+        )}
       </div>
     </form>
   );

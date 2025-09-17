@@ -239,6 +239,7 @@
     "register": "Зарегистрироваться",
     "registering": "Регистрация...",
     "registerSuccess": "Регистрация успешна",
+    "registerSuccessMessage": "Пользователь успешно создан! Добро пожаловать в AirBag!",
     "registerFailed": "Ошибка регистрации",
     "registerToAirBag": "Регистрация в AirBag.",
     "alreadyHaveAccount": "Уже есть аккаунт?",
@@ -258,7 +259,17 @@
     "warehouse": "Отделение Новой Почты",
     "warehouseRequired": "Отделение обязательно",
     "maxCharacters": "Максимум {count} символов",
-    "invalidPhone": "Неверный формат номера телефона"
+    "invalidPhone": "Неверный формат номера телефона",
+    "invalidCredentials": "Неверный логин или пароль",
+    "userAlreadyExists": "Пользователь с таким телефоном или email уже существует",
+    "emailAlreadyExists": "Пользователь с таким email уже существует",
+    "phoneAlreadyExists": "Пользователь с таким телефоном уже существует",
+    "serverError": "Ошибка сервера. Попробуйте позже",
+    "checkInputData": "Проверьте правильность введенных данных",
+    "registrationError": "Ошибка регистрации",
+    "authenticationError": "Ошибка авторизации",
+    "passwordLettersAndNumbers": "Пароль должен содержать буквы и цифры",
+    "agreeToTerms": "Необходимо согласиться с условиями использования"
   },
   
   "ProfileExtra": {

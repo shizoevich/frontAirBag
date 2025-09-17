@@ -108,7 +108,7 @@ const OrderCheckoutArea = () => {
                               <p>
                                 {item.title} <span> x {item.orderQuantity}</span>
                               </p>
-                              <span>₴{formatPrice(Number(item.price_minor || 0) * item.orderQuantity)}</span>
+                              <span>₴{((Number(item.price_minor || 0) / 100) * item.orderQuantity).toFixed(2)}</span>
                             </li>
                           ))}
 

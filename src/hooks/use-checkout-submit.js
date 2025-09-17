@@ -88,7 +88,7 @@ const useCheckoutSubmit = () => {
     );
     const discountProductTotal = result?.reduce(
       (preValue, currentValue) =>
-        preValue + currentValue.price_minor * currentValue.orderQuantity,
+        preValue + (currentValue.price_minor / 100) * currentValue.orderQuantity,
       0
     );
     let totalValue = "";

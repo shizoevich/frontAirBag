@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useCreateOrderMutation } from "@/redux/features/ordersApi";
 import { useGetUserQuery, useCreateGuestMutation } from "@/redux/features/auth/authApi";
 import { clearCart } from "@/redux/features/cartSlice";
@@ -43,6 +43,7 @@ const useOrderCheckout = () => {
 
   const dispatch = useDispatch();
   const router = useRouter();
+  const { locale } = useParams();
   const { cart_products } = useSelector((state) => state.cart);
   const { user, accessToken } = useSelector((state) => state.auth);
   const { data: userData } = useGetUserQuery(undefined, { skip: !accessToken });
@@ -118,6 +119,16 @@ const useOrderCheckout = () => {
         }))
       };
 
+      // Детальное логирование данных заказа
+      console.log("=== ORDER DATA DEBUG ===");
+      console.log("Order data being sent:", JSON.stringify(orderData, null, 2));
+      console.log("Cart products:", JSON.stringify(cart_products, null, 2));
+      console.log("Current user:", JSON.stringify(currentUser, null, 2));
+      console.log("Form data:", JSON.stringify(data, null, 2));
+      console.log("Payment method:", paymentMethod);
+      console.log("Access token exists:", !!accessToken);
+      console.log("========================");
+
       // Если пользователь не авторизован, создаем гостевой аккаунт
       if (!accessToken) {
         console.log("Creating guest account for order...");
@@ -168,6 +179,14 @@ const useOrderCheckout = () => {
       // Показываем сообщение об успехе
       notifySuccess("Заказ успешно создан!");
       
+      // Сохраняем информацию о заказе в sessionStorage для отображения на странице успеха
+      sessionStorage.setItem('lastOrderInfo', JSON.stringify({
+        orderId: result.id,
+        paymentMethod,
+        orderData,
+        timestamp: new Date().toISOString()
+      }));
+
       // Если пользователь не авторизован, показываем модальное окно предложения регистрации
       if (!accessToken) {
         setShowGuestRegistrationModal(true);
@@ -177,12 +196,9 @@ const useOrderCheckout = () => {
           paymentMethod
         }));
       } else {
-        // Для авторизованных пользователей сразу перенаправляем
-        if (paymentMethod === "pay_now") {
-          router.push(`/payment/${result.id}`);
-        } else {
-          router.push(`/order-confirmation/${result.id}`);
-        }
+        // Для всех пользователей перенаправляем на страницу успешного оформления
+        // TODO: В будущем можно добавить логику оплаты для paymentMethod === "pay_now"
+        router.push(`/${locale}/order-success`);
       }
       
     } catch (error) {
@@ -195,8 +211,25 @@ const useOrderCheckout = () => {
         error: error?.error
       });
       
+      // Логируем полную структуру ошибки для диагностики
+      console.error("Full error object:", JSON.stringify(error, null, 2));
+      
+      // Если есть детали ошибки от сервера, выводим их
+      if (error?.data) {
+        console.error("Server error response:", JSON.stringify(error.data, null, 2));
+      }
+      
       // Более детальное сообщение об ошибке
       let errorMessage = "Ошибка при создании заказа. Попробуйте еще раз.";
+      
+      // Если есть конкретная ошибка от сервера, показываем её
+      if (error?.data?.detail) {
+        errorMessage = `Ошибка: ${error.data.detail}`;
+      } else if (error?.data?.message) {
+        errorMessage = `Ошибка: ${error.data.message}`;
+      } else if (error?.status === 400) {
+        errorMessage = "Некорректные данные заказа. Проверьте заполнение всех полей.";
+      }
       
       if (error?.data) {
         if (error.data.detail) {
