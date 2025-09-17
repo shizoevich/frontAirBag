@@ -10,11 +10,13 @@ const useCartInfo = () => {
     useEffect(() => {
         const cart = cart_products.reduce((cartTotal, cartItem) => {
             const { price_minor, orderQuantity } = cartItem;
-            // Конвертируем price_minor (копейки) в основную валюту (гривны) путем деления на 100
-            const priceInMainCurrency = price_minor / 100;
-            const itemTotal = priceInMainCurrency * orderQuantity;
+            // Безопасная конвертация: если price_minor отсутствует, считаем 0
+            const minor = Number(price_minor ?? 0);
+            const qty = Number(orderQuantity ?? 0);
+            const priceInMainCurrency = minor / 100;
+            const itemTotal = priceInMainCurrency * qty;
             cartTotal.total += itemTotal
-            cartTotal.quantity += orderQuantity
+            cartTotal.quantity += qty
 
             return cartTotal;
         }, {

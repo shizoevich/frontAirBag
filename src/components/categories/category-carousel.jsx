@@ -9,7 +9,7 @@ import 'swiper/css/grid';
 import 'swiper/css/navigation';
 import ErrorMsg from '../common/error-msg';
 import HomeCateLoader from '../loader/home/home-cate-loader';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 // Fallback image URL для категорий, когда изображение не загружается
 const FALLBACK_IMAGE = '/assets/img/category/noimage.png';
@@ -25,6 +25,7 @@ const CategoryCarousel = ({
   noResultsMessage
 }) => {
   const t = useTranslations('Categories');
+  const locale = useLocale();
   const navigationPrevRef = useRef(null);
   const navigationNextRef = useRef(null);
   const [mounted, setMounted] = useState(false);
@@ -46,9 +47,13 @@ const CategoryCarousel = ({
       console.log('CategoryCarousel: calling onCategorySelect with:', newCategoryId);
       onCategorySelect(newCategoryId);
     } else {
-      console.warn('onCategorySelect is not a function or not provided to CategoryCarousel');
-      // Альтернативная логика, если функция не передана
-      // Например, можно использовать локальное состояние
+      console.warn('onCategorySelect is not a function; navigating to search');
+      // Навигация на страницу поиска с выбранной категорией
+      if (categoryId) {
+        window.location.href = `/${locale}/search?categoryId=${categoryId}`;
+      } else {
+        window.location.href = `/${locale}/search`;
+      }
     }
   };
 

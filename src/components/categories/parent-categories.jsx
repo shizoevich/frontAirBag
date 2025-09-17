@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import ErrorMsg from '@/components/common/error-msg';
 import HomeCateLoader from '../loader/home/home-cate-loader';
 import Image from 'next/image';
@@ -13,6 +13,7 @@ const ParentCategories = ({
   onParentCategorySelect 
 }) => {
   const t = useTranslations('ParentCategories');
+  const locale = useLocale();
   
   // Идентификаторы родительских категорий (Covers, Комплектующие Airbag SRS, Пиропатроны)
   const parentCategoryIds = [754099, 754100, 754101];
@@ -79,7 +80,18 @@ const ParentCategories = ({
               <div 
                 key={category.id} 
                 className={`parent-category-item ${isActive ? 'active' : ''}`}
-                onClick={() => onParentCategorySelect(categoryId)}
+                onClick={() => {
+                  if (typeof onParentCategorySelect === 'function') {
+                    onParentCategorySelect(categoryId);
+                  } else {
+                    // Навигация на страницу поиска с выбранной родительской категорией
+                    if (categoryId) {
+                      window.location.href = `/${locale}/search?categoryId=${categoryId}`;
+                    } else {
+                      window.location.href = `/${locale}/search`;
+                    }
+                  }
+                }}
               >
                 <div 
                   className="parent-category-btn d-flex align-items-center"

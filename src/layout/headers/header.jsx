@@ -30,13 +30,21 @@ const Header = () => {
   const { sticky } = useSticky();
   const dispatch = useDispatch();
 
-  // Функция для добавления локали к ссылкам
-  const getLocalizedLink = (link) => {
-    if (!link) return '#';
-    if (link.startsWith('/')) {
-      return `/${locale}${link}`;
+  // Функция для добавления локали к ссылкам (с защитой от не-строк)
+  const getLocalizedLink = (link, context = 'Header') => {
+    try {
+      if (typeof link !== 'string') {
+        console.warn(`[getLocalizedLink] Non-string link in ${context}:`, link);
+        return `/${locale}`;
+      }
+      if (link.startsWith('/')) {
+        return `/${locale}${link}`;
+      }
+      return link;
+    } catch (e) {
+      console.warn(`[getLocalizedLink] Fallback in ${context}:`, e);
+      return `/${locale}`;
     }
-    return link;
   };
   
   // Close category menu when clicking outside

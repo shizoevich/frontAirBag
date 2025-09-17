@@ -10,7 +10,7 @@ import { Toaster } from 'react-hot-toast';
 export default function Providers({ children, locale, messages }) {
   return (
     <ReduxProvider>
-      <NextIntlClientProvider locale={locale} messages={messages}>
+      <NextIntlClientProvider locale={locale} messages={messages} timeZone="Europe/Kyiv">
         <AppProvider>
           {children}
           <Toaster 

@@ -2,8 +2,9 @@ import React from "react";
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
-import ShopSubcategoryArea from "@/components/shop/shop-subcategory-area";
+import ProductItem from "@/components/products/electronics/product-item";
 import { getTranslations } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 
 export async function generateMetadata({ params }) {
   const { locale, slug } = await params;
@@ -43,42 +44,43 @@ export async function generateMetadata({ params }) {
   };
 }
 
-// Generate static params for static export
-export async function generateStaticParams() {
-  // Return common subcategory slugs for static generation
-  return [
-    { slug: 'connectors' },
-    { slug: 'mounts' },
-    { slug: 'resistors' },
-    { slug: 'airbags' },
-    { slug: 'belt-parts' },
-    { slug: 'pyro-belts' },
-    { slug: 'pyro-seats' },
-    { slug: 'pyro-curtains' },
-    { slug: 'pyro-steering' },
-    { slug: 'pyro-dashboard' },
-    { slug: 'covers' },
-  ];
+export const revalidate = 600; // ISR 10 минут
+
+async function fetchSubcategoryProducts(slug) {
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL;
+  // Пытаемся фильтровать по slug категории на сервере (Django lookup-style)
+  const url = `${base}/goods/?category__slug=${encodeURIComponent(slug)}&limit=24&offset=0`;
+  const res = await fetch(url, { next: { revalidate, tags: ['products', `shop:slug:${slug}`] } });
+  if (!res.ok) return [];
+  const data = await res.json();
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.results)) return data.results;
+  if (Array.isArray(data?.data)) return data.data;
+  return [];
 }
 
 export default async function ShopSubcategoryPage({ params }) {
   const { slug } = await params;
-  // Преобразуем slug в более читаемый формат для отображения
-  const formatSlug = (slug) => {
-    return slug
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
-  
-  // Определяем заголовок и подзаголовок для хлебных крошек
-  const title = formatSlug(slug);
-  const subtitle = formatSlug(slug);
-  
+  if (!slug) notFound();
+  const products = await fetchSubcategoryProducts(slug);
+
   return (
     <Wrapper>
       <Header />
-      <ShopSubcategoryArea subcategorySlug={slug} />
+      <section className="tp-product-area pb-90">
+        <div className="container">
+          <div className="row">
+            {products.length === 0 && (
+              <div className="col-12"><p>Товари тимчасово недоступні.</p></div>
+            )}
+            {products.map((item) => (
+              <div className="col-xl-3 col-lg-4 col-md-6" key={item.id}>
+                <ProductItem product={item} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       <Footer primary_style={true} />
     </Wrapper>
   );

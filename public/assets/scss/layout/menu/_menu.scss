@@ -95,9 +95,6 @@
                                 color: var(--tp-theme-primary);
                             }
                         }
-                        & > .tp-submenu{
-                            
-                        }
                     }
                 }
             }
@@ -505,16 +502,7 @@
         right: 0;
         text-align: center;
     }
-    &-list{
-        & a{
-
-        }
-    }
-    &-arrow{
-        & button{
-
-        }
-    }
+    
 }
 
 
