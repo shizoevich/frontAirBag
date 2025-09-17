@@ -111,13 +111,17 @@ const useOrderCheckout = () => {
         last_name: data.lastName || currentUser?.last_name || "",
         phone: data.phone || currentUser?.phone || "",
         nova_post_address: novaPostAddress,
-        description: data.orderNote || "",
         prepayment: paymentMethod === "pay_now",
         items: cart_products.map(item => ({
           good: item.id, // Используем good вместо good_external_id согласно API схеме
           quantity: item.orderQuantity
         }))
       };
+
+      // Добавляем description только если оно не пустое
+      if (data.orderNote && data.orderNote.trim() !== "") {
+        orderData.description = data.orderNote.trim();
+      }
 
       // Детальное логирование данных заказа
       console.log("=== ORDER DATA DEBUG ===");
