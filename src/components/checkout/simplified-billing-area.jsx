@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 
 const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
@@ -17,19 +17,11 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
   const [selectedWarehouseName, setSelectedWarehouseName] = useState('');
   const [warehouses, setWarehouses] = useState([]);
   const [showWarehouseDropdown, setShowWarehouseDropdown] = useState(false);
-
-  // Заполняем поля данными пользователя при загрузке
-  useEffect(() => {
-    if (user) {
-      setValue('firstName', user.first_name || user.name || '');
-      setValue('lastName', user.last_name || '');
-      setValue('phone', user.phone || '');
-      // Если у пользователя есть сохраненный адрес НП, парсим его
-      if (user.nova_post_address) {
-        setValue('novaPostAddress', user.nova_post_address);
-      }
-    }
-  }, [user, setValue]);
+  
+  // Refs for inputs
+  const cityInputRef = useRef(null);
+  const warehouseInputRef = useRef(null);
+  
 
   // Поиск городов через API Новой Почты
   const fetchCities = async () => {
@@ -112,6 +104,21 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
   const handleCityChange = (e) => {
     const query = e.target.value;
     setSearchCity(query);
+    // При вводе текста считаем, что выбирается новый город
+    setSelectedCity('');
+    setSelectedCityName('');
+    setValue('city', query);
+    // Сбрасываем склад и связанные поля
+    setSelectedWarehouse('');
+    setSelectedWarehouseName('');
+    setValue('warehouse', '');
+    setWarehouses([]);
+
+    if (query && query.trim().length >= 2) {
+      setShowCityDropdown(true);
+    } else {
+      setShowCityDropdown(false);
+    }
   };
 
   // Обработка выбора города
@@ -138,6 +145,8 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
     } else {
       console.warn('CityRef is missing on selected city item:', city);
     }
+    // Сразу убираем фокус, чтобы избежать повторного открытия и лишних кликов
+    cityInputRef.current?.blur();
   };
 
   // Обработка изменения поля отделения
@@ -174,19 +183,33 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
     };
   }, []);
 
+  // Заполняем поля данными пользователя при загрузке
+  useEffect(() => {
+    if (user) {
+      setValue('firstName', user.first_name || user.name || '');
+      setValue('lastName', user.last_name || '');
+      setValue('phone', user.phone || '');
+      // Если у пользователя есть сохраненный адрес НП, парсим его
+      if (user.nova_post_address) {
+        setValue('novaPostAddress', user.nova_post_address);
+      }
+    }
+    fetchCities();
+  }, [user, setValue]);
+
   useEffect(() => {
     // Загружаем города при монтировании компонента
-    if (searchCity.length >= 2) {
+    if (searchCity.length >= 2 && !selectedCity) {
       fetchCities();
     }
-  }, [searchCity]);
+  }, [searchCity, selectedCity]);
 
   useEffect(() => {
     // Загружаем отделения при выборе города
     if (selectedCity) {
       fetchWarehouses();
     }
-  }, [selectedCity, searchWarehouse]);
+  }, [selectedCity]);
 
   return (
     <div className="tp-checkout-bill-area">
@@ -255,23 +278,47 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
               <div className="tp-checkout-input">
                 <label>{t('nova_post_city')} *</label>
                 <div className="tp-register-input-dropdown">
-                  <input
-                    {...register('city', {
-                      required: t('city_required'),
-                    })}
-                    type="text"
-                    placeholder={t('select_city')}
-                    value={searchCity}
-                    onChange={handleCityChange}
-                    autoComplete="off"
-                  />
+                  {(() => {
+                    const { ref: rhfCityRef, onChange: rhfCityOnChange, ...cityReg } = register('city', { required: t('city_required') });
+                    return (
+                      <input
+                        {...cityReg}
+                        ref={(el) => {
+                          cityInputRef.current = el;
+                          if (typeof rhfCityRef === 'function') rhfCityRef(el);
+                          else if (rhfCityRef) rhfCityRef.current = el;
+                        }}
+                        type="text"
+                        placeholder={t('select_city')}
+                        value={searchCity}
+                        onChange={(e) => {
+                          handleCityChange(e);
+                          rhfCityOnChange?.(e);
+                        }}
+                        onFocus={() => {
+                          if (cities.length > 0) setShowCityDropdown(true);
+                          else if (searchCity.trim().length >= 2) fetchCities();
+                        }}
+                        onBlur={() => {
+                          // Даем onMouseDown на элементе выпадающего списка выполниться раньше blur
+                          setTimeout(() => setShowCityDropdown(false), 150);
+                        }}
+                        autoComplete="off"
+                      />
+                    );
+                  })()}
                   {showCityDropdown && cities.length > 0 && (
                     <div className="tp-register-dropdown">
                       {cities.map((city) => (
                         <div
-                          key={city.Ref}
+                          key={city.Ref || city.DeliveryCity || city.SettlementRef || city.Present}
                           className="tp-register-dropdown-item"
-                          onClick={() => handleCitySelect(city)}
+                          onMouseDown={(e) => {
+                            // предотвращаем blur инпута до выбора
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleCitySelect(city);
+                          }}
                         >
                           {city.Present}
                         </div>
@@ -290,24 +337,45 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
               <div className="tp-checkout-input">
                 <label>{t('nova_post_warehouse')} *</label>
                 <div className="tp-register-input-dropdown">
-                  <input
-                    {...register('warehouse', {
-                      required: t('warehouse_required'),
-                    })}
-                    type="text"
-                    placeholder={t('select_warehouse')}
-                    value={searchWarehouse}
-                    onChange={handleWarehouseChange}
-                    disabled={!selectedCity}
-                    autoComplete="off"
-                  />
+                  {(() => {
+                    const { ref: rhfWhRef, onChange: rhfWhOnChange, ...whReg } = register('warehouse', { required: t('warehouse_required') });
+                    return (
+                      <input
+                        {...whReg}
+                        ref={(el) => {
+                          warehouseInputRef.current = el;
+                          if (typeof rhfWhRef === 'function') rhfWhRef(el);
+                          else if (rhfWhRef) rhfWhRef.current = el;
+                        }}
+                        type="text"
+                        placeholder={t('select_warehouse')}
+                        value={searchWarehouse}
+                        onChange={(e) => {
+                          handleWarehouseChange(e);
+                          rhfWhOnChange?.(e);
+                        }}
+                        disabled={!selectedCity}
+                        onFocus={() => {
+                          if (warehouses.length > 0) setShowWarehouseDropdown(true);
+                        }}
+                        onBlur={() => {
+                          setTimeout(() => setShowWarehouseDropdown(false), 150);
+                        }}
+                        autoComplete="off"
+                      />
+                    );
+                  })()}
                   {showWarehouseDropdown && warehouses.length > 0 && (
                     <div className="tp-register-dropdown">
                       {warehouses.map((warehouse) => (
                         <div
                           key={warehouse.Ref}
                           className="tp-register-dropdown-item"
-                          onClick={() => handleWarehouseSelect(warehouse)}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleWarehouseSelect(warehouse);
+                          }}
                         >
                           {warehouse.Description}
                         </div>

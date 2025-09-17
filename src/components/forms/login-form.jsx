@@ -4,11 +4,13 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useRouter, usePathname } from 'next/navigation';
+import { useDispatch } from 'react-redux';
 import Link from 'next/link';
 // internal
 import { CloseEye, OpenEye } from '@/svg';
 import ErrorMsg from '../common/error-msg';
 import { useLoginMutation } from '@/redux/features/auth/authApi';
+import { userLoggedIn } from '@/redux/features/auth/authSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import { useTranslations } from 'next-intl';
 
@@ -17,10 +19,13 @@ const LoginForm = () => {
   const [showPass, setShowPass] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [login, { isLoading }] = useLoginMutation();
+  const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
   const locale = pathname.split('/')[1]; // Получаем текущую локаль из URL
   const t = useTranslations('Common');
+
+
 
   // Динамическая схема валидации с переводами
   const schema = Yup.object().shape({
@@ -47,23 +52,58 @@ const LoginForm = () => {
   const onSubmit = (data) => {
     setLoginError(''); // Очищаем предыдущие ошибки
     
-    login({
+    const loginPromise = login({
       email: data.email,
       password: data.password,
       remember: data.remember || false
-    })
+    });
+    
+    loginPromise
       .unwrap()
-      .then((response) => {
+      .then(async (response) => {
+        // Сохраняем токены в localStorage и cookies (перенесено из onQueryStarted)
+        try {
+          const { access, refresh } = response;
+          
+          // Сохраняем в localStorage
+          const authData = { accessToken: access, refreshToken: refresh };
+          localStorage.setItem('userInfo', JSON.stringify(authData));
+          
+          // Сохраняем в cookies
+          const Cookies = (await import('js-cookie')).default;
+          Cookies.set('userInfo', JSON.stringify(authData), { expires: 7 });
+          
+          // Обновляем Redux состояние
+          dispatch(userLoggedIn({
+            accessToken: access,
+          }));
+          
+        } catch (saveError) {
+          console.error('Error saving tokens:', saveError);
+        }
+        
         notifySuccess(t('loginSuccess'));
         
         // Проверяем, есть ли параметр redirect в URL или localStorage
         const urlParams = new URLSearchParams(window.location.search);
         const redirectUrl = urlParams.get('redirect') || localStorage.getItem('redirectAfterLogin');
         
+        // Очищаем сохраненный redirect в любом случае
+        localStorage.removeItem('redirectAfterLogin');
+        
         if (redirectUrl) {
-          // Очищаем сохраненный redirect
-          localStorage.removeItem('redirectAfterLogin');
-          router.push(redirectUrl);
+          // Проверяем, что redirect URL не ведет на страницы авторизации
+          const isAuthPage = redirectUrl.includes('/login') || 
+                           redirectUrl.includes('/register') || 
+                           redirectUrl.includes('/forgot');
+          
+          if (!isAuthPage) {
+            // Безопасный редирект на сохраненную страницу
+            router.push(redirectUrl);
+          } else {
+            // Если redirect ведет на страницу авторизации, идем на главную
+            router.push(`/${locale}`);
+          }
         } else {
           // По умолчанию перенаправляем на главную страницу с учетом локали
           router.push(`/${locale}`);

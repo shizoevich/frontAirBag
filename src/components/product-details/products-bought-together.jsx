@@ -14,14 +14,17 @@ const ProductsBoughtTogether = ({ togetherBuyProducts }) => {
   console.log('ProductsBoughtTogether - isArray:', Array.isArray(togetherBuyProducts));
   console.log('ProductsBoughtTogether - length:', togetherBuyProducts?.length);
 
+  // Получаем полные данные товаров по их ID (всегда вызываем хук)
+  const shouldFetch = togetherBuyProducts && Array.isArray(togetherBuyProducts) && togetherBuyProducts.length > 0;
+  const { data: productsData, isLoading, isError } = useGetProductsByIdsQuery(
+    shouldFetch ? togetherBuyProducts : []
+  );
+
   // Не показываем блок если нет товаров
-  if (!togetherBuyProducts || !Array.isArray(togetherBuyProducts) || togetherBuyProducts.length === 0) {
+  if (!shouldFetch) {
     console.log('ProductsBoughtTogether - returning null due to empty data');
     return null;
   }
-
-  // Получаем полные данные товаров по их ID
-  const { data: productsData, isLoading, isError } = useGetProductsByIdsQuery(togetherBuyProducts);
   
   // Debug: логируем результат API запроса
   console.log('ProductsBoughtTogether - API result:', { productsData, isLoading, isError });

@@ -12,7 +12,11 @@ function ProfileSetting() {
   const t = useTranslations('HeaderTopRight');
   const locale = useLocale();
   const [isActive, setIsActive] = useState(false);
-  const { user } = useSelector((state) => state.auth);
+  const { user, accessToken, isGuest } = useSelector((state) => state.auth);
+  
+  // Проверяем, авторизован ли пользователь
+  const isAuthenticated = !!accessToken;
+  const isAuthenticatedUser = isAuthenticated && !isGuest;
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const router = useRouter();
   const pathname = usePathname();
@@ -65,8 +69,8 @@ function ProfileSetting() {
           <Link href={getLocalizedLink("/cart")} onClick={() => setIsActive(false)}>{t('cart')}</Link>
         </li>
         <li>
-          {!user && <Link href={`/${locale}/login`} onClick={() => setIsActive(false)} className="cursor-pointer">{t('login')}</Link>}
-          {user && <a onClick={handleLogout} className="cursor-pointer" style={{ opacity: isLoggingOut ? 0.7 : 1 }}>
+          {!isAuthenticated && <Link href={`/${locale}/login`} onClick={() => setIsActive(false)} className="cursor-pointer">{t('login')}</Link>}
+          {isAuthenticated && <a onClick={handleLogout} className="cursor-pointer" style={{ opacity: isLoggingOut ? 0.7 : 1 }}>
             {isLoggingOut ? '...' : t('logout')}
           </a>}
         </li>

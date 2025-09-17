@@ -26,6 +26,12 @@ export const ToastProvider = ({ children }) => {
 
   // Expose addToast to global window object
   useEffect(() => {
+    if (message) {
+      addToast(message, type);
+    }
+  }, [message, type, addToast]);
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       window.addToast = addToast;
     }

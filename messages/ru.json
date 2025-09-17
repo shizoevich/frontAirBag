@@ -201,9 +201,10 @@
     "logout": "Выйти"
   },
   "AllProductsArea": {
-    "loadingError": "Ошибка загрузки товаров",
+    "ourProducts": "Наши товары",
     "noProductsFound": "Товары не найдены",
-    "ourProducts": "Наши товары"
+    "showing": "Показано",
+    "products": "товаров"
   },
   "SearchPage": {
     "title": "AirBag - Поиск товаров",

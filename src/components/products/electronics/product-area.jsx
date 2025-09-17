@@ -1,13 +1,12 @@
 'use client';
-import React, { useState, useEffect } from "react";
-import { ShapeLine } from "@/svg";
-import ProductItem from "./product-item";
+import React, { useEffect, useState, useMemo } from "react";
+import { useGetShowCategoryQuery, useGetProductsByCategoryIdRemonlineQuery } from "@/redux/features/categoryApi";
 import ErrorMsg from "@/components/common/error-msg";
+import { HomeNewArrivalPrdLoader } from "@/components/loader";
 import HomePrdLoader from "@/components/loader/home/home-prd-loader";
-import {
-  useGetShowCategoryQuery,
-  useGetProductsByCategoryIdRemonlineQuery
-} from "@/redux/features/categoryApi";
+import ProductItem from "./product-item";
+import { useTranslations } from 'next-intl';
+import { ShapeLine } from "@/svg";
 
 const ProductArea = () => {
   const [mounted, setMounted] = useState(false);
@@ -21,14 +20,16 @@ const ProductArea = () => {
     isError: catError
   } = useGetShowCategoryQuery();
 
-  // Преобразуем данные категорий в массив
-  const categories = Array.isArray(categoriesData) 
-    ? categoriesData 
-    : Array.isArray(categoriesData?.data) 
-      ? categoriesData.data 
-      : Array.isArray(categoriesData?.results) 
-        ? categoriesData.results 
-        : [];
+  // Преобразуем данные категорий в массив с useMemo для оптимизации
+  const categories = useMemo(() => {
+    return Array.isArray(categoriesData) 
+      ? categoriesData 
+      : Array.isArray(categoriesData?.data) 
+        ? categoriesData.data 
+        : Array.isArray(categoriesData?.results) 
+          ? categoriesData.results 
+          : [];
+  }, [categoriesData]);
 
   const [activeCategoryId, setActiveCategoryId] = useState(null);
 

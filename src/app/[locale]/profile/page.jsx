@@ -6,6 +6,7 @@ import Footer from "@/layout/footers/footer";
 import SEO from "@/components/seo";
 import { useTranslations } from 'next-intl';
 import UserProfileArea from '@/components/profile/user-profile-area';
+import AuthGuard from '@/components/auth/auth-guard';
 
 export default function ProfilePage() {
   const t = useTranslations('Profile');
@@ -14,7 +15,9 @@ export default function ProfilePage() {
     <Wrapper>
       <SEO pageTitle={t('profilePage')} />
       <Header />
-      <UserProfileArea />
+      <AuthGuard requireAuth="user">
+        <UserProfileArea />
+      </AuthGuard>
       <Footer style_2={true} />
     </Wrapper>
   );

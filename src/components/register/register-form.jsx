@@ -172,14 +172,14 @@ const RegisterForm = () => {
     if (searchCity.length >= 2) {
       fetchCities();
     }
-  }, [searchCity]);
+  }, [searchCity, fetchCities]);
 
   useEffect(() => {
     // Загружаем отделения при выборе города
     if (selectedCity) {
       fetchWarehouses();
     }
-  }, [selectedCity, searchWarehouse]);
+  }, [selectedCity, fetchWarehouses, searchWarehouse]);
   
   // Используем isRegistering из RTK Query для отслеживания статуса запроса
   useEffect(() => {

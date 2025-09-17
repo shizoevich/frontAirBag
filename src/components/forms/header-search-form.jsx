@@ -46,7 +46,7 @@ const HeaderSearchForm = () => {
       
       setCategoryOptions(options);
     }
-  }, [categoriesData, isLoading]);
+  }, [categoriesData, isLoading, t]);
 
   // selectHandle - автоматически запускаем поиск после выбора категории
   const selectCategoryHandle = (e) => {

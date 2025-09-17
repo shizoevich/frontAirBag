@@ -5,30 +5,60 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from 'next-intl';
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 // internal
 import useCartInfo from "@/hooks/use-cart-info";
-import { CartTwo, Menu, User } from "@/svg";
 import { openCartMini } from "@/redux/features/cartSlice";
-import { useRouter } from "next/navigation";
 import { useGetUserQuery } from "@/redux/features/auth/authApi";
+import { userLoggedIn } from "@/redux/features/auth/authSlice";
+import { CartTwo, Menu, User } from "@/svg";
+import Cookies from "js-cookie";
 
 const HeaderMainRight = ({ setIsCanvasOpen }) => {
   const t = useTranslations('HeaderMainRight');
-  const { user: userInfo, accessToken } = useSelector((state) => state.auth);
+  const { user: userInfo, accessToken, isGuest } = useSelector((state) => state.auth);
   const { quantity } = useCartInfo();
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
   const locale = pathname.split('/')[1]; // Получаем текущую локаль из URL
   
+  // Проверяем, авторизован ли пользователь
+  const isAuthenticated = !!accessToken;
+  const isAuthenticatedUser = isAuthenticated && !isGuest;
+  
   // Загружаем данные пользователя, если есть токен, но нет данных пользователя
   const { data: userData, error: userError } = useGetUserQuery(undefined, {
     skip: !accessToken || !!userInfo // Пропускаем запрос, если нет токена или уже есть данные пользователя
   });
   
+  // Используем данные пользователя из Redux или из API запроса
+  const currentUser = userInfo || userData;
+  
+  // Debug логи для отслеживания состояния пользователя
+  console.log('HeaderMainRight: Auth state:', {
+    isAuthenticated,
+    isAuthenticatedUser,
+    userInfo,
+    userData,
+    currentUser,
+    accessToken: !!accessToken,
+    rawAccessToken: accessToken,
+    isGuest,
+    fullReduxState: { accessToken, user: userInfo, isGuest }
+  });
+  
+  // Дополнительная проверка localStorage
+  if (typeof window !== 'undefined') {
+    const localStorageData = localStorage.getItem('userInfo');
+    console.log('HeaderMainRight: localStorage userInfo:', localStorageData);
+  }
+
+  
   // Handle cart button click
   const handleCartClick = () => {
     dispatch(openCartMini());
+    console.log('Cart button clicked');
   };
   
 
@@ -38,19 +68,20 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
         <div className="d-flex align-items-center">
           <div className="tp-header-login-icon">
             <span>
-              {userInfo?.imageURL ? (
+              {isAuthenticatedUser && currentUser?.imageURL ? (
                 <Link href={`/${locale}/profile`}>
                   <Image
-                    src={userInfo.imageURL}
+                    src={currentUser.imageURL}
                     alt="user img"
                     width={35}
                     height={35}
+                    style={{ height: "auto" }}
                   />
                 </Link>
-              ) : userInfo ? (
+              ) : isAuthenticatedUser && currentUser ? (
                 <Link href={`/${locale}/profile`}>
                   <h2 className="text-uppercase login_text">
-                    {(userInfo.email || userInfo.username || 'U')[0]}
+                    {(currentUser.email || currentUser.username || 'U')[0]}
                   </h2>
                 </Link>
               ) : (
@@ -59,15 +90,15 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
             </span>
           </div>
           <div className="tp-header-login-content d-none d-xl-block">
-            {!userInfo && (
+            {!isAuthenticatedUser && (
               <Link href={`/${locale}/login`}>
                 <span>{t('hello')}</span>
               </Link>
             )}
-            {userInfo && <span>{t('helloWithName', { name: userInfo.email || userInfo.username || 'User' })}</span>}
+            {isAuthenticatedUser && currentUser && <span>{t('helloWithName', { name: currentUser.email || currentUser.username || 'User' })}</span>}
             <div className="tp-header-login-title">
-              {!userInfo && <Link href={`/${locale}/login`}>{t('signIn')}</Link>}
-              {userInfo && <Link href={`/${locale}/profile`}>{t('yourAccount')}</Link>}
+              {!isAuthenticatedUser && <Link href={`/${locale}/login`}>{t('signIn')}</Link>}
+              {isAuthenticatedUser && <Link href={`/${locale}/profile`}>{t('yourAccount')}</Link>}
             </div>
           </div>
         </div>

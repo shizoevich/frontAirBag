@@ -204,9 +204,8 @@
     "logout": "Вийти"
   },
   "AllProductsArea": {
-    "loadingError": "Помилка завантаження товарів",
-    "noProductsFound": "Товари не знайдено",
     "ourProducts": "Наші товари",
+    "noProductsFound": "Товарів не знайдено",
     "showing": "Показано",
     "products": "товарів"
   },

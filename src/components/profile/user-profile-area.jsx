@@ -35,15 +35,19 @@ const UserProfileArea = () => {
   // Получаем данные пользователя
   const { data: userData, isLoading, isError } = useGetUserQuery();
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
-  const { user } = useSelector((state) => state.auth);
+  const { user, accessToken } = useSelector((state) => state.auth);
   
   // Проверяем авторизацию
   useEffect(() => {
-    const isAuthenticate = getAuth();
-    if (!isAuthenticate) {
+    const authData = getAuth();
+    const isAuthenticated = authData?.accessToken || accessToken;
+    
+    if (!isAuthenticated) {
+      // Сохраняем текущий URL для редиректа после логина
+      localStorage.setItem('redirectAfterLogin', `/${locale}/profile`);
       router.push(`/${locale}/login`);
     }
-  }, [router, locale]);
+  }, [router, locale, accessToken]);
   
   // Инициализация данных формы при загрузке пользователя
   useEffect(() => {
@@ -223,7 +227,7 @@ const UserProfileArea = () => {
                         </button>
                       </div>
                       <div className="col-xxl-6 col-md-6">
-                        <Link href={`/${locale}/my-orders`} className="tp-btn tp-btn-2 w-100 d-flex align-items-center justify-content-center shadow-sm">
+                        <Link href={`/${locale}/orders`} className="tp-btn tp-btn-2 w-100 d-flex align-items-center justify-content-center shadow-sm">
                           <i className="fas fa-shopping-bag me-2"></i> {t('myOrders')}
                         </Link>
                       </div>

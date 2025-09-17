@@ -72,6 +72,7 @@
     "shoppingCart": "Shopping Cart",
     "addMoreForFreeShipping": "Add {amount} more to qualify for free shipping",
     "eligibleForFreeShipping": "You are eligible for free shipping",
+    "discountHint": "Add {amount} more to get a discount",
     "yourCartIsEmpty": "Your Cart is empty",
     "goToShop": "Go to Shop",
     "subtotal": "Subtotal:",
@@ -212,8 +213,10 @@
   },
   "AllProductsArea": {
     "loadingError": "Error loading products",
-    "noProductsFound": "Products not found",
-    "ourProducts": "Our Products"
+    "noProductsFound": "No products found",
+    "ourProducts": "Our Products",
+    "showing": "Showing",
+    "products": "products"
   },
   "SearchPage": {
     "title": "AirBag - Search Products",

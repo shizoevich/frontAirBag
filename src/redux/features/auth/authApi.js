@@ -1,6 +1,7 @@
 import { apiSlice } from "@/redux/api/apiSlice";
 import { userLoggedIn, userLoggedOut } from "./authSlice";
 import { setAuth, updateAuth, removeAuth, getAuth } from "@/utils/authStorage";
+import Cookies from "js-cookie";
 
 export const authApi = apiSlice.injectEndpoints({
   overrideExisting: true,
@@ -22,12 +23,17 @@ export const authApi = apiSlice.injectEndpoints({
       },
 
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        console.log('🔧 LOGIN API: onQueryStarted called with arg:', arg);
         try {
+          console.log('🔧 LOGIN API: Waiting for queryFulfilled...');
           const result = await queryFulfilled;
+          console.log('🔧 LOGIN API: queryFulfilled resolved, result:', result);
+          console.log('Login successful, received tokens:', { access: !!result.data.access, refresh: !!result.data.refresh });
           
           // Сохраняем токены в localStorage (без cookies)
           const { access, refresh } = result.data;
           setAuth({ accessToken: access, refreshToken: refresh });
+          console.log('Tokens saved to localStorage');
 
           // Диспатчим действие для обновления состояния
           dispatch(
@@ -35,14 +41,39 @@ export const authApi = apiSlice.injectEndpoints({
               accessToken: access,
             })
           );
+          console.log('Redux state updated with access token');
           
-          // После успешного логина получаем данные пользователя
-          dispatch(authApi.endpoints.getUser.initiate());
+          // Синхронизируем cookie для совместимости с authMiddleware и initialState
+          try {
+            Cookies.set(
+              'userInfo',
+              JSON.stringify({
+                accessToken: access,
+                refreshToken: refresh,
+                // user пока не знаем, будет установлен после getUser
+              }),
+              { expires: 7 }
+            );
+            console.log('Cookies userInfo set (tokens)');
+          } catch (cookieErr) {
+            console.error('Failed to set cookies userInfo after login:', cookieErr);
+          }
+          
+          // После успешного логина получаем данные пользователя и ждем их загрузки
+          try {
+            console.log('Fetching user data...');
+            const userResult = await dispatch(authApi.endpoints.getUser.initiate()).unwrap();
+            console.log('User data loaded successfully:', userResult);
+          } catch (userError) {
+            console.error('Failed to load user data after login:', userError);
+          }
         } catch (err) {
+          console.log('🔧 LOGIN API: queryFulfilled rejected, error:', err);
           // RTK Query may attach the error under err.error or err.data
           const status = err?.error?.status ?? err?.status;
           const data = err?.error?.data ?? err?.data;
           const message = data?.detail || data?.message || err?.error || err?.message || 'Unknown error';
+          console.error('🔧 LOGIN API: Login error details:', { status, data, message, fullError: err });
           console.error('Login error:', { status, data, message });
         }
       },
@@ -58,26 +89,62 @@ export const authApi = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
+          console.log('GetUser successful, received user data:', result.data);
           
-          // Обновляем данные пользователя в store
+          // Получаем текущие данные из localStorage для сохранения токена
+          const existing = getAuth();
+          console.log('Current auth data in localStorage:', existing);
+          
+          // Обновляем данные пользователя в store с сохранением токена
           dispatch(
             userLoggedIn({
+              accessToken: existing?.accessToken || null, // Сохраняем токен
               user: result.data,
+              isGuest: result.data.is_guest || false,
+              guestId: result.data.guest_id || null,
             })
           );
+          console.log('Redux state updated with user data and token');
           
-          // Обновляем cookie с полной информацией о пользователе
-          const existing = getAuth();
+          // Обновляем localStorage с полной информацией о пользователе
           if (existing) {
             try {
-              updateAuth({
+              const updatedData = {
                 user: result.data,
                 isGuest: result.data.is_guest || false,
                 guestId: result.data.guest_id || null,
-              });
+              };
+              updateAuth(updatedData);
+              console.log('Updated localStorage with user data:', updatedData);
+              
+              // Проверяем, что данные действительно сохранились
+              const verifyData = getAuth();
+              console.log('Verification - auth data after update:', verifyData);
             } catch (storageError) {
               console.error('Error updating local auth with user data:', storageError);
             }
+          } else {
+            console.warn('No existing auth data found in localStorage during user data update');
+          }
+
+          // Синхронизируем cookie userInfo с полным набором данных (tokens + user)
+          try {
+            const cookieExisting = Cookies.get('userInfo');
+            const cookieTokens = cookieExisting ? JSON.parse(cookieExisting) : {};
+            Cookies.set(
+              'userInfo',
+              JSON.stringify({
+                accessToken: cookieTokens.accessToken || existing?.accessToken || null,
+                refreshToken: cookieTokens.refreshToken || null,
+                user: result.data,
+                isGuest: result.data.is_guest || false,
+                guestId: result.data.guest_id || null,
+              }),
+              { expires: 7 }
+            );
+            console.log('Cookies userInfo updated with user data');
+          } catch (cookieErr) {
+            console.error('Failed to update cookies userInfo after getUser:', cookieErr);
           }
         } catch (err) {
           console.error('Get user error:', err);

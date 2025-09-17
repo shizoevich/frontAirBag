@@ -5,8 +5,8 @@ import LoginArea from "@/components/login-register/login-area";
 import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata({ params }) {
-  // Получаем локаль асинхронно
-  const locale = params.locale;
+  // В Next.js 15 params должен быть awaited
+  const { locale } = await params;
   
   // Получаем переводы для заголовка
   let title = 'Login';

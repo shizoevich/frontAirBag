@@ -5,6 +5,7 @@ import { ReduxProvider } from '@/redux/provider';
 import { AppProvider } from '@/context/app-context';
 import { NextIntlClientProvider } from 'next-intl';
 import { Toaster } from 'react-hot-toast';
+import AuthInitializer from '@/components/auth/auth-initializer';
 
 // This component centralizes all client-side providers
 export default function Providers({ children, locale, messages }) {
@@ -12,7 +13,9 @@ export default function Providers({ children, locale, messages }) {
     <ReduxProvider>
       <NextIntlClientProvider locale={locale} messages={messages} timeZone="Europe/Kyiv">
         <AppProvider>
-          {children}
+          <AuthInitializer>
+            {children}
+          </AuthInitializer>
           <Toaster 
             position="top-right"
             reverseOrder={false}
