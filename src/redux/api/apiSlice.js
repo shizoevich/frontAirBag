@@ -1,6 +1,6 @@
-import Cookies from "js-cookie";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { userLoggedOut } from "../features/auth/authSlice";
+import { getAccessToken, getRefreshToken, setAuth, getAuth } from "@/utils/authStorage";
 
 // Логируем базовый URL для отладки
 console.log('API Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
@@ -8,17 +8,14 @@ console.log('API Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
 // Создаем базовый запрос с обработкой токенов
 const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
-  prepareHeaders: async (headers, { getState, endpoint }) => {
+  prepareHeaders: async (headers) => {
     try {
-      const userInfo = Cookies.get('userInfo');
-      if (userInfo) {
-        const user = JSON.parse(userInfo);
-        if (user?.accessToken) {
-          headers.set("Authorization", `Bearer ${user.accessToken}`);
-        }
+      const token = getAccessToken();
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
       }
     } catch (error) {
-      console.error('Error parsing user info:', error);
+      console.error('Error reading auth from storage:', error);
     }
     return headers;
   },
@@ -32,8 +29,8 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
   if (result?.error?.status === 401) {
     // Проверяем, есть ли refresh токен
     try {
-      const userInfo = JSON.parse(Cookies.get('userInfo') || '{}');
-      const refreshToken = userInfo.refreshToken;
+      const userInfo = getAuth() || {};
+      const refreshToken = getRefreshToken();
       
       if (!refreshToken) {
         // Если нет refresh токена, выполняем logout
@@ -52,15 +49,8 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
         // Сохраняем новый access токен
         const { access } = refreshResult.data;
         
-        // Обновляем токены в cookie
-        Cookies.set(
-          "userInfo",
-          JSON.stringify({
-            ...userInfo,
-            accessToken: access,
-          }),
-          { expires: 7 }
-        );
+        // Обновляем токены в localStorage
+        setAuth({ ...userInfo, accessToken: access });
         
         // Повторяем исходный запрос с новым токеном
         result = await baseQuery(args, api, extraOptions);

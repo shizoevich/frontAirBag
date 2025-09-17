@@ -1,6 +1,7 @@
 'use client';
 import React from "react";
 import Link from "next/link";
+import { useLocale } from 'next-intl';
 // internal
 import LoginShapes from "./login-shapes";
 import RegisterForm from "../forms/register-form";
@@ -8,6 +9,8 @@ import GoogleSignUp from "./google-sign-up";
 
 
 const RegisterArea = () => {
+  const locale = useLocale();
+  
   return (
     <>
       <section className="tp-login-area pb-140 p-relative z-index-1 fix">
@@ -21,7 +24,7 @@ const RegisterArea = () => {
                   <p>
                     Already have an account?{" "}
                     <span>
-                      <Link href="/login">Sign In</Link>
+                      <Link href={`/${locale}/login`}>Sign In</Link>
                     </span>
                   </p>
                 </div>

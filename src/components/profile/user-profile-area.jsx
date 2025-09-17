@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { useTranslations } from 'next-intl';
-import Cookies from "js-cookie";
+import { useTranslations, useLocale } from 'next-intl';
+import { getAuth } from "@/utils/authStorage";
 import Link from "next/link";
 import { useGetUserQuery, useUpdateProfileMutation } from "@/redux/features/auth/authApi";
 import Loader from "../loader/loader";
@@ -15,7 +15,11 @@ const UserProfileArea = () => {
   const router = useRouter();
   const t = useTranslations('Profile');
   const profileExtra = useTranslations('ProfileExtra');
-  const locale = useTranslations('Common');
+  // IMPORTANT: useLocale returns the current locale string (e.g. 'en')
+  // Do NOT use useTranslations for locale, it returns a function and will serialize to
+  // `function translateFn(...)` if used in a URL, causing malformed paths like
+  // /function%20translateFn(...)/login
+  const locale = useLocale();
   const [editMode, setEditMode] = useState(false);
   
   // Состояние формы
@@ -35,7 +39,7 @@ const UserProfileArea = () => {
   
   // Проверяем авторизацию
   useEffect(() => {
-    const isAuthenticate = Cookies.get("userInfo");
+    const isAuthenticate = getAuth();
     if (!isAuthenticate) {
       router.push(`/${locale}/login`);
     }

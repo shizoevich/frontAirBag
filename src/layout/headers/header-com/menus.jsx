@@ -49,13 +49,24 @@ const Menus = () => {
     }
     return link;
   };
+
+  // Безопасная функция перевода: всегда возвращает строку
+  const safeTranslate = (key) => {
+    try {
+      const result = t(key);
+      return typeof result === 'string' ? result : key;
+    } catch (error) {
+      console.warn(`Translation error for key: ${key}`, error);
+      return key;
+    }
+  };
   
   return (
     <ul style={{ display: 'flex', justifyContent: 'space-between', width: '100%', margin: 0, padding: 0 }}>
       {menu_data.map((menu) =>
         menu.homes ? (
           <li key={menu.id} className="has-dropdown has-mega-menu">
-            <Link href={getLocalizedLink(menu.link)}>{menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
+            <Link href={getLocalizedLink(menu.link)}>{menu.titleKey ? safeTranslate(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
             <div className="home-menu tp-submenu tp-mega-menu">
               <div className="row row-cols-1 row-cols-lg-4 row-cols-xl-4">
                 {menu.home_pages.map((home, i) => (
@@ -77,7 +88,7 @@ const Menus = () => {
           </li>
         ) : menu.products ? (
           <li key={menu.id} className="has-dropdown has-mega-menu">
-            <Link href={getLocalizedLink(menu.link)}>{menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
+            <Link href={getLocalizedLink(menu.link)}>{menu.titleKey ? safeTranslate(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
             <div className="tp-submenu tp-mega-menu tp-mega-menu-wrapper p-relative" style={{ 
               display: 'grid', 
               gridTemplateColumns: 'repeat(3, 1fr)', 
@@ -115,17 +126,17 @@ const Menus = () => {
           </li>
         ) : menu.user_account ? (
           <li key={menu.id} className="has-dropdown">
-            <Link href={getLocalizedLink(menu.link)}>{menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
+            <Link href={getLocalizedLink(menu.link)}>{menu.titleKey ? safeTranslate(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
             <ul className="tp-submenu">
               {filterAccountPages(menu.account_pages).map((page, i) => (
                 <li key={i}>
                   {page.titleKey === 'menu.logout' ? (
                     <a href="#" onClick={handleLogout} style={{ cursor: 'pointer' }}>
-                      {t(page.titleKey.replace('menu.', ''))}
+                      {safeTranslate(page.titleKey.replace('menu.', ''))}
                     </a>
                   ) : (
                     <Link href={getLocalizedLink(page.link)}>
-                      {t(page.titleKey.replace('menu.', ''))}
+                      {safeTranslate(page.titleKey.replace('menu.', ''))}
                     </Link>
                   )}
                 </li>
@@ -134,18 +145,18 @@ const Menus = () => {
           </li>
         ) : menu.sub_menu ? (
           <li key={menu.id} className="has-dropdown">
-            <Link href={getLocalizedLink(menu.link)}>{menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
+            <Link href={getLocalizedLink(menu.link)}>{menu.titleKey ? safeTranslate(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
             <ul className="tp-submenu">
               {menu.sub_menus.map((b, i) => (
                 <li key={i}>
-                  <Link href={getLocalizedLink(b.link)}>{b.titleKey ? t(b.titleKey.replace('menu.', '')) : b.title}</Link>
+                  <Link href={getLocalizedLink(b.link)}>{b.titleKey ? safeTranslate(b.titleKey.replace('menu.', '')) : b.title}</Link>
                 </li>
               ))}
             </ul>
           </li>
         ) : (
           <li key={menu.id}>
-            <Link href={getLocalizedLink(menu.link)}>{menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
+            <Link href={getLocalizedLink(menu.link)}>{menu.titleKey ? safeTranslate(menu.titleKey.replace('menu.', '')) : menu.title}</Link>
           </li>
         )
       )}

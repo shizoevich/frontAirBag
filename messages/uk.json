@@ -1,7 +1,8 @@
 {
   "Header": {
-    "contact_us": "Зв'яжіться з нами",
+    "contact_us": "Зв'язатися з нами",
     "shippingInfo": "Безкоштовна доставка при замовленні від 1000 грн",
+    "freeShippingBanner": "Наберіть товарів на визначену суму та отримайте знижку",
     "catalog": "Каталог"
   },
   "menu": {
@@ -74,7 +75,8 @@
     "quantity": "Кількість",
     "remove": "Видалити",
     "clearCart": "Очистити кошик",
-    "proceedToCheckout": "Перейти до оформлення"
+    "proceedToCheckout": "Перейти до оформлення",
+    "discountHint": "Ви додали товарів на суму {amount}. Незабаром стане доступна знижка."
   },
   "HeaderSearchForm": {
     "placeholder": "Пошук товарів..."
@@ -364,7 +366,24 @@
     "discount_applied": "Знижка застосована",
     "discount_code": "Код знижки",
     "apply_discount": "Застосувати знижку",
-    "invalid_discount": "Недійсний код знижки"
+    "invalid_discount": "Недійсний код знижки",
+    "page_title": "Знижки",
+    "page_description": "Отримуйте знижки залежно від суми ваших покупок. Чим більше купуєте, тим більше економите!",
+    "loading": "Завантаження...",
+    "error_loading": "Помилка завантаження знижок",
+    "no_discounts": "Знижки відсутні",
+    "no_discounts_description": "На даний момент немає доступних знижок",
+    "available": "Доступна",
+    "locked": "Заблокована",
+    "discount_title": "Знижка {percentage}%",
+    "discount_description": "Отримайте знижку {percentage}% на всі товари при досягненні необхідної суми покупок",
+    "requirement_text": "Необхідна сума покупок",
+    "requirement_met": "Вимога виконана! Знижка доступна",
+    "need_more": "Потрібно ще {amount}",
+    "your_stats": "Ваша статистика",
+    "total_spent": "Загальна сума покупок",
+    "current_discount": "Поточна знижка: {percentage}%",
+    "no_discount": "Знижка не застосована"
   },
   "Orders": {
     "my_orders": "Мої замовлення",

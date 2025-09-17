@@ -1,36 +1,33 @@
 import { apiSlice } from "@/redux/api/apiSlice";
 import { userLoggedIn, userLoggedOut } from "./authSlice";
-import Cookies from "js-cookie";
+import { setAuth, updateAuth, removeAuth, getAuth } from "@/utils/authStorage";
 
 export const authApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
     // Авторизация пользователя
     login: builder.mutation({
-      query: (data) => ({
-        url: "/auth/login/",
-        method: "POST",
-        body: data,
-      }),
+      query: (data) => {
+        const payload = {
+          // Many backends accept either email or username; include both for compatibility
+          email: data.email,
+          username: data.email,
+          password: data.password,
+        };
+        return {
+          url: "/auth/login/",
+          method: "POST",
+          body: payload,
+        };
+      },
 
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
           
-          // Сохраняем токены в cookie
+          // Сохраняем токены в localStorage (без cookies)
           const { access, refresh } = result.data;
-          
-          // Устанавливаем срок хранения в зависимости от флага remember
-          const expiresInDays = arg.remember ? 30 : 1;
-          
-          Cookies.set(
-            "userInfo",
-            JSON.stringify({
-              accessToken: access,
-              refreshToken: refresh
-            }),
-            { expires: expiresInDays }
-          );
+          setAuth({ accessToken: access, refreshToken: refresh });
 
           // Диспатчим действие для обновления состояния
           dispatch(
@@ -42,7 +39,11 @@ export const authApi = apiSlice.injectEndpoints({
           // После успешного логина получаем данные пользователя
           dispatch(authApi.endpoints.getUser.initiate());
         } catch (err) {
-          console.error('Login error:', err);
+          // RTK Query may attach the error under err.error or err.data
+          const status = err?.error?.status ?? err?.status;
+          const data = err?.error?.data ?? err?.data;
+          const message = data?.detail || data?.message || err?.error || err?.message || 'Unknown error';
+          console.error('Login error:', { status, data, message });
         }
       },
     }),
@@ -66,23 +67,16 @@ export const authApi = apiSlice.injectEndpoints({
           );
           
           // Обновляем cookie с полной информацией о пользователе
-          const existingCookie = Cookies.get('userInfo');
-          if (existingCookie) {
+          const existing = getAuth();
+          if (existing) {
             try {
-              const cookieData = JSON.parse(existingCookie);
-              const updatedCookieData = {
-                ...cookieData,
+              updateAuth({
                 user: result.data,
                 isGuest: result.data.is_guest || false,
-                guestId: result.data.guest_id || null
-              };
-              
-              // Сохраняем обновленные данные в cookie с тем же сроком действия
-              Cookies.set('userInfo', JSON.stringify(updatedCookieData), { 
-                expires: cookieData.expires || 1 
+                guestId: result.data.guest_id || null,
               });
-            } catch (cookieError) {
-              console.error('Error updating cookie with user data:', cookieError);
+            } catch (storageError) {
+              console.error('Error updating local auth with user data:', storageError);
             }
           }
         } catch (err) {
@@ -112,16 +106,8 @@ export const authApi = apiSlice.injectEndpoints({
           const { access } = result.data;
           
           // Обновляем токены в cookie
-          const userInfo = JSON.parse(Cookies.get('userInfo') || '{}');
-          
-          Cookies.set(
-            "userInfo",
-            JSON.stringify({
-              ...userInfo,
-              accessToken: access,
-            }),
-            { expires: 7 }
-          );
+          const userInfo = getAuth() || {};
+          setAuth({ ...userInfo, accessToken: access });
 
           // Обновляем токен в store
           dispatch(
@@ -156,7 +142,7 @@ export const authApi = apiSlice.injectEndpoints({
       // Даже если запрос не удался, мы всё равно выполняем logout на клиенте
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         // Сначала очищаем клиентские данные
-        Cookies.remove('userInfo');
+        removeAuth();
         dispatch(userLoggedOut());
         
         try {

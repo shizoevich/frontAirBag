@@ -54,7 +54,7 @@ const menu_data = [
     id: 5,
     single_link: true,
     titleKey: 'menu.discounts',
-    link: '/coupon',
+    link: '/discounts',
   },
   {
     id: 6,
@@ -64,7 +64,7 @@ const menu_data = [
     account_pages: [
       { titleKey: 'menu.cart', link: '/cart', showAlways: true },
       { titleKey: 'menu.checkout', link: '/checkout', showAlways: true },
-      { titleKey: 'menu.myOrders', link: '/order', showAlways: true },
+      { titleKey: 'menu.myOrders', link: '/profile', showAlways: true },
       { titleKey: 'menu.login', link: '/login', showForGuests: true },
       { titleKey: 'menu.register', link: '/register', showForGuests: true },
       { titleKey: 'menu.logout', link: '/logout', showForAuth: true },
@@ -114,6 +114,6 @@ export const mobile_menu = [
     id: 6,
     single_link: true,
     title: 'Скидки',
-    link: '/coupon',
+    link: '/discounts',
   },
 ]

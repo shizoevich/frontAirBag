@@ -27,7 +27,7 @@ const ContactInfo = ({ locale }) => {
                     </div>
                     <div className="tp-contact-content">
                       <h5 className="mb-2 fs-6 fw-bold">{t('email')}</h5>
-                      <a href={`mailto:${t('emailAddress')}`} className="text-primary text-decoration-none">
+                      <a href="mailto:Noxnew@hotmail.com" className="text-primary text-decoration-none">
                         {t('emailAddress')}
                       </a>
                     </div>
@@ -42,7 +42,7 @@ const ContactInfo = ({ locale }) => {
                     </div>
                     <div className="tp-contact-content">
                       <h5 className="mb-2 fs-6 fw-bold">{t('phone')}</h5>
-                      <a href={`tel:${t('phoneNumber').replace(/\s+/g, '')}`} className="text-success text-decoration-none">
+                      <a href="tel:+380989998928" className="text-success text-decoration-none">
                         {t('phoneNumber')}
                       </a>
                     </div>

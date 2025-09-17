@@ -2,7 +2,17 @@
   "Header": {
     "contact_us": "Contact Us",
     "shippingInfo": " Quality guarantee for all Airbag parts",
+    "freeShippingBanner": "Spend over the threshold and get a discount",
     "catalog": "Catalog"
+  },
+  "CartTop": {
+    "shoppingCart": "Shopping Cart",
+    "yourCartIsEmpty": "Your cart is empty",
+    "goToShop": "Go to shop",
+    "subtotal": "Subtotal",
+    "viewCart": "View cart",
+    "checkout": "Checkout",
+    "discountHint": "You've added items worth {amount}. A discount will unlock soon."
   },
   "menu": {
     "home": "Home",
@@ -386,7 +396,24 @@
     "discount_applied": "Discount applied",
     "discount_code": "Discount code",
     "apply_discount": "Apply discount",
-    "invalid_discount": "Invalid discount code"
+    "invalid_discount": "Invalid discount code",
+    "page_title": "Discounts",
+    "page_description": "Get discounts based on your purchase amount. The more you buy, the more you save!",
+    "loading": "Loading...",
+    "error_loading": "Error loading discounts",
+    "no_discounts": "No discounts available",
+    "no_discounts_description": "There are currently no available discounts",
+    "available": "Available",
+    "locked": "Locked",
+    "discount_title": "{percentage}% Discount",
+    "discount_description": "Get {percentage}% discount on all products when you reach the required purchase amount",
+    "requirement_text": "Required purchase amount",
+    "requirement_met": "Requirement met! Discount available",
+    "need_more": "Need {amount} more",
+    "your_stats": "Your Statistics",
+    "total_spent": "Total Amount Spent",
+    "current_discount": "Current discount: {percentage}%",
+    "no_discount": "No discount applied"
   },
   "Orders": {
     "loading": "Loading...",

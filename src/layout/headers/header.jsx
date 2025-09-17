@@ -17,7 +17,7 @@ import HeaderTopRight from "./header-com/header-top-right";
 import HeaderMainRight from "./header-com/header-main-right";
 import CartMiniSidebar from "@/components/common/cart-mini-sidebar";
 import HeaderSearchForm from "@/components/forms/header-search-form";
-import { CartTwo, CategoryMenu, Compare, Menu, Phone, ShippingCar } from "@/svg";
+import { CartTwo, CategoryMenu, Compare, Menu, Phone, Discount } from "@/svg";
 
 const Header = () => {
   const t = useTranslations('Header');
@@ -78,9 +78,11 @@ const Header = () => {
                 <div className="col-md-6">
                   <div className="tp-header-welcome d-flex align-items-center">
                     <span>
-                      <ShippingCar />
+                      <Discount />
                     </span>
-                    <p>{t('shippingInfo')}</p>
+                    <Link href={getLocalizedLink("/discounts")}>
+                      {t('freeShippingBanner')}
+                    </Link>
                   </div>
                 </div>
                 <div className="col-md-6">

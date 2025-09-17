@@ -65,7 +65,6 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                   <h4 className="tp-footer-widget-title">{t('myAccountTitle')}</h4>
                   <div className="tp-footer-widget-content">
                     <ul>
-                      <li><Link href={getLocalizedLink("/track-order")}>{t('trackOrders')}</Link></li>
                       <li><Link href={getLocalizedLink("/shipping")}>{t('shipping')}</Link></li>
                       <li><Link href={getLocalizedLink("/profile")}>{t('myAccount')}</Link></li>
                       <li><Link href={getLocalizedLink("/profile")}>{t('orderHistory')}</Link></li>

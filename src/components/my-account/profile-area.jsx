@@ -9,18 +9,20 @@ import MyOrders from "./my-orders";
 import { useGetUserOrdersQuery } from "@/redux/features/order/orderApi";
 import Loader from "../loader/loader";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import ErrorMsg from "../common/error-msg";
-import Cookies from "js-cookie";
+import { getAuth } from "@/utils/authStorage";
 
 const ProfileArea = () => {
   const router = useRouter();
+  const locale = useLocale();
   const { data: orderData, isError, isLoading, } = useGetUserOrdersQuery();
   useEffect(() => {
-    const isAuthenticate = Cookies.get("userInfo");
+    const isAuthenticate = getAuth();
     if (!isAuthenticate) {
-      router.push("/login");
+      router.push(`/${locale}/login`);
     }
-  }, [router]);
+  }, [router, locale]);
 
   let content = null;
   if (isLoading) {

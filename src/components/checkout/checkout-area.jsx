@@ -2,7 +2,8 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
+import { useLocale } from "next-intl";
+import { getAuth } from "@/utils/authStorage";
 import Link from "next/link";
 // internal
 import CheckoutBillingArea from "./checkout-billing-area";
@@ -13,12 +14,13 @@ import useCheckoutSubmit from "@/hooks/use-checkout-submit";
 
 const CheckoutArea = () => {
   const router = useRouter();
+  const locale = useLocale();
   useEffect(() => {
-    const isAuthenticate = Cookies.get("userInfo");
+    const isAuthenticate = getAuth();
     if(!isAuthenticate){
-      router.push("/login")
+      router.push(`/${locale}/login`)
     }
-  },[router]);
+  },[router, locale]);
   const checkoutData = useCheckoutSubmit();
   const {handleSubmit,submitHandler,register,errors,handleCouponCode,couponRef,couponApplyMsg} = checkoutData;
   const { cart_products } = useSelector((state) => state.cart);

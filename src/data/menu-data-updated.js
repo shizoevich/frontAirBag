@@ -84,7 +84,7 @@ const menu_data = [
     single_link: true,
     title: 'Скидки',
     titleKey: 'discounts',
-    link: '/coupon',
+    link: '/discounts',
   },
 ]
 
@@ -135,6 +135,6 @@ export const mobile_menu = [
     single_link: true,
     title: 'Скидки',
     titleKey: 'discounts',
-    link: '/coupon',
+    link: '/discounts',
   },
 ]

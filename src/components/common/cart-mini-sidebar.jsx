@@ -45,6 +45,9 @@ const handleCloseCartMini = () => {
             </div>
             <div className="cartmini__shipping">
               <RenderCartProgress/>
+              <p className="mt-10 mb-0 small text-white-50">
+                {t('discountHint', { amount: `${(total).toFixed(2)}₴` })}
+              </p>
             </div>
             {cart_products.length > 0 && <div className="cartmini__widget">
               {cart_products.map((item,i) => (

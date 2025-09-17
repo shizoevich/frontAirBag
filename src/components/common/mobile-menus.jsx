@@ -32,6 +32,17 @@ const MobileMenus = ({setIsCanvasOpen}) => {
     return link;
   };
 
+  // Безопасная функция перевода
+  const safeTranslate = (key) => {
+    try {
+      const result = t(key);
+      return typeof result === 'string' ? result : key;
+    } catch (error) {
+      console.warn(`Translation error for key: ${key}`, error);
+      return key;
+    }
+  };
+
   // handleOpenSubMenu
   const handleOpenSubMenu = (title) => {
     if(title === isActiveMenu){
@@ -78,7 +89,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
             menu.homes ? (
               <li key={menu.id} className={`has-dropdown has-mega-menu ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
                 <a className={`${isActiveMenu === menu.titleKey ? 'expanded':''}`}>
-                  {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
+                  {menu.titleKey ? safeTranslate(menu.titleKey.replace('menu.', '')) : menu.title}
                   <button onClick={()=> handleOpenSubMenu(menu.titleKey)} className={`dropdown-toggle-btn ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
                     <i className="fa-regular fa-angle-right"></i>
                   </button>
@@ -105,7 +116,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
             ) : menu.products ? (
               <li key={menu.id} className={`has-dropdown ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
                 <a className={`${isActiveMenu === menu.titleKey ? 'expanded':''}`}>
-                  {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
+                  {menu.titleKey ? safeTranslate(menu.titleKey.replace('menu.', '')) : menu.title}
                   <button onClick={()=> handleOpenSubMenu(menu.titleKey)} className={`dropdown-toggle-btn ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
                     <i className="fa-regular fa-angle-right"></i>
                   </button>
@@ -134,7 +145,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
             ) : menu.user_account ? (
               <li key={menu.id} className={`has-dropdown ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
                 <a className={`${isActiveMenu === menu.titleKey ? 'expanded':''}`}>
-                  {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
+                  {menu.titleKey ? safeTranslate(menu.titleKey.replace('menu.', '')) : menu.title}
                   <button onClick={()=> handleOpenSubMenu(menu.titleKey)} className={`dropdown-toggle-btn ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
                     <i className="fa-regular fa-angle-right"></i>
                   </button>
@@ -158,7 +169,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
             ) : menu.sub_menu ? (
               <li key={menu.id} className={`has-dropdown ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
                 <a className={`${isActiveMenu === menu.titleKey ? 'expanded':''}`}>
-                  {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
+                  {menu.titleKey ? safeTranslate(menu.titleKey.replace('menu.', '')) : menu.title}
                   <button onClick={()=> handleOpenSubMenu(menu.titleKey)} className={`dropdown-toggle-btn ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
                     <i className="fa-regular fa-angle-right"></i>
                   </button>
@@ -167,7 +178,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
                   {menu.sub_menus.map((b, i) => (
                     <li key={i}>
                       <Link href={getLocalizedLink(b.link)} onClick={() => handleNavigation(b.link)}>
-                        {b.titleKey ? t(b.titleKey.replace('menu.', '')) : b.title}
+                        {b.titleKey ? safeTranslate(b.titleKey.replace('menu.', '')) : b.title}
                       </Link>
                     </li>
                   ))}
@@ -176,7 +187,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
             ) : (
               <li key={menu.id}>
                 <Link href={getLocalizedLink(menu.link)} onClick={() => handleNavigation(menu.link)}>
-                  {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
+                  {menu.titleKey ? safeTranslate(menu.titleKey.replace('menu.', '')) : menu.title}
                 </Link>
               </li>
             )

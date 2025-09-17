@@ -200,6 +200,7 @@ export const {
   useGetAllProductsQuery,
   useGetAllProductsNoLimitQuery,
   useGetAllProductsDebugQuery,
+  useGetProductsByCategoryQuery,
   useGetProductsByIdsQuery,
   useGetProductByIdQuery,
   useGetRelatedProductsQuery,

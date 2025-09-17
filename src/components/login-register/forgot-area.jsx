@@ -1,10 +1,13 @@
 'use client';
 import Link from 'next/link';
 import React from 'react';
+import { useLocale } from 'next-intl';
 import ForgotForm from '../forms/forgot-form';
 import LoginShapes from './login-shapes';
 
 const ForgotArea = () => {
+  const locale = useLocale();
+  
   return (
     <section className="tp-login-area pb-140 p-relative z-index-1 fix">
       <LoginShapes />
@@ -22,7 +25,7 @@ const ForgotArea = () => {
                 {/* form end */}
                 <div className="tp-login-suggetions d-sm-flex align-items-center justify-content-center">
                   <div className="tp-login-forgot">
-                    <span>Remeber Passowrd? <Link href="/login"> Login</Link></span>
+                    <span>Remeber Passowrd? <Link href={`/${locale}/login`}> Login</Link></span>
                   </div>
                 </div>
               </div>

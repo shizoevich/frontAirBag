@@ -1,7 +1,6 @@
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
-import ShopBreadcrumb from "@/components/breadcrumb/shop-breadcrumb";
 import CarBrandsArea from "@/components/categories/car-brands-area";
 
 export async function generateMetadata({ params: { locale } }) {
@@ -20,7 +19,6 @@ export default function CarBrandsPage() {
   return (
     <Wrapper>
       <Header />
-      <ShopBreadcrumb title="car_brands" subtitle="car_brands" />
       <CarBrandsArea />
       <Footer primary_style={true} />
     </Wrapper>
