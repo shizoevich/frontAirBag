@@ -9,6 +9,7 @@ import { handleProductModal } from "@/redux/features/productModalSlice";
 import { add_cart_product } from "@/redux/features/cartSlice";
 import BlurImage from "@/components/common/BlurImage";
 import { getProductImage, getProductId } from "@/utils/image-utils";
+import { slugify } from '@/utils/slugify';
 
 const ProductItem = ({ product }) => {
   const t = useTranslations('ProductItem');
@@ -45,7 +46,7 @@ const ProductItem = ({ product }) => {
   return (
     <div className="tp-product-item mb-25 transition-3">
       <div className="tp-product-thumb p-relative fix">
-        <Link href={`/${locale}/product-details/${id || ''}`}>
+        <Link href={`/${locale}/product/${slugify(title)}-${id}`}>
           <div style={{
             width: '100%',
             height: '300px',
@@ -59,8 +60,19 @@ const ProductItem = ({ product }) => {
           </div>
           {/* Out of Stock Badge - красная плашка поверх фотографии */}
           {isOutOfStock && (
-            <div className="tp-product-out-of-stock-badge">
-              <span className="out-of-stock-text">{t('outOfStock')}</span>
+            <div style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              backgroundColor: 'rgba(255, 0, 0, 0.7)',
+              color: 'white',
+              padding: '5px 10px',
+              borderRadius: '5px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              zIndex: 2
+            }}>
+              {t('outOfStock')}
             </div>
           )}
           
@@ -116,7 +128,7 @@ const ProductItem = ({ product }) => {
             WebkitBoxOrient: 'vertical',
             lineHeight: '24px'
           }}>
-            <Link href={`/${locale}/product-details/${id || ''}`}>{title}</Link>
+            <Link href={`/${locale}/product/${slugify(title)}-${id}`}>{title}</Link>
           </h3>
         </div>
         <div className="d-flex flex-column gap-2">
@@ -151,12 +163,12 @@ const ProductItem = ({ product }) => {
                   style={{
                     fontSize: '14px',
                     padding: '8px 15px',
-                    backgroundColor: isOutOfStock ? '#9e9e9e' : '#de8043',
-                    color: isOutOfStock ? '#666' : '#fff',
-                    border: isOutOfStock ? '1px solid #ccc' : 'none',
+                    backgroundColor: isOutOfStock ? '#f0f0f0' : '#de8043',
+                    color: isOutOfStock ? '#a0a0a0' : '#fff',
+                    border: '1px solid #e0e0e0',
                     borderRadius: '4px',
                     cursor: isOutOfStock ? 'not-allowed' : 'pointer',
-                    opacity: isOutOfStock ? 0.6 : 1
+                    transition: 'background-color 0.3s ease'
                   }}
                 >
                   <span style={{ marginRight: '5px', display: 'inline-block', verticalAlign: 'middle' }}>

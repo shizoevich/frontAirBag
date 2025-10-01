@@ -1,11 +1,12 @@
 'use client';
-import React from "react";
+import React, { useState } from "react";
 import menu_data from "@/data/menu-data";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations, useLocale } from 'next-intl';
 import { useSelector } from 'react-redux';
 import { useLogoutMutation } from '@/redux/features/auth/authApi';
+import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 import { useRouter } from 'next/navigation';
 
 const Menus = () => {
@@ -14,6 +15,11 @@ const Menus = () => {
   const router = useRouter();
   const { user, accessToken, isGuest } = useSelector((state) => state.auth);
   const [logout] = useLogoutMutation();
+  const [showAllBrands, setShowAllBrands] = useState(false);
+  const [hoverTimeout, setHoverTimeout] = useState(null);
+  
+  // Load all categories to get car brands
+  const { data: categoriesData } = useGetShowCategoryQuery();
 
   // Определяем статус пользователя для отображения соответствующих пунктов меню
   const isAuthenticated = !!accessToken;
@@ -39,6 +45,21 @@ const Menus = () => {
       if (page.showForAuth && isAuthenticatedUser) return true;
       return false;
     });
+  };
+
+  // Get all car brands (subcategories of Covers - parent_id = 754099)
+  const getAllCarBrands = () => {
+    const allCategories = Array.isArray(categoriesData) 
+      ? categoriesData 
+      : Array.isArray(categoriesData?.data) 
+        ? categoriesData.data 
+        : Array.isArray(categoriesData?.results) 
+          ? categoriesData.results 
+          : [];
+    
+    return allCategories.filter(cat => 
+      cat && String(cat.parent_id) === '754099'
+    ).sort((a, b) => a.title.localeCompare(b.title));
   };
 
   // Функция для добавления локали к ссылкам (с защитой от не-строк)
@@ -117,14 +138,114 @@ const Menus = () => {
                   </h4>
                   <ul className="tp-submenu" style={{ marginLeft: '0' }}>
                     {p.mega_menus.map((m, i) => (
-                      <li key={i} style={{ marginBottom: '8px' }}>
-                        <Link href={getLocalizedLink(m.link)} style={{ 
-                          fontSize: '14px', 
-                          color: '#666',
-                          transition: 'color 0.3s ease'
-                        }}>
-                          {m.titleKey ? t(m.titleKey.replace('menu.', '')) : m.title}
-                        </Link>
+                      <li 
+                        key={i} 
+                        style={{ marginBottom: '8px', position: 'relative' }}
+                        className={m.hasDropdown ? "has-dropdown-nested" : ""}
+                      >
+                        {m.hasDropdown ? (
+                          <div
+                            onMouseEnter={() => {
+                              console.log('Mouse entered all brands');
+                              if (hoverTimeout) {
+                                clearTimeout(hoverTimeout);
+                                setHoverTimeout(null);
+                              }
+                              setShowAllBrands(true);
+                            }}
+                            onMouseLeave={() => {
+                              console.log('Mouse left all brands - setting timeout');
+                              const timeout = setTimeout(() => {
+                                console.log('Timeout executed - closing dropdown');
+                                setShowAllBrands(false);
+                              }, 300);
+                              setHoverTimeout(timeout);
+                            }}
+                            style={{ position: 'relative' }}
+                          >
+                            <span
+                              style={{ 
+                                fontSize: '14px', 
+                                color: '#666',
+                                transition: 'color 0.3s ease',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px'
+                              }}
+                            >
+                              {m.titleKey ? t(m.titleKey.replace('menu.', '')) : m.title}
+                              <i className="fa fa-angle-right" style={{ fontSize: '12px' }}></i>
+                            </span>
+                            {(() => {
+                              console.log('Rendering dropdown, showAllBrands:', showAllBrands);
+                              return showAllBrands;
+                            })() && (
+                              <ul 
+                                onMouseEnter={() => {
+                                  console.log('Mouse entered dropdown list');
+                                  if (hoverTimeout) {
+                                    clearTimeout(hoverTimeout);
+                                    setHoverTimeout(null);
+                                  }
+                                }}
+                                onMouseLeave={() => {
+                                  console.log('Mouse left dropdown list');
+                                  const timeout = setTimeout(() => {
+                                    setShowAllBrands(false);
+                                  }, 300);
+                                  setHoverTimeout(timeout);
+                                }}
+                                style={{
+                                position: 'relative',
+                                marginTop: '10px',
+                                marginLeft: '0',
+                                backgroundColor: '#f8f9fa',
+                                border: '1px solid #ddd',
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                borderRadius: '6px',
+                                padding: '15px',
+                                width: '100%',
+                                maxHeight: '300px',
+                                overflowY: 'auto',
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(2, 1fr)',
+                                gap: '8px',
+                                listStyle: 'none'
+                              }}>
+                                {getAllCarBrands().map((brand) => {
+                                  const brandSlug = brand.title.toLowerCase()
+                                    .replace(/\s+/g, '-')
+                                    .replace(/[()]/g, '');
+                                  const categorySlug = `${brandSlug}-${brand.id}`;
+                                  return (
+                                    <li key={brand.id} style={{ marginBottom: '0' }}>
+                                      <Link 
+                                        href={getLocalizedLink(`/shop/${categorySlug}`)}
+                                        style={{ 
+                                          fontSize: '13px', 
+                                          color: '#666',
+                                          transition: 'color 0.3s ease',
+                                          whiteSpace: 'nowrap'
+                                        }}
+                                      >
+                                        {brand.title}
+                                      </Link>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            )}
+                          </div>
+                        ) : (
+                          <Link href={getLocalizedLink(m.link)} style={{ 
+                            fontSize: '14px', 
+                            color: '#666',
+                            transition: 'color 0.3s ease'
+                          }}>
+                            {m.titleKey ? t(m.titleKey.replace('menu.', '')) : m.title}
+                          </Link>
+                        )}
                       </li>
                     ))}
                   </ul>

@@ -15,25 +15,11 @@ const ContactInfo = ({ locale }) => {
             <div className="tp-contact-info-wrapper bg-white rounded-3 shadow-sm p-4 p-md-5">
               <div className="text-center mb-4">
                 <h2 className="tp-section-title mb-3">{t('title')}</h2>
-                <p className="tp-section-subtitle mb-4">{t('subtitle')}</p>
+                <h5 className="tp-section-subtitle ">{t('subtitle')}</h5>
               </div>
               
+              
               <div className="row">
-                {/* Email Card */}
-                <div className="col-lg-6 col-md-6 mb-4">
-                  <div className="tp-contact-card d-flex align-items-center gap-3 p-4 rounded-3 shadow-sm border h-100">
-                    <div className="tp-contact-icon bg-primary rounded-circle d-flex align-items-center justify-content-center" style={{width: 50, height: 50, flexShrink: 0}}>
-                      <i className="far fa-envelope text-white fs-4"></i>
-                    </div>
-                    <div className="tp-contact-content">
-                      <h5 className="mb-2 fs-6 fw-bold">{t('email')}</h5>
-                      <a href="mailto:Noxnew@hotmail.com" className="text-primary text-decoration-none">
-                        {t('emailAddress')}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                
                 {/* Phone Card */}
                 <div className="col-lg-6 col-md-6 mb-4">
                   <div className="tp-contact-card d-flex align-items-center gap-3 p-4 rounded-3 shadow-sm border h-100">
@@ -77,6 +63,23 @@ const ContactInfo = ({ locale }) => {
                     </div>
                   </div>
                 </div>
+
+                
+                {/* Email Card */}
+                <div className="col-lg-6 col-md-6 mb-4">
+                  <div className="tp-contact-card d-flex align-items-center gap-3 p-4 rounded-3 shadow-sm border h-100">
+                    <div className="tp-contact-icon bg-primary rounded-circle d-flex align-items-center justify-content-center" style={{width: 50, height: 50, flexShrink: 0}}>
+                      <i className="far fa-envelope text-white fs-4"></i>
+                    </div>
+                    <div className="tp-contact-content">
+                      <h5 className="mb-2 fs-6 fw-bold">{t('email')}</h5>
+                      <a href="mailto:Noxnew@hotmail.com" className="text-primary text-decoration-none">
+                        {t('emailAddress')}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
               </div>
               
               <div className="tp-contact-social mt-5 text-center">
@@ -99,7 +102,7 @@ const ContactInfo = ({ locale }) => {
                   
                   {/* TikTok */}
                   <a 
-                    href="https://tiktok.com/@airbag_ad" 
+                    href="https://www.tiktok.com/@dmytro_gekalo?_t=ZM-8yjBBkpbNbi&_r=1" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     aria-label={t('socialLabels.tiktok')}
@@ -111,7 +114,7 @@ const ContactInfo = ({ locale }) => {
                   
                   {/* Instagram */}
                   <a 
-                    href="https://instagram.com/airbag_ad" 
+                    href="https://www.instagram.com/dmytro_gekalo?igsh=MXV2MmNsaWpkdHlkeA%3D%3D&utm_source=qr" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     aria-label={t('socialLabels.instagram')}
@@ -123,7 +126,7 @@ const ContactInfo = ({ locale }) => {
                   
                   {/* Facebook */}
                   <a 
-                    href="https://facebook.com/airbag.ad" 
+                    href="https://www.facebook.com/share/15rmtkFcaX/?mibextid=wwXIfr" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     aria-label={t('socialLabels.facebook')}

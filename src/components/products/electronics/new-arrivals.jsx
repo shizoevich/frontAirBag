@@ -154,7 +154,6 @@ const NewArrivals = () => {
             <div className="tp-section-title-wrapper mb-40">
               <h3 className="tp-section-title">
                 {t('popularProducts')}
-                <ShapeLine />
               </h3>
             </div>
           </div>

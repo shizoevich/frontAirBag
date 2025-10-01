@@ -70,19 +70,23 @@ const ShopSubcategoryArea = ({ subcategorySlug }) => {
         : [];
   
   // Обрабатываем разные форматы данных API
-  let safeProductsData = [];
-  let totalCount = 0;
-  
-  if (Array.isArray(productsData)) {
-    safeProductsData = productsData;
-    totalCount = productsData.length;
-  } else if (productsData?.results && Array.isArray(productsData.results)) {
-    safeProductsData = productsData.results;
-    totalCount = productsData.count || productsData.results.length;
-  } else if (productsData?.data && Array.isArray(productsData.data)) {
-    safeProductsData = productsData.data;
-    totalCount = productsData.count || productsData.data.length;
-  }
+  const { safeProductsData, totalCount } = React.useMemo(() => {
+    let products = [];
+    let count = 0;
+    
+    if (Array.isArray(productsData)) {
+      products = productsData;
+      count = productsData.length;
+    } else if (productsData?.results && Array.isArray(productsData.results)) {
+      products = productsData.results;
+      count = productsData.count || productsData.results.length;
+    } else if (productsData?.data && Array.isArray(productsData.data)) {
+      products = productsData.data;
+      count = productsData.count || productsData.data.length;
+    }
+    
+    return { safeProductsData: products, totalCount: count };
+  }, [productsData]);
 
   // Отладочная информация для категорий и товаров
   useEffect(() => {

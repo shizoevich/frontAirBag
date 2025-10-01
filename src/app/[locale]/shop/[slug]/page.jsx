@@ -1,86 +1,38 @@
-import React from "react";
-import Wrapper from "@/layout/wrapper";
-import Header from "@/layout/headers/header";
-import Footer from "@/layout/footers/footer";
-import ProductItem from "@/components/products/electronics/product-item";
+import React from 'react';
+import Wrapper from '@/layout/wrapper';
+import Header from '@/layout/headers/header';
+import Footer from '@/layout/footers/footer';
+import CategoryProductsArea from '@/components/products/category-products-area';
 import { getTranslations } from 'next-intl/server';
-import { notFound } from 'next/navigation';
 
+// Helper function to fetch a single category by its slug
+async function fetchCategory(slug) {
+  if (!slug) return null;
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const res = await fetch(`${base}/good-categories/?slug=${slug}`, { next: { revalidate: 600 } });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.results?.[0] || data.data?.[0] || data?.[0];
+}
+
+// Generate metadata for the page
 export async function generateMetadata({ params }) {
   const { locale, slug } = await params;
   const t = await getTranslations({ locale, namespace: 'Categories' });
-  
-  // Определяем заголовок страницы в зависимости от slug подкатегории
-  let title = '';
-  
-  // Маппинг slug на ключи переводов
-  const slugToTitleKey = {
-    'connectors': 'connectors_seo_title',
-    'mounts': 'mounts_seo_title',
-    'resistors': 'resistors_seo_title',
-    'airbags': 'airbags_seo_title',
-    'belt-parts': 'belt_parts_seo_title',
-    'pyro-belts': 'pyro_belts_seo_title',
-    'pyro-seats': 'pyro_seats_seo_title',
-    'pyro-curtains': 'pyro_curtains_seo_title',
-    'pyro-steering': 'pyro_steering_seo_title',
-    'pyro-dashboard': 'pyro_dashboard_seo_title',
-    'covers': 'covers_seo_title'
-  };
-  
-  if (slugToTitleKey[slug]) {
-    try {
-      title = t(slugToTitleKey[slug]);
-    } catch (error) {
-      // Если перевод не найден, используем форматированный slug
-      title = `AirBag - ${slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}`;
-    }
-  } else {
-    title = `AirBag - ${slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}`;
-  }
-  
+  const category = await fetchCategory(slug);
+
   return {
-    title,
+    title: category?.title || t('default_shop_title'),
+    description: category?.description || `Products in the ${category?.title || 'shop'}`,
   };
 }
 
-export const revalidate = 600; // ISR 10 минут
-
-async function fetchSubcategoryProducts(slug) {
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL;
-  // Пытаемся фильтровать по slug категории на сервере (Django lookup-style)
-  const url = `${base}/goods/?category__slug=${encodeURIComponent(slug)}&limit=24&offset=0`;
-  const res = await fetch(url, { next: { revalidate, tags: ['products', `shop:slug:${slug}`] } });
-  if (!res.ok) return [];
-  const data = await res.json();
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.results)) return data.results;
-  if (Array.isArray(data?.data)) return data.data;
-  return [];
-}
-
-export default async function ShopSubcategoryPage({ params }) {
-  const { slug } = await params;
-  if (!slug) notFound();
-  const products = await fetchSubcategoryProducts(slug);
-
+// The main page component shows only products for the selected category
+export default function ShopSubcategoryPage() {
   return (
     <Wrapper>
       <Header />
-      <section className="tp-product-area pb-90">
-        <div className="container">
-          <div className="row">
-            {products.length === 0 && (
-              <div className="col-12"><p>Товари тимчасово недоступні.</p></div>
-            )}
-            {products.map((item) => (
-              <div className="col-xl-3 col-lg-4 col-md-6" key={item.id}>
-                <ProductItem product={item} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CategoryProductsArea />
       <Footer primary_style={true} />
     </Wrapper>
   );

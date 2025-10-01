@@ -51,7 +51,7 @@ const CtaArea = () => {
                 
                 {/* TikTok */}
                 <a 
-                  href="https://tiktok.com/@airbag_ad" 
+                  href="https://www.tiktok.com/@dmytro_gekalo?_t=ZM-8yjBBkpbNbi&_r=1" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   aria-label="TikTok"
@@ -63,7 +63,7 @@ const CtaArea = () => {
                 
                 {/* Instagram */}
                 <a 
-                  href="https://instagram.com/airbag_ad" 
+                  href="https://www.instagram.com/dmytro_gekalo?igsh=MXV2MmNsaWpkdHlkeA%3D%3D&utm_source=qr" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   aria-label="Instagram"
@@ -75,7 +75,7 @@ const CtaArea = () => {
                 
                 {/* Facebook */}
                 <a 
-                  href="https://facebook.com/airbag.ad" 
+                  href="https://www.facebook.com/share/15rmtkFcaX/?mibextid=wwXIfr" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   aria-label="Facebook"

@@ -29,7 +29,8 @@ export const ToastProvider = ({ children }) => {
     if (message) {
       addToast(message, type);
     }
-  }, [message, type, addToast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -40,7 +41,7 @@ export const ToastProvider = ({ children }) => {
         delete window.addToast;
       }
     };
-  }, []);
+  }, [addToast]);
 
   return (
     <ToastContext.Provider value={{ addToast, removeToast }}>

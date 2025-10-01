@@ -13,32 +13,40 @@ const menu_data = [
     link: '/shop',
     product_pages: [
       {
-        titleKey: 'menu.carBrands',
-        link: '/search/brand',
+        titleKey: 'menu.covers',
+        link: '/shop/covers-754099',
         mega_menus: [
-          { titleKey: 'menu.searchByBrand', link: '/search/brand' },
+          { titleKey: 'menu.renault', link: '/shop/renault-753900' },
+          { titleKey: 'menu.toyota', link: '/shop/toyota-753914' },
+          { titleKey: 'menu.skoda', link: '/shop/skoda-753913' },
+          { titleKey: 'menu.bmw', link: '/shop/bmw-753905' },
+          { titleKey: 'menu.volkswagen', link: '/shop/volkswagen-753915' },
+          { titleKey: 'menu.mercedes', link: '/shop/mercedes-753933' },
+          { titleKey: 'menu.hyundai', link: '/shop/hyundai-753901' },
+          { titleKey: 'menu.audi', link: '/shop/audi-753903' },
+          { titleKey: 'menu.allBrands', link: '/search/brand', hasDropdown: true },
         ]
       },
       {
         titleKey: 'menu.airbagComponents',
-        link: '/shop-category/airbag-components',
+        link: '/category/airbag-components',
         mega_menus: [
-          { titleKey: 'menu.connectors', link: '/shop/connectors' },
-          { titleKey: 'menu.mounts', link: '/shop/mounts' },
-          { titleKey: 'menu.resistors', link: '/shop/resistors' },
-          { titleKey: 'menu.airbags', link: '/shop/airbags' },
-          { titleKey: 'menu.beltParts', link: '/shop/belt-parts' },
+          { titleKey: 'menu.connectors', link: '/shop/konnektory-753917' },
+          { titleKey: 'menu.mounts', link: '/shop/krepleniia-753918' },
+          { titleKey: 'menu.resistors', link: '/shop/obmanki-rezistory-753919' },
+          { titleKey: 'menu.airbags', link: '/shop/parashiuty-meshki-753897' },
+          { titleKey: 'menu.beltParts', link: '/shop/zapchasti-dlia-remnei-753899' },
         ]
       },
       {
         titleKey: 'menu.pyrotechnics',
-        link: '/shop-category/pyrotechnics',
+        link: '/category/pyrotechnics',
         mega_menus: [
-          { titleKey: 'menu.pyroBelts', link: '/shop/pyro-belts' },
-          { titleKey: 'menu.pyroSeats', link: '/shop/pyro-seats' },
-          { titleKey: 'menu.pyroCurtains', link: '/shop/pyro-curtains' },
-          { titleKey: 'menu.pyroSteering', link: '/shop/pyro-steering' },
-          { titleKey: 'menu.pyroDashboard', link: '/shop/pyro-dashboard' },
+          { titleKey: 'menu.pyroBelts', link: '/shop/pp-v-remni-753920' },
+          { titleKey: 'menu.pyroSeats', link: '/shop/pp-v-nogi-sidenie-753898' },
+          { titleKey: 'menu.pyroCurtains', link: '/shop/pp-v-shtory-753924' },
+          { titleKey: 'menu.pyroSteering', link: '/shop/pp-v-rul-753925' },
+          { titleKey: 'menu.pyroDashboard', link: '/shop/pp-torpedo-753927' },
         ]
       },
 
@@ -89,8 +97,8 @@ export const mobile_menu = [
     link: '/shop',
     sub_menus: [
       { title: '🚘 Марки автомобилей', link: '/search/brand' },
-      { title: '🛡️ Комплектующие Airbag SRS', link: '/shop-category/airbag-components' },
-      { title: '💥 Пиропатроны', link: '/shop-category/pyrotechnics' },
+      { title: '🛡️ Комплектующие Airbag SRS', link: '/category/airbag-components' },
+      { title: '💥 Пиропатроны', link: '/category/pyrotechnics' },
     ],
   },
   {

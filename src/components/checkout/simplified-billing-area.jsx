@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 
 const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
@@ -24,7 +24,7 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
   
 
   // Поиск городов через API Новой Почты
-  const fetchCities = async () => {
+  const fetchCities = useCallback(async () => {
     if (searchCity.length < 2) return;
     
     try {
@@ -56,10 +56,10 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
       console.error('Error searching cities:', error);
       setCities([]);
     }
-  };
+  }, [searchCity]);
 
   // Поиск отделений Новой Почты
-  const fetchWarehouses = async () => {
+  const fetchWarehouses = useCallback(async () => {
     try {
       const payload = {
         apiKey: '1690358338d20ac90d792f5da5bb1292',
@@ -98,7 +98,7 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
       console.error('Error searching warehouses:', error);
       setWarehouses([]);
     }
-  };
+  }, [selectedCity]);
 
   // Обработка изменения поля города
   const handleCityChange = (e) => {

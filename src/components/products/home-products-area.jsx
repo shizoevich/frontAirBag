@@ -1,42 +1,26 @@
 'use client';
-import React, { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from 'next/navigation';
-import Image from "next/image";
-import Link from "next/link";
+import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ShapeLine } from "@/svg";
-import ProductItem from "./electronics/product-item";
-import ErrorMsg from "@/components/common/error-msg";
-import HomePrdLoader from "@/components/loader/home/home-prd-loader";
-import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
-import { slugify } from '@/utils/slugify';
-import { useGetAllProductsQuery, useGetAllProductsNoLimitQuery, useGetAllProductsDebugQuery } from "@/redux/features/productsApi";
 import ReactPaginate from 'react-paginate';
-import CategoryCarousel from "@/components/categories/category-carousel";
-import ParentCategories from "@/components/categories/parent-categories";
+import ProductItem from './electronics/product-item';
+import ParentCategories from '@/components/categories/parent-categories';
+import CategoryCarousel from '@/components/categories/category-carousel';
+import HomePrdLoader from '@/components/loader/home/home-prd-loader';
+import ErrorMsg from '@/components/common/error-msg';
+import ShapeLine from '@/svg/shape-line';
+import { useGetAllProductsQuery } from '@/redux/features/productsApi';
+import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 
-// Fallback image URL
-const FALLBACK_IMAGE = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg';
-
-const AllProductsArea = () => {
+const HomeProductsArea = () => {
   const t = useTranslations('AllProductsArea');
   const tPagination = useTranslations('SearchArea');
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedParentCategory, setSelectedParentCategory] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const itemsPerPage = 12;
 
-  // Get category slug from URL and extract ID
-  const categorySlug = searchParams.get('category');
-  const categoryIdFromSlug = categorySlug ? categorySlug.split('-').pop() : null;
-  
-  // Get search text from URL
-  const searchText = searchParams.get('searchText') || '';
-
   // Determine the active category ID for filtering
-  const activeCategoryId = selectedSubcategory || selectedParentCategory || categoryIdFromSlug;
+  const activeCategoryId = selectedSubcategory || selectedParentCategory;
 
   // Fetch categories
   const { data: categoriesData, isLoading: catLoading, isError: catError } = useGetShowCategoryQuery();
@@ -46,7 +30,6 @@ const AllProductsArea = () => {
     limit: itemsPerPage,
     offset: currentPage * itemsPerPage,
     categoryId: activeCategoryId,
-    searchText: searchText,
   });
 
   // Process categories
@@ -69,20 +52,21 @@ const AllProductsArea = () => {
   // Handle page change
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
-    document.getElementById('all-products-section')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('home-products-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Handle category selection and update URL
-  const handleCategoryChange = (category, isParent) => {
-    if (!category || !category.id || !category.title) return;
-    const newSlug = `${slugify(category.title)}-${category.id}`;
-    router.push(`/shop?category=${newSlug}`);
-    if (isParent) {
-      setSelectedParentCategory(category.id);
-      setSelectedSubcategory(null);
-    } else {
-      setSelectedSubcategory(category.id);
-    }
+  // Handle parent category selection (local state, no navigation)
+  const handleParentCategoryChange = (category) => {
+    const categoryId = category.id === 'all' ? null : Number(category.id);
+    setSelectedParentCategory(categoryId);
+    setSelectedSubcategory(null);
+    setCurrentPage(0);
+  };
+
+  // Handle subcategory selection (local state, no navigation)
+  const handleSubcategoryChange = (category) => {
+    const categoryId = Number(category.id);
+    setSelectedSubcategory(categoryId === selectedSubcategory ? null : categoryId);
     setCurrentPage(0);
   };
 
@@ -103,7 +87,7 @@ const AllProductsArea = () => {
   }
 
   return (
-    <section id="all-products-section" className="tp-product-area pb-55">
+    <section id="home-products-section" className="tp-product-area pb-55">
       <div className="container">
         <div className="row">
           <div className="col-12">
@@ -112,7 +96,7 @@ const AllProductsArea = () => {
               isLoading={catLoading}
               isError={catError}
               selectedParentCategory={selectedParentCategory}
-              onParentCategorySelect={(cat) => handleCategoryChange(cat, true)}
+              onParentCategorySelect={handleParentCategoryChange}
             />
           </div>
         </div>
@@ -126,7 +110,7 @@ const AllProductsArea = () => {
                 isError={catError}
                 parentCategoryId={selectedParentCategory}
                 selectedCategory={selectedSubcategory}
-                onCategorySelect={(cat) => handleCategoryChange(cat, false)}
+                onCategorySelect={handleSubcategoryChange}
               />
               <div className="tp-section-title-wrapper mb-40">
                 <h3 className="tp-section-title">
@@ -168,4 +152,4 @@ const AllProductsArea = () => {
   );
 };
 
-export default AllProductsArea;
+export default HomeProductsArea;

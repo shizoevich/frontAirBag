@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { Rating } from "react-simple-star-rating";
 import { useLocale } from 'next-intl';
+import { slugify } from '@/utils/slugify';
 // internal
 import { add_cart_product } from "@/redux/features/cartSlice";
 import { remove_compare_product } from "@/redux/features/compareSlice";
@@ -53,7 +54,7 @@ const CompareArea = () => {
                                 height={176}
                               />
                               <h4 className="tp-compare-product-title">
-                                <Link href={`/${locale}/product-details/${item._id}`}>
+                                <Link href={`/${locale}/product/${slugify(item.title)}-${item._id}`}>
                                   {item.title}
                                 </Link>
                               </h4>

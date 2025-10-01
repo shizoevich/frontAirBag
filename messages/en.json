@@ -17,7 +17,16 @@
   "menu": {
     "home": "Home",
     "catalog": "Catalog",
-    "carBrandsAndAccount": "Car Brands & Account",
+    "covers": "Covers",
+    "renault": "Renault",
+    "toyota": "Toyota",
+    "skoda": "Skoda",
+    "bmw": "BMW",
+    "volkswagen": "Volkswagen",
+    "mercedes": "Mercedes-Benz",
+    "hyundai": "Hyundai",
+    "audi": "Audi",
+    "allBrands": "All Brands",
     "carBrands": "Car Brands",
     "selectCarBrand": "Select Car Brand",
     "carMats": "Car Mats by Brands",
@@ -184,6 +193,9 @@
   },
   "SearchArea": {
     "placeholder": "Search for products...",
+    "searchResults": "Search Results",
+    "productsFound": "Products Found",
+    "searchResultsFor": "Search results for",
     "error": "Something went wrong...",
     "noProductsFound": "No products found",
     "noResults": "Sorry, but nothing matched your search terms: {searchText}",
@@ -212,7 +224,7 @@
     "logout": "Logout"
   },
   "AllProductsArea": {
-    "loadingError": "Error loading products",
+    "loadingError": "Failed to load products",
     "noProductsFound": "No products found",
     "ourProducts": "Our Products",
     "showing": "Showing",
@@ -296,6 +308,7 @@
     "profileUpdateError": "Error updating profile"
   },
   "Categories": {
+    "all_covers": "All Covers",
     "car_brands": "Car Brands",
     "select_car_brand": "Select Car Brand",
     "search_brands": "Search Car Brands",
@@ -360,9 +373,14 @@
     "covers_seo_title": "Covers and Overlays for Safety Systems",
     "covers_seo_description": "Covers, overlays and decorative elements for vehicle safety systems. Quality accessories for Airbag SRS components."
   },
+  "YouTube": {
+    "title": "Our Videos",
+    "subtitle": "Watch our latest videos about AirBag repair and installation",
+    "viewChannel": "View Channel"
+  },
   "Contact": {
     "title": "Contact",
-    "subtitle": "🏎️ Everything for AirBag SRS Safety Restoration",
+    "subtitle": "Everything to restore the safety of your car — AirBag SRS spare parts in stock, same-day shipping, convenient payment and customer support.",
     "pageTitle": "Contact - AirBag",
     "pageDescription": "Contact us for more information about our products and services",
     "email": "Email",
@@ -370,10 +388,10 @@
     "phone": "Phone",
     "phoneNumber": "+38 (098) 998-98-28",
     "delivery": "Delivery",
-    "deliveryInfo": "Nova Poshta, shipping within 1-3 days",
+    "deliveryInfo": "Nova Poshta, same day delivery if ordered before 7:00 PM",
     "workingHours": "Working Hours",
-    "workingDays": "Mon-Sat: 9:00 AM – 7:00 PM",
-    "weekend": "Sun: Closed",
+    "workingDays": "Mon-Fri: 9:00 AM – 8:00 PM",
+    "weekend": "Sat-Sun: 9:00 AM – 7:00 PM",
     "socialNetworks": "Find us on social networks",
     "socialDescription": "Follow us on social networks to stay up to date with the latest news and promotions",
     "socialLabels": {

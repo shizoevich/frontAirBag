@@ -11,10 +11,11 @@ export const productsApi = apiSlice.injectEndpoints({
           // For parent categories like Covers (754099), search by category__parent_id
           // For subcategories, search by category__id_remonline
           const parentCategoryIds = [754099, 754100, 754101]; // Known parent category IDs
-          if (parentCategoryIds.includes(categoryId)) {
-            url += `&category__parent_id=${categoryId}`;
+          const numericCategoryId = Number(categoryId);
+          if (parentCategoryIds.includes(numericCategoryId)) {
+            url += `&category__parent_id=${numericCategoryId}`;
           } else {
-            url += `&category__id_remonline=${categoryId}`;
+            url += `&category__id_remonline=${numericCategoryId}`;
           }
         } else if (parentCategoryId) {
           url += `&category__parent_id=${parentCategoryId}`;
@@ -75,6 +76,17 @@ export const productsApi = apiSlice.injectEndpoints({
     getProductById: builder.query({
       query: (id) => `/goods/${id}/`,
       providesTags: (result, error, id) => [{ type: 'products', id }],
+    }),
+
+    // Получение товара по slug
+    getProductBySlug: builder.query({
+      query: (slug) => `/goods/?slug=${slug}`,
+      transformResponse: (response) => {
+        // API returns a list, so we take the first item
+        const product = response.results?.[0] || response.data?.[0] || response?.[0];
+        return product;
+      },
+      providesTags: (result, error, slug) => [{ type: 'products', slug }],
     }),
 
     // Создание товара

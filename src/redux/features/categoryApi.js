@@ -3,6 +3,16 @@ import { apiSlice } from "../api/apiSlice";
 export const categoryApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
+    // Get single category by slug
+    getCategoryBySlug: builder.query({
+      query: (slug) => `/good-categories/?slug=${slug}`,
+      transformResponse: (response) => {
+        // API returns a list, so we take the first item
+        const category = response.results?.[0] || response.data?.[0] || response?.[0];
+        return category;
+      },
+      providesTags: (result, error, slug) => [{ type: 'Category', slug }],
+    }),
     // Добавление категории
     addCategory: builder.mutation({
       query: (categoryData) => ({

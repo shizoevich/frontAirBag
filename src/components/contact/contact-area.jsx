@@ -23,14 +23,6 @@ const ContactArea = () => {
                   
                   <div className="tp-contact-info-compact mb-4">
                     <div className="contact-item d-flex align-items-center mb-3">
-                      <i className="far fa-envelope text-dark fs-5 me-3"></i>
-                      <div>
-                        <h5 className="mb-1">{t('email')}</h5>
-                        <a href="mailto:Noxnew@hotmail.com" className="text-primary">Noxnew@hotmail.com</a>
-                      </div>
-                    </div>
-                    
-                    <div className="contact-item d-flex align-items-center mb-3">
                       <i className="far fa-phone-alt text-dark fs-5 me-3"></i>
                       <div>
                         <h5 className="mb-1">{t('phone')}</h5>
@@ -53,6 +45,14 @@ const ContactArea = () => {
                         <p className="mb-0">Пн-Сб: 9:00 - 19:00<br/>Нд: Вихідний</p>
                       </div>
                     </div>
+
+                    <div className="contact-item d-flex align-items-center mb-3">
+                      <i className="far fa-envelope text-dark fs-5 me-3"></i>
+                      <div>
+                        <h5 className="mb-1">{t('email')}</h5>
+                        <a href="mailto:Noxnew@hotmail.com" className="text-primary">Noxnew@hotmail.com</a>
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="tp-contact-social-wrapper">
@@ -64,13 +64,13 @@ const ContactArea = () => {
                       <a href="https://t.me/AirBagAD_bot" target="_blank" rel="noopener noreferrer" aria-label="Telegram" className="me-2">
                         <i className="fa-brands fa-telegram fs-4"></i>
                       </a>
-                      <a href="https://tiktok.com/@airbag_ad" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="me-2">
+                      <a href="https://www.tiktok.com/@dmytro_gekalo?_t=ZM-8yjBBkpbNbi&_r=1" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="me-2">
                         <i className="fa-brands fa-tiktok fs-4"></i>
                       </a>
-                      <a href="https://instagram.com/dmytro_gekalo" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="me-2">
+                      <a href="https://www.instagram.com/dmytro_gekalo?igsh=MXV2MmNsaWpkdHlkeA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="me-2">
                         <i className="fa-brands fa-instagram fs-4"></i>
                       </a>
-                      <a href="https://facebook.com/dmytro.gekalo" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="me-2">
+                      <a href="https://www.facebook.com/share/15rmtkFcaX/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="me-2">
                         <i className="fa-brands fa-facebook-f fs-4"></i>
                       </a>
                     </div>

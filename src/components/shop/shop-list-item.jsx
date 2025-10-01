@@ -9,6 +9,7 @@ import { handleProductModal } from "@/redux/features/productModalSlice";
 import { add_cart_product } from "@/redux/features/cartSlice";
 import BlurImage from "@/components/common/BlurImage";
 import { add_to_compare } from "@/redux/features/compareSlice";
+import { slugify } from '@/utils/slugify';
 
 const ShopListItem = ({ product }) => {
   const locale = useLocale();
@@ -54,7 +55,7 @@ const ShopListItem = ({ product }) => {
   return (
     <div className="tp-product-list-item d-md-flex">
       <div className="tp-product-list-thumb p-relative fix">
-        <Link href={`/${locale}/product-details/${_id}`}>
+        <Link href={`/${locale}/product/${slugify(title)}-${_id}`}>
           <div style={{ width: '306px', height: '350px', position: 'relative' }}>
             <BlurImage image={productImage} alt={title || 'Product Image'} />
           </div>
@@ -92,7 +93,7 @@ const ShopListItem = ({ product }) => {
             {tags?.map((t, i) => <a key={i} href="#">{t}</a>)}
           </div>
           <h3 className="tp-product-title-2">
-            <Link href={`/${locale}/product-details/${_id}`}>{title}</Link>
+            <Link href={`/${locale}/product/${slugify(title)}-${_id}`}>{title}</Link>
           </h3>
           <div className="tp-product-rating-icon tp-product-rating-icon-2">
             <Rating allowFraction size={16} initialValue={ratingVal} readonly={true} />

@@ -2,14 +2,16 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { ShapeLine } from "@/svg";
-import ProductItem from "../products/electronics/product-item";
+import { useTranslations } from 'next-intl';
+import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
+import { useGetAllProductsQuery } from "@/redux/features/productsApi";
+import ProductItem from "@/components/products/electronics/product-item";
 import ErrorMsg from "@/components/common/error-msg";
 import HomePrdLoader from "@/components/loader/home/home-prd-loader";
-import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
-import { useGetAllProductsQuery } from "@/redux/features/productsApi";
 import ReactPaginate from 'react-paginate';
-import { useTranslations } from 'next-intl';
 
 // Fallback image URL
 const FALLBACK_IMAGE = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg';
@@ -76,14 +78,19 @@ const BrandSearchArea = () => {
   const t = useTranslations('Categories');
   const tSearch = useTranslations('SearchArea');
   const tProducts = useTranslations('AllProductsArea');
+  const router = useRouter();
+  const locale = useLocale();
+  const searchParams = useSearchParams();
   
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const itemsPerPage = 12; // Number of products per page
   
+  // Get brand from URL parameter
+  const brandParam = searchParams.get('brand');
+  
   // Всегда показываем товары из категории Covers (754099)
-  const selectedCategoryId = selectedSubcategory || 754099;
+  const selectedCategoryId = 754099;
   
   useEffect(() => {
     setMounted(true);
@@ -138,16 +145,29 @@ const BrandSearchArea = () => {
   };
 
   // Handle category selection
-  const handleCategorySelect = (categoryId) => {
-    setSelectedSubcategory(categoryId);
+  const handleCategorySelect = (brand) => {
+    if (!brand) {
+      // "Все накладки" - показываем все товары из категории Covers
+      router.push(`/${locale}/search/brand/`);
+    } else {
+      // Конкретная марка - переходим на страницу категории с slug
+      const brandSlug = brand.title.toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[()]/g, '');
+      const categorySlug = `${brandSlug}-${brand.id}`;
+      router.push(`/${locale}/shop/${categorySlug}`);
+    }
     setCurrentPage(0); // Reset to first page when category changes
   };
 
   // Get selected category name
   const getSelectedCategoryName = () => {
-    if (selectedSubcategory) {
-      const category = allCategories.find(cat => String(cat.id) === String(selectedSubcategory));
-      return category ? category.title : '';
+    if (brandParam) {
+      // Find category by brand name from URL parameter
+      const category = allCategories.find(cat => 
+        cat.title.toLowerCase().includes(brandParam.toLowerCase())
+      );
+      return category ? category.title : brandParam;
     }
     return t('all_covers');
   };
@@ -172,10 +192,10 @@ const BrandSearchArea = () => {
           <div className="col-xl-12">
             <div className="tp-category-carousel">
               <div className="row">
-                {/* Кнопка "Все накладки" */}
+                {/* Все накладки */}
                 <div className="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-20">
                   <div 
-                    className={`tp-category-item text-center cursor-pointer ${!selectedSubcategory ? 'active' : ''}`}
+                    className={`tp-category-item text-center cursor-pointer ${!brandParam ? 'active' : ''}`}
                     onClick={() => handleCategorySelect(null)}
                   >
                     <div className="tp-category-thumb">
@@ -197,8 +217,8 @@ const BrandSearchArea = () => {
                 {carBrands.map((brand) => (
                   <div key={brand.id} className="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-20">
                     <div 
-                      className={`tp-category-item text-center cursor-pointer ${selectedSubcategory === brand.id ? 'active' : ''}`}
-                      onClick={() => handleCategorySelect(brand.id)}
+                      className={`tp-category-item text-center cursor-pointer ${brandParam && brand.title.toLowerCase().includes(brandParam.toLowerCase()) ? 'active' : ''}`}
+                      onClick={() => handleCategorySelect(brand)}
                     >
                       <div className="tp-category-thumb">
                         <Image 

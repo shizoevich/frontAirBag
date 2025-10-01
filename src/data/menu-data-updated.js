@@ -27,7 +27,7 @@ const menu_data = [
       {
         title: '🛡️ Комплектующие Airbag SRS',
         titleKey: 'airbag_components',
-        link: '/shop-category/airbag-components',
+        link: '/category/airbag-components',
         mega_menus: [
           { title: 'Коннекторы - Разъёмы и соединители для подушек безопасности', titleKey: 'connectors', link: '/shop/connectors' },
           { title: 'Крепления - Крепёжные элементы и скобы', titleKey: 'mounts', link: '/shop/mounts' },
@@ -39,7 +39,7 @@ const menu_data = [
       {
         title: '💥 Пиропатроны',
         titleKey: 'squibs',
-        link: '/shop-category/pyrotechnics',
+        link: '/category/pyrotechnics',
         mega_menus: [
           { title: 'ПП в Ремни - Пиропатроны в ремни безопасности', titleKey: 'pyro_belts', link: '/shop/pyro-belts' },
           { title: 'ПП в Ноги/Сиденье - Пиропатроны в сиденья и нижнюю часть салона', titleKey: 'pyro_seats', link: '/shop/pyro-seats' },
@@ -107,8 +107,8 @@ export const mobile_menu = [
     link: '/shop',
     sub_menus: [
       { title: 'Марки автомобилей', titleKey: 'car_brands', link: '/search/brand' },
-      { title: 'Комплектующие Airbag SRS', titleKey: 'airbag_components', link: '/shop-category/airbag-components' },
-      { title: 'Пиропатроны', titleKey: 'squibs', link: '/shop-category/pyrotechnics' },
+      { title: 'Комплектующие Airbag SRS', titleKey: 'airbag_components', link: '/category/airbag-components' },
+      { title: 'Пиропатроны', titleKey: 'squibs', link: '/category/pyrotechnics' },
     ],
   },
   {

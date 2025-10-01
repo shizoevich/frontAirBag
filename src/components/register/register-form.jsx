@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
@@ -82,7 +82,7 @@ const RegisterForm = () => {
   const isLoading = loading || isRegistering || isLoggingIn;
 
   // Поиск городов через API Новой Почты
-  const fetchCities = async () => {
+  const fetchCities = useCallback(async () => {
     if (searchCity.length < 2) return;
     
     try {
@@ -114,10 +114,10 @@ const RegisterForm = () => {
       console.error('Error searching cities:', error);
       setCities([]);
     }
-  };
+  }, [searchCity]);
 
   // Поиск отделений Новой Почты
-  const fetchWarehouses = async () => {
+  const fetchWarehouses = useCallback(async () => {
     try {
       const payload = {
         apiKey: '1690358338d20ac90d792f5da5bb1292',
@@ -159,7 +159,7 @@ const RegisterForm = () => {
       console.error('Error searching warehouses:', error);
       setWarehouses([]);
     }
-  };
+  }, [selectedCity]);
 
   // Обработка изменения поля города
   const handleCityChange = (e) => {

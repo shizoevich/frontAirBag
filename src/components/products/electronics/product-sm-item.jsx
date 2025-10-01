@@ -3,12 +3,15 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { Cart } from "@/svg";
 import { add_cart_product } from "@/redux/features/cartSlice";
 import BlurImage from "@/components/common/BlurImage";
+import { slugify } from '@/utils/slugify';
 
 const ProductSmItem = ({ product }) => {
   const t = useTranslations('ProductItem');
+  const locale = useLocale();
   const {_id, img, images, imageURLs, category, title, price_minor, reviews, residue } = product || {};
   const dispatch = useDispatch();
   const { cart_products } = useSelector((state) => state.cart);
@@ -46,7 +49,7 @@ const ProductSmItem = ({ product }) => {
   return (
     <div className="tp-product-sm-item d-flex align-items-center">
       <div className="tp-product-thumb mr-25 fix">
-        <Link href={`/product-details/${_id}`}>
+        <Link href={`/${locale}/product/${slugify(title)}-${_id}`}>
           <div style={{ width: '140px', height: '140px', position: 'relative' }}>
             <BlurImage image={productImage} alt={title || 'Product Image'} />
             {isOutOfStock && (
@@ -79,7 +82,7 @@ const ProductSmItem = ({ product }) => {
             WebkitBoxOrient: 'vertical',
             lineHeight: '24px'
           }}>
-            <Link href={`/product-details/${_id}`}>{title}</Link>
+            <Link href={`/${locale}/product/${slugify(title)}-${_id}`}>{title}</Link>
           </h3>
         </div>
         <div className="d-flex flex-column gap-2">

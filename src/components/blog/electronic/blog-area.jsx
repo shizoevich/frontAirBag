@@ -53,7 +53,6 @@ const BlogArea = () => {
           <div className="col-xl-4 col-md-6">
             <div className="tp-section-title-wrapper mb-50">
               <h3 className="tp-section-title">Latest news & articles
-                <ShapeLine />
               </h3>
             </div>
           </div>

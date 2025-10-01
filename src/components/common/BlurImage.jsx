@@ -11,7 +11,9 @@ const BlurImage = ({ image, alt = 'Product Image' }) => {
 
     return (
         <div className={classes.container}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className={classes.blurIMG} alt={alt} src={imageSrc} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className={classes.finalIMG} alt={alt} src={imageSrc} />
         </div>
     );
