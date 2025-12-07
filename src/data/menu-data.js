@@ -72,7 +72,7 @@ const menu_data = [
     account_pages: [
       { titleKey: 'menu.cart', link: '/cart', showAlways: true },
       { titleKey: 'menu.checkout', link: '/checkout', showAlways: true },
-      { titleKey: 'menu.myOrders', link: '/profile', showAlways: true },
+      { titleKey: 'menu.myOrders', link: '/orders', showAlways: true },
       { titleKey: 'menu.login', link: '/login', showForGuests: true },
       { titleKey: 'menu.register', link: '/register', showForGuests: true },
       { titleKey: 'menu.logout', link: '/logout', showForAuth: true },

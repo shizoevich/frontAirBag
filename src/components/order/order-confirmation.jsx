@@ -45,8 +45,9 @@ const OrderConfirmation = ({ orderId }) => {
           <div className="col-12">
             <div className="text-center py-5">
               <div className="spinner-border" role="status">
-                <span className="visually-hidden">{t('loading')}</span>
+                <span className="visually-hidden">Завантаження...</span>
               </div>
+              <p className="mt-3">{t('loading')}</p>
             </div>
           </div>
         </div>

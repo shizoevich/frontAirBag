@@ -27,9 +27,11 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
   const isAuthenticated = !!accessToken;
   const isAuthenticatedUser = isAuthenticated && !isGuest;
   
-  // Загружаем данные пользователя, если есть токен, но нет данных пользователя
-  const { data: userData, error: userError } = useGetUserQuery(undefined, {
-    skip: !accessToken || !!userInfo // Пропускаем запрос, если нет токена или уже есть данные пользователя
+  // Временно отключаем автозагрузку пользователя пока /auth/me/ не заработает
+  const { data: userData, error: userError, isLoading: isLoadingUser } = useGetUserQuery(undefined, {
+    skip: true // Отключено: endpoint /auth/me/ возвращает HTML вместо JSON
+    // TODO: Включить когда бэкенд исправит endpoint
+    // skip: !accessToken || !!userInfo
   });
   
   // Используем данные пользователя из Redux или из API запроса
@@ -45,8 +47,20 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
     accessToken: !!accessToken,
     rawAccessToken: accessToken,
     isGuest,
+    userError,
+    isLoadingUser,
     fullReduxState: { accessToken, user: userInfo, isGuest }
   });
+  
+  // Логируем ошибку получения пользователя
+  if (userError) {
+    console.error('❌ HeaderMainRight: Error loading user:', {
+      status: userError?.status,
+      data: userError?.data,
+      message: userError?.data?.detail || userError?.message,
+      fullError: userError
+    });
+  }
   
   // Дополнительная проверка localStorage
   if (typeof window !== 'undefined') {

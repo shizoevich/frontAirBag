@@ -61,26 +61,9 @@ const LoginForm = () => {
     loginPromise
       .unwrap()
       .then(async (response) => {
-        // Сохраняем токены в localStorage и cookies (перенесено из onQueryStarted)
-        try {
-          const { access, refresh } = response;
-          
-          // Сохраняем в localStorage
-          const authData = { accessToken: access, refreshToken: refresh };
-          localStorage.setItem('userInfo', JSON.stringify(authData));
-          
-          // Сохраняем в cookies
-          const Cookies = (await import('js-cookie')).default;
-          Cookies.set('userInfo', JSON.stringify(authData), { expires: 7 });
-          
-          // Обновляем Redux состояние
-          dispatch(userLoggedIn({
-            accessToken: access,
-          }));
-          
-        } catch (saveError) {
-          console.error('Error saving tokens:', saveError);
-        }
+        // Токены уже сохранены в authApi.js через onQueryStarted
+        // Здесь только показываем уведомление и делаем редирект
+        console.log('✅ Login form: Login successful, tokens saved by authApi');
         
         notifySuccess(t('loginSuccess'));
         

@@ -3,10 +3,23 @@ import { apiSlice } from "../api/apiSlice";
 export const discountsApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
-    // Получение всех скидок
+    // Получение всех скидок с поддержкой пагинации
     getDiscounts: builder.query({
-      query: () => '/discounts/',
+      query: ({ limit, offset } = {}) => {
+        const params = new URLSearchParams();
+        if (limit) params.append('limit', limit);
+        if (offset) params.append('offset', offset);
+        const queryString = params.toString() ? `?${params.toString()}` : '';
+        console.log('Fetching discounts from:', `/discounts/${queryString}`);
+        return `/discounts/${queryString}`;
+      },
       providesTags: ['Discounts'],
+      // Добавляем обработку ошибок и таймаут
+      keepUnusedDataFor: 60, // Кэшируем на 60 секунд
+      transformErrorResponse: (response, meta, arg) => {
+        console.error('Discounts API Error Response:', response);
+        return response;
+      },
     }),
 
     // Получение скидки по ID

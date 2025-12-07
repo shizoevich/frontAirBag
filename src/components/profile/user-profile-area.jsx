@@ -32,8 +32,10 @@ const UserProfileArea = () => {
     nova_post_address: ''
   });
   
-  // Получаем данные пользователя
-  const { data: userData, isLoading, isError } = useGetUserQuery();
+  // Временно отключаем загрузку пользователя - /auth/me/ возвращает HTML
+  const { data: userData, isLoading, isError } = useGetUserQuery(undefined, {
+    skip: true // TODO: Включить когда бэкенд исправит /auth/me/
+  });
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
   const { user, accessToken } = useSelector((state) => state.auth);
   

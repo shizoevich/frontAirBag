@@ -23,7 +23,21 @@ const baseQuery = fetchBaseQuery({
 
 // Создаем обертку для базового запроса с обработкой ошибок и обновлением токенов
 const baseQueryWithReauth = async (args, api, extraOptions) => {
+  console.log('🌐 API Request:', { 
+    url: typeof args === 'string' ? args : args.url,
+    method: typeof args === 'string' ? 'GET' : args.method 
+  });
+  
   let result = await baseQuery(args, api, extraOptions);
+  
+  console.log('🌐 API Response:', { 
+    url: typeof args === 'string' ? args : args.url,
+    status: result?.error?.status || result?.meta?.response?.status || 'success',
+    hasData: !!result?.data,
+    hasError: !!result?.error,
+    data: result?.data,
+    error: result?.error
+  });
   
   // Если получаем ошибку 401 (токен истек), пробуем обновить токен
   if (result?.error?.status === 401) {

@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { useGetOrdersQuery, useGetOrderByIdQuery } from '@/redux/features/ordersApi';
-import { useGetMeQuery } from '@/redux/features/authApi';
+import { useSelector } from 'react-redux';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
@@ -9,7 +9,8 @@ const OrderPage = () => {
   const t = useTranslations('Orders');
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   
-  const { data: user } = useGetMeQuery();
+  // Получаем данные пользователя из Redux (не вызываем /auth/me/)
+  const { user } = useSelector((state) => state.auth);
   const { data: orders, isLoading: ordersLoading, error: ordersError } = useGetOrdersQuery();
   const { data: selectedOrder, isLoading: orderLoading } = useGetOrderByIdQuery(selectedOrderId, {
     skip: !selectedOrderId
@@ -85,8 +86,9 @@ const OrderPage = () => {
           <div className="col-12">
             <div className="text-center py-5">
               <div className="spinner-border" role="status">
-                <span className="visually-hidden">{t('loading')}</span>
+                <span className="visually-hidden">Завантаження...</span>
               </div>
+              <p className="mt-3">{t('loading')}</p>
             </div>
           </div>
         </div>
@@ -208,8 +210,9 @@ const OrderPage = () => {
                     {orderLoading ? (
                       <div className="text-center py-4">
                         <div className="spinner-border spinner-border-sm text-primary" role="status">
-                          <span className="visually-hidden">{t('loading')}</span>
+                          <span className="visually-hidden">Завантаження...</span>
                         </div>
+                        <p className="mt-2 small">{t('loading')}</p>
                       </div>
                     ) : (() => {
                       // Найти заказ в тестовых данных или использовать данные из API

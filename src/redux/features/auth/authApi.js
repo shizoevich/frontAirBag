@@ -1,6 +1,7 @@
 import { apiSlice } from "@/redux/api/apiSlice";
 import { userLoggedIn, userLoggedOut } from "./authSlice";
 import { setAuth, updateAuth, removeAuth, getAuth } from "@/utils/authStorage";
+import { decodeJWT, getUserIdFromToken } from "@/utils/jwtDecode";
 import Cookies from "js-cookie";
 
 export const authApi = apiSlice.injectEndpoints({
@@ -32,16 +33,33 @@ export const authApi = apiSlice.injectEndpoints({
           
           // Сохраняем токены в localStorage (без cookies)
           const { access, refresh } = result.data;
-          setAuth({ accessToken: access, refreshToken: refresh });
-          console.log('Tokens saved to localStorage');
+          
+          // Извлекаем user_id из токена
+          const tokenPayload = decodeJWT(access);
+          const userId = tokenPayload?.user_id;
+          console.log('Decoded token payload:', { userId, exp: tokenPayload?.exp });
+          
+          // Создаем минимальный объект пользователя из токена
+          const minimalUser = userId ? {
+            id: userId,
+            email: arg.email, // Используем email из формы логина
+          } : null;
+          
+          setAuth({ 
+            accessToken: access, 
+            refreshToken: refresh,
+            user: minimalUser 
+          });
+          console.log('Tokens and minimal user data saved to localStorage');
 
-          // Диспатчим действие для обновления состояния
+          // Диспатчим действие для обновления состояния с данными пользователя
           dispatch(
             userLoggedIn({
               accessToken: access,
+              user: minimalUser,
             })
           );
-          console.log('Redux state updated with access token');
+          console.log('Redux state updated with access token and minimal user data');
           
           // Синхронизируем cookie для совместимости с authMiddleware и initialState
           try {
@@ -50,16 +68,18 @@ export const authApi = apiSlice.injectEndpoints({
               JSON.stringify({
                 accessToken: access,
                 refreshToken: refresh,
-                // user пока не знаем, будет установлен после getUser
+                user: minimalUser, // Сохраняем минимальные данные пользователя
               }),
               { expires: 7 }
             );
-            console.log('Cookies userInfo set (tokens)');
+            console.log('Cookies userInfo set (tokens + minimal user)');
           } catch (cookieErr) {
             console.error('Failed to set cookies userInfo after login:', cookieErr);
           }
           
-          // После успешного логина получаем данные пользователя и ждем их загрузки
+          // Временно отключено: /auth/me/ возвращает HTML вместо JSON
+          // TODO: Включить когда бэкенд исправит endpoint
+          /*
           try {
             console.log('Fetching user data...');
             const userResult = await dispatch(authApi.endpoints.getUser.initiate()).unwrap();
@@ -67,6 +87,8 @@ export const authApi = apiSlice.injectEndpoints({
           } catch (userError) {
             console.error('Failed to load user data after login:', userError);
           }
+          */
+          console.log('⚠️ Skipping /auth/me/ - endpoint returns HTML instead of JSON');
         } catch (err) {
           console.log('🔧 LOGIN API: queryFulfilled rejected, error:', err);
           // RTK Query may attach the error under err.error or err.data
@@ -81,15 +103,30 @@ export const authApi = apiSlice.injectEndpoints({
     
     // Получение данных пользователя
     getUser: builder.query({
-      query: () => ({
-        url: "/auth/me/",
-        method: "GET",
-      }),
+      query: () => {
+        console.log('🔍 GET USER: Making request to /auth/me/');
+        return {
+          url: "/auth/me/",
+          method: "GET",
+          // Добавляем обработку для массива ответов (если API возвращает список)
+        };
+      },
+      // Трансформируем ответ если это массив
+      transformResponse: (response) => {
+        console.log('🔍 GET USER: Raw response:', response);
+        // Если ответ - массив, берем первый элемент
+        if (Array.isArray(response) && response.length > 0) {
+          console.log('✅ Transformed array response to single user object');
+          return response[0];
+        }
+        return response;
+      },
 
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
+          console.log('🔍 GET USER: Waiting for response...');
           const result = await queryFulfilled;
-          console.log('GetUser successful, received user data:', result.data);
+          console.log('✅ GetUser successful, received user data:', result.data);
           
           // Получаем текущие данные из localStorage для сохранения токена
           const existing = getAuth();
@@ -147,10 +184,20 @@ export const authApi = apiSlice.injectEndpoints({
             console.error('Failed to update cookies userInfo after getUser:', cookieErr);
           }
         } catch (err) {
-          console.error('Get user error:', err);
+          console.error('❌ GET USER ERROR:', err);
+          console.error('Error details:', {
+            status: err?.error?.status || err?.status,
+            data: err?.error?.data || err?.data,
+            message: err?.error?.data?.detail || err?.message,
+            fullError: err
+          });
+          
           // Если ошибка 401, выполняем logout
-          if (err?.error?.status === 401) {
+          if (err?.error?.status === 401 || err?.status === 401) {
+            console.warn('⚠️ 401 Unauthorized - logging out user');
             dispatch(userLoggedOut());
+          } else {
+            console.warn('⚠️ GET USER failed but not 401, keeping user logged in with token only');
           }
         }
       },
