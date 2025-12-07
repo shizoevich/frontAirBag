@@ -25,10 +25,10 @@ const CheckoutLoginDiscount = ({ user, accessToken }) => {
                   </div>
                   <div className="tp-checkout-discount-actions">
                     <Link href={`/${locale}/login?redirect=/${locale}/checkout`} className="btn btn-sm btn-outline-primary me-2">
-                      Увійти
+                      {t('login_button')}
                     </Link>
                     <Link href={`/${locale}/register?redirect=/${locale}/checkout`} className="btn btn-sm btn-primary">
-                      Зареєструватися
+                      {t('register_button')}
                     </Link>
                   </div>
                 </div>
@@ -37,7 +37,7 @@ const CheckoutLoginDiscount = ({ user, accessToken }) => {
                   <div className="d-flex align-items-center">
                     <i className="fa-solid fa-check-circle text-success me-2"></i>
                     <span className="text-success fw-medium">
-                      Ви авторизовані! Ваші знижки будуть автоматично застосовані.
+                      {t('authenticated_discount_message')}
                     </span>
                   </div>
                 </div>

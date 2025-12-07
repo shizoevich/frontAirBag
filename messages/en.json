@@ -516,6 +516,9 @@
   "Checkout": {
     "returning_customer": "Returning customer? Click here to login",
     "discount_message": "Login or register to accumulate discounts",
+    "authenticated_discount_message": "You are authenticated! Your discounts will be automatically applied.",
+    "login_button": "Login",
+    "register_button": "Register",
     "billing_details": "Billing Details",
     "your_order": "Your Order",
     "product": "Product",
@@ -524,6 +527,7 @@
     "shipping": "Shipping",
     "shipping_cost": "Shipping Cost",
     "discount": "Discount",
+    "your_discount": "Your Discount",
     "payment_method": "Payment Method",
     "cash_on_delivery": "Cash on Delivery",
     "cash_on_delivery_description": "Pay for your order with cash when you receive it at Nova Post office",

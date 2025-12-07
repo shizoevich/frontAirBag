@@ -184,19 +184,18 @@ export const authApi = apiSlice.injectEndpoints({
             console.error('Failed to update cookies userInfo after getUser:', cookieErr);
           }
         } catch (err) {
-          console.error('❌ GET USER ERROR:', err);
-          console.error('Error details:', {
-            status: err?.error?.status || err?.status,
-            data: err?.error?.data || err?.data,
-            message: err?.error?.data?.detail || err?.message,
-            fullError: err
-          });
+          // Игнорируем ошибки отмены запроса
+          if (err?.name === 'AbortError' || err?.message?.includes('aborted')) {
+            console.log('ℹ️ GET USER request was aborted');
+            return;
+          }
+          
           
           // Если ошибка 401, выполняем logout
           if (err?.error?.status === 401 || err?.status === 401) {
             console.warn('⚠️ 401 Unauthorized - logging out user');
             dispatch(userLoggedOut());
-          } else {
+          } else if (err?.error || err?.status) {
             console.warn('⚠️ GET USER failed but not 401, keeping user logged in with token only');
           }
         }

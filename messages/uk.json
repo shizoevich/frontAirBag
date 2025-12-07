@@ -477,6 +477,9 @@
   "Checkout": {
     "returning_customer": "Постійний клієнт? Натисніть тут для входу",
     "discount_message": "Авторизуйтесь або зареєструйтесь, щоб накопичити знижку",
+    "authenticated_discount_message": "Ви авторизовані! Ваші знижки будуть автоматично застосовані.",
+    "login_button": "Увійти",
+    "register_button": "Зареєструватися",
     "billing_details": "Деталі замовлення",
     "your_order": "Ваше замовлення",
     "product": "Товар",
@@ -485,6 +488,7 @@
     "shipping": "Доставка",
     "shipping_cost": "Вартість доставки",
     "discount": "Знижка",
+    "your_discount": "Ваша знижка",
     "payment_method": "Спосіб оплати",
     "cash_on_delivery": "Оплата при отриманні",
     "cash_on_delivery_description": "Оплатіть замовлення готівкою при отриманні на відділенні Нової Пошти",

@@ -13,6 +13,8 @@ import UserInfoModal from "./user-info-modal";
 import GuestRegistrationModal from './guest-registration-modal';
 import useOrderCheckout from "@/hooks/use-order-checkout";
 import useCartInfo from "@/hooks/use-cart-info";
+import { useGetOrdersQuery } from "@/redux/features/ordersApi";
+import { useGetDiscountsQuery } from "@/redux/features/discountsApi";
 
 const OrderCheckoutArea = () => {
   const t = useTranslations('Checkout');
@@ -50,10 +52,55 @@ const OrderCheckoutArea = () => {
   
   const { cart_products } = useSelector((state) => state.cart);
   const { quantity } = useCartInfo();
+  const { data: ordersData } = useGetOrdersQuery();
+  const { data: discountsData } = useGetDiscountsQuery();
 
   const formatPrice = (priceMinor) => {
     return (priceMinor / 100).toFixed(2);
   };
+
+  // Рассчитываем текущую скидку пользователя
+  const calculateCurrentDiscount = () => {
+    if (!ordersData || !discountsData) return 0;
+    
+    const orders = ordersData.results || ordersData.data || ordersData;
+    const discounts = discountsData.results || discountsData.data || discountsData;
+    
+    if (!Array.isArray(orders) || !Array.isArray(discounts)) return 0;
+    
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    
+    // Начало и конец прошлого месяца
+    const previousMonthStart = new Date(currentYear, currentMonth - 1, 1);
+    const previousMonthEnd = new Date(currentYear, currentMonth, 0, 23, 59, 59);
+    
+    // Считаем сумму за прошлый месяц
+    let previousMonthTotal = 0;
+    orders
+      .filter(order => order.is_paid || order.is_completed)
+      .forEach(order => {
+        const orderDate = new Date(order.created_at || order.date);
+        if (orderDate >= previousMonthStart && orderDate <= previousMonthEnd) {
+          previousMonthTotal += (order.grand_total_minor || 0) / 100;
+        }
+      });
+    
+    // Определяем скидку на основе суммы прошлого месяца
+    const sortedDiscounts = [...discounts].sort((a, b) => (b.month_payment || 0) - (a.month_payment || 0));
+    
+    for (const discount of sortedDiscounts) {
+      const threshold = (discount.month_payment || 0) / 100;
+      if (previousMonthTotal >= threshold) {
+        return parseFloat(discount.percentage);
+      }
+    }
+    
+    return 0;
+  };
+
+  const currentDiscountPercent = calculateCurrentDiscount();
 
   return (
     <>
@@ -118,6 +165,16 @@ const OrderCheckoutArea = () => {
                             <span>₴{subtotal.toFixed(2)}</span>
                           </li>
 
+                          {/* Current User Discount */}
+                          {currentDiscountPercent > 0 && (
+                            <li className="tp-order-info-list-subtotal" style={{ backgroundColor: 'rgb(248, 225, 191)', borderLeft: '4px solid rgb(223, 106, 34)' }}>
+                              <span style={{ fontWeight: 600, color: 'rgb(133, 60, 0)' }}>
+                                {t('your_discount')} ({currentDiscountPercent}%)
+                              </span>
+                              <span style={{ fontWeight: 600, color: 'rgb(133, 60, 0)' }}>- ₴{(subtotal * currentDiscountPercent / 100).toFixed(2)}</span>
+                            </li>
+                          )}
+
                           {/* Shipping */}
                           <li className="tp-order-info-list-shipping">
                             <div className="tp-order-info-list-shipping-item">
@@ -173,14 +230,14 @@ const OrderCheckoutArea = () => {
                           {discountAmount > 0 && (
                             <li className="tp-order-info-list-subtotal">
                               <span>{t('discount')}</span>
-                              <span>-₴{discountAmount.toFixed(2)}</span>
+                              <span>- ₴{discountAmount.toFixed(2)}</span>
                             </li>
                           )}
 
                           {/* Total */}
                           <li className="tp-order-info-list-total">
                             <span>{t('total')}</span>
-                            <span>₴{(subtotal + shippingCost - discountAmount).toFixed(2)}</span>
+                            <span>₴{(subtotal - (subtotal * currentDiscountPercent / 100) + shippingCost - discountAmount).toFixed(2)}</span>
                           </li>
                         </ul>
                       </div>
