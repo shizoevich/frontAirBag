@@ -14,7 +14,6 @@ const nextConfig = {
   images: {
     // Отключаем оптимизацию изображений только для статического экспорта
     unoptimized: process.env.STATIC_EXPORT === 'true',
-    domains: ['storage.remonline.app', 'storage.roapp.io', 't3.ftcdn.net'],
     // Опционально: настройки для форматов и качества
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60,
@@ -37,6 +36,16 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: 'storage.roapp.io',
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: 'storage.remonline.app',
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: 't3.ftcdn.net',
         pathname: "**",
       }
     ],

@@ -16,7 +16,8 @@ async function fetchCategory(slug) {
 }
 
 // Generate metadata for the page
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params: awaitedParams }) {
+  const params = await awaitedParams;
   const t = await getTranslations({ locale: params.locale, namespace: 'Categories' });
   const category = await fetchCategory(params.categorySlug);
   if (!category) {
@@ -29,7 +30,8 @@ export async function generateMetadata({ params }) {
 }
 
 // The main page component
-export default async function ShopCategoryPage({ params }) {
+export default async function ShopCategoryPage({ params: awaitedParams }) {
+  const params = await awaitedParams;
   const category = await fetchCategory(params.categorySlug);
 
   if (!category) {
