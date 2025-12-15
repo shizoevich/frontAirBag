@@ -20,6 +20,21 @@ const ContactInfo = ({ locale }) => {
               
               
               <div className="row">
+                
+                
+                {/* Delivery Card */}
+                <div className="col-lg-6 col-md-6 mb-4">
+                  <div className="tp-contact-card d-flex align-items-center gap-3 p-4 rounded-3 shadow-sm border h-100">
+                    <div className="tp-contact-icon bg-info rounded-circle d-flex align-items-center justify-content-center" style={{width: 50, height: 50, flexShrink: 0}}>
+                      <i className="fas fa-truck text-white fs-4"></i>
+                    </div>
+                    <div className="tp-contact-content">
+                      <h5 className="mb-2 fs-6 fw-bold">{t('delivery')}</h5>
+                      <p className="text-secondary mb-0 small">{t('deliveryInfo')}</p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Phone Card */}
                 <div className="col-lg-6 col-md-6 mb-4">
                   <div className="tp-contact-card d-flex align-items-center gap-3 p-4 rounded-3 shadow-sm border h-100">
@@ -31,19 +46,7 @@ const ContactInfo = ({ locale }) => {
                       <a href="tel:+380989998928" className="text-success text-decoration-none">
                         {t('phoneNumber')}
                       </a>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Delivery Card */}
-                <div className="col-lg-6 col-md-6 mb-4">
-                  <div className="tp-contact-card d-flex align-items-center gap-3 p-4 rounded-3 shadow-sm border h-100">
-                    <div className="tp-contact-icon bg-info rounded-circle d-flex align-items-center justify-content-center" style={{width: 50, height: 50, flexShrink: 0}}>
-                      <i className="fas fa-truck text-white fs-4"></i>
-                    </div>
-                    <div className="tp-contact-content">
-                      <h5 className="mb-2 fs-6 fw-bold">{t('delivery')}</h5>
-                      <p className="text-secondary mb-0 small">{t('deliveryInfo')}</p>
+                      <p className="text-secondary mb-0 small">{t('messendgers')}</p>
                     </div>
                   </div>
                 </div>
@@ -80,6 +83,42 @@ const ContactInfo = ({ locale }) => {
                   </div>
                 </div>
 
+              </div>
+              
+              {/* Address and Map Section */}
+              <div className="tp-contact-address mt-5 text-center">
+                <h3 className="tp-section-title-sm mb-4">{t('ourAddress')}</h3>
+                <div className="row justify-content-center">
+                  <div className="col-lg-8">
+                    <div className="tp-contact-map-wrapper rounded-3 overflow-hidden shadow-sm mb-4">
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2747.8234567890123!2d30.7234567890123!3d46.4567890123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDbCsDI3JzI0LjQiTiAzMMKwNDMnMjQuNCJF!5e0!3m2!1suk!2sua!4v1234567890123!5m2!1suk!2sua"
+                        width="100%"
+                        height="350"
+                        style={{ border: 0 }}
+                        allowFullScreen=""
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title={t('mapAriaLabel')}
+                      ></iframe>
+                    </div>
+                    <div className="tp-contact-address-info mb-4">
+                      <p className="mb-3 text-secondary">
+                        <i className="fas fa-map-marker-alt text-danger me-2"></i>
+                        {t('addressFull')}
+                      </p>
+                      <a 
+                        href="https://www.google.com/maps/search/?api=1&query=Україна,+м.+Одеса,+вул.+В.+Самофалова,+16А/1+(Santim)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary btn-sm"
+                      >
+                        <i className="fas fa-map-marked-alt me-2"></i>
+                        {t('viewOnMap')}
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </div>
               
               <div className="tp-contact-social mt-5 text-center">

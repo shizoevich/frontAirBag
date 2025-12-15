@@ -42,6 +42,45 @@ const CategoryCarousel = ({
       return <div className="text-center p-4">{t('noSubcategories')}</div>;
     }
 
+    // Сортируем категории: английский, кириллица, цифры
+    const alphabeticallySorted = [...displayCategories].sort((a, b) => {
+      const titleA = (a.title || '').trim();
+      const titleB = (b.title || '').trim();
+      
+      // Определяем тип первого символа
+      const getCharType = (str) => {
+        const firstChar = str.charAt(0);
+        if (/\d/.test(firstChar)) return 3; // Цифры
+        if (/[а-яА-ЯіІїЇєЄґҐ]/.test(firstChar)) return 2; // Кириллица
+        if (/[a-zA-Z]/.test(firstChar)) return 1; // Английский
+        return 4; // Остальное
+      };
+      
+      const typeA = getCharType(titleA);
+      const typeB = getCharType(titleB);
+      
+      // Сначала сортируем по типу символа
+      if (typeA !== typeB) return typeA - typeB;
+      
+      // Внутри одного типа - по алфавиту
+      return titleA.toLowerCase().localeCompare(titleB.toLowerCase(), typeA === 2 ? 'uk' : 'en');
+    });
+
+    // Пересортировываем для вертикального отображения (по колонкам)
+    const rows = 2;
+    const cols = Math.ceil(alphabeticallySorted.length / rows);
+    const sortedCategories = [];
+    
+    // Заполняем массив по строкам, но берем элементы по колонкам
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const index = row + col * rows;
+        if (index < alphabeticallySorted.length) {
+          sortedCategories.push(alphabeticallySorted[index]);
+        }
+      }
+    }
+
     content = (
       <Swiper
         modules={[SwiperNavigation, SwiperGrid]}
@@ -66,7 +105,7 @@ const CategoryCarousel = ({
         }}
         className="category-carousel"
       >
-        {displayCategories.map((category) => {
+        {sortedCategories.map((category) => {
           const categoryId = Number(category.id);
           const categoryName = category.title || '';
           const imagePath = category.image?.startsWith('http') ? category.image : `/assets/img/category/${category.image || 'noimage.png'}`;

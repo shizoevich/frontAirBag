@@ -78,7 +78,6 @@ const SearchProductsArea = () => {
               <div className="tp-section-title-wrapper">
                 <h3 className="tp-section-title">
                   {t('searchResults')}: &quot;{searchText}&quot;
-                  <ShapeLine />
                 </h3>
                 {!productsLoading && (
                   <p className="text-muted">

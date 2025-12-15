@@ -47,9 +47,6 @@
     "login": "Войти",
     "register": "Регистрация"
   },
-  "Products": {
-    "default_seo_title": "Продукт"
-  },
   "features": {
     "fastDelivery": "Быстрая доставка",
     "fastDeliveryDesc": "Доставка по всей Украине за 1-3 дня",
@@ -117,8 +114,9 @@
     "talkToUsTitle": "Свяжитесь с нами",
     "gotQuestions": "Есть вопросы? Звоните нам",
     "phoneNumber": "+38 098 998 9828",
+    "messendgers": "доступный на Telegram и Viber",
     "emailAddress": "Noxnew@hotmail.com",
-    "address": "Украина, г. Киев, ул. Примерная, 1",
+    "address": "Украина, г. Одесса, ул. В. Самофалова, 16А/1 (Santim)",
     "copyright": " {year} Все права защищены | Шаблон Next.js от ThemePure"
   },
   "ProductItem": {
@@ -322,11 +320,15 @@
     "emailAddress": "Noxnew@hotmail.com",
     "phone": "Телефон",
     "phoneNumber": "+38 (098) 998-98-28",
+    "messendgers": "доступный на Telegram и Viber",
     "delivery": "Доставка",
     "deliveryInfo": "Новая Почта, день в день при заказе до 19:00",
     "workingHours": "График работы",
     "workingDays": "Пн-Пт: 9:00 – 20:00",
     "weekend": "Сб-Вс: 9:00 – 19:00",
+    "ourAddress": "Наш адрес",
+    "addressFull": "Украина, г. Одесса, ул. В. Самофалова, 16А/1 (Santim)",
+    "viewOnMap": "Посмотреть на карте",
     "socialNetworks": "Найдите нас в социальных сетях",
     "socialDescription": "Следите за нами в социальных сетях, чтобы быть в курсе последних новостей и акций",
     "socialLabels": {
@@ -338,7 +340,6 @@
     "mapTitle": "Наше расположение",
     "mapDescription": "Мы находимся в центре города, удобное расположение для посещения",
     "mapAriaLabel": "Карта с расположением нашего офиса",
-    "viewOnMap": "Посмотреть на карте",
     "sendMessage": "Отправить сообщение",
     "yourName": "Ваше имя",
     "yourEmail": "Ваша электронная почта",
@@ -654,5 +655,16 @@
     "last_name": "Фамилия",
     "phone": "Телефон",
     "nova_post_address": "Адрес Новой Почты"
+  },
+  "Products": {
+    "default_seo_title": "AirBag - Автозапчасти",
+    "product_details": "Детали товара",
+    "add_to_cart": "Добавить в корзину",
+    "out_of_stock": "Нет в наличии",
+    "in_stock": "В наличии",
+    "price": "Цена",
+    "description": "Описание",
+    "specifications": "Характеристики",
+    "related_products": "Похожие товары"
   }
 }

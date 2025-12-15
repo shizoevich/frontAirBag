@@ -109,7 +109,7 @@ const CategoryProductsArea = () => {
               <div className="tp-section-title-wrapper">
                 <h3 className="tp-section-title">
                   {currentCategory.title}
-                  <ShapeLine />
+                  
                 </h3>
                 {!productsLoading && totalCount > 0 && (
                   <p className="text-muted">

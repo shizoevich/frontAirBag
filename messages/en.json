@@ -125,8 +125,9 @@
     "talkToUsTitle": "Talk To Us",
     "gotQuestions": "Got Questions? Call us",
     "phoneNumber": "+38 098 998 9828",
+    "messendgers": "available on Telegram and Viber",
     "emailAddress": "Noxnew@hotmail.com",
-    "address": "Ukraine, Kyiv, Prykladna St, 1",
+    "address": "Ukraine, Odessa, ul. V. Samofalova, 16A/1 (Santim)",
     "copyright": " {year} All Rights Reserved | Next.js Template by ThemePure"
   },
   "ProductItem": {
@@ -387,11 +388,15 @@
     "emailAddress": "Noxnew@hotmail.com",
     "phone": "Phone",
     "phoneNumber": "+38 (098) 998-98-28",
+    "messendgers": "available on Telegram and Viber",
     "delivery": "Delivery",
     "deliveryInfo": "Nova Poshta, same day delivery if ordered before 7:00 PM",
     "workingHours": "Working Hours",
     "workingDays": "Mon-Fri: 9:00 AM – 8:00 PM",
     "weekend": "Sat-Sun: 9:00 AM – 7:00 PM",
+    "ourAddress": "Our Address",
+    "addressFull": "Ukraine, Odessa, ul. V. Samofalova, 16A/1 (Santim)",
+    "viewOnMap": "View on Map",
     "socialNetworks": "Find us on social networks",
     "socialDescription": "Follow us on social networks to stay up to date with the latest news and promotions",
     "socialLabels": {
@@ -403,7 +408,6 @@
     "mapTitle": "Our Location",
     "mapDescription": "We are located in the city center, convenient location for visiting",
     "mapAriaLabel": "Map with the location of our office",
-    "viewOnMap": "View on Map",
     "sendMessage": "Send Message",
     "yourName": "Your Name",
     "yourEmail": "Your Email",
@@ -711,5 +715,20 @@
     "step4": "We will notify you when ready for pickup",
     "continueShopping": "Continue Shopping",
     "backToHome": "Back to Home"
+  },
+  "ContactPage": {
+    "title": "AirBag - Contact Us",
+    "contactUs": "Contact Us"
+  },
+  "Products": {
+    "default_seo_title": "AirBag - Auto Parts",
+    "product_details": "Product Details",
+    "add_to_cart": "Add to Cart",
+    "out_of_stock": "Out of Stock",
+    "in_stock": "In Stock",
+    "price": "Price",
+    "description": "Description",
+    "specifications": "Specifications",
+    "related_products": "Related Products"
   }
 }

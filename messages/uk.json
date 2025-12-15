@@ -115,8 +115,9 @@
     "talkToUsTitle": "Зв'яжіться з нами",
     "gotQuestions": "Є питання? Телефонуйте нам",
     "phoneNumber": "+38 098 998 9828",
+    "messendgers": "доступний на Telegram та Viber",
     "emailAddress": "Noxnew@hotmail.com",
-    "address": "Україна, м. Київ, вул. Прикладна, 1",
+    "address": "Українa, м. Одеса, вул. В. Самофалова, 16А/1 (Santim)",
     "copyright": " 2024 Всі права захищено | Шаблон Next.js від ThemePure"
   },
   "ProductItem": {
@@ -551,11 +552,15 @@
     "emailAddress": "Noxnew@hotmail.com",
     "phone": "Телефон",
     "phoneNumber": "+38 (098) 998-98-28",
+    "messendgers": "доступний на Telegram та Viber",
     "delivery": "Доставка",
     "deliveryInfo": "Нова Пошта, день у день, при замовленні до 19:00",
     "workingHours": "Графік роботи",
     "workingDays": "Пн-Пт: 9:00 - 20:00",
     "weekend": "Сб-Вс: 9:00 - 19:00",
+    "ourAddress": "Наша адреса",
+    "addressFull": "Українa, м. Одеса, вул. В. Самофалова, 16А/1 (Santim)",
+    "viewOnMap": "Переглянути на карті",
     "socialNetworks": "Знайдіть нас у соціальних мережах",
     "socialDescription": "Слідкуйте за нами в соціальних мережах, щоб бути в курсі останніх новин та акцій",
     "socialLabels": {
@@ -567,7 +572,6 @@
     "mapTitle": "Наше розташування",
     "mapDescription": "Ми знаходимося в центрі міста, зручне розташування для відвідування",
     "mapAriaLabel": "Карта з розташуванням нашого офісу",
-    "viewOnMap": "Переглянути на карті",
     "sendMessage": "Надіслати повідомлення",
     "yourName": "Ваше ім'я",
     "yourEmail": "Ваша електронна пошта",
@@ -710,5 +714,16 @@
     "step4": "Повідомимо вас про готовність до отримання",
     "continueShopping": "Продовжити покупки",
     "backToHome": "На головну"
+  },
+  "Products": {
+    "default_seo_title": "AirBag - Автозапчастини",
+    "product_details": "Деталі товару",
+    "add_to_cart": "Додати в кошик",
+    "out_of_stock": "Немає в наявності",
+    "in_stock": "В наявності",
+    "price": "Ціна",
+    "description": "Опис",
+    "specifications": "Характеристики",
+    "related_products": "Схожі товари"
   }
 }

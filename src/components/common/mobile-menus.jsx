@@ -8,15 +8,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { closeCartMini } from "@/redux/features/cartSlice";
 import { useTranslations, useLocale } from 'next-intl';
 import { useLogoutMutation } from '@/redux/features/auth/authApi';
+import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 
 const MobileMenus = ({setIsCanvasOpen}) => {
   const [isActiveMenu, setIsActiveMenu] = useState("");
+  const [isActiveSubMenu, setIsActiveSubMenu] = useState("");
+  const [isActiveBrandsMenu, setIsActiveBrandsMenu] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
   const t = useTranslations('menu');
   const locale = useLocale();
   const { user, accessToken, isGuest } = useSelector((state) => state.auth);
   const [logout] = useLogoutMutation();
+  
+  // Load all categories to get car brands
+  const { data: categoriesData } = useGetShowCategoryQuery();
 
   // Определяем статус пользователя для отображения соответствующих пунктов меню
   const isAuthenticated = !!accessToken;
@@ -43,6 +49,43 @@ const MobileMenus = ({setIsCanvasOpen}) => {
     }
   };
 
+  // Get all car brands (subcategories of Covers - parent_id = 754099)
+  const getAllCarBrands = () => {
+    const allCategories = Array.isArray(categoriesData) 
+      ? categoriesData 
+      : Array.isArray(categoriesData?.data) 
+        ? categoriesData.data 
+        : Array.isArray(categoriesData?.results) 
+          ? categoriesData.results 
+          : [];
+    
+    // Сортируем бренды: английский, кириллица, цифры
+    return allCategories.filter(cat => 
+      cat && String(cat.parent_id) === '754099'
+    ).sort((a, b) => {
+      const titleA = (a.title || '').trim();
+      const titleB = (b.title || '').trim();
+      
+      // Определяем тип первого символа
+      const getCharType = (str) => {
+        const firstChar = str.charAt(0);
+        if (/\d/.test(firstChar)) return 3; // Цифры
+        if (/[а-яА-ЯіІїЇєЄґҐ]/.test(firstChar)) return 2; // Кириллица
+        if (/[a-zA-Z]/.test(firstChar)) return 1; // Английский
+        return 4; // Остальное
+      };
+      
+      const typeA = getCharType(titleA);
+      const typeB = getCharType(titleB);
+      
+      // Сначала сортируем по типу символа
+      if (typeA !== typeB) return typeA - typeB;
+      
+      // Внутри одного типа - по алфавиту
+      return titleA.toLowerCase().localeCompare(titleB.toLowerCase(), typeA === 2 ? 'uk' : 'en');
+    });
+  };
+
   // handleOpenSubMenu
   const handleOpenSubMenu = (title) => {
     if(title === isActiveMenu){
@@ -51,6 +94,21 @@ const MobileMenus = ({setIsCanvasOpen}) => {
     else {
       setIsActiveMenu(title)
     }
+  }
+
+  // handleOpenNestedSubMenu
+  const handleOpenNestedSubMenu = (title) => {
+    if(title === isActiveSubMenu){
+      setIsActiveSubMenu("")
+    }
+    else {
+      setIsActiveSubMenu(title)
+    }
+  }
+
+  // handleToggleBrandsMenu
+  const handleToggleBrandsMenu = () => {
+    setIsActiveBrandsMenu(!isActiveBrandsMenu);
   }
   
   // Handle navigation
@@ -123,18 +181,43 @@ const MobileMenus = ({setIsCanvasOpen}) => {
                 </a>
                 <ul className={`tp-submenu ${isActiveMenu === menu.titleKey ? 'active':''}`}>
                   {menu.product_pages.map((p, i) => (
-                    <li key={i} className="has-dropdown">
-                      <Link href={getLocalizedLink(p.link)} onClick={() => handleNavigation(p.link)}>
+                    <li key={i} className={`has-dropdown ${isActiveSubMenu === p.titleKey ? 'dropdown-opened':''}`}>
+                      <a className={`${isActiveSubMenu === p.titleKey ? 'expanded':''}`}>
                         {p.titleKey ? t(p.titleKey.replace('menu.', '')) : p.title}
-                      </Link>
+                        {p.mega_menus && p.mega_menus.length > 0 && (
+                          <button onClick={()=> handleOpenNestedSubMenu(p.titleKey)} className={`dropdown-toggle-btn ${isActiveSubMenu === p.titleKey ? 'dropdown-opened':''}`}>
+                            <i className="fa-regular fa-angle-right"></i>
+                          </button>
+                        )}
+                      </a>
                       {p.mega_menus && p.mega_menus.length > 0 && (
-                        <ul className="tp-submenu">
+                        <ul className={`tp-submenu ${isActiveSubMenu === p.titleKey ? 'active':''}`}>
                           {p.mega_menus.map((subItem, subIndex) => (
-                            <li key={subIndex}>
-                              <Link href={getLocalizedLink(subItem.link)} onClick={() => handleNavigation(subItem.link)}>
-                                {subItem.titleKey ? t(subItem.titleKey.replace('menu.', '')) : subItem.title}
-                              </Link>
-                            </li>
+                            subItem.hasDropdown ? (
+                              <li key={subIndex} className={`has-dropdown ${isActiveBrandsMenu ? 'dropdown-opened':''}`}>
+                                <a className={`${isActiveBrandsMenu ? 'expanded':''}`}>
+                                  {subItem.titleKey ? t(subItem.titleKey.replace('menu.', '')) : subItem.title}
+                                  <button onClick={handleToggleBrandsMenu} className={`dropdown-toggle-btn ${isActiveBrandsMenu ? 'dropdown-opened':''}`}>
+                                    <i className="fa-regular fa-angle-right"></i>
+                                  </button>
+                                </a>
+                                <ul className={`tp-submenu ${isActiveBrandsMenu ? 'active':''}`} style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                                  {getAllCarBrands().map((brand) => (
+                                    <li key={brand.id}>
+                                      <Link href={getLocalizedLink(`/shop/${brand.slug}-${brand.id}`)} onClick={() => handleNavigation(`/shop/${brand.slug}-${brand.id}`)}>
+                                        {brand.title}
+                                      </Link>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </li>
+                            ) : (
+                              <li key={subIndex}>
+                                <Link href={getLocalizedLink(subItem.link)} onClick={() => handleNavigation(subItem.link)}>
+                                  {subItem.titleKey ? t(subItem.titleKey.replace('menu.', '')) : subItem.title}
+                                </Link>
+                              </li>
+                            )
                           ))}
                         </ul>
                       )}

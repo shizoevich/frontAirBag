@@ -16,14 +16,6 @@ const menu_data = [
         titleKey: 'menu.covers',
         link: '/shop/covers-754099',
         mega_menus: [
-          { titleKey: 'menu.renault', link: '/shop/renault-753900' },
-          { titleKey: 'menu.toyota', link: '/shop/toyota-753914' },
-          { titleKey: 'menu.skoda', link: '/shop/skoda-753913' },
-          { titleKey: 'menu.bmw', link: '/shop/bmw-753905' },
-          { titleKey: 'menu.volkswagen', link: '/shop/volkswagen-753915' },
-          { titleKey: 'menu.mercedes', link: '/shop/mercedes-753933' },
-          { titleKey: 'menu.hyundai', link: '/shop/hyundai-753901' },
-          { titleKey: 'menu.audi', link: '/shop/audi-753903' },
           { titleKey: 'menu.allBrands', link: '/search/brand', hasDropdown: true },
         ]
       },

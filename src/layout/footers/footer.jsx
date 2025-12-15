@@ -113,7 +113,15 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                           </span>
                         </div>
                         <div className="tp-footer-contact-content">
-                          <p><a href="#" target="_blank">{t('address')}</a></p>
+                          <p>
+                            <a 
+                              href="https://www.google.com/maps/search/?api=1&query=Україна,+м.+Одеса,+вул.+В.+Самофалова,+16А/1+(Santim)" 
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {t('address')}
+                            </a>
+                          </p>
                         </div>
                       </div>
                     </div>
