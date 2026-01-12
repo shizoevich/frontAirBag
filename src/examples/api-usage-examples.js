@@ -207,7 +207,7 @@ export const ClientsExample = () => {
       const clientData = {
         name: 'New Client',
         email: 'client@example.com',
-        phone: '+1234567890'
+        phone: '+38 098 998 9828'
       };
       
       const result = await createClient(clientData).unwrap();

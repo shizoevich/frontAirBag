@@ -6,6 +6,8 @@
     
   },
   "menu": {
+    "back": "Назад",
+    "loading": "Загрузка категорий...",
     "home": "Главная",
     "catalog": "Каталог",
     "covers": "Накладки",
@@ -116,7 +118,7 @@
     "phoneNumber": "+38 098 998 9828",
     "messendgers": "доступный на Telegram и Viber",
     "emailAddress": "Noxnew@hotmail.com",
-    "address": "Украина, г. Одесса, ул. В. Самофалова, 16А/1 (Santim)",
+    "address": "Украина, г. Одесса, ул. В. Самофалова, 16А/1, AirbagAD",
     "copyright": " {year} Все права защищены | Шаблон Next.js от ThemePure"
   },
   "ProductItem": {
@@ -327,7 +329,7 @@
     "workingDays": "Пн-Пт: 9:00 – 20:00",
     "weekend": "Сб-Вс: 9:00 – 19:00",
     "ourAddress": "Наш адрес",
-    "addressFull": "Украина, г. Одесса, ул. В. Самофалова, 16А/1 (Santim)",
+    "addressFull": "Украина, г. Одесса, ул. В. Самофалова, 16А/1, AirbagAD",
     "viewOnMap": "Посмотреть на карте",
     "socialNetworks": "Найдите нас в социальных сетях",
     "socialDescription": "Следите за нами в социальных сетях, чтобы быть в курсе последних новостей и акций",
@@ -350,6 +352,16 @@
   },
 
   "Categories": {
+  "allCategories": "Все категории",
+  "categories": "Категории",
+  "subcategories": "Подкатегории",
+  "subcategoriesOf": "Подкатегории",
+  "viewProducts": "Просмотр товаров",
+  "back": "Назад",
+  "loading": "Загрузка категорий...",
+  "errorLoading": "Помилка завантаження категорій",
+  "pageTitle": "Каталог категорій - AirBag",
+  "pageDescription": "Перегляд всіх категорій товарів",
     "all_covers": "Все накладки",
     "car_brands": "Марки автомобилей",
     "select_car_brand": "Выберите марку автомобиля",

@@ -108,7 +108,7 @@ const ContactInfo = ({ locale }) => {
                         {t('addressFull')}
                       </p>
                       <a 
-                        href="https://www.google.com/maps/search/?api=1&query=Україна,+м.+Одеса,+вул.+В.+Самофалова,+16А/1+(Santim)"
+                        href="https://www.google.com/maps/search/?api=1&query= +AirbagAD +Україна,+м.+Одеса,+вул.+В.+Самофалова,+16А/1"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-primary btn-sm"

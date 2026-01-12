@@ -1,85 +1,42 @@
-'use client';
 import React from 'react';
-import { feature_data } from './feature-data';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+// internal
+import { AnimatedLine } from '@/svg';
+import shape_1 from '@assets/img/subscribe/subscribe-shape-1.png';
+import shape_2 from '@assets/img/subscribe/subscribe-shape-2.png';
+import shape_3 from '@assets/img/subscribe/subscribe-shape-3.png';
+import shape_4 from '@assets/img/subscribe/subscribe-shape-4.png';
+import plane from '@assets/img/subscribe/plane.png';
+
+function Shape({ img, num }) {
+  return (
+    <Image className={`tp-subscribe-shape-${num}`} src={img} alt="shape" />
+  );
+}
 
 const FeatureArea = () => {
-  const t = useTranslations('features');
-  
-  // Стили для выравнивания высоты блоков
-  const containerStyle = {
-    display: 'flex',
-    flexWrap: 'wrap'
-  };
-  
-  const colStyle = {
-    display: 'flex'
-  };
-  
-  const featureItemStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    height: '100%',
-    minHeight: '120px',
-    padding: '30px 0px 0px 20px',
-    background: '#fff',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-    transition: 'all 0.3s ease',
-    width: '100%'
-  };
-  
-  const featureContentStyle = {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-start'
-  };
-  
-  const titleStyle = {
-    marginBottom: '8px',
-    fontSize: '16px',
-    lineHeight: '1.3',
-    minHeight: '20px'
-  };
-  
-  const descStyle = {
-    margin: 0,
-    fontSize: '14px',
-    lineHeight: '1.4',
-    color: '#666',
-    display: '-webkit-box',
-    WebkitLineClamp: 3,
-    WebkitBoxOrient: 'vertical',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
-  };
+  const t = useTranslations('Contact');
   
   return (
-    <section className="tp-feature-area tp-feature-border-radius pt-30 pb-70">
-        <div className="container">
-          <div className="row gx-1 gy-1 gy-xl-0" style={containerStyle}>
-            {feature_data.map((item,i) => (
-              <div key={i} className="col-xl-3 col-lg-6 col-md-6 col-sm-6" style={colStyle}>
-                <div className="tp-feature-item d-flex align-items-start" style={featureItemStyle}>
-                    <div className="tp-feature-icon mr-15">
-                      <span>
-                          {item.icon}                                                     
-                      </span>
-                    </div>
-                    <div className="tp-feature-content" style={featureContentStyle}>
-                      <h3 className="tp-feature-title" style={titleStyle}>
-                        {item.titleKey ? t(item.titleKey.replace('features.', '')) : item.title}
-                      </h3>
-                      <p style={descStyle}>
-                        {item.subtitleKey ? t(item.subtitleKey.replace('features.', '')) : item.subtitle}
-                      </p>
-                    </div>
-                </div>
-              </div>
-            ))}
+    <section className="tp-subscribe-area pt-70 pb-65 mb-50 theme-bg p-relative z-index-1">
+      <div className="tp-subscribe-shape">
+        <Shape img={shape_1} num="1" />
+        
+        
+        
+        
+      </div>
+      <div className="container">
+        <div className="row align-items-center justify-content-center">
+          <div className="col-xl-8 col-lg-8 text-center">
+            <div className="tp-subscribe-content">
+              
+              
+            </div>
           </div>
         </div>
+      </div>
     </section>
   );
 };

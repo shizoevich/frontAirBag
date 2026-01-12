@@ -93,7 +93,7 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                   <div className="tp-footer-widget-content">
                     <div className="tp-footer-talk mb-20">
                       <span>{t('gotQuestions')}</span>
-                      <h4><a href="tel:+380123456789">{t('phoneNumber')}</a></h4>
+                      <h4><a href="tel:+38 098 998 9828">{t('phoneNumber')}</a></h4>
                     </div>
                     <div className="tp-footer-contact">
                       <div className="tp-footer-contact-item d-flex align-items-start">
@@ -115,7 +115,7 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                         <div className="tp-footer-contact-content">
                           <p>
                             <a 
-                              href="https://www.google.com/maps/search/?api=1&query=Україна,+м.+Одеса,+вул.+В.+Самофалова,+16А/1+(Santim)" 
+                              href="https://www.google.com/maps/search/?api=1&query= +AirbagAD +вул. +Валерія +Самофалова, +16А/1, +Одеса, +Одеська +область, +Україна, +65000" 
                               target="_blank"
                               rel="noopener noreferrer"
                             >

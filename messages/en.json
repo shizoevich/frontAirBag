@@ -15,6 +15,8 @@
     "discountHint": "You've added items worth {amount}. A discount will unlock soon."
   },
   "menu": {
+    "back": "Back",
+    "loading": "Loading categories...",
     "home": "Home",
     "catalog": "Catalog",
     "covers": "Covers",
@@ -127,7 +129,7 @@
     "phoneNumber": "+38 098 998 9828",
     "messendgers": "available on Telegram and Viber",
     "emailAddress": "Noxnew@hotmail.com",
-    "address": "Ukraine, Odessa, ul. V. Samofalova, 16A/1 (Santim)",
+    "address": "AirbagAD, Одеса, вул. В. Самофалова, 16А/1",
     "copyright": " {year} All Rights Reserved | Next.js Template by ThemePure"
   },
   "ProductItem": {
@@ -309,6 +311,16 @@
     "profileUpdateError": "Error updating profile"
   },
   "Categories": {
+  "allCategories": "All Categories",
+  "categories": "Categories",
+  "subcategories": "Subcategories",
+  "subcategoriesOf": "Subcategories",
+  "viewProducts": "View Products",
+  "back": "Back",
+  "loading": "Loading categories...",
+  "errorLoading": "Error loading categories",
+  "pageTitle": "Catalog categories - AirBag",
+  "pageDescription": "View all categories of products",
     "all_covers": "All Covers",
     "car_brands": "Car Brands",
     "select_car_brand": "Select Car Brand",
@@ -395,7 +407,7 @@
     "workingDays": "Mon-Fri: 9:00 AM – 8:00 PM",
     "weekend": "Sat-Sun: 9:00 AM – 7:00 PM",
     "ourAddress": "Our Address",
-    "addressFull": "Ukraine, Odessa, ul. V. Samofalova, 16A/1 (Santim)",
+    "addressFull": "Ukraine, Odessa, ul. V. Samofalova, 16A/1, AirbagAD",
     "viewOnMap": "View on Map",
     "socialNetworks": "Find us on social networks",
     "socialDescription": "Follow us on social networks to stay up to date with the latest news and promotions",

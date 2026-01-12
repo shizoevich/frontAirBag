@@ -129,13 +129,13 @@ const YouTubeVideosSlider = () => {
   }
 
   return (
-    <section className="tp-youtube-area pb-40 pt-40">
+    <section className="tp-youtube-area pb-40 pt-40 pr-50 pl-50 mr-50 ml-50" >
       <div className="container-fluid px-4">
         <div className="row">
           <div className="col-12">
             <Swiper
               modules={[Navigation]}
-              spaceBetween={15}
+              spaceBetween={3}
               slidesPerView={2}
               navigation={true}
               onSlideChange={(swiper) => setActiveVideoIndex(swiper.activeIndex)}

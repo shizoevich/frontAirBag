@@ -6,7 +6,9 @@
     "catalog": "Каталог"
   },
   "menu": {
+  "loading": "Завантаження...",
     "home": "Головна",
+    "back": "Назад",
     "catalog": "Каталог",
     "covers": "Накладки",
     "renault": "Renault",
@@ -117,7 +119,7 @@
     "phoneNumber": "+38 098 998 9828",
     "messendgers": "доступний на Telegram та Viber",
     "emailAddress": "Noxnew@hotmail.com",
-    "address": "Українa, м. Одеса, вул. В. Самофалова, 16А/1 (Santim)",
+    "address": "Українa, м. Одеса, вул. В. Самофалова, 16А/1, AirbagAD",
     "copyright": " 2024 Всі права захищено | Шаблон Next.js від ThemePure"
   },
   "ProductItem": {
@@ -307,6 +309,16 @@
     "addressRequired": "Адреса обов'язкова"
   },
   "Categories": {
+    "allCategories": "Всі категорії",
+  "categories": "Категорії",
+  "subcategories": "підкатегорій",
+  "subcategoriesOf": "Підкатегорії",
+    "viewProducts": "Дивитись товари",
+    "back": "Назад",
+    "loading": "Завантаження категорій...",
+    "errorLoading": "Помилка завантаження категорій",
+    "pageTitle": "Каталог категорій - AirBag",
+    "pageDescription": "Перегляд всіх категорій товарів",
     "all_covers": "Всі накладки",
     "car_brands": "Марки автомобілів",
     "select_car_brand": "Виберіть марку автомобіля",
@@ -559,7 +571,7 @@
     "workingDays": "Пн-Пт: 9:00 - 20:00",
     "weekend": "Сб-Вс: 9:00 - 19:00",
     "ourAddress": "Наша адреса",
-    "addressFull": "Українa, м. Одеса, вул. В. Самофалова, 16А/1 (Santim)",
+    "addressFull": "Українa, м. Одеса, вул. В. Самофалова, 16А/1, AirbagAD",
     "viewOnMap": "Переглянути на карті",
     "socialNetworks": "Знайдіть нас у соціальних мережах",
     "socialDescription": "Слідкуйте за нами в соціальних мережах, щоб бути в курсі останніх новин та акцій",
