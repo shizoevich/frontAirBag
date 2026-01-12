@@ -66,11 +66,14 @@ export const getCategoryById = (tree, id) => {
 export const getCategoryFromTree = (tree, id) => {
   if (!Array.isArray(tree)) return null;
   
+  // Приводим к числу для сравнения
+  const idNum = Number(id);
+  
   for (const node of tree) {
-    if (node.id === id) return node;
+    if (Number(node.id) === idNum) return node;
     
     if (node.children && node.children.length > 0) {
-      const found = getCategoryFromTree(node.children, id);
+      const found = getCategoryFromTree(node.children, idNum);
       if (found) return found;
     }
   }
@@ -82,15 +85,19 @@ export const getCategoryFromTree = (tree, id) => {
 export const getCategoryPath = (tree, targetId, currentPath = []) => {
   if (!Array.isArray(tree)) return null;
   
+  // Приводим к числу для сравнения
+  const targetIdNum = Number(targetId);
+  
   for (const node of tree) {
     const newPath = [...currentPath, node];
     
-    if (node.id === targetId) {
+    // Сравниваем как числа
+    if (Number(node.id) === targetIdNum) {
       return newPath;
     }
     
     if (node.children && node.children.length > 0) {
-      const found = getCategoryPath(node.children, targetId, newPath);
+      const found = getCategoryPath(node.children, targetIdNum, newPath);
       if (found) return found;
     }
   }

@@ -26,13 +26,15 @@ const ParentCategories = ({
   }
 
   return (
-    <div className="tp-parent-categories mb-4">
+    
+    <div className="tp-parent-categories mb-4 mt-4">
       <div className="d-flex flex-wrap gap-2 justify-content-center">
         {categories.map((category) => {
           const isSelected = selectedCategory === category.id;
           const hasChildren = category.children && category.children.length > 0;
           
           return (
+            
             <button
               key={category.id}
               onClick={() => onCategorySelect(category)}

@@ -7,10 +7,9 @@ import ParentCategories from '@/components/categories/parent-categories';
 import CategoryCarousel from '@/components/categories/category-carousel';
 import HomePrdLoader from '@/components/loader/home/home-prd-loader';
 import ErrorMsg from '@/components/common/error-msg';
-import ShapeLine from '@/svg/shape-line';
 import { useGetAllProductsQuery } from '@/redux/features/productsApi';
 import { useGetCategoryTreeQuery } from '@/redux/features/categoryApi';
-import { getChildrenAtLevel, hasChildren, sortAlphabetically } from '@/utils/categoryTreeHelpers';
+import { getChildrenAtLevel, hasChildren, sortAlphabetically, getCategoryFromTree } from '@/utils/categoryTreeHelpers';
 
 const HomeProductsArea = () => {
   const t = useTranslations('AllProductsArea');
@@ -86,6 +85,16 @@ const HomeProductsArea = () => {
     return sortAlphabetically(categoryTree);
   }, [categoryTree]);
 
+  // Получаем хлебные крошки выбранных категорий
+  const breadcrumbs = useMemo(() => {
+    if (!categoryTree || selectedPath.length === 0) return [];
+    
+    return selectedPath.map(categoryId => {
+      const category = getCategoryFromTree(categoryTree, categoryId);
+      return category ? category.title : '';
+    }).filter(Boolean);
+  }, [categoryTree, selectedPath]);
+
   // Контент товаров
   let content = null;
   if (productsLoading) {
@@ -144,17 +153,42 @@ const HomeProductsArea = () => {
           );
         })}
         
-        {/* Заголовок секции */}
-        <div className="row">
-          <div className="col-12">
-            <div className="tp-section-title-wrapper mb-40">
-              <h3 className="tp-section-title">
-                {t('ourProducts') || 'Наші товари'}
-                <ShapeLine />
-              </h3>
+        {/* Хлебные крошки вместо заголовка */}
+          <div className="row">
+            <div className="col-12">
+              <div className="tp-section-title-wrapper mb-40">
+                <div className="category-breadcrumbs" style={{ 
+                  display: 'flex', 
+                  alignItems: 'baseline',
+                  gap: '8px',
+                  flexWrap: 'wrap'
+                }}>
+                  {breadcrumbs.map((crumb, index) => (
+                    <React.Fragment key={index}>
+                      <span style={{
+                        fontSize: index === 0 ? '24px' : index === 1 ? '18px' : '18px',
+                        fontWeight: index === 0 ? '600' : index === 1 ? '400' : '400',
+                        color: index === 0 ? '#222' : index === 1 ? '#444' : '#444',
+                        lineHeight: '1.2'
+                      }}>
+                        {crumb}
+                      </span>
+                      {index < breadcrumbs.length - 1 && (
+                        <span style={{ 
+                          fontSize: '24px', 
+                          color: '#999',
+                          margin: '0 4px'
+                        }}>
+                          /
+                        </span>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        
 
         {/* Товары */}
         <div className="row">{content}</div>
