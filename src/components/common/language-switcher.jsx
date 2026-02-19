@@ -27,8 +27,13 @@ const LanguageSwitcher = () => {
       setIsMobile(window.innerWidth <= 768);
     };
 
+    // Check on mount
     checkScreenSize();
+    
+    // Add event listener for window resize
     window.addEventListener('resize', checkScreenSize);
+    
+    // Clean up
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
@@ -39,7 +44,7 @@ const LanguageSwitcher = () => {
       : pathname;
     
     // Ensure we don't have double slashes
-    const newPath = `/${newLocale}${pathWithoutLocale}`.replace(/\/+/, '/');
+    const newPath = `/${newLocale}${pathWithoutLocale}`.replace(/\/\//, '/');
     router.push(newPath);
     setIsOpen(false);
   };
@@ -50,6 +55,9 @@ const LanguageSwitcher = () => {
         onClick={() => setIsOpen(!isOpen)}
         className="tp-header-setting-toggle"
         id="tp-lang-toggle"
+        style={{
+          color: isMobile ? '#000' : '#fff'
+        }}
       >
         {languages[locale]}
       </span>
@@ -58,7 +66,8 @@ const LanguageSwitcher = () => {
         style={{
           position: 'absolute',
           right: 0,
-          top: '100%',
+          top: isMobile ? 'auto' : '100%',
+          bottom: isMobile ? '100%' : 'auto',
           background: '#fff',
           borderRadius: '4px',
           boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
@@ -67,15 +76,17 @@ const LanguageSwitcher = () => {
           zIndex: 999,
           opacity: isOpen ? 1 : 0,
           visibility: isOpen ? 'visible' : 'hidden',
-          transform: isOpen ? 'translateY(0)' : 'translateY(10px)',
+          transform: isOpen ? 'translateY(0)' : `translateY(${isMobile ? '10px' : '-10px'})`,
           transition: 'all 0.3s ease',
+          marginBottom: isMobile ? '5px' : 0,
+          marginTop: !isMobile ? '5px' : 0,
         }}
       >
         {locales.map((loc) => (
           <li key={loc}>
             <Link 
-              href={`/${loc}${pathname.substring(3)}`} // Remove current locale from path
-              locale={false} // Disable automatic locale handling
+              href={`/${loc}${pathname.substring(3)}`}
+              locale={false}
               onClick={(e) => {
                 e.preventDefault();
                 handleLanguageChange(loc);
