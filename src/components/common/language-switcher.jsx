@@ -1,9 +1,9 @@
 'use client';
 
-import { useLocale } from 'next-intl';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { IoMdArrowDropdown } from 'react-icons/io';
+import Link from 'next/link';
 
 const languages = {
   en: 'English',
@@ -12,54 +12,88 @@ const languages = {
 };
 
 const LanguageSwitcher = () => {
-  const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const locales = Object.keys(languages);
+  
+  // Extract locale from pathname (first segment)
+  const locale = pathname?.split('/')[1] || 'en';
+  const asPath = pathname;
 
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
 
-    // Проверяем размер экрана при монтировании компонента
     checkScreenSize();
-
-    // Добавляем слушатель изменения размера окна
     window.addEventListener('resize', checkScreenSize);
-
-    // Очищаем слушатель при размонтировании
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
   const handleLanguageChange = (newLocale) => {
     // remove the current locale from the pathname
-    const newPath = pathname.startsWith(`/${locale}`) ? pathname.substring(locale.length + 1) : pathname;
-    router.replace(`/${newLocale}${newPath}`);
+    const pathWithoutLocale = pathname.startsWith(`/${locale}`) 
+      ? pathname.substring(locale.length + 1) 
+      : pathname;
+    
+    // Ensure we don't have double slashes
+    const newPath = `/${newLocale}${pathWithoutLocale}`.replace(/\/+/, '/');
+    router.push(newPath);
     setIsOpen(false);
   };
 
   return (
-    <div className="offcanvas__select language">
-      <div className="offcanvas__lang d-flex align-items-center justify-content-md-end">
-        <div className="offcanvas__lang-wrapper">
-          <span onClick={() => setIsOpen(!isOpen)} className="offcanvas__lang-selected-lang tp-lang-toggle" id="tp-offcanvas-lang-toggle">
-            {languages[locale]}
-          </span>
-          <ul className={`offcanvas__lang-list tp-lang-list ${isOpen ? 'tp-lang-list-open' : ''}`} style={{ 
-            // На мобильных устройствах открывается вверх, на десктопе - вниз
-            bottom: isMobile ? '100%' : 'auto',
-            top: isMobile ? 'auto' : '100%'
-          }}>
-            {Object.keys(languages).map((lang) => (
-              <li key={lang} onClick={() => handleLanguageChange(lang)} style={{ cursor: 'pointer' }}>
-                {languages[lang]}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+    <div className="tp-header-top-menu-item tp-header-setting">
+      <span 
+        onClick={() => setIsOpen(!isOpen)}
+        className="tp-header-setting-toggle"
+        id="tp-lang-toggle"
+      >
+        {languages[locale]}
+      </span>
+      <ul 
+        className={`offcanvas__lang-list ${isOpen ? 'open' : ''}`}
+        style={{
+          position: 'absolute',
+          right: 0,
+          top: '100%',
+          background: '#fff',
+          borderRadius: '4px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+          minWidth: '120px',
+          padding: '5px 0',
+          zIndex: 999,
+          opacity: isOpen ? 1 : 0,
+          visibility: isOpen ? 'visible' : 'hidden',
+          transform: isOpen ? 'translateY(0)' : 'translateY(10px)',
+          transition: 'all 0.3s ease',
+        }}
+      >
+        {locales.map((loc) => (
+          <li key={loc}>
+            <Link 
+              href={`/${loc}${pathname.substring(3)}`} // Remove current locale from path
+              locale={false} // Disable automatic locale handling
+              onClick={(e) => {
+                e.preventDefault();
+                handleLanguageChange(loc);
+              }}
+              style={{
+                display: 'block',
+                padding: '5px 15px',
+                color: '#333',
+                fontSize: '13px',
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {languages[loc]}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

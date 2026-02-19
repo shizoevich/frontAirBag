@@ -74,26 +74,30 @@
 
 .body-overlay{
     background-color: var(--tp-common-black);
-	height: 100%;
-	width: 100%;
-	position: fixed;
-	top: 0;
-	z-index: 9999;
-	left: 0;
-	opacity: 0;
-	visibility: hidden;
-	@include tp-transition();
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    @include tp-transition();
 
-	&:hover{
-		cursor: url('../../img/icon/cross-out.png'), pointer;
-	}
+    &:hover{
+        cursor: url('../../img/icon/cross-out.png'), pointer;
+    }
 }
 
 .body-overlay.opened{
-	opacity: .7;
+    opacity: .7;
     visibility: visible;
 }
-
 
 
 /* dropcap */

@@ -90,6 +90,7 @@ export const apiSlice = createApi({
     "UserOrders", "ProductType", "OfferProducts", "PopularProducts", 
     "products", "productCategories", "Orders", "Carts", "FeaturedProducts", "NewArrivals",
     "categories", "User", "CartItems", "OrderItems", "OrderUpdates", "Clients", 
-    "ClientUpdates", "Discounts", "BotVisitors", "Templates", "allProducts", "BoughtTogetherProducts"
+    "ClientUpdates", "Discounts", "BotVisitors", "Templates", "allProducts", "BoughtTogetherProducts",
+    "CategoryTree", "AllProducts", "SearchResults"
   ]
 });

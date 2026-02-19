@@ -288,7 +288,6 @@ const YouTubeVideosSlider = () => {
         
         .youtube-reel-player iframe {
           display: block;
-          width: 100% !important;
           height: 100% !important;
           border: none;
         }

@@ -1,0 +1,93 @@
+/* Language Switcher - Match Settings Button */
+.tp-header-top-menu-item {
+  position: relative;
+  padding: 3px 14px 4px 18px;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tp-header-top-menu-item:last-child {
+  border-right: 0;
+}
+
+.offcanvas__lang {
+  position: relative;
+  display: inline-block;
+  color: white !important;
+  font-weight: 500;
+  font-size: 13px;
+  font-family: var(--tp-ff-roboto);
+  cursor: pointer;
+  padding-right: 20px;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.offcanvas__lang::after {
+  content: '▼';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: white;
+  pointer-events: none;
+  transition: transform 0.3s ease;
+  margin-left: 5px;
+}
+
+.offcanvas__lang:hover {
+  color: white !important;
+}
+
+.offcanvas__lang-list {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  min-width: 120px;
+  padding: 5px 0;
+  z-index: 1000;
+  margin-top: 5px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.offcanvas__lang-list.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.offcanvas__lang-list li {
+  padding: 5px 15px;
+  color: #333 !important;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.offcanvas__lang-list li:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--tp-theme-primary) !important;
+}
+
+/* Make sure the language switcher container has the same class as settings */
+.tp-header-setting {
+  position: relative;
+  display: inline-block;
+}
+
+/* Ensure the language text is properly aligned */
+.offcanvas__lang-selected-lang {
+  display: inline-block;
+  vertical-align: middle;
+  color: white !important;
+  font-weight: 500;
+  font-size: 13px;
+  font-family: var(--tp-ff-roboto);
+}

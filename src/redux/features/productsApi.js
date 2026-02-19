@@ -26,15 +26,53 @@ export const productsApi = apiSlice.injectEndpoints({
       providesTags: ['AllProducts'],
     }),
 
-    // Получение товара по ID
-    getProductsByIds: builder.query({
-      query: (id) => `/goods/${id}/`,
-      transformResponse: (response) => {
-        console.log('Ответ API товара по ID:', response);
-        return response;
-      },
-      providesTags: (result, error, id) => [{ type: 'Product', id }],
-    }),
+        // Получение товара по ID (работает с id и id_remonline)
+        getProductsByIds: builder.query({
+          query: (id) => {
+            // Если ID числовой и длинный (>1000000), вероятно это id_remonline
+            // Иначе - обычный id
+            const paramName = id > 1000000 ? 'id_remonline' : 'id';
+            return `/goods/?${paramName}=${id}`;
+          },
+          transformResponse: (response) => {
+            console.log('Ответ API товара по ID:', response);
+            // Возвращаем первый найденный товар или пустой объект
+            return response.results && response.results.length > 0 ? response.results[0] : null;
+          },
+          providesTags: (result, error, id) => result ? [{ type: 'Product', id: result.id }] : [],
+        }),
+
+       // Получение товаров по массиву ID (несколько товаров)
+       getProductsByMultipleIds: builder.query({
+        query: (ids) => {
+          if (Array.isArray(ids) && ids.length > 0) {
+            // Убираем дубликаты ID
+            const uniqueIds = [...new Set(ids)];
+            // Создаем строку запроса с несколькими id
+            const idsParam = uniqueIds.join(',');
+            return `/goods/?id=${idsParam}`;
+          }
+          return '/goods/';
+        },
+        transformResponse: (response) => {
+          console.log('Ответ API товаров по нескольким ID:', response);
+          // API возвращает { count, next, previous, results: [...] }
+          // Преобразуем в формат { data: [...], count, next, previous }
+          return {
+            data: response.results || [],
+            count: response.count || 0,
+            next: response.next,
+            previous: response.previous
+          };
+        },
+        providesTags: (result, error, ids) => {
+          if (Array.isArray(ids)) {
+            return ids.map(id => ({ type: 'Product', id }));
+          }
+          return ['Products'];
+        },
+      }),
+
 
     // Получение товаров по категории с пагинацией
     getProductsByCategory: builder.query({
@@ -106,16 +144,37 @@ export const productsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['AllProducts', 'products'],
     }),
+
+       // Получение связанных товаров (товары из той же категории)
+       // Получение связанных товаров (товары из той же категории)
+    getRelatedProducts: builder.query({
+      query: (productId) => `/goods/${productId}/related/`,
+      transformResponse: (response) => {
+        console.log('Связанные товары:', response);
+        // API возвращает { count, next, previous, results: [...] }
+        // Преобразуем в формат { data: [...], count, next, previous }
+        return {
+          data: response.results || [],
+          count: response.count || 0,
+          next: response.next,
+          previous: response.previous
+        };
+      },
+      providesTags: ['RelatedProducts'],
+    }),
+
   }),
 });
 
 export const {
   useGetAllProductsQuery,
   useGetProductsByIdsQuery,
+  useGetProductsByMultipleIdsQuery,
   useGetFeaturedProductsQuery,
   useGetProductsByCategoryQuery,
   useSearchProductsQuery,
   useAddProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useGetRelatedProductsQuery
 } = productsApi;

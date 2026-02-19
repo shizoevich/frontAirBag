@@ -5,6 +5,7 @@ import { Scrollbar, Navigation,Autoplay } from "swiper/modules";
 // internal
 import { useGetRelatedProductsQuery } from "@/redux/features/productsApi";
 import ProductItem from "../products/electronics/product-item";
+import { useGetProductsByCategoryQuery } from "@/redux/features/productsApi";
 import ErrorMsg from "../common/error-msg";
 import { HomeNewArrivalPrdLoader } from "../loader";
 
