@@ -9,7 +9,7 @@ const MobileSearch = () => {
   const { handleSubmit, searchText, setSearchText } = useSearchFormSubmit();
 
   return (
-    <div className="mobile-search-area d-block d-lg-none mb-40">
+    <div className="mobile-search-area d-block d-lg-none">
       <div className="container">
         <div className="row">
           <div className="col-12">

@@ -15,13 +15,28 @@ const ProductItem = ({ product }) => {
   const t = useTranslations('ProductItem');
   const locale = useLocale();
   const [isClient, setIsClient] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const { cart_products } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   
-  const { id, category, title, price_minor, images, residue } = product || {};
+  const { id, category, title, price_minor, images, residue, imageURLs } = product || {};
 
   useEffect(() => {
     setIsClient(true);
+    // Проверяем, является ли устройство десктопным (не touch)
+    const checkIfDesktop = () => {
+      const isLargeScreen = window.innerWidth > 768;
+      // Используем более мягкую логику: hover работает на больших экранах независимо от touch
+      const isDesktopDevice = isLargeScreen;
+      
+      setIsDesktop(isDesktopDevice);
+    };
+    
+    checkIfDesktop();
+    window.addEventListener('resize', checkIfDesktop);
+    
+    return () => window.removeEventListener('resize', checkIfDesktop);
   }, []);
 
   if (!isClient) {
@@ -41,20 +56,48 @@ const ProductItem = ({ product }) => {
     dispatch(add_cart_product(prd));
   };
 
+// Получаем вторую картинку для hover эффекта
+const getHoverImage = () => {
+  // Проверяем images массив (основной способ хранения картинок)
+  if (product?.images && Array.isArray(product.images) && product.images.length > 1) {
+    const imageItem = product.images[1];
+    if (typeof imageItem === 'string') {
+      return imageItem;
+    }
+    return imageItem?.url || imageItem?.img || imageItem?.src || getProductImage(product);
+  }
+  
+  // Запасной вариант - проверяем imageURLs
+  if (product?.imageURLs && Array.isArray(product.imageURLs) && product.imageURLs.length > 1) {
+    return product.imageURLs[1];
+  }
+  
+  return getProductImage(product); // Основная картинка если второй нет
+};
+const handleMouseEnter = () => {
+  setIsHovered(true);
+};
 
+const handleMouseLeave = () => {
+  setIsHovered(false);
+};
 
   return (
     <div className="tp-product-item mb-25 transition-3">
       <div className="tp-product-thumb p-relative fix">
         <Link href={`/${locale}/product/${slugify(title)}-${id}`}>
-          <div style={{
-            width: '100%',
-            height: '300px',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
+          <div 
+            style={{
+              width: '100%',
+              height: '300px',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
             <BlurImage 
-              image={getProductImage(product)}
+              image={isHovered ? getHoverImage() : getProductImage(product)}
               alt={title || "product image"}
             />
           </div>

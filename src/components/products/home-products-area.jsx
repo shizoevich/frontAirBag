@@ -138,7 +138,7 @@ const HomeProductsArea = () => {
           return (
             <div key={level} className="row">
               <div className="col-12">
-                <div className="tp-product-tab mb-45 tp-tab">
+                <div className="tp-product-tab mb-45 mt-20 tp-tab">
                   <CategoryCarousel
                     categories={categories}
                     isLoading={catLoading}
