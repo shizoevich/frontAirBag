@@ -3,7 +3,6 @@ import React from 'react';
 import { useTranslations } from 'next-intl';
 import ProductItem from '../products/electronics/product-item';
 import { useGetProductsByMultipleIdsQuery } from '@/redux/features/productsApi';
-import { useGetProductsByIdsQuery } from '@/redux/features/productsApi';
 import { HomeNewArrivalPrdLoader } from '../loader';
 import ErrorMsg from '../common/error-msg';
 
@@ -18,24 +17,13 @@ const ProductsBoughtTogether = ({ togetherBuyProducts }) => {
   // Убираем дубликаты и получаем уникальные ID
   const uniqueIds = togetherBuyProducts ? [...new Set(togetherBuyProducts)] : [];
   
-  const productQueries = uniqueIds.map(id => {
-    const query = useGetProductsByIdsQuery(id, { skip: !id });
-    console.log(`ProductsBoughtTogether - Query for ID ${id}:`, {
-      data: query.data,
-      isLoading: query.isLoading,
-      isError: query.isError,
-      error: query.error
-    });
-    return query;
+  // Используем правильный хук для множественных ID
+  const { data: productsResponse, isLoading, isError, error } = useGetProductsByMultipleIdsQuery(uniqueIds, { 
+    skip: !uniqueIds.length 
   });
-  // Собираем результаты всех запросов
-  const productsData = {
-    data: productQueries
-      .map(query => query.data)
-      .filter(data => data && !data.error), // Фильтруем успешные ответы
-    isLoading: productQueries.some(query => query.isLoading),
-    isError: productQueries.some(query => query.isError)
-  };
+
+  // Debug: логируем результат API запроса
+  console.log('ProductsBoughtTogether - API result:', { productsResponse, isLoading, isError, error });
 
   // Не показываем блок если нет товаров
   if (!uniqueIds.length) {
@@ -43,9 +31,8 @@ const ProductsBoughtTogether = ({ togetherBuyProducts }) => {
     return null;
   }
   
-    // Debug: логируем результат API запроса
-    console.log('ProductsBoughtTogether - API result:', { productsData, productQueries });
-  
+  // Показываем лоадер во время загрузки
+  if (isLoading) {
     // Показываем лоадер во время загрузки
     if (productsData.isLoading) {
       return (
@@ -63,9 +50,8 @@ const ProductsBoughtTogether = ({ togetherBuyProducts }) => {
         </section>
       );
     }
-  
     // Показываем ошибку если что-то пошло не так
-    if (productsData.isError) {
+    if (isError) {
       return (
         <section className="tp-bought-together-product pt-20 pb-50">
           <div className="container">
@@ -83,7 +69,7 @@ const ProductsBoughtTogether = ({ togetherBuyProducts }) => {
     }
   
     // Получаем товары из ответа API
-    const products = productsData?.data || [];
+    const products = productsResponse?.data || [];
     
     // Не показываем блок если нет товаров после загрузки
     if (products.length === 0) {
@@ -111,5 +97,5 @@ const ProductsBoughtTogether = ({ togetherBuyProducts }) => {
       </section>
     );
   };
-  
+}
   export default ProductsBoughtTogether;
