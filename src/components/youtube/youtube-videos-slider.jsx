@@ -97,22 +97,34 @@ const YouTubeVideosSlider = () => {
         if (container && !playersInstances.current[index]) {
           try {
             const player = new window.YT.Player(`youtube-player-${index}`, {
-              videoId: video.videoId,
-              playerVars: {
-                autoplay: index === 0 ? 1 : 0,
-                mute: 1,
-                controls: 0,
-                loop: 0,
-                playsinline: 1,
-                rel: 0,
-                modestbranding: 1,
-              },
-              events: {
-                onReady: (event) => {
-                  if (index === 0) {
-                    event.target.playVideo();
-                  }
+                playerVars: {
+                    autoplay: index === 0 ? 1 : 0,
+                    mute: 1,
+                    controls: 0,
+                    rel: 0,
+                    modestbranding: 1,
+                    iv_load_policy: 3,
+                    fs: 0,
+                    disablekb: 1,
+                    playsinline: 1,
+                    enablejsapi: 1, // must be 1 иначе баги
                 },
+                events: {
+                  onReady: (event) => {
+                    // Отключаем аналитику после инициализации
+                    if (event.target && event.target.playerInfo) {
+                      try {
+                        // Пытаемся отключить аналитику программно
+              
+                      } catch (e) {
+                        // Игнорируем ошибки
+                      }
+                    }
+                    
+                    if (index === 0) {
+                      event.target.playVideo();
+                    }
+                  },
                 onStateChange: (event) => {
                   if (event.data === window.YT.PlayerState.ENDED) {
                     // Play next video

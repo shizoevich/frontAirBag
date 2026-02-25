@@ -7,7 +7,7 @@ import ProductItem from './electronics/product-item';
 import HomePrdLoader from '@/components/loader/home/home-prd-loader';
 import ErrorMsg from '@/components/common/error-msg';
 import ShapeLine from '@/svg/shape-line';
-import { useGetAllProductsQuery } from '@/redux/features/productsApi';
+import { useGetAllProductsQuery } from "@/redux/features/productsApi";
 import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 
 const CategoryProductsArea = () => {

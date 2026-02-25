@@ -50,7 +50,7 @@ const ParentCategories = ({
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 background: isSelected 
                   ? 'linear-gradient(135deg,rgb(245, 184, 51) 0%,rgb(222, 128, 67) 100%)'
-                  : 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
+                  : 'linear-gradient(135deg, rgba(255, 225, 192, 0.9) 0%, rgba(241, 180, 180, 0.7) 100%)',
                 color: isSelected ? '#2d3748' : '#2d3748',
                 boxShadow: isSelected 
                   ? '0 8px 25px rgba(102, 126, 234, 0.3), 0 4px 10px rgba(0,0,0,0.1)'

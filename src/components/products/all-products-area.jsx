@@ -25,46 +25,67 @@ const AllProductsArea = () => {
   // Загружаем дерево категорий
   const { data: categoryTree, isLoading: catLoading, isError: catError } = useGetCategoryTreeQuery();
   
-  // Получаем categoryId из URL
-  const urlCategoryId = searchParams.get('category');
-  const searchText = searchParams.get('searchText') || '';
-
-    // Инициализация selectedPath из URL при загрузке
-    useEffect(() => {
-      if (urlCategoryId && categoryTree) {
-        const categoryId = Number(urlCategoryId);
-        // Получаем путь от корня до этой категории
-        const path = getCategoryPath(categoryTree, categoryId);
-        if (path) {
-          setSelectedPath(path.map(cat => cat.id));
-        } else {
-          // Если путь не найден, просто устанавливаем ID
-          setSelectedPath([categoryId]);
-        }
-      } else if (!urlCategoryId) {
-        // Если нет категории в URL, сбрасываем путь
-        setSelectedPath([]);
-      }
-    }, [urlCategoryId, categoryTree]);
-
-  // Получаем ID активной категории (последняя в пути)
-  const activeCategoryId = selectedPath.length > 0 ? selectedPath[selectedPath.length - 1] : null;
-  
-  // Загружаем товары с серверной фильтрацией и пагинацией
-  const { data: productsData, isLoading: productsLoading, isError: productsError } = useGetAllProductsQuery({
-    limit: itemsPerPage,
-    offset: currentPage * itemsPerPage,
-    categoryId: activeCategoryId,
-    searchText: searchText,
-  });
-
-  // Обрабатываем товары
-  const { products, totalCount } = useMemo(() => {
-    if (!productsData) return { products: [], totalCount: 0 };
-    const results = productsData.results || productsData.data || productsData || [];
-    const count = productsData.count || results.length;
-    return { products: results, totalCount: count };
-  }, [productsData]);
+   // Получаем categoryId из URL
+   const urlCategoryId = searchParams.get('category');
+   const searchText = searchParams.get('searchText') || '';
+ 
+   console.log('AllProductsArea - URL category (raw):', urlCategoryId);
+   console.log('AllProductsArea - URL category (type):', typeof urlCategoryId);
+   console.log('AllProductsArea - searchText:', searchText);
+ 
+     // Инициализация selectedPath из URL при загрузке
+     useEffect(() => {
+       console.log('AllProductsArea - useEffect triggered:', { urlCategoryId, categoryTree: !!categoryTree });
+       if (urlCategoryId && categoryTree) {
+         const categoryId = Number(urlCategoryId);
+         console.log('AllProductsArea - processing categoryId:', categoryId, 'from string:', urlCategoryId);
+         
+         // Получаем путь от корня до этой категории
+         const path = getCategoryPath(categoryTree, categoryId);
+         console.log('AllProductsArea - getCategoryPath result:', path);
+         
+         if (path && path.length > 0) {
+           const pathIds = path.map(cat => cat.id);
+           console.log('AllProductsArea - setting selectedPath to:', pathIds);
+           setSelectedPath(pathIds);
+         } else {
+           // Если путь не найден, просто устанавливаем ID
+           console.log('AllProductsArea - path not found, setting fallback:', [categoryId]);
+           setSelectedPath([categoryId]);
+         }
+       } else if (!urlCategoryId) {
+         // Если нет категории в URL, сбрасываем путь
+         console.log('AllProductsArea - no category in URL, resetting path');
+         setSelectedPath([]);
+       }
+     }, [urlCategoryId, categoryTree]);
+ 
+   // Получаем ID активной категории (последняя в пути)
+   const activeCategoryId = selectedPath.length > 0 ? selectedPath[selectedPath.length - 1] : null;
+   
+   console.log('AllProductsArea - selectedPath:', selectedPath);
+   console.log('AllProductsArea - activeCategoryId:', activeCategoryId, 'type:', typeof activeCategoryId);
+    // Загружаем товары с серверной фильтрацией и пагинацией
+    const apiParams = {
+      limit: itemsPerPage,
+      offset: currentPage * itemsPerPage,
+      categoryId: activeCategoryId,
+      searchText: searchText,
+    };
+    
+    console.log('AllProductsArea - API call with params:', apiParams);
+    console.log('AllProductsArea - categoryId value:', activeCategoryId, 'type:', typeof activeCategoryId);
+    
+    const { data: productsData, isLoading: productsLoading, isError: productsError } = useGetAllProductsQuery(apiParams);
+    // Обрабатываем товары
+    const { products, totalCount } = useMemo(() => {
+      if (!productsData) return { products: [], totalCount: 0 };
+      const results = productsData.results || productsData.data || productsData || [];
+      const count = productsData.count || results.length;
+      console.log('AllProductsArea - processed results:', results);
+      console.log('AllProductsArea - total count:', count);
+      return { products: results, totalCount: count };
+    }, [productsData]);
 
   const pageCount = Math.ceil(totalCount / itemsPerPage);
 
