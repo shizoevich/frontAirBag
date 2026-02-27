@@ -71,19 +71,6 @@ export const categoryApi = apiSlice.injectEndpoints({
       transformResponse: (response) => response.results || [],
       providesTags: (result, error, category_id) => [{ type: 'products', id: category_id }],
     }),
-
-    // Получение всех товаров
-    getAllProducts: builder.query({
-      query: () => 'goods/',
-      transformResponse: (response) => {
-        console.log('API ответ товаров:', response);
-        return response.results || [];
-      },
-      onError: (error) => {
-        console.error('Ошибка загрузки товаров:', error);
-      },
-      providesTags: ['allProducts'],
-    }),
   }),
 });
 
@@ -94,5 +81,4 @@ export const {
   useGetCategoryBySlugQuery,
   useGetCategoryByIdQuery,
   useGetProductsByCategoryIdQuery,
-  useGetAllProductsQuery,
 } = categoryApi;

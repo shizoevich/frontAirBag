@@ -73,6 +73,17 @@ export const productsApi = apiSlice.injectEndpoints({
         },
       }),
 
+          // Получение всех товаров без лимита (для фильтров)
+    getAllProductsNoLimit: builder.query({
+      query: () => 'goods/',
+      transformResponse: (response) => {
+        return {
+          data: response.results || [],
+          count: response.count || 0,
+        };
+      },
+      providesTags: ['AllProducts'],
+    }),
 
     // Получение товаров по категории с пагинацией
     getProductsByCategory: builder.query({
@@ -168,6 +179,7 @@ export const productsApi = apiSlice.injectEndpoints({
 
 export const {
   useGetAllProductsQuery,
+  useGetAllProductsNoLimitQuery,
   useGetProductsByIdsQuery,
   useGetProductsByMultipleIdsQuery,
   useGetFeaturedProductsQuery,

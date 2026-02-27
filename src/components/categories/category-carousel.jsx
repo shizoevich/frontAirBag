@@ -147,7 +147,6 @@ const CategoryCarousel = ({
       <style jsx global>{`
         .category-carousel .swiper-grid-column .swiper-wrapper { flex-direction: row; }
         .category-carousel .swiper-slide { height: auto; margin-bottom: 20px; }
-        .category-carousel .swiper-grid-column .swiper-slide { height: calc((100% - 20px) / 2) !important; }
       `}</style>
     </div>
   );

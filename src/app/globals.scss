@@ -384,11 +384,7 @@
     
     .category-carousel {
       max-width: 100% !important;
-      
-      .swiper-slide {
-        max-width: calc(25% - 10px) !important;
-        flex-shrink: 0 !important;
-      }
+     
     }
     
     /* Fix navigation arrows to stay within screen bounds */

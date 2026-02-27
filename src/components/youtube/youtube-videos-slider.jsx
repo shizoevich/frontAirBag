@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css';
@@ -17,136 +17,160 @@ const YouTubeVideosSlider = () => {
   const playersInstances = useRef([]);
   const mountedRef = useRef(true);
 
+  const observerRef = useRef(null);
+  const isVisibleRef = useRef(true);
+
   // YouTube channel ID для @dmytro_gekalo
   const CHANNEL_ID = 'UCncoevDhvLF6Ek_0bqO12ug';
   const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
 
-  // Cleanup function for players
-  const cleanupPlayers = () => {
-    playersInstances.current.forEach((player, index) => {
-      if (player && player.destroy) {
-        try {
-          player.destroy();
-        } catch (error) {
-          console.warn(`Error destroying player ${index}:`, error);
-        }
+  const cleanupPlayers = useCallback(() => {
+  // Останавливаем все видео перед уничтожением
+  playersInstances.current.forEach((player, index) => {
+    if (player && player.stopVideo) {
+      try {
+        player.stopVideo();
+      } catch (error) {
+        console.warn(`Error stopping player ${index}:`, error);
       }
-    });
-    playersInstances.current = [];
-    playerRefs.current = [];
-  };
+    }
+  });
+  
+  // Уничтожаем плееры
+  playersInstances.current.forEach((player, index) => {
+    if (player && player.destroy) {
+      try {
+        player.destroy();
+      } catch (error) {
+        console.warn(`Error destroying player ${index}:`, error);
+      }
+    }
+  });
+  
+  playersInstances.current = [];
+  playerRefs.current = [];
+}, []);
 
-  useEffect(() => {
+ useEffect(() => {
     mountedRef.current = true;
-    
+
     const fetchVideos = async () => {
       try {
-        const response = await fetch(
+        const res = await fetch(
           `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=10&type=video`
         );
-        const data = await response.json();
-        
-        if (data.items && mountedRef.current) {
-          const videoData = data.items.map(item => ({
+        const data = await res.json();
+
+        if (mountedRef.current && data.items) {
+          const formatted = data.items.map((item) => ({
             id: item.id.videoId,
+            videoId: item.id.videoId,
             title: item.snippet.title,
             thumbnail: item.snippet.thumbnails.medium.url,
-            videoId: item.id.videoId
           }));
-          setVideos(videoData);
+          setVideos(formatted);
         }
-      } catch (error) {
-        console.error('Error fetching YouTube videos:', error);
+      } catch (err) {
+        console.error('YouTube fetch error:', err);
       } finally {
-        if (mountedRef.current) {
-          setLoading(false);
-        }
+        if (mountedRef.current) setLoading(false);
       }
     };
 
     fetchVideos();
 
-    // Cleanup on unmount
     return () => {
       mountedRef.current = false;
       cleanupPlayers();
     };
-  }, [API_KEY, CHANNEL_ID]);
+  }, [API_KEY, CHANNEL_ID, cleanupPlayers]);
 
-  // Load YouTube IFrame API when videos are loaded
+  /* =========================
+     2️⃣ Page visibility
+  ========================== */
   useEffect(() => {
-    if (videos.length === 0 || !mountedRef.current) return;
+    const handleVisibilityChange = () => {
+      isVisibleRef.current = !document.hidden;
 
-    // Load YouTube IFrame API script only once
-    if (!window.YT) {
+      if (!isVisibleRef.current) {
+        playersInstances.current.forEach((player) => {
+          try {
+            player?.stopVideo?.();
+          } catch {}
+        });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  /* =========================
+     3️⃣ YouTube API Init
+  ========================== */
+  useEffect(() => {
+    if (!videos.length || !mountedRef.current) return;
+
+    const loadYouTubeAPI = () => {
+      if (window.YT && window.YT.Player) {
+        initPlayers();
+        return;
+      }
+
       const tag = document.createElement('script');
       tag.src = 'https://www.youtube.com/iframe_api';
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    }
+      document.body.appendChild(tag);
 
-    // Wait for API to be ready and initialize players
+      window.onYouTubeIframeAPIReady = initPlayers;
+    };
+
     const initPlayers = () => {
-      if (!window.YT || !window.YT.Player || !mountedRef.current) {
+      if (!window.YT?.Player) {
         setTimeout(initPlayers, 100);
         return;
       }
 
+      cleanupPlayers();
+
       videos.forEach((video, index) => {
-        const container = document.getElementById(`youtube-player-${index}`);
-        if (container && !playersInstances.current[index]) {
-          try {
-            const player = new window.YT.Player(`youtube-player-${index}`, {
-                playerVars: {
-                    autoplay: index === 0 ? 1 : 0,
-                    mute: 1,
-                    controls: 0,
-                    rel: 0,
-                    modestbranding: 1,
-                    iv_load_policy: 3,
-                    fs: 0,
-                    disablekb: 1,
-                    playsinline: 1,
-                    enablejsapi: 1, // must be 1 иначе баги
-                },
-                events: {
-                  onReady: (event) => {
-                    // Отключаем аналитику после инициализации
-                    if (event.target && event.target.playerInfo) {
-                      try {
-                        // Пытаемся отключить аналитику программно
-              
-                      } catch (e) {
-                        // Игнорируем ошибки
-                      }
-                    }
-                    
-                    if (index === 0) {
-                      event.target.playVideo();
-                    }
-                  },
-                onStateChange: (event) => {
-                  if (event.data === window.YT.PlayerState.ENDED) {
-                    // Play next video
-                    const nextIndex = (index + 1) % videos.length;
-                    setActiveVideoIndex(nextIndex);
-                    if (playersInstances.current[nextIndex]) {
-                      playersInstances.current[nextIndex].playVideo();
-                    }
-                  }
-                },
-              },
-            });
-            playersInstances.current[index] = player;
-          } catch (error) {
-            console.error(`Error creating player ${index}:`, error);
-          }
-        }
+        const el = document.getElementById(`youtube-player-${index}`);
+        if (!el) return;
+
+        const player = new window.YT.Player(el, {
+          videoId: video.videoId,
+          playerVars: {
+            autoplay: index === 0 ? 1 : 0,
+            mute: 1,
+            controls: 0,
+            rel: 0,
+            modestbranding: 1,
+            playsinline: 1,
+          },
+          events: {
+            onReady: (e) => {
+              if (index === 0 && isVisibleRef.current) {
+                e.target.playVideo();
+              }
+            },
+            onStateChange: (e) => {
+              if (e.data === window.YT.PlayerState.ENDED) {
+                const next = (index + 1) % videos.length;
+                setActiveVideoIndex(next);
+                playersInstances.current[next]?.playVideo?.();
+              }
+            },
+          },
+        });
+
+        playersInstances.current[index] = player;
       });
     };
 
-    initPlayers();
-  }, [videos]);
+    loadYouTubeAPI();
+  }, [videos, cleanupPlayers]);
 
   // Handle slide change
   const handleSlideChange = (swiper) => {
@@ -264,12 +288,11 @@ const YouTubeVideosSlider = () => {
         
         .youtube-reels-slider .swiper-button-next,
         .youtube-reels-slider .swiper-button-prev {
-          color: #de8043;
-          background: white;
+          color: #f8f8f8;
           width: 35px;
           height: 35px;
           border-radius: 50%;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+          box-shadow: 0 2px 8px rgba(235, 91, 8, 0.2);
           z-index: 10;
         }
         

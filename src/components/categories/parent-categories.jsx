@@ -50,7 +50,7 @@ const ParentCategories = ({
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 background: isSelected 
                   ? 'linear-gradient(135deg,rgb(245, 184, 51) 0%,rgb(222, 128, 67) 100%)'
-                  : 'linear-gradient(135deg, rgba(255, 225, 192, 0.9) 0%, rgba(241, 180, 180, 0.7) 100%)',
+                  : 'linear-gradient(135deg, rgba(250, 196, 115, 0.9) 0%, rgba(247, 97, 11, 0.83) 100%)',
                 color: isSelected ? '#2d3748' : '#2d3748',
                 boxShadow: isSelected 
                   ? '0 8px 25px rgba(102, 126, 234, 0.3), 0 4px 10px rgba(0,0,0,0.1)'
@@ -86,8 +86,8 @@ const ParentCategories = ({
                 right: 0,
                 bottom: 0,
                 background: isSelected 
-                  ? 'linear-gradient(135deg, rgba(204, 113, 29, 0.1) 0%, rgba(209, 26, 26, 0.05) 100%)'
-                  : 'linear-gradient(135deg, rgba(227, 92, 8, 0.05) 0%, rgba(216, 73, 7, 0.05) 100%)',
+                  ? 'linear-gradient(135deg, rgba(204, 113, 29, 0.1) 0%, rgba(209, 26, 26, 0.05) 10%)'
+                  : 'linear-gradient(135deg, rgba(227, 92, 8, 0.05) 0%, rgba(216, 73, 7, 0.05) 10%)',
                 borderRadius: '12px',
                 opacity: 0,
                 transition: 'opacity 0.3s ease',
