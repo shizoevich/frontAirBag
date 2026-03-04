@@ -5,32 +5,73 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useCreateOrderMutation } from "@/redux/features/ordersApi";
 import { useGetUserQuery, useCreateGuestMutation } from "@/redux/features/auth/authApi";
+import { userLoggedIn } from "@/redux/features/auth/authSlice";
 import { clearCart } from "@/redux/features/cartSlice";
 import { notifySuccess, notifyError } from "@/utils/toast";
 import Cookies from "js-cookie";
+import { getAuth } from "@/utils/authStorage";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+async function fetchGoodIdBy(paramName, paramValue) {
+  if (!API_BASE_URL) return null;
+  if (paramValue === undefined || paramValue === null || paramValue === "") return null;
+
+  const url = `${API_BASE_URL}/goods/?${paramName}=${encodeURIComponent(paramValue)}`;
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  const good = data?.results?.[0];
+  return good?.id ?? null;
+}
+
+async function resolveCartItemGoodId(item) {
+  // Prefer internal PK when present.
+  const direct = Number(item?.id ?? item?._id);
+  if (Number.isFinite(direct) && direct > 0) {
+    // Verify it exists to avoid “Invalid pk” at order creation.
+    const byId = await fetchGoodIdBy("id", direct);
+    if (byId) return byId;
+  }
+
+  const remonline = Number(item?.id_remonline);
+  if (Number.isFinite(remonline) && remonline > 0) {
+    const byRem = await fetchGoodIdBy("id_remonline", remonline);
+    if (byRem) return byRem;
+  }
+
+  return null;
+}
 
 // Валидационная схема для checkout формы
-const checkoutSchema = Yup.object().shape({
-  firstName: Yup.string()
-    .required("Имя обязательно для заполнения")
-    .min(2, "Имя должно содержать минимум 2 символа"),
-  lastName: Yup.string()
-    .required("Фамилия обязательна для заполнения")
-    .min(2, "Фамилия должна содержать минимум 2 символа"),
-  phone: Yup.string()
-    .required("Телефон обязателен для заполнения")
-    .matches(/^[\+]?[0-9\(\)\-\s]+$/, "Введите корректный номер телефона"),
-  city: Yup.string()
-    .required("Выберите город"),
-  warehouse: Yup.string()
-    .required("Выберите отделение Новой Почты"),
-  orderNotes: Yup.string()
-    .max(500, "Комментарий не должен превышать 500 символов")
-});
+const buildCheckoutSchema = (t) =>
+  Yup.object().shape({
+    firstName: Yup.string()
+      .required(t("first_name_required"))
+      .min(2, t("min_characters", { count: 2 })),
+    lastName: Yup.string()
+      .required(t("last_name_required"))
+      .min(2, t("min_characters", { count: 2 })),
+    phone: Yup.string()
+      .required(t("phone_required"))
+      .matches(/^[\+]?[0-9\(\)\-\s]+$/, t("phone_invalid")),
+    city: Yup.string().required(t("city_required")),
+    warehouse: Yup.string().required(t("warehouse_required")),
+    orderNotes: Yup.string().max(500, t("order_notes_max", { count: 500 })),
+  });
 
 const useOrderCheckout = () => {
+  const tv = useTranslations("CheckoutValidation");
+  const tg = useTranslations("GuestValidation");
+  const checkoutSchema = buildCheckoutSchema(tv);
   const [shippingCost, setShippingCost] = useState(0);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [discountPercentage, setDiscountPercentage] = useState(0);
@@ -93,9 +134,13 @@ const useOrderCheckout = () => {
     setIsCheckoutSubmit(true);
 
     try {
+      // Remember whether user started checkout without auth.
+      // We use this later to decide whether to show guest registration suggestions.
+      const startedUnauthenticated = !accessToken;
+
       // Проверяем, что все обязательные поля заполнены
       if (!data.firstName || !data.lastName || !data.phone || !data.city || !data.warehouse) {
-        notifyError("Пожалуйста, заполните все обязательные поля");
+        notifyError(tv("fill_required_fields"));
         setIsCheckoutSubmit(false);
         return;
       }
@@ -106,16 +151,33 @@ const useOrderCheckout = () => {
       // Формируем адрес Nova Poshta из города и отделения
       const novaPostAddress = `${data.city}, ${data.warehouse}`;
       
+      // Resolve Good PKs for cart items (prevents backend: Invalid pk ".." - object does not exist)
+      const resolvedItems = await Promise.all(
+        cart_products.map(async (item) => {
+          const goodId = await resolveCartItemGoodId(item);
+          const quantity = Number(item?.orderQuantity ?? 0);
+          return {
+            good: goodId,
+            quantity,
+            title: item?.title,
+          };
+        })
+      );
+
+      const invalid = resolvedItems.find((it) => !it.good || !Number.isFinite(it.quantity) || it.quantity <= 0);
+      if (invalid) {
+        // Most common case: stale cart item id that doesn't exist in backend.
+        const name = invalid?.title || "товар";
+        throw new Error(`Товар "${name}" не найден в базе. Удалите его из корзины и добавьте заново.`);
+      }
+
       const orderData = {
         name: data.firstName || currentUser?.name || "",
         last_name: data.lastName || currentUser?.last_name || "",
         phone: data.phone || currentUser?.phone || "",
         nova_post_address: novaPostAddress,
         prepayment: paymentMethod === "pay_now",
-        items: cart_products.map(item => ({
-          good: item.id, // Используем good вместо good_external_id согласно API схеме
-          quantity: item.orderQuantity
-        }))
+        items: resolvedItems.map(({ good, quantity }) => ({ good, quantity })),
       };
 
       // Добавляем description только если оно не пустое
@@ -135,6 +197,57 @@ const useOrderCheckout = () => {
 
       // Если пользователь не авторизован, создаем гостевой аккаунт
       if (!accessToken) {
+        // If we already have guest/user tokens in storage, sync them and do NOT create another guest.
+        // This prevents situations where guest was created on backend, but checkout retries and hits
+        // `phone already exists`.
+        try {
+          const ls = getAuth();
+          if (ls?.accessToken) {
+            dispatch(
+              userLoggedIn({
+                accessToken: ls.accessToken,
+                user: ls.user ?? null,
+                isGuest: ls.isGuest ?? false,
+                guestId: ls.guestId ?? null,
+              })
+            );
+            console.log("Using existing auth token from localStorage, skipping guest creation");
+          }
+        } catch (e) {
+          console.warn("Failed to sync auth from localStorage:", e);
+        }
+
+        const cookieRaw = Cookies.get("userInfo");
+        if (!accessToken && cookieRaw) {
+          try {
+            const c = JSON.parse(cookieRaw);
+            if (c?.accessToken) {
+              dispatch(
+                userLoggedIn({
+                  accessToken: c.accessToken,
+                  user: c.user ?? null,
+                  isGuest: c.isGuest ?? false,
+                  guestId: c.guestId ?? null,
+                })
+              );
+              console.log("Using existing auth token from cookies, skipping guest creation");
+            }
+          } catch (e) {
+            console.warn("Failed to parse cookie userInfo:", e);
+          }
+        }
+
+        // After sync attempt, if token exists in storage, proceed to create order
+        const finalLs = (() => {
+          try {
+            return getAuth();
+          } catch {
+            return null;
+          }
+        })();
+        if (finalLs?.accessToken) {
+          console.log("Auth token is present in storage, continuing order creation without new guest");
+        } else {
         console.log("Creating guest account for order...");
         const guestData = {
           name: data.firstName,
@@ -146,22 +259,6 @@ const useOrderCheckout = () => {
         try {
           const guestResult = await createGuest(guestData).unwrap();
           console.log("Guest account created successfully:", guestResult);
-          
-          // Проверяем, что токены были сохранены
-          const userInfo = Cookies.get('userInfo');
-          console.log("Tokens after guest creation:", userInfo);
-          
-          if (!userInfo) {
-            throw new Error("Токены гостя не были сохранены");
-          }
-          
-          // Даем время для обновления токенов в Redux store и cookies
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          // Проверяем еще раз
-          const finalUserInfo = Cookies.get('userInfo');
-          console.log("Final tokens check:", finalUserInfo);
-          
         } catch (guestError) {
           console.error("Failed to create guest account:", guestError);
           console.error("Guest error details:", {
@@ -169,8 +266,80 @@ const useOrderCheckout = () => {
             status: guestError?.status,
             data: guestError?.data
           });
+
+          // If backend says the phone already exists, we might be retrying after a successful guest create.
+          // If tokens are already in storage, allow checkout to continue.
+          if (guestError?.status === 400 && guestError?.data?.phone?.[0]?.includes("already exists")) {
+            const existing = (() => {
+              try {
+                return getAuth();
+              } catch {
+                return null;
+              }
+            })();
+            if (existing?.accessToken) {
+              console.warn("Guest already exists by phone, but token is present in storage. Continuing...");
+              // do not throw
+              return;
+            }
+          }
+
+          // If we failed due to client-side validation, surface the exact fields
+          if (guestError?.status === "CLIENT_VALIDATION_ERROR") {
+            const errs = guestError?.data?.errors || {};
+
+            const formatGuestFieldError = (field, err) => {
+              if (!err) return null;
+              const label = (() => {
+                try {
+                  return tg(field);
+                } catch {
+                  return field;
+                }
+              })();
+
+              if (typeof err === "string") return `${label}: ${err}`;
+              const code = err?.code;
+              if (!code) return `${label}: ${JSON.stringify(err)}`;
+
+              if (code === "maxLength") return `${label}: ${tg("maxLength", { max: err.max })}`;
+              return `${label}: ${tg(code)}`;
+            };
+
+            const parts = Object.entries(errs)
+              .map(([field, err]) => formatGuestFieldError(field, err))
+              .filter(Boolean);
+
+            const details = parts.length ? parts.join("; ") : tv("guest_validation_failed_generic");
+            throw new Error(`${tv("guest_create_failed")}: ${details}`);
+          }
+
+          // If backend returns 400 with field errors, show them as well
+          if (guestError?.status === 400 && guestError?.data) {
+            const d = guestError.data;
+
+            // translate common backend messages
+            const phoneAlreadyExists =
+              Array.isArray(d.phone) &&
+              typeof d.phone[0] === "string" &&
+              d.phone[0].includes("already exists");
+
+            const msg =
+              d.detail ||
+              (phoneAlreadyExists && tv("phone_already_exists")) ||
+              (d.phone && `Телефон: ${d.phone[0]}`) ||
+              (d.name && `Имя: ${d.name[0]}`) ||
+              (d.last_name && `Фамилия: ${d.last_name[0]}`) ||
+              (d.nova_post_address && `Адрес доставки: ${d.nova_post_address[0]}`) ||
+              (d.email && `Email: ${d.email[0]}`) ||
+              (d.login && `Логин: ${d.login[0]}`) ||
+              (d.telegram_id && `Telegram: ${d.telegram_id[0]}`) ||
+              "Некорректные данные гостя";
+            throw new Error(`Не удалось создать гостевой аккаунт: ${msg}`);
+          }
           
-          throw new Error("Не удалось создать гостевой аккаунт. Попробуйте еще раз.");
+          throw new Error(tv("guest_create_failed_try_again"));
+        }
         }
       }
 
@@ -191,8 +360,13 @@ const useOrderCheckout = () => {
         timestamp: new Date().toISOString()
       }));
 
+      // For card payments we must return the created order so the caller can open the payment iframe.
+      if (paymentMethod === "pay_now") {
+        return result;
+      }
+
       // Если пользователь не авторизован, показываем модальное окно предложения регистрации
-      if (!accessToken) {
+      if (startedUnauthenticated) {
         setShowGuestRegistrationModal(true);
         // Сохраняем информацию о заказе для последующего перенаправления
         sessionStorage.setItem('pendingOrderRedirect', JSON.stringify({
@@ -200,27 +374,39 @@ const useOrderCheckout = () => {
           paymentMethod
         }));
       } else {
-        // Для всех пользователей перенаправляем на страницу успешного оформления
-        // TODO: В будущем можно добавить логику оплаты для paymentMethod === "pay_now"
+        // Если наложка — обычный редирект
         router.push(`/${locale}/order-success`);
       }
       
     } catch (error) {
-      console.error("Ошибка создания заказа:", error);
-      console.error("Error details:", {
-        message: error?.message,
-        status: error?.status,
-        data: error?.data,
-        originalStatus: error?.originalStatus,
-        error: error?.error
+      // RTK Query / fetch errors can look like {} in console (non-enumerable fields).
+      const status = error?.status ?? error?.error?.status;
+      const data = error?.data ?? error?.error?.data;
+      const message =
+        data?.detail ||
+        data?.message ||
+        error?.message ||
+        error?.error ||
+        "Unknown error";
+
+      const safeStringify = (v) => {
+        try {
+          return JSON.stringify(v, null, 2);
+        } catch (e) {
+          return "[unstringifiable]";
+        }
+      };
+
+      console.error("Ошибка создания заказа (details):", {
+        status,
+        message,
+        data,
+        keys: error ? Object.getOwnPropertyNames(error) : [],
+        raw: error,
       });
-      
-      // Логируем полную структуру ошибки для диагностики
-      console.error("Full error object:", JSON.stringify(error, null, 2));
-      
-      // Если есть детали ошибки от сервера, выводим их
-      if (error?.data) {
-        console.error("Server error response:", JSON.stringify(error.data, null, 2));
+
+      if (data) {
+        console.error("Server error response:", safeStringify(data));
       }
       
       // Более детальное сообщение об ошибке
@@ -253,8 +439,8 @@ const useOrderCheckout = () => {
         errorMessage = "Ошибка авторизации. Попробуйте войти в аккаунт";
       } else if (error?.status >= 500) {
         errorMessage = "Ошибка сервера. Попробуйте позже";
-      } else if (error?.message) {
-        errorMessage = error.message;
+      } else if (message) {
+        errorMessage = message;
       }
       
       notifyError(errorMessage);

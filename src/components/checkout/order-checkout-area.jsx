@@ -20,8 +20,9 @@ const OrderCheckoutArea = () => {
   const t = useTranslations('Checkout');
   const router = useRouter();
   
-  // Убираем принудительную аутентификацию - разрешаем неавторизованным пользователям оформлять заказы
-  
+  const [monoPageUrl, setMonoPageUrl] = React.useState(null);
+  const [isCreatingPayment, setIsCreatingPayment] = React.useState(false);
+
   const {
     handleSubmit,
     submitHandler,
@@ -49,10 +50,44 @@ const OrderCheckoutArea = () => {
     total,
     isCheckoutSubmit
   } = useOrderCheckout();
+
+  const getCurrentAccessToken = React.useCallback(() => {
+    // Redux token can be stale inside an async handler before re-render.
+    // Always try cookies/localStorage as well.
+    try {
+      if (accessToken) return accessToken;
+      const cookieRaw = Cookies.get('userInfo');
+      if (cookieRaw) {
+        const parsed = JSON.parse(cookieRaw);
+        if (parsed?.accessToken) return parsed.accessToken;
+      }
+    } catch (e) {
+      console.warn('Failed to read accessToken from cookies:', e);
+    }
+
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('userInfo') : null;
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.accessToken) return parsed.accessToken;
+      }
+    } catch (e) {
+      console.warn('Failed to read accessToken from localStorage:', e);
+    }
+
+    return null;
+  }, [accessToken]);
   
   const { cart_products } = useSelector((state) => state.cart);
+  const { isGuest } = useSelector((state) => state.auth);
   const { quantity } = useCartInfo();
-  const { data: ordersData } = useGetOrdersQuery();
+
+  const showPaymentFrame = paymentMethod === "pay_now" && (isCreatingPayment || !!monoPageUrl);
+
+  // Guests typically don't have permission to list orders -> avoid noisy 403
+  const { data: ordersData } = useGetOrdersQuery(undefined, {
+    skip: !accessToken || isGuest,
+  });
   const { data: discountsData } = useGetDiscountsQuery();
 
   const formatPrice = (priceMinor) => {
@@ -61,6 +96,7 @@ const OrderCheckoutArea = () => {
 
   // Рассчитываем текущую скидку пользователя
   const calculateCurrentDiscount = () => {
+    if (isGuest) return 0;
     if (!ordersData || !discountsData) return 0;
     
     const orders = ordersData.results || ordersData.data || ordersData;
@@ -101,6 +137,110 @@ const OrderCheckoutArea = () => {
   };
 
   const currentDiscountPercent = calculateCurrentDiscount();
+ const customSubmitHandler = async (formData) => {
+    const createdOrder = await submitHandler(formData);
+
+    if (!createdOrder?.id) return;
+
+    if (paymentMethod === "pay_now") {
+      await createMonoPayment(createdOrder.id);
+    }
+  };
+
+  const createMonoPayment = async (orderId) => {
+    try {
+      setIsCreatingPayment(true);
+
+      // Use backend API base URL, same as RTK Query.
+      const base = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const url = `${base}/payments/create/`;
+
+      const token = getCurrentAccessToken();
+      console.log('Creating Monobank payment:', { url, orderId, hasToken: !!token });
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          order_id: orderId,
+        }),
+      });
+
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = null;
+      }
+
+      console.log('Monobank payment raw response:', {
+        status: res.status,
+        ok: res.ok,
+        data,
+        textPreview: typeof text === 'string' ? text.slice(0, 300) : null,
+      });
+
+      if (!res.ok) {
+        const msg = data?.detail || data?.message || `Payment creation failed (status ${res.status})`;
+        throw new Error(msg);
+      }
+
+      // backend may return different field names depending on implementation
+      const pageUrl =
+        data?.page_url ||
+        data?.pageUrl ||
+        data?.mono_url ||
+        data?.monoUrl ||
+        data?.redirect_url ||
+        data?.redirectUrl ||
+        data?.invoice_url ||
+        data?.invoiceUrl ||
+        data?.url ||
+        data?.data?.page_url ||
+        data?.data?.pageUrl ||
+        data?.data?.mono_url ||
+        data?.data?.monoUrl ||
+        data?.data?.redirect_url ||
+        data?.data?.redirectUrl ||
+        data?.data?.invoice_url ||
+        data?.data?.invoiceUrl ||
+        data?.data?.url;
+
+      console.log('Monobank payment resolved pageUrl:', pageUrl);
+
+      if (pageUrl) {
+        setMonoPageUrl(pageUrl);
+
+        // Try to bring the payment frame into view
+        try {
+          setTimeout(() => {
+            const el = document.getElementById('mono-payment-frame');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 50);
+        } catch {}
+      } else {
+        throw new Error(`Payment creation succeeded but payment URL is missing. Response: ${JSON.stringify(data)}`);
+      }
+    } catch (error) {
+      console.error('Monobank payment error:', error);
+    } finally {
+      setIsCreatingPayment(false);
+    }
+  };
+
+  React.useEffect(() => {
+    console.log('Monobank UI state:', {
+      paymentMethod,
+      monoPageUrl,
+      isCreatingPayment,
+      cartCount: cart_products?.length,
+    });
+  }, [paymentMethod, monoPageUrl, isCreatingPayment, cart_products?.length]);
 
   return (
     <>
@@ -109,7 +249,7 @@ const OrderCheckoutArea = () => {
         style={{ backgroundColor: "#EFF1F5" }}
       >
         <div className="container">
-          {cart_products.length === 0 ? (
+          {cart_products.length === 0 && !showPaymentFrame ? (
             <div className="text-center py-5">
               <h4>{t('no_items_in_cart')}</h4>
               <Link href="/shop" className="tp-btn">
@@ -126,7 +266,7 @@ const OrderCheckoutArea = () => {
                 </div>
               </div>
               
-              <form onSubmit={handleSubmit(submitHandler)}>
+              <form onSubmit={handleSubmit(customSubmitHandler)}>
                 <div className="row">
                   <div className="col-lg-7">
                     <SimplifiedBillingArea 
@@ -280,6 +420,52 @@ const OrderCheckoutArea = () => {
                           </div>
                         </div>
                       </div>
+                        
+                        {paymentMethod === "pay_now" && (
+                          <div className="mt-4 text-center">
+                            {isCreatingPayment && (
+                              <p className="mb-2">{t('processing')}</p>
+                            )}
+
+                            {monoPageUrl && (
+                              <>
+                                <div className="alert alert-info mb-3" style={{ maxWidth: '600px', margin: '0 auto' }}>
+                                  <div style={{ fontSize: '13px', wordBreak: 'break-all' }}>
+                                    Payment URL: <a href={monoPageUrl} target="_blank" rel="noreferrer">{monoPageUrl}</a>
+                                  </div>
+                                </div>
+                                <iframe
+                                  id="mono-payment-frame"
+                                  title="monobank-payment"
+                                  width="100%"
+                                  height="600"
+                                  src={monoPageUrl}
+                                  allow="payment *"
+                                  onLoad={() => console.log('Monobank iframe loaded')}
+                                  onError={() => console.log('Monobank iframe failed to load')}
+                                  style={{
+                                    borderRadius: "20px",
+                                    border: "none",
+                                    maxWidth: "600px"
+                                  }}
+                                />
+
+                                {/* Fallback in case Monobank blocks iframe embedding */}
+                                <div className="mt-3">
+                                  <a
+                                    href={monoPageUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="tp-btn tp-btn-2"
+                                    style={{ display: 'inline-block' }}
+                                  >
+                                    {t('pay_now')}
+                                  </a>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
 
                       <div className="tp-checkout-btn-wrapper">
                         <button 

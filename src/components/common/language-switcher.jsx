@@ -86,7 +86,6 @@ const LanguageSwitcher = () => {
           <li key={loc}>
             <Link 
               href={`/${loc}${pathname.substring(3)}`}
-              locale={false}
               onClick={(e) => {
                 e.preventDefault();
                 handleLanguageChange(loc);

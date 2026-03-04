@@ -668,6 +668,35 @@
     "phone": "Телефон",
     "nova_post_address": "Адрес Новой Почты"
   },
+  "CheckoutValidation": {
+    "first_name_required": "Имя обязательно",
+    "last_name_required": "Фамилия обязательна",
+    "phone_required": "Телефон обязателен",
+    "phone_invalid": "Некорректный формат телефона",
+    "city_required": "Город обязателен",
+    "warehouse_required": "Отделение обязательно",
+    "min_characters": "Минимум {count} символа(ов)",
+    "order_notes_max": "Комментарий не должен превышать {count} символов",
+    "fill_required_fields": "Пожалуйста, заполните все обязательные поля",
+    "guest_create_failed": "Не удалось создать гостевой аккаунт",
+    "guest_validation_failed_generic": "Проверьте введённые данные",
+    "guest_create_failed_try_again": "Не удалось создать гостевой аккаунт. Попробуйте еще раз.",
+    "phone_already_exists": "Клиент с таким телефоном уже существует"
+  },
+  "GuestValidation": {
+    "required": "Поле обязательно",
+    "maxLength": "Максимальная длина {max}",
+    "invalidPhone": "Некорректный формат телефона",
+    "invalidEmail": "Некорректный формат email",
+    "integer": "Должно быть целым числом",
+    "outOfRange": "Значение вне диапазона",
+    "name": "Имя",
+    "last_name": "Фамилия",
+    "phone": "Телефон",
+    "email": "Email",
+    "login": "Логин",
+    "telegram_id": "Telegram id"
+  },
   "Products": {
     "default_seo_title": "AirBag - Автозапчасти",
     "product_details": "Детали товара",

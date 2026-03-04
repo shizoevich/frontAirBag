@@ -550,6 +550,35 @@
     "maybe_later": "Можливо пізніше",
     "continue_as_guest": "Продовжити як гість"
   },
+  "CheckoutValidation": {
+    "first_name_required": "Ім'я обов'язкове",
+    "last_name_required": "Прізвище обов'язкове",
+    "phone_required": "Телефон обов'язковий",
+    "phone_invalid": "Неправильний формат телефону",
+    "city_required": "Місто є обов'язковим",
+    "warehouse_required": "Відділення обов'язкове",
+    "min_characters": "Мінімум {count} символів",
+    "order_notes_max": "Примітки не повинні перевищувати {count} символів",
+    "fill_required_fields": "Будь ласка, заповніть усі обов'язкові поля",
+    "guest_create_failed": "Не вдалося створити гостьовий акаунт",
+    "guest_validation_failed_generic": "Перевірте введені дані",
+    "guest_create_failed_try_again": "Не вдалося створити гостьовий акаунт. Спробуйте ще раз.",
+    "phone_already_exists": "Клієнт з таким телефоном вже існує"
+  },
+  "GuestValidation": {
+    "required": "Поле обов'язкове",
+    "maxLength": "Максимальна довжина {max}",
+    "invalidPhone": "Неправильний формат телефону",
+    "invalidEmail": "Неправильний формат email",
+    "integer": "Має бути цілим числом",
+    "outOfRange": "Значення поза діапазоном",
+    "name": "Ім'я",
+    "last_name": "Прізвище",
+    "phone": "Телефон",
+    "email": "Email",
+    "login": "Логін",
+    "telegram_id": "Telegram id"
+  },
   "YouTube": {
     "title": "Наші відео",
     "subtitle": "Дивіться наші останні відео про ремонт та встановлення AirBag",

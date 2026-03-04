@@ -118,6 +118,12 @@ const RegisterForm = () => {
 
   // Поиск отделений Новой Почты
   const fetchWarehouses = useCallback(async () => {
+    if (!selectedCity) {
+      setWarehouses([]);
+      setShowWarehouseDropdown(false);
+      return;
+    }
+
     try {
       const payload = {
         apiKey: '1690358338d20ac90d792f5da5bb1292',
@@ -144,6 +150,16 @@ const RegisterForm = () => {
         body: JSON.stringify(payload),
       });
 
+      if (!response.ok) {
+        console.warn('Nova Poshta warehouses request failed:', {
+          status: response.status,
+          statusText: response.statusText,
+        });
+        setWarehouses([]);
+        setShowWarehouseDropdown(false);
+        return;
+      }
+
       const data = await response.json();
 
       console.log('Warehouse response:', data);
@@ -152,14 +168,22 @@ const RegisterForm = () => {
         setWarehouses(data.data);
         setShowWarehouseDropdown(true);
       } else {
-        console.error('No warehouses found:', data || {});
+        // Not an application error: could be empty search, rate limit, invalid CityRef, etc.
+        console.warn('No warehouses found or unexpected response:', {
+          success: data?.success,
+          errors: data?.errors,
+          warnings: data?.warnings,
+          info: data?.info,
+        });
         setWarehouses([]);
+        setShowWarehouseDropdown(false);
       }
     } catch (error) {
       console.error('Error searching warehouses:', error);
       setWarehouses([]);
+      setShowWarehouseDropdown(false);
     }
-  }, [selectedCity]);
+  }, [selectedCity, searchWarehouse]);
 
   // Обработка изменения поля города
   const handleCityChange = (e) => {
@@ -279,7 +303,11 @@ const RegisterForm = () => {
       
       reset();
     } catch (error) {
-      console.error('Registration error:', error);
+      // RTK Query errors can appear as {} in console (non-enumerable fields).
+      const status = error?.status ?? error?.error?.status;
+      const data = error?.data ?? error?.error?.data;
+      const message = data?.detail || data?.message || error?.message || 'Unknown error';
+      console.error('Registration error (details):', { status, message, data, raw: error });
       
       // Обрабатываем различные типы ошибок от API
       if (error.data) {

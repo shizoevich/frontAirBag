@@ -593,6 +593,35 @@
     "maybe_later": "Maybe Later",
     "continue_as_guest": "Continue as Guest"
   },
+  "CheckoutValidation": {
+    "first_name_required": "First name is required",
+    "last_name_required": "Last name is required",
+    "phone_required": "Phone is required",
+    "phone_invalid": "Invalid phone format",
+    "city_required": "City is required",
+    "warehouse_required": "Warehouse is required",
+    "min_characters": "Must be at least {count} characters",
+    "order_notes_max": "Order notes must be at most {count} characters",
+    "fill_required_fields": "Please fill in all required fields",
+    "guest_create_failed": "Failed to create guest account",
+    "guest_validation_failed_generic": "Please check the entered data",
+    "guest_create_failed_try_again": "Failed to create guest account. Please try again.",
+    "phone_already_exists": "A client with this phone number already exists"
+  },
+  "GuestValidation": {
+    "required": "This field is required",
+    "maxLength": "Maximum length is {max}",
+    "invalidPhone": "Invalid phone format",
+    "invalidEmail": "Invalid email format",
+    "integer": "Must be an integer",
+    "outOfRange": "Value is out of range",
+    "name": "Name",
+    "last_name": "Last name",
+    "phone": "Phone",
+    "email": "Email",
+    "login": "Login",
+    "telegram_id": "Telegram id"
+  },
   "PrivacyPolicy": {
     "metaTitle": "Privacy Policy - AirBag",
     "metaDescription": "AirBag website privacy policy. Information about the collection, use and protection of your personal data.",

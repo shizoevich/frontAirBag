@@ -4,6 +4,89 @@ import { setAuth, updateAuth, removeAuth, getAuth } from "@/utils/authStorage";
 import { decodeJWT, getUserIdFromToken } from "@/utils/jwtDecode";
 import Cookies from "js-cookie";
 
+function isBlankString(v) {
+  return v === undefined || v === null || String(v).trim() === "";
+}
+
+function normalizeGuestClientPayload(input) {
+  const data = input || {};
+
+  const name = isBlankString(data.name) ? "" : String(data.name).trim();
+  const last_name = isBlankString(data.last_name) ? "" : String(data.last_name).trim();
+  const phone = isBlankString(data.phone) ? "" : String(data.phone).trim();
+
+  const payload = {
+    name,
+    last_name,
+    phone,
+  };
+
+  // Optional fields (send only when non-empty)
+  if (!isBlankString(data.nova_post_address)) {
+    payload.nova_post_address = String(data.nova_post_address).trim();
+  }
+  if (!isBlankString(data.title)) {
+    payload.title = String(data.title).trim();
+  }
+  if (!isBlankString(data.login)) {
+    payload.login = String(data.login).trim();
+  }
+  if (!isBlankString(data.email)) {
+    payload.email = String(data.email).trim();
+  }
+  if (data.telegram_id !== undefined && data.telegram_id !== null && data.telegram_id !== "") {
+    const tg = Number(data.telegram_id);
+    if (Number.isFinite(tg)) payload.telegram_id = Math.trunc(tg);
+  }
+
+  // Validation (based on backend schema)
+  const errors = {};
+  if (isBlankString(payload.name)) errors.name = { code: "required" };
+  if (isBlankString(payload.last_name)) errors.last_name = { code: "required" };
+  if (isBlankString(payload.phone)) errors.phone = { code: "required" };
+
+  if (payload.name && payload.name.length > 255) errors.name = { code: "maxLength", max: 255 };
+  if (payload.last_name && payload.last_name.length > 255) errors.last_name = { code: "maxLength", max: 255 };
+  if (payload.phone && payload.phone.length > 20) errors.phone = { code: "maxLength", max: 20 };
+  if (payload.login && payload.login.length > 128) errors.login = { code: "maxLength", max: 128 };
+  if (payload.email && payload.email.length > 100) errors.email = { code: "maxLength", max: 100 };
+
+  // Lightweight phone validation (backend may be stricter)
+  if (payload.phone && !/^[\+]?[- 0-9()]+$/.test(payload.phone)) {
+    errors.phone = { code: "invalidPhone" };
+  }
+
+  // Lightweight email validation
+  if (payload.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+    errors.email = { code: "invalidEmail" };
+  }
+
+  if (payload.telegram_id !== undefined) {
+    // Backend int64 range from swagger
+    const min = -9223372036854776000;
+    const max = 9223372036854776000;
+    if (!Number.isInteger(payload.telegram_id)) errors.telegram_id = { code: "integer" };
+    else if (payload.telegram_id < min || payload.telegram_id > max) errors.telegram_id = { code: "outOfRange" };
+  }
+
+  return {
+    payload,
+    errors,
+    isValid: Object.keys(errors).length === 0,
+  };
+}
+
+function normalizeGuestCreateResponse(data) {
+  // Backend responses can vary. Supported shapes:
+  // 1) { access, refresh, guest_id }
+  // 2) { client_id, tokens: { access, refresh } }
+  // 3) { tokens: { access, refresh }, guest_id|client_id }
+  const access = data?.access || data?.tokens?.access;
+  const refresh = data?.refresh || data?.tokens?.refresh;
+  const guest_id = data?.guest_id ?? data?.client_id ?? data?.id ?? null;
+  return { access, refresh, guest_id };
+}
+
 export const authApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
@@ -297,73 +380,99 @@ export const authApi = apiSlice.injectEndpoints({
             console.log("Post-conversion login successful:", loginResult);
           }
         } catch (err) {
-          console.error('Registration error:', err);
+          // RTK Query errors can look empty in console due to non-enumerable props.
+          const status = err?.error?.status ?? err?.status;
+          const data = err?.error?.data ?? err?.data;
+          const message = data?.detail || data?.message || err?.error || err?.message || 'Unknown error';
+          console.error('Registration error (details):', {
+            status,
+            message,
+            data,
+            raw: err,
+          });
         }
       },
     }),
 
     // Создание гостевого аккаунта
     createGuest: builder.mutation({
-      query: (data) => ({
-        url: "/auth/guest/", // Специальный эндпоинт для создания гостя
-        method: "POST",
-        body: {
-          name: data.name || "Test",
-          last_name: data.last_name || "Guest",
-          phone: data.phone || "",
-          nova_post_address: data.nova_post_address || ""
-        },
-      }),
-      
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-          console.log("Guest creation successful:", result);
-          
-          // Ожидаем, что эндпоинт /auth/guest/ вернет токены напрямую
-          const { access, refresh, guest_id } = result.data;
-          
-          if (access && refresh) {
-            // Сохраняем гостевые токены
-            const guestData = {
-              accessToken: access,
-              refreshToken: refresh,
-              isGuest: true,
-              guestId: guest_id,
-            };
-            
-            Cookies.set(
-              "userInfo",
-              JSON.stringify(guestData),
-              { expires: 365 } // Гостевые токены на год (бессрочные refresh)
-            );
-            
-            console.log("Guest tokens saved:", guestData);
-            
-            // Обновляем состояние Redux
-            dispatch(
-              userLoggedIn({
-                accessToken: access,
-                user: null, // Гость не имеет полных данных пользователя
-                isGuest: true,
-                guestId: guest_id,
-              })
-            );
-            
-            console.log("Guest state updated in Redux");
-          } else {
-            throw new Error("Гостевые токены не были получены");
-          }
+      // Use queryFn to validate & normalize payload BEFORE request
+      async queryFn(arg, api, extraOptions, baseQuery) {
+        const { payload, errors, isValid } = normalizeGuestClientPayload(arg);
 
-        } catch (err) {
-          console.error('Guest creation error:', err);
-          console.error('Error details:', {
-            message: err?.message,
-            status: err?.status,
-            data: err?.data
-          });
-          throw err;
+        if (!isValid) {
+          return {
+            error: {
+              status: "CLIENT_VALIDATION_ERROR",
+              data: {
+                detail: "Guest client data validation failed",
+                errors,
+              },
+            },
+          };
         }
+
+        const result = await baseQuery(
+          {
+            url: "/auth/guest/",
+            method: "POST",
+            body: payload,
+          },
+          api,
+          extraOptions
+        );
+
+        // Normalize response to a stable shape for the app + persist tokens immediately
+        // (do not rely on onQueryStarted timing)
+        if (!result?.data) return result;
+
+        const { access, refresh, guest_id } = normalizeGuestCreateResponse(result.data);
+
+        if (!access || !refresh) {
+          return {
+            error: {
+              status: "RESPONSE_FORMAT_ERROR",
+              data: {
+                detail: "Guest create response does not contain tokens",
+              },
+            },
+          };
+        }
+
+        const guestData = {
+          accessToken: access,
+          refreshToken: refresh,
+          isGuest: true,
+          guestId: guest_id,
+        };
+
+        // localStorage (apiSlice uses authStorage)
+        setAuth({
+          ...guestData,
+          user: null,
+        });
+
+        // cookie (compatibility with middleware/initialState)
+        Cookies.set("userInfo", JSON.stringify(guestData), { expires: 365 });
+
+        // redux state
+        api.dispatch(
+          userLoggedIn({
+            accessToken: access,
+            user: null,
+            isGuest: true,
+            guestId: guest_id,
+          })
+        );
+
+        return {
+          data: {
+            access,
+            refresh,
+            guest_id,
+            raw: result.data,
+          },
+        };
       },
     }),
     // Обновление профиля пользователя
@@ -396,6 +505,7 @@ export const authApi = apiSlice.injectEndpoints({
 export const {
   useLoginMutation,
   useRegisterMutation,
+  useRegisterMutation: useRegisterUserMutation,
   useCreateGuestMutation,
   useGetUserQuery,
   useRefreshTokenMutation,
