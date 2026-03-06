@@ -2,7 +2,7 @@
 import React from 'react';
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from 'next-intl';
 import Cookies from "js-cookie";
 import Link from "next/link";
@@ -11,17 +11,28 @@ import SimplifiedBillingArea from "./simplified-billing-area";
 import CheckoutLoginDiscount from "./checkout-login-discount";
 import UserInfoModal from "./user-info-modal";
 import GuestRegistrationModal from './guest-registration-modal';
+import PaymentModal from './payment-modal';
+import GooglePayButton from './google-pay-button';
+import ApplePayButton from './apple-pay-button';
 import useOrderCheckout from "@/hooks/use-order-checkout";
 import useCartInfo from "@/hooks/use-cart-info";
 import { useGetOrdersQuery } from "@/redux/features/ordersApi";
 import { useGetDiscountsQuery } from "@/redux/features/discountsApi";
+import { useCreatePaymentMutation } from "@/redux/features/paymentsApi";
+import { notifyError, notifyInfo } from '@/utils/toast';
 
 const OrderCheckoutArea = () => {
   const t = useTranslations('Checkout');
   const router = useRouter();
+  const { locale } = useParams();
   
   const [monoPageUrl, setMonoPageUrl] = React.useState(null);
+  const [lastOrderId, setLastOrderId] = React.useState(null);
   const [isCreatingPayment, setIsCreatingPayment] = React.useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = React.useState(false);
+  const [monoPaymentError, setMonoPaymentError] = React.useState(null);
+
+  const [createPayment] = useCreatePaymentMutation();
 
   const {
     handleSubmit,
@@ -84,6 +95,10 @@ const OrderCheckoutArea = () => {
 
   const showPaymentFrame = paymentMethod === "pay_now" && (isCreatingPayment || !!monoPageUrl);
 
+  // When pay_now is the default selected option, onChange won't fire.
+  // This ensures we still create a payment URL once when pay_now is active.
+  const didAutoCreatePaymentRef = React.useRef(false);
+
   // Guests typically don't have permission to list orders -> avoid noisy 403
   const { data: ordersData } = useGetOrdersQuery(undefined, {
     skip: !accessToken || isGuest,
@@ -137,58 +152,91 @@ const OrderCheckoutArea = () => {
   };
 
   const currentDiscountPercent = calculateCurrentDiscount();
- const customSubmitHandler = async (formData) => {
-    const createdOrder = await submitHandler(formData);
 
-    if (!createdOrder?.id) return;
+  // Create payment via Next.js API route (proxy to backend).
+  // NOTE: backend requires `order_id`, so we can only create payment AFTER order is created.
+  const createMonoPaymentFromApiRoute = React.useCallback(async (orderId) => {
+    try {
+      setIsCreatingPayment(true);
+      setMonoPaymentError(null);
 
-    if (paymentMethod === "pay_now") {
-      await createMonoPayment(createdOrder.id);
+      const resolvedOrderId = orderId ?? lastOrderId;
+      if (!resolvedOrderId) {
+        throw new Error('Order is not created yet. Please place the order first.');
+      }
+
+      // redirect_url MUST accept POST from the payment provider. We use an internal API route
+      // to receive POST and convert it into a user-facing GET page with toast + redirects.
+      const redirect_url = `${window.location.origin}/api/monobank/redirect?locale=${encodeURIComponent(
+        locale
+      )}&order_id=${encodeURIComponent(resolvedOrderId)}`;
+      const token = getCurrentAccessToken();
+
+      const res = await fetch('/api/create-monobank-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          order_id: resolvedOrderId,
+          redirect_url,
+        }),
+      });
+
+      console.log('[Monobank][api-route] response status:', res.status);
+
+      const data = await res.json();
+      console.log('[Monobank][api-route] response json:', data);
+      if (!res.ok) {
+        const msg = data?.error || data?.message || 'Monobank payment create failed';
+        throw new Error(msg);
+      }
+
+      if (data?.pageUrl) {
+        setMonoPageUrl(data.pageUrl);
+        setIsPaymentModalOpen(true);
+        notifyInfo(t('monobank_payment_opened'));
+        return;
+      }
+
+      throw new Error('Payment created but pageUrl is missing');
+    } catch (err) {
+      console.error('Monobank payment error (api route):', err);
+      setMonoPaymentError(err?.message || String(err));
+    } finally {
+      setIsCreatingPayment(false);
     }
-  };
+  }, [getCurrentAccessToken, lastOrderId, locale, t]);
+ const customSubmitHandler = async (formData) => {
+     const createdOrder = await submitHandler(formData);
+
+     if (!createdOrder?.id) return;
+
+     setLastOrderId(createdOrder.id);
+
+     if (paymentMethod === "pay_now") {
+       await createMonoPayment(createdOrder.id);
+     }
+   };
 
   const createMonoPayment = async (orderId) => {
     try {
       setIsCreatingPayment(true);
+      setMonoPaymentError(null);
 
-      // Use backend API base URL, same as RTK Query.
-      const base = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const url = `${base}/payments/create/`;
+      // New swagger contract: order_id + redirect_url are required
+      const redirect_url = `${window.location.origin}/api/monobank/redirect?locale=${encodeURIComponent(
+        locale
+      )}&order_id=${encodeURIComponent(orderId)}`;
+      console.log('Creating Monobank payment (RTK):', { orderId, redirect_url });
 
-      const token = getCurrentAccessToken();
-      console.log('Creating Monobank payment:', { url, orderId, hasToken: !!token });
+      const data = await createPayment({
+        order_id: orderId,
+        redirect_url,
+      }).unwrap();
 
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          order_id: orderId,
-        }),
-      });
-
-      const text = await res.text();
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = null;
-      }
-
-      console.log('Monobank payment raw response:', {
-        status: res.status,
-        ok: res.ok,
-        data,
-        textPreview: typeof text === 'string' ? text.slice(0, 300) : null,
-      });
-
-      if (!res.ok) {
-        const msg = data?.detail || data?.message || `Payment creation failed (status ${res.status})`;
-        throw new Error(msg);
-      }
+      console.log('Monobank payment raw response:', { data });
 
       // backend may return different field names depending on implementation
       const pageUrl =
@@ -196,6 +244,8 @@ const OrderCheckoutArea = () => {
         data?.pageUrl ||
         data?.mono_url ||
         data?.monoUrl ||
+        data?.redirect_url ||
+        data?.redirectUrl ||
         data?.redirect_url ||
         data?.redirectUrl ||
         data?.invoice_url ||
@@ -215,19 +265,25 @@ const OrderCheckoutArea = () => {
 
       if (pageUrl) {
         setMonoPageUrl(pageUrl);
+        setIsPaymentModalOpen(true);
 
-        // Try to bring the payment frame into view
-        try {
-          setTimeout(() => {
-            const el = document.getElementById('mono-payment-frame');
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 50);
-        } catch {}
+        // Modal-only UX: no inline iframe scroll
       } else {
         throw new Error(`Payment creation succeeded but payment URL is missing. Response: ${JSON.stringify(data)}`);
       }
     } catch (error) {
-      console.error('Monobank payment error:', error);
+      const status = error?.status ?? error?.error?.status;
+      const data = error?.data ?? error?.error?.data;
+      const message =
+        data?.detail ||
+        data?.message ||
+        error?.message ||
+        error?.error ||
+        'Monobank payment error';
+
+      console.error('Monobank payment error:', { status, message, data, raw: error });
+      setMonoPaymentError(message);
+      notifyError(t('monobank_payment_create_failed'));
     } finally {
       setIsCreatingPayment(false);
     }
@@ -244,6 +300,13 @@ const OrderCheckoutArea = () => {
 
   return (
     <>
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        iframeUrl={monoPageUrl}
+        title={t('monobank_payment_title')}
+      />
+
       <section
         className="tp-checkout-area pb-120"
         style={{ backgroundColor: "#EFF1F5" }}
@@ -266,7 +329,17 @@ const OrderCheckoutArea = () => {
                 </div>
               </div>
               
-              <form onSubmit={handleSubmit(customSubmitHandler)}>
+               <form
+                 onSubmit={(e) => {
+                   // UX requirement: for card payments we create the order only when user initiates payment,
+                   // not via the generic form submit.
+                   if (paymentMethod === 'pay_now') {
+                     e.preventDefault();
+                     return;
+                   }
+                   return handleSubmit(customSubmitHandler)(e);
+                 }}
+               >
                 <div className="row">
                   <div className="col-lg-7">
                     <SimplifiedBillingArea 
@@ -382,11 +455,11 @@ const OrderCheckoutArea = () => {
                         </ul>
                       </div>
 
-                      {/* Payment Method Selection */}
-                      <div className="tp-checkout-payment">
-                        <h4 className="tp-checkout-payment-title">{t('payment_method')}</h4>
+                       {/* Payment Method Selection */}
+                       <div className="tp-checkout-payment">
+                         <h4 className="tp-checkout-payment-title">{t('payment_method')}</h4>
                         
-                        <div className="tp-checkout-payment-item">
+                         <div className="tp-checkout-payment-item">
                           <input
                             type="radio"
                             id="cash_on_delivery"
@@ -409,77 +482,117 @@ const OrderCheckoutArea = () => {
                             id="pay_now"
                             name="payment"
                             value="pay_now"
-                            checked={paymentMethod === "pay_now"}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                          />
+                             checked={paymentMethod === "pay_now"}
+                              onChange={(e) => {
+                                setPaymentMethod(e.target.value);
+                              // Backend requires `order_id` to create a Monobank payment.
+                              // Payment will be created right after the order is placed.
+                              }}
+                            />
                           <label htmlFor="pay_now">
                             {t('pay_now')}
                           </label>
                           <div className="direct-bank-transfer">
                             <p>{t('pay_now_description')}</p>
                           </div>
-                        </div>
-                      </div>
-                        
-                        {paymentMethod === "pay_now" && (
-                          <div className="mt-4 text-center">
-                            {isCreatingPayment && (
-                              <p className="mb-2">{t('processing')}</p>
-                            )}
 
-                            {monoPageUrl && (
-                              <>
-                                <div className="alert alert-info mb-3" style={{ maxWidth: '600px', margin: '0 auto' }}>
-                                  <div style={{ fontSize: '13px', wordBreak: 'break-all' }}>
-                                    Payment URL: <a href={monoPageUrl} target="_blank" rel="noreferrer">{monoPageUrl}</a>
-                                  </div>
-                                </div>
-                                <iframe
-                                  id="mono-payment-frame"
-                                  title="monobank-payment"
-                                  width="100%"
-                                  height="600"
-                                  src={monoPageUrl}
-                                  allow="payment *"
-                                  onLoad={() => console.log('Monobank iframe loaded')}
-                                  onError={() => console.log('Monobank iframe failed to load')}
-                                  style={{
-                                    borderRadius: "20px",
-                                    border: "none",
-                                    maxWidth: "600px"
-                                  }}
-                                />
+                           {/* Payment iframe is rendered in the pay-now buttons section below to avoid duplication */}
+                         </div>
+                       </div>
 
-                                {/* Fallback in case Monobank blocks iframe embedding */}
-                                <div className="mt-3">
-                                  <a
-                                    href={monoPageUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="tp-btn tp-btn-2"
-                                    style={{ display: 'inline-block' }}
-                                  >
-                                    {t('pay_now')}
-                                  </a>
-                                </div>
-                              </>
-                            )}
+                       {paymentMethod === 'cash_on_delivery' && (
+                         <div className="tp-checkout-btn-wrapper">
+                           <button
+                             type="submit"
+                             className="tp-checkout-btn w-100"
+                             disabled={isCheckoutSubmit}
+                           >
+                             {isCheckoutSubmit ? t('processing') : t('place_order')}
+                           </button>
+                         </div>
+                       )}
+
+                       {/* Pay-now buttons must be at the bottom and only visible for pay_now */}
+                       {paymentMethod === "pay_now" && (
+                          <div className="mt-4">
+                            {(() => {
+                              // Precompute to avoid nested t() calls inside message formatting.
+                              // next-intl supports rich formatting, but we keep it simple.
+                              return null;
+                            })()}
+                            <div style={{ display: 'grid', gap: 10 }}>
+                              <GooglePayButton
+                                amountMinor={Math.round(
+                                  (subtotal - (subtotal * currentDiscountPercent / 100) + shippingCost - discountAmount) * 100
+                                )}
+                               currencyCode="UAH"
+                               merchantName="AirbagAD"
+                               gatewayMerchantId={process.env.NEXT_PUBLIC_GOOGLE_PAY_MERCHANT_ID}
+                             />
+                             <ApplePayButton />
+                           </div>
+
+                           <div className="mt-3" style={{ display: 'grid', gap: 10 }}>
+                             {isCreatingPayment && (
+                               <p className="mb-2">{t('processing')}</p>
+                             )}
+
+                              <button
+                                type="button"
+                                className="tp-btn tp-btn-2 w-100"
+                                disabled={isCheckoutSubmit || isCreatingPayment}
+                                onClick={async () => {
+                                  // If we already have payment URL -> show it.
+                                  if (monoPageUrl) {
+                                    setIsPaymentModalOpen(true);
+                                    return;
+                                  }
+
+                                  // Create order first, then create Monobank payment for that order.
+                                  await handleSubmit(async (formData) => {
+                                    const createdOrder = await submitHandler(formData);
+                                    if (!createdOrder?.id) return;
+
+                                    setLastOrderId(createdOrder.id);
+                                    await createMonoPaymentFromApiRoute(createdOrder.id);
+                                  })();
+                                }}
+                              >
+                                {(() => {
+                                  // Avoid runtime crash if locale messages are stale in dev (hot reload) and key is missing.
+                                  if (isCreatingPayment) return t('processing');
+                                  // next-intl provides `.has()` on the translation function.
+                                  // If not present, fall back to a safe string.
+                                  // eslint-disable-next-line no-prototype-builtins
+                                  const hasKey = typeof t?.has === 'function' ? t.has('pay_with_monobank') : true;
+                                  return hasKey ? t('pay_with_monobank') : 'Pay with Monobank';
+                                })()}
+                              </button>
+
+                              {monoPaymentError && (
+                                <p className="mb-0" style={{ color: '#b00020' }}>
+                                  {monoPaymentError}
+                                </p>
+                              )}
+
+                              {/* We no longer show the "place order" hint for pay_now, because we create order on payment click. */}
+
+                              {monoPageUrl && (
+                                <button
+                                  type="button"
+                                  className="tp-btn w-100"
+                                  onClick={() => setIsPaymentModalOpen(true)}
+                                >
+                                  {t('open_payment')}
+                                </button>
+                              )}
+                            </div>
                           </div>
                         )}
-
-                      <div className="tp-checkout-btn-wrapper">
-                        <button 
-                          type="submit" 
-                          className="tp-checkout-btn w-100"
-                          disabled={isCheckoutSubmit}
-                        >
-                          {isCheckoutSubmit ? t('processing') : t('place_order')}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
+                     </div>
+                   </div>
+                 </div>
+               </form>
             </div>
           )}
         </div>

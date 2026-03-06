@@ -22,6 +22,8 @@ export const config = {
 
     // Enable redirects that add a locale prefix
     // (e.g. `/pathnames` -> `/en/pathnames`)
-    '/((?!_next|.*\\..*).*)'
+    // IMPORTANT: exclude Next.js API routes from locale middleware.
+    // Otherwise `/api/...` gets rewritten to `/<locale>/api/...` and returns 404.
+    '/((?!api|_next|.*\\..*).*)'
   ]
 };

@@ -35,9 +35,9 @@ const OrderPage = () => {
 
                     {orderLoading ? (
                       <div className="text-center py-4">
-                        <div className="spinner-border spinner-border-sm text-primary" role="status">
-                          <span className="visually-hidden">Завантаження...</span>
-                        </div>
+                      <div className="spinner-border spinner-border-sm text-primary" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                      </div>
                         <p className="mt-2 small">{t('loading')}</p>
                       </div>
                     ) : (() => {

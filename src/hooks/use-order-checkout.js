@@ -80,14 +80,17 @@ const useOrderCheckout = () => {
   const [isCheckoutSubmit, setIsCheckoutSubmit] = useState(false);
   const [showUserInfoModal, setShowUserInfoModal] = useState(false);
   const [showGuestRegistrationModal, setShowGuestRegistrationModal] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("cash_on_delivery"); // "cash_on_delivery" или "pay_now"
+  // Checkout UX: default to card payment ("pay now").
+  const [paymentMethod, setPaymentMethod] = useState("pay_now"); // "cash_on_delivery" | "pay_now"
 
   const dispatch = useDispatch();
   const router = useRouter();
   const { locale } = useParams();
   const { cart_products } = useSelector((state) => state.cart);
   const { user, accessToken } = useSelector((state) => state.auth);
-  const { data: userData } = useGetUserQuery(undefined, { skip: !accessToken });
+  // Do not call /auth/me/ here.
+  // Backend can return 403 or non-JSON in some environments; checkout works with token-only.
+  const { data: userData } = useGetUserQuery(undefined, { skip: true });
   const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
   const [createGuest, { isLoading: isCreatingGuest }] = useCreateGuestMutation();
 
@@ -345,12 +348,15 @@ const useOrderCheckout = () => {
 
       // Создаем заказ
       const result = await createOrder(orderData).unwrap();
-      
-      // Очищаем корзину
-      dispatch(clearCart());
-      
-      // Показываем сообщение об успехе
-      notifySuccess("Заказ успешно создан!");
+
+      // For pay-now flow we keep the cart until payment is completed.
+      // Clearing immediately makes the checkout totals show 0 while payment iframe is open.
+      if (paymentMethod !== 'pay_now') {
+        dispatch(clearCart());
+        notifySuccess("Заказ успешно создан!");
+      } else {
+        notifySuccess("Заказ создан. Перейдите к оплате.");
+      }
       
       // Сохраняем информацию о заказе в sessionStorage для отображения на странице успеха
       sessionStorage.setItem('lastOrderInfo', JSON.stringify({

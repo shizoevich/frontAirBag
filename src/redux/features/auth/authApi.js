@@ -191,12 +191,15 @@ export const authApi = apiSlice.injectEndpoints({
         return {
           url: "/auth/me/",
           method: "GET",
-          // Добавляем обработку для массива ответов (если API возвращает список)
         };
       },
-      // Трансформируем ответ если это массив
+      // Guard against non-JSON/HTML and transform arrays
       transformResponse: (response) => {
         console.log('🔍 GET USER: Raw response:', response);
+        // Some environments can return HTML; do not crash the app.
+        if (typeof response === 'string' && response.trim().startsWith('<')) {
+          return null;
+        }
         // Если ответ - массив, берем первый элемент
         if (Array.isArray(response) && response.length > 0) {
           console.log('✅ Transformed array response to single user object');

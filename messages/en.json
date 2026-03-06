@@ -520,6 +520,12 @@
     "view_details": "View Details",
     "prepayment": "Prepayment",
     "tracking_number": "Tracking Number",
+    "processing": "Processing...",
+    "pay_with_monobank": "Pay with Monobank",
+    "monobank_payment_title": "Monobank payment",
+    "monobank_payment_iframe_title": "Monobank payment iframe",
+    "monobank_payment_opened": "Payment page opened. Complete the payment in Monobank.",
+    "monobank_payment_create_failed": "Failed to start Monobank payment. Please try again.",
     "payment_confirmation_note": "After payment confirmation, we will send you a notification.",
     "cash_delivery_note": "Payment is made in cash upon receipt of goods at Nova Poshta branch.",
     "my_orders": "My Orders",
@@ -551,6 +557,13 @@
     "pay_now_description": "Pay for your order now online with card",
     "place_order": "Place Order",
     "processing": "Processing...",
+    "open_payment": "Open payment",
+    "pay_with_monobank": "Pay with Monobank",
+    "monobank_order_required_hint": "Create the order first ({placeOrderLabel}) to get an order_id for Monobank payment.",
+    "monobank_payment_title": "Monobank payment",
+    "monobank_payment_iframe_title": "Monobank payment iframe",
+    "monobank_payment_opened": "Payment page opened. Complete the payment in Monobank.",
+    "monobank_payment_create_failed": "Failed to start Monobank payment. Please try again.",
     "no_items_in_cart": "No items found in cart to checkout",
     "return_to_shop": "Return to shop",
     "nova_post_delivery": "Nova Post Delivery",
@@ -673,6 +686,14 @@
       "title": "7. Cookies",
       "description": "Our website may use cookies to improve user experience. You can disable cookies in your browser settings."
     }
+  },
+  "Payments": {
+    "processing_title": "Processing payment",
+    "processing_description": "Please wait, we are finalizing the payment status...",
+    "payment_success": "Payment successful. Thank you!",
+    "payment_failed": "Payment failed.",
+    "payment_failed_with_reason": "Payment failed: {reason}",
+    "payment_status_unknown": "Payment status is not confirmed yet. Please check your order status."
   },
   "PreCheckout": {
     "title": "Checkout",

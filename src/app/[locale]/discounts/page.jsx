@@ -178,11 +178,15 @@ const MOCK_DISCOUNTS = {
   ]
 };
 
-const DiscountsPage = () => {
-  const t = useTranslations('Discounts');
-  const { data: apiDiscounts, isLoading, isError, error } = useGetDiscountsQuery();
-  const { data: ordersData, isLoading: ordersLoading } = useGetOrdersQuery();
-  const { user } = useSelector((state) => state.auth);
+  const DiscountsPage = () => {
+    const t = useTranslations('Discounts');
+    const { data: apiDiscounts, isLoading, isError, error } = useGetDiscountsQuery();
+    const { accessToken, isGuest } = useSelector((state) => state.auth);
+    // Guests / unauthenticated users can't list orders -> avoid noisy 403
+    const { data: ordersData, isLoading: ordersLoading } = useGetOrdersQuery(undefined, {
+      skip: !accessToken || isGuest,
+    });
+    const { user } = useSelector((state) => state.auth);
   
   // Debug logging
   React.useEffect(() => {
