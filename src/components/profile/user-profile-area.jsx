@@ -8,8 +8,7 @@ import Link from "next/link";
 import { useGetUserQuery, useUpdateProfileMutation } from "@/redux/features/auth/authApi";
 import Loader from "../loader/loader";
 import ErrorMsg from "../common/error-msg";
-// Используем Font Awesome иконки вместо SVG
-import { toast } from "react-toastify";
+import { notifyError, notifySuccess } from '@/utils/toast';
 
 const UserProfileArea = () => {
   const router = useRouter();
@@ -112,13 +111,13 @@ const UserProfileArea = () => {
       }).unwrap();
       
       // Показываем уведомление об успешном обновлении
-      toast.success(profileExtra('profileUpdateSuccess'));
+      notifySuccess(profileExtra('profileUpdateSuccess'));
       
       // Выключаем режим редактирования
       setEditMode(false);
     } catch (error) {
       console.error('Ошибка при обновлении профиля:', error);
-      toast.error(error?.data?.message || profileExtra('profileUpdateError'));
+      notifyError(error?.data?.message || profileExtra('profileUpdateError'));
     }
   };
 

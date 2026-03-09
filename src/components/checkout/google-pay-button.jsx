@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { useGooglePayMutation } from '@/redux/features/paymentsApi';
+import { useParams } from 'next/navigation';
 
 function loadScriptOnce(src) {
   return new Promise((resolve, reject) => {
@@ -22,11 +23,13 @@ const GooglePayButton = ({
   merchantName = 'Merchant',
   gatewayMerchantId,
 }) => {
+  const { locale } = useParams();
   const [ready, setReady] = React.useState(false);
   const [error, setError] = React.useState(null);
   const [googlePay, { isLoading }] = useGooglePayMutation();
 
   const paymentsClientRef = React.useRef(null);
+  const buttonRootRef = React.useRef(null);
 
   React.useEffect(() => {
     loadScriptOnce('https://pay.google.com/gp/p/js/pay.js')
@@ -39,12 +42,16 @@ const GooglePayButton = ({
     if (typeof window === 'undefined') return;
     if (!window.google?.payments?.api) return;
     paymentsClientRef.current = new window.google.payments.api.PaymentsClient({
-      environment: 'PRODUCTION',
+      // TEST environment for development/testing.
+      // Switch to PRODUCTION only when merchant is approved and IDs are live.
+      environment: 'TEST',
+      // Locale affects the Google Pay UI language.
+      locale,
     });
     console.log('Google Pay client initialized');
-  }, [ready]);
+  }, [locale, ready]);
 
-  const buildPaymentDataRequest = () => {
+  const buildPaymentDataRequest = React.useCallback(() => {
     const totalPrice = (Number(amountMinor || 0) / 100).toFixed(2);
     return {
       apiVersion: 2,
@@ -75,13 +82,13 @@ const GooglePayButton = ({
         currencyCode,
       },
     };
-  };
+  }, [amountMinor, currencyCode, gatewayMerchantId, merchantName]);
 
   const extractGToken = (paymentData) => {
     return paymentData?.paymentMethodData?.tokenizationData?.token ?? '';
   };
 
-  const onClick = async () => {
+  const onClick = React.useCallback(async () => {
     try {
       if (!ready) throw new Error('Google Pay SDK not loaded yet');
       if (!gatewayMerchantId) throw new Error('Google Pay gatewayMerchantId is not configured');
@@ -102,19 +109,45 @@ const GooglePayButton = ({
       console.error('Google Pay click error:', e);
       setError(e?.message || String(e));
     }
-  };
+  }, [buildPaymentDataRequest, googlePay, gatewayMerchantId, ready]);
 
-  // Minimal placeholder button (do not call Google Pay until backend ready)
+  // Render official Google Pay button UI (via PaymentsClient.createButton)
+  React.useEffect(() => {
+    if (!ready) return;
+    if (typeof window === 'undefined') return;
+
+    const client = paymentsClientRef.current;
+    const root = buttonRootRef.current;
+    if (!client || !root) return;
+
+    // Clean previous button on re-render
+    root.innerHTML = '';
+
+    const button = client.createButton({
+      onClick,
+      buttonType: 'buy',
+      buttonColor: 'default',
+      buttonSizeMode: 'fill',
+    });
+
+    // Ensure full width in our layout
+    button.style.width = '100%';
+    button.style.borderRadius = '10px';
+    root.appendChild(button);
+  }, [onClick, ready]);
+
   return (
     <div>
-      <button
-        type="button"
-        className="tp-btn tp-btn-2 w-100"
-        onClick={onClick}
-        disabled={!ready || isLoading}
-      >
-        {isLoading ? 'Processing...' : 'Google Pay'}
-      </button>
+      <div ref={buttonRootRef} />
+      {/* Fallback / loading state */}
+      {!ready && (
+        <button type="button" className="tp-btn tp-btn-2 w-100" disabled>
+          Google Pay
+        </button>
+      )}
+      {isLoading && (
+        <div style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>Processing…</div>
+      )}
       {error && <div style={{ marginTop: 8, fontSize: 12, color: '#b00020' }}>{error}</div>}
     </div>
   );

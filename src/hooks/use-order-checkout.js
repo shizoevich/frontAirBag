@@ -8,6 +8,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCreateOrderMutation } from "@/redux/features/ordersApi";
 import { useGetUserQuery, useCreateGuestMutation } from "@/redux/features/auth/authApi";
+import { useUpdateClientPutMutation } from '@/redux/features/clientsApi';
 import { userLoggedIn } from "@/redux/features/auth/authSlice";
 import { clearCart } from "@/redux/features/cartSlice";
 import { notifySuccess, notifyError } from "@/utils/toast";
@@ -93,6 +94,7 @@ const useOrderCheckout = () => {
   const { data: userData } = useGetUserQuery(undefined, { skip: true });
   const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
   const [createGuest, { isLoading: isCreatingGuest }] = useCreateGuestMutation();
+  const [updateClientPut] = useUpdateClientPutMutation();
 
   const { register, handleSubmit, setValue, formState: { errors }, watch } = useForm({
     resolver: yupResolver(checkoutSchema),
@@ -182,6 +184,28 @@ const useOrderCheckout = () => {
         prepayment: paymentMethod === "pay_now",
         items: resolvedItems.map(({ good, quantity }) => ({ good, quantity })),
       };
+
+      // After first order, persist user-entered checkout fields into the Client profile.
+      // This enables prefilling the checkout form next time.
+      try {
+        const userId = currentUser?.id;
+        const canUpdateClient = Boolean(accessToken && userId);
+        if (canUpdateClient) {
+          const merged = {
+            ...currentUser,
+            name: data.firstName || currentUser?.name || null,
+            last_name: data.lastName || currentUser?.last_name || null,
+            phone: data.phone || currentUser?.phone || null,
+            nova_post_address: novaPostAddress || currentUser?.nova_post_address || null,
+            // Keep required email if backend enforces it
+            email: currentUser?.email,
+          };
+          await updateClientPut({ id: userId, data: merged }).unwrap();
+        }
+      } catch (e) {
+        // Non-blocking: order creation should still succeed
+        console.warn('Client profile update failed (non-blocking):', e);
+      }
 
       // Добавляем description только если оно не пустое
       if (data.orderNotes && data.orderNotes.trim() !== "") {

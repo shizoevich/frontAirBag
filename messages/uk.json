@@ -569,7 +569,8 @@
     "payment_success": "Оплата пройшла успішно. Дякуємо!",
     "payment_failed": "Оплата не пройшла.",
     "payment_failed_with_reason": "Оплата не пройшла: {reason}",
-    "payment_status_unknown": "Статус оплати ще не підтверджено. Перевірте статус замовлення."
+    "payment_status_unknown": "Статус оплати ще не підтверджено. Перевірте статус замовлення.",
+    "err_59": "Невірний CVV код"
   },
   "CheckoutValidation": {
     "first_name_required": "Ім'я обов'язкове",

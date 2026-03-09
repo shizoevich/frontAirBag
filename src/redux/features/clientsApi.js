@@ -1,4 +1,41 @@
 import { apiSlice } from "../api/apiSlice";
+import Cookies from 'js-cookie';
+import { userLoggedIn } from './auth/authSlice';
+import { getAuth, updateAuth } from '@/utils/authStorage';
+
+function syncAuthUserEverywhere(dispatch, user) {
+  if (!user) return;
+
+  // redux
+  dispatch(userLoggedIn({ user }));
+
+  // localStorage
+  try {
+    updateAuth({ user });
+  } catch {
+    // ignore
+  }
+
+  // cookie (compatibility with middleware/initialState)
+  try {
+    const existing = getAuth() || {};
+    const cookieExisting = Cookies.get('userInfo');
+    const cookieTokens = cookieExisting ? JSON.parse(cookieExisting) : {};
+    Cookies.set(
+      'userInfo',
+      JSON.stringify({
+        accessToken: cookieTokens.accessToken || existing?.accessToken || null,
+        refreshToken: cookieTokens.refreshToken || existing?.refreshToken || null,
+        user,
+        isGuest: user?.is_guest || false,
+        guestId: user?.guest_id || existing?.guestId || null,
+      }),
+      { expires: 7 }
+    );
+  } catch {
+    // ignore
+  }
+}
 
 export const clientsApi = apiSlice.injectEndpoints({
   overrideExisting: true,
@@ -32,6 +69,25 @@ export const clientsApi = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: patch,
       }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Clients', id }],
+    }),
+
+    // Full update клиента (Swagger: PUT /clients/{id}/)
+    updateClientPut: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/clients/${id}/`,
+        method: 'PUT',
+        body: data,
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const res = await queryFulfilled;
+          // Keep auth user in sync so checkout form is prefilled next time
+          syncAuthUserEverywhere(dispatch, res?.data);
+        } catch {
+          // non-blocking
+        }
+      },
       invalidatesTags: (result, error, { id }) => [{ type: 'Clients', id }],
     }),
 
@@ -86,6 +142,7 @@ export const {
   useGetClientByIdQuery,
   useCreateClientMutation,
   useUpdateClientMutation,
+  useUpdateClientPutMutation,
   useDeleteClientMutation,
   useGetClientUpdatesQuery,
   useCreateClientUpdateMutation,

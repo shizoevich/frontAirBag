@@ -11,6 +11,13 @@ const nextConfig = {
     quietDeps: true,
     silenceDeprecations: ['color-functions', 'global-builtin', 'import'],
   },
+  compiler: {
+    // Removes console.* calls from production bundles (except console.error/warn).
+    // This reduces JS size and avoids expensive logging at runtime.
+    removeConsole: {
+      exclude: ['error', 'warn'],
+    },
+  },
   images: {
     // Отключаем оптимизацию изображений только для статического экспорта
     unoptimized: process.env.STATIC_EXPORT === 'true',

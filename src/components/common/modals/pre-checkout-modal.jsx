@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { useCreateGuestMutation, useRegisterUserMutation } from '@/redux/features/auth/authApi';
-import { toast } from 'react-toastify';
+import { notifyError, notifySuccess } from '@/utils/toast';
 
 const PreCheckoutModal = ({ isOpen, onClose, onProceedAsGuest, checkoutData }) => {
   const t = useTranslations('PreCheckout');
@@ -36,19 +36,19 @@ const PreCheckoutModal = ({ isOpen, onClose, onProceedAsGuest, checkoutData }) =
     e.preventDefault();
     
     if (formData.password !== formData.confirm_password) {
-      toast.error(t('passwordMismatch'));
+      notifyError(t('passwordMismatch'));
       return;
     }
 
     try {
       await registerUser(formData).unwrap();
-      toast.success(t('registrationSuccess'));
+      notifySuccess(t('registrationSuccess'));
       onClose();
       // Перенаправляем на страницу оформления заказа
       router.push('/checkout');
     } catch (error) {
       console.error('Registration error:', error);
-      toast.error(t('registrationError'));
+      notifyError(t('registrationError'));
     }
   };
 

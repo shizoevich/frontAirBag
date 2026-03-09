@@ -13,6 +13,9 @@ function normalizeResult(payload) {
   const errCode = pickFirst(payload, ['errCode', 'errorCode', 'code']);
   const errText = pickFirst(payload, ['errText', 'errorText', 'message', 'detail']);
   const failureReason = pickFirst(payload, ['failureReason', 'failReason', 'reason']);
+  const hasSuccessFlag = ['true', '1', 'yes', 'ok', 'success', 'paid'].includes(
+    String(pickFirst(payload, ['success', 'isPaid', 'paid']) || '').toLowerCase()
+  );
 
   const status = statusRaw ? String(statusRaw).toLowerCase() : null;
   const hasFailureSignal =
@@ -26,6 +29,11 @@ function normalizeResult(payload) {
       errCode: errCode ? String(errCode) : null,
       reason: failureReason || errText || null,
     };
+  }
+
+  // Some integrations indicate success without `status` field.
+  if (hasSuccessFlag) {
+    return { result: 'success', errCode: null, reason: null };
   }
 
   if (status && ['success', 'paid', 'ok', 'approved', 'complete', 'completed'].includes(status)) {
@@ -88,7 +96,7 @@ export async function POST(req) {
 
   const normalized = normalizeResult(payload);
 
-  const nextUrl = new URL(`/${locale}/payment-result`, req.url);
+  const nextUrl = new URL(`/${locale}/payment-redirect`, req.url);
   nextUrl.searchParams.set('result', normalized.result);
   if (orderId) nextUrl.searchParams.set('orderId', String(orderId));
   if (invoiceId) nextUrl.searchParams.set('invoiceId', String(invoiceId));
@@ -98,3 +106,24 @@ export async function POST(req) {
   return NextResponse.redirect(nextUrl, { status: 303 });
 }
 
+export async function GET(req) {
+  // Some provider flows may redirect with GET params instead of POST.
+  // Support both to make the integration robust.
+  const { searchParams } = new URL(req.url);
+  const locale = searchParams.get('locale') || 'uk';
+  const orderId = searchParams.get('order_id') || searchParams.get('orderId') || null;
+
+  const payload = Object.fromEntries(searchParams.entries());
+  const invoiceId = pickFirst(payload, ['invoiceId', 'invoice_id', 'invoice']);
+
+  const normalized = normalizeResult(payload);
+
+  const nextUrl = new URL(`/${locale}/payment-redirect`, req.url);
+  nextUrl.searchParams.set('result', normalized.result);
+  if (orderId) nextUrl.searchParams.set('orderId', String(orderId));
+  if (invoiceId) nextUrl.searchParams.set('invoiceId', String(invoiceId));
+  if (normalized.errCode) nextUrl.searchParams.set('errCode', normalized.errCode);
+  if (normalized.reason) nextUrl.searchParams.set('reason', normalized.reason);
+
+  return NextResponse.redirect(nextUrl, { status: 303 });
+}

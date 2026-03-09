@@ -696,7 +696,8 @@
     "payment_success": "Оплата прошла успешно. Спасибо!",
     "payment_failed": "Оплата не прошла.",
     "payment_failed_with_reason": "Оплата не прошла: {reason}",
-    "payment_status_unknown": "Статус оплаты ещё не подтверждён. Проверьте статус заказа."
+    "payment_status_unknown": "Статус оплаты ещё не подтверждён. Проверьте статус заказа.",
+    "err_59": "Неверный CVV код"
   },
   "CheckoutValidation": {
     "first_name_required": "Имя обязательно",

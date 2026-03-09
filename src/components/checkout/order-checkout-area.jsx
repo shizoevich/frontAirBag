@@ -305,6 +305,12 @@ const OrderCheckoutArea = () => {
         onClose={() => setIsPaymentModalOpen(false)}
         iframeUrl={monoPageUrl}
         title={t('monobank_payment_title')}
+        onPaymentResult={({ result }) => {
+          // Close iframe on failure/pending as requested, keep on checkout.
+          if (result !== 'success') {
+            setMonoPageUrl(null);
+          }
+        }}
       />
 
       <section

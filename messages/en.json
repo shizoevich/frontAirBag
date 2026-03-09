@@ -693,7 +693,8 @@
     "payment_success": "Payment successful. Thank you!",
     "payment_failed": "Payment failed.",
     "payment_failed_with_reason": "Payment failed: {reason}",
-    "payment_status_unknown": "Payment status is not confirmed yet. Please check your order status."
+    "payment_status_unknown": "Payment status is not confirmed yet. Please check your order status.",
+    "err_59": "Incorrect CVV code"
   },
   "PreCheckout": {
     "title": "Checkout",

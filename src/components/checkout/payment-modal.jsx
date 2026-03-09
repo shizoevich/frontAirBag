@@ -1,12 +1,89 @@
 'use client';
 import React from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { notifyError, notifyInfo, notifySuccess } from '@/utils/toast';
+import { useDispatch } from 'react-redux';
+import { clearCart } from '@/redux/features/cartSlice';
+import { useUpdateOrderMutation } from '@/redux/features/ordersApi';
 
 const PaymentModal = ({
   isOpen,
   onClose,
   iframeUrl,
   title = 'Payment',
+  onPaymentResult,
 }) => {
+  const router = useRouter();
+  const { locale } = useParams();
+  const t = useTranslations('Payments');
+  const dispatch = useDispatch();
+  const [updateOrder] = useUpdateOrderMutation();
+
+  const resolveFailureMessage = React.useCallback(
+    ({ errCode, reason }) => {
+      const code = errCode ? String(errCode) : null;
+      if (code) {
+        // Known provider error codes (monobank)
+        const key = `err_${code}`;
+        // next-intl exposes `t.has()` in this project, but it may not exist everywhere.
+        const hasKey = typeof t?.has === 'function' ? t.has(key) : false;
+        if (hasKey) return t(key);
+      }
+
+      if (reason) return t('payment_failed_with_reason', { reason: String(reason) });
+      return t('payment_failed');
+    },
+    [t]
+  );
+
+  // Handle provider redirects inside the iframe by listening for postMessage from
+  // [`PaymentRedirectPage()`](src/app/[locale]/payment-redirect/page.jsx:1).
+  React.useEffect(() => {
+    if (!isOpen) return;
+    if (typeof window === 'undefined') return;
+
+    const onMessage = (event) => {
+      // Only accept same-origin messages
+      if (event.origin !== window.location.origin) return;
+      const data = event.data;
+      if (!data || data.type !== 'monobank-payment-result') return;
+
+      const result = String(data.result || 'unknown').toLowerCase();
+      const reason = data.reason ? String(data.reason) : null;
+      const errCode = data.errCode ? String(data.errCode) : null;
+      const orderId = data.orderId ? String(data.orderId) : null;
+
+      onPaymentResult?.({ result, reason, errCode, orderId });
+
+      if (result === 'success') {
+        notifySuccess(t('payment_success'));
+        // Best-effort: mark order as paid on backend so it counts as paid in UI.
+        // If backend rejects the patch, we still proceed with UX flow.
+        if (orderId) {
+          updateOrder({ id: orderId, is_paid: true, is_completed: true }).catch(() => null);
+        }
+        dispatch(clearCart());
+        onClose?.();
+        router.push(`/${locale}`);
+        return;
+      }
+
+      if (result === 'failed') {
+        notifyError(resolveFailureMessage({ errCode, reason }));
+        // Stay on checkout page, just close modal
+        onClose?.();
+        return;
+      }
+
+      notifyInfo(t('payment_status_unknown'));
+      onClose?.();
+    };
+
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [dispatch, isOpen, locale, onClose, onPaymentResult, resolveFailureMessage, router, t, updateOrder]);
+
   // Prevent background scroll when modal is open.
   React.useEffect(() => {
     if (!isOpen) return;

@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 
 const UserInfoModal = ({ isOpen, onClose, onSubmit, user }) => {
   const t = useTranslations('Checkout');
+  const tv = useTranslations('CheckoutValidation');
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       firstName: user?.name || '',
@@ -46,7 +47,7 @@ const UserInfoModal = ({ isOpen, onClose, onSubmit, user }) => {
                   <label>{t('first_name')} *</label>
                   <input
                     {...register("firstName", { 
-                      required: t('first_name_required') 
+                      required: tv('first_name_required') 
                     })}
                     type="text"
                     placeholder={t('enter_first_name')}
@@ -62,7 +63,7 @@ const UserInfoModal = ({ isOpen, onClose, onSubmit, user }) => {
                   <label>{t('last_name')} *</label>
                   <input
                     {...register("lastName", { 
-                      required: t('last_name_required') 
+                      required: tv('last_name_required') 
                     })}
                     type="text"
                     placeholder={t('enter_last_name')}
@@ -78,10 +79,10 @@ const UserInfoModal = ({ isOpen, onClose, onSubmit, user }) => {
               <label>{t('phone')} *</label>
               <input
                 {...register("phone", { 
-                  required: t('phone_required'),
+                  required: tv('phone_required'),
                   pattern: {
                     value: /^(\+380|380|0)[0-9]{9}$/,
-                    message: t('phone_invalid')
+                    message: tv('phone_invalid')
                   }
                 })}
                 type="tel"

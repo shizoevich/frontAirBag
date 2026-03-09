@@ -10,6 +10,12 @@ import gadget_girl from '@assets/img/product/gadget/gadget-girl.png';
 import HomeGadgetPrdLoader from '@/components/loader/home/home-gadget-prd-loader';
 import { useGetProductsByCategoryQuery, useGetProductCategoriesQuery } from '@/redux/features/productsApi';
 
+const GadgetBanner = () => (
+  <div className="banner">
+    <Image src={gadget_girl} alt="Gadget Girl" />
+  </div>
+);
+
 const ProductGadgetArea = () => {
   const { data: categories, isLoading: isCategoriesLoading, isError: isCategoriesError } = useGetProductCategoriesQuery();
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -42,13 +48,6 @@ const ProductGadgetArea = () => {
       </div>
     ));
   }
-
-  // Баннер (простой пример)
-  const GadgetBanner = () => (
-    <div className="banner">
-      <Image src={gadget_girl} alt="Gadget Girl" />
-    </div>
-  );
 
   return (
     <section className="tp-product-gadget-area pt-80 pb-75">

@@ -1,8 +1,10 @@
 'use client';
 import React from 'react';
+import { useParams } from 'next/navigation';
 
 const ApplePayButton = () => {
   const [supported, setSupported] = React.useState(false);
+  const { locale } = useParams();
 
   React.useEffect(() => {
     try {
@@ -25,15 +27,28 @@ const ApplePayButton = () => {
   return (
     <button
       type="button"
-      className="tp-btn tp-btn-2 w-100"
       onClick={onClick}
+      lang={locale}
+      // Apple Pay "standard" button styles
+      // Docs: https://developer.apple.com/design/human-interface-guidelines/apple-pay/overview/buttons-and-marks/
       style={{
-        background: '#000',
-        color: '#fff',
+        WebkitAppearance: 'none',
+        appearance: 'none',
+        width: '100%',
+        height: 48,
+        borderRadius: 10,
         border: '1px solid #000',
+        backgroundColor: '#000',
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 600,
+        letterSpacing: 0.2,
+        cursor: 'pointer',
       }}
       title={'Apple Pay'}
+      aria-label={'Apple Pay'}
     >
+      {/* Keep it simple: black button with Apple Pay label */}
       Apple Pay
     </button>
   );

@@ -1,9 +1,7 @@
 import { Jost, Roboto, Charm, Oregano } from 'next/font/google';
 import { notFound } from 'next/navigation';
-import { NextIntlClientProvider } from 'next-intl';
 import Providers from '@/components/provider';
-import '../globals.scss';
-import '../../styles/quantity-buttons.css';
+// NOTE: global styles are imported once in [`RootLayout`](src/app/layout.jsx:1)
 
 // Font definitions
 const body = Jost({

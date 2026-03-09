@@ -21,6 +21,17 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
   // Refs for inputs
   const cityInputRef = useRef(null);
   const warehouseInputRef = useRef(null);
+
+  // Combine RHF ref callback with our own ref without mutating RHF internals
+  // (new React hooks lint rule in Next 16).
+  const makeCombinedRef = useCallback(
+    (rhfRef, localRef) =>
+      (el) => {
+        localRef.current = el;
+        if (typeof rhfRef === 'function') rhfRef(el);
+      },
+    []
+  );
   
 
   // Поиск городов через API Новой Почты
@@ -98,7 +109,7 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
       console.error('Error searching warehouses:', error);
       setWarehouses([]);
     }
-  }, [selectedCity]);
+  }, [searchWarehouse, selectedCity]);
 
   // Обработка изменения поля города
   const handleCityChange = (e) => {
@@ -155,6 +166,15 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
     setShowWarehouseDropdown(true);
   };
 
+  // Debounced search for warehouses (otherwise list is not updated while typing)
+  useEffect(() => {
+    if (!selectedCity) return;
+    const timer = setTimeout(() => {
+      fetchWarehouses();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [fetchWarehouses, searchWarehouse, selectedCity]);
+
   // Обработка выбора отделения
   const handleWarehouseSelect = (warehouse) => {
     setSelectedWarehouse(warehouse.Ref);
@@ -195,21 +215,25 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
       }
     }
     fetchCities();
-  }, [user, setValue]);
+  }, [fetchCities, setValue, user]);
 
   useEffect(() => {
     // Загружаем города при монтировании компонента
     if (searchCity.length >= 2 && !selectedCity) {
       fetchCities();
     }
-  }, [searchCity, selectedCity]);
+  }, [fetchCities, searchCity, selectedCity]);
 
   useEffect(() => {
     // Загружаем отделения при выборе города
     if (selectedCity) {
       fetchWarehouses();
     }
-  }, [selectedCity]);
+  }, [fetchWarehouses, selectedCity]);
+
+  // Validation messages moved to CheckoutValidation namespace in i18n.
+  // Using a separate namespace avoids collisions and missing keys.
+  const tv = useTranslations('CheckoutValidation');
 
   return (
     <div className="tp-checkout-bill-area">
@@ -224,7 +248,7 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
                 <label>{t('first_name')} *</label>
                 <input
                   {...register('firstName', {
-                    required: t('first_name_required'),
+                    required: tv('first_name_required'),
                   })}
                   type="text"
                   placeholder={t('enter_first_name')}
@@ -241,7 +265,7 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
                 <label>{t('last_name')} *</label>
                 <input
                   {...register('lastName', {
-                    required: t('last_name_required'),
+                    required: tv('last_name_required'),
                   })}
                   type="text"
                   placeholder={t('enter_last_name')}
@@ -258,10 +282,10 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
                 <label>{t('phone')} *</label>
                 <input
                   {...register('phone', {
-                    required: t('phone_required'),
+                    required: tv('phone_required'),
                     pattern: {
                       value: /^[\+]?[0-9\(\)\-\s]+$/,
-                      message: t('phone_invalid')
+                      message: tv('phone_invalid')
                     }
                   })}
                   type="tel"
@@ -283,11 +307,7 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
                     return (
                       <input
                         {...cityReg}
-                        ref={(el) => {
-                          cityInputRef.current = el;
-                          if (typeof rhfCityRef === 'function') rhfCityRef(el);
-                          else if (rhfCityRef) rhfCityRef.current = el;
-                        }}
+                        ref={makeCombinedRef(rhfCityRef, cityInputRef)}
                         type="text"
                         placeholder={t('select_city')}
                         value={searchCity}
@@ -299,10 +319,8 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
                           if (cities.length > 0) setShowCityDropdown(true);
                           else if (searchCity.trim().length >= 2) fetchCities();
                         }}
-                        onBlur={() => {
-                          // Даем onMouseDown на элементе выпадающего списка выполниться раньше blur
-                          setTimeout(() => setShowCityDropdown(false), 150);
-                        }}
+                        // NOTE: do not close on blur (it closes too aggressively during selection).
+                        // Closing is handled by outside click handler + selecting an item.
                         autoComplete="off"
                       />
                     );
@@ -342,11 +360,7 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
                     return (
                       <input
                         {...whReg}
-                        ref={(el) => {
-                          warehouseInputRef.current = el;
-                          if (typeof rhfWhRef === 'function') rhfWhRef(el);
-                          else if (rhfWhRef) rhfWhRef.current = el;
-                        }}
+                        ref={makeCombinedRef(rhfWhRef, warehouseInputRef)}
                         type="text"
                         placeholder={t('select_warehouse')}
                         value={searchWarehouse}
@@ -357,10 +371,13 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
                         disabled={!selectedCity}
                         onFocus={() => {
                           if (warehouses.length > 0) setShowWarehouseDropdown(true);
+                          else if (selectedCity) {
+                            setShowWarehouseDropdown(true);
+                            fetchWarehouses();
+                          }
                         }}
-                        onBlur={() => {
-                          setTimeout(() => setShowWarehouseDropdown(false), 150);
-                        }}
+                        // NOTE: do not close on blur (it closes too aggressively during selection).
+                        // Closing is handled by outside click handler + selecting an item.
                         autoComplete="off"
                       />
                     );
