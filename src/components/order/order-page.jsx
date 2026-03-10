@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useGetOrdersQuery, useGetOrderByIdQuery } from '@/redux/features/ordersApi';
 import { useSelector } from 'react-redux';
 import { useTranslations } from 'next-intl';
@@ -16,34 +16,123 @@ const OrderPage = () => {
     skip: !selectedOrderId
   });
 
-              {/* Order Details Modal */}
-              {selectedOrderId && (
-                <div className="tp-order-details-wrapper mt-5">
-                  <div className="tp-order-details bg-light p-4 rounded">
-                    <div className="tp-order-details-top d-flex justify-content-between align-items-center mb-4">
-                      <h4 className="mb-0">
-                        <i className="fas fa-receipt me-2 text-primary"></i>
-                        {t('order_details')} #{selectedOrderId}
-                      </h4>
-                      <button
-                        className="btn btn-outline-secondary btn-sm"
-                        onClick={() => setSelectedOrderId(null)}
-                      >
-                        <i className="fas fa-times"></i>
-                      </button>
-                    </div>
+  const displayOrders = useMemo(() => {
+    const results = orders?.results || orders?.data || orders || [];
+    return Array.isArray(results) ? results : [];
+  }, [orders]);
 
-                    {orderLoading ? (
-                      <div className="text-center py-4">
+  const formatPrice = (priceMinor) => {
+    return (Number(priceMinor || 0) / 100).toFixed(2);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('uk-UA');
+  };
+
+  const renderStatus = (order) => {
+    if (order?.is_completed) return t('order_completed');
+    if (order?.is_paid) return t('order_paid');
+    return t('order_pending');
+  };
+
+  return (
+    <div className="tp-order-area pt-80 pb-80">
+      <div className="container">
+        <div className="row">
+          <div className="col-12">
+            <h3 className="mb-4">{t('my_orders')}</h3>
+
+            {ordersLoading && (
+              <div className="text-center py-5">
+                <div className="spinner-border" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-3">{t('loading')}</p>
+              </div>
+            )}
+
+            {!ordersLoading && ordersError && (
+              <div className="alert alert-danger">
+                {t('error_loading_orders')}
+              </div>
+            )}
+
+            {!ordersLoading && !ordersError && displayOrders.length === 0 && (
+              <div className="text-center py-5">
+                <h4>{t('no_orders_found')}</h4>
+                <p className="mb-4">{t('no_orders_description')}</p>
+                <Link href="/shop" className="tp-btn">
+                  {t('start_shopping')}
+                </Link>
+              </div>
+            )}
+
+            {!ordersLoading && !ordersError && displayOrders.length > 0 && (
+              <div className="table-responsive">
+                <table className="table table-striped">
+                  <thead className="table-light">
+                    <tr>
+                      <th>{t('orderNumber')}</th>
+                      <th>{t('date')}</th>
+                      <th>{t('total')}</th>
+                      <th>{t('status')}</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {displayOrders.map((order) => (
+                      <tr key={order.id}>
+                        <td>#{order.id}</td>
+                        <td>{formatDate(order.date)}</td>
+                        <td>₴{formatPrice(order.grand_total_minor)}</td>
+                        <td>
+                          <span className="badge bg-secondary">{renderStatus(order)}</span>
+                        </td>
+                        <td className="text-end">
+                          <button
+                            type="button"
+                            className="tp-btn tp-btn-2"
+                            onClick={() => setSelectedOrderId(order.id)}
+                          >
+                            {t('order_details')}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Order Details Modal */}
+            {selectedOrderId && (
+              <div className="tp-order-details-wrapper mt-5">
+                <div className="tp-order-details bg-light p-4 rounded">
+                  <div className="tp-order-details-top d-flex justify-content-between align-items-center mb-4">
+                    <h4 className="mb-0">
+                      <i className="fas fa-receipt me-2 text-primary"></i>
+                      {t('order_details')} #{selectedOrderId}
+                    </h4>
+                    <button
+                      className="btn btn-outline-secondary btn-sm"
+                      onClick={() => setSelectedOrderId(null)}
+                    >
+                      <i className="fas fa-times"></i>
+                    </button>
+                  </div>
+
+                  {orderLoading ? (
+                    <div className="text-center py-4">
                       <div className="spinner-border spinner-border-sm text-primary" role="status">
-                          <span className="visually-hidden">Loading...</span>
+                        <span className="visually-hidden">Loading...</span>
                       </div>
-                        <p className="mt-2 small">{t('loading')}</p>
-                      </div>
-                    ) : (() => {
-                      // Найти заказ в тестовых данных или использовать данные из API
-                      const orderToShow = selectedOrder || displayOrders.results.find(order => order.id === selectedOrderId);
-                      return orderToShow ? (
+                      <p className="mt-2 small">{t('loading')}</p>
+                    </div>
+                  ) : (() => {
+                    // Find order from API data (list or direct query)
+                    const orderToShow = selectedOrder || displayOrders.find(order => order.id === selectedOrderId);
+                    return orderToShow ? (
                       <div className="tp-order-details-content">
                         <div className="row mb-4">
                           <div className="col-md-6">
@@ -183,13 +272,16 @@ const OrderPage = () => {
                           </div>
                         </div>
                       </div>
-                      ) : null;
-                    })()}
-                  </div>
+                    ) : null;
+                  })()}
                 </div>
-              )}
-            
-  ;
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default OrderPage;

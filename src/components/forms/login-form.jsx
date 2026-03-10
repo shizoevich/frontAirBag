@@ -11,6 +11,7 @@ import { CloseEye, OpenEye } from '@/svg';
 import ErrorMsg from '../common/error-msg';
 import { useLoginMutation } from '@/redux/features/auth/authApi';
 import { userLoggedIn } from '@/redux/features/auth/authSlice';
+import { setAuth } from '@/utils/authStorage';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import { useTranslations } from 'next-intl';
 
@@ -61,6 +62,20 @@ const LoginForm = () => {
     loginPromise
       .unwrap()
       .then(async (response) => {
+        // Ensure tokens are persisted to localStorage even if onQueryStarted failed.
+        try {
+          const access = response?.access;
+          const refresh = response?.refresh;
+          if (access) {
+            setAuth({ accessToken: access, refreshToken: refresh || null });
+            console.log('✅ Login form: tokens persisted to localStorage');
+            const stored = typeof window !== 'undefined' ? localStorage.getItem('userInfo') : null;
+            console.log('✅ Login form: localStorage.userInfo =', stored);
+          }
+        } catch (e) {
+          console.warn('Login form: failed to persist tokens to localStorage', e);
+        }
+
         // Токены уже сохранены в authApi.js через onQueryStarted
         // Здесь только показываем уведомление и делаем редирект
         console.log('✅ Login form: Login successful, tokens saved by authApi');

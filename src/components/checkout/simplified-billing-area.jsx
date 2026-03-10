@@ -185,7 +185,7 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
     
     // Формируем полный адрес для сохранения
     const fullAddress = `${selectedCityName}, ${warehouse.Description}`;
-    setValue('novaPostAddress', fullAddress);
+    //setValue('novaPostAddress', fullAddress);
   };
 
   // Обработка кликов вне выпадающих списков
@@ -205,17 +205,15 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
 
   // Заполняем поля данными пользователя при загрузке
   useEffect(() => {
-    if (user) {
-      setValue('firstName', user.first_name || user.name || '');
-      setValue('lastName', user.last_name || '');
-      setValue('phone', user.phone || '');
-      // Если у пользователя есть сохраненный адрес НП, парсим его
-      if (user.nova_post_address) {
-        setValue('novaPostAddress', user.nova_post_address);
-      }
+    if (!user) return;
+    setValue('firstName', user.first_name || user.name || '');
+    setValue('lastName', user.last_name || '');
+    setValue('phone', user.phone || '');
+    // Если у пользователя есть сохраненный адрес НП, парсим его
+    if (user.nova_post_address) {
+      setValue('novaPostAddress', user.nova_post_address);
     }
-    fetchCities();
-  }, [fetchCities, setValue, user]);
+  }, [setValue, user]);
 
   useEffect(() => {
     // Загружаем города при монтировании компонента

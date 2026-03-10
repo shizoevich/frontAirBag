@@ -96,7 +96,6 @@ export const authApi = apiSlice.injectEndpoints({
         const payload = {
           // Many backends accept either email or username; include both for compatibility
           email: data.email,
-          username: data.email,
           password: data.password,
         };
         return {

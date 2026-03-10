@@ -8,6 +8,10 @@ function isAccessTokenExpiredError(result) {
 
   if (status === 401) return true;
 
+  if (status === 403 && data?.code === 'user_not_found') {
+    return true;
+  }
+
   // Some backends return 403 with { code: 'token_not_valid', messages: [{ message: 'Token is expired' }] }
   if (status === 403 && data && typeof data === 'object') {
     if (data.code === 'token_not_valid') {
@@ -104,21 +108,32 @@ const baseQuery = fetchBaseQuery({
 
 // Создаем обертку для базового запроса с обработкой ошибок и обновлением токенов
 const baseQueryWithReauth = async (args, api, extraOptions) => {
+  const reqUrl = typeof args === 'string' ? args : args.url;
+  const reqMethod = typeof args === 'string' ? 'GET' : args.method;
   console.log('🌐 API Request:', { 
-    url: typeof args === 'string' ? args : args.url,
-    method: typeof args === 'string' ? 'GET' : args.method 
+    url: reqUrl,
+    method: reqMethod 
   });
   
   let result = await baseQuery(args, api, extraOptions);
   
+  const resStatus = result?.error?.status || result?.meta?.response?.status || 'success';
   console.log('🌐 API Response:', { 
-    url: typeof args === 'string' ? args : args.url,
-    status: result?.error?.status || result?.meta?.response?.status || 'success',
+    url: reqUrl,
+    status: resStatus,
     hasData: !!result?.data,
     hasError: !!result?.error,
     data: result?.data,
     error: result?.error
   });
+
+  if (reqUrl?.includes('/payments/') && reqMethod?.toUpperCase() === 'POST') {
+    console.log('💳 Payment POST summary:', {
+      url: reqUrl,
+      status: resStatus,
+      ok: !result?.error,
+    });
+  }
   
   // If access token expired/invalid, try refresh and retry
   if (isAccessTokenExpiredError(result)) {
@@ -134,11 +149,18 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       }
       
       // Пытаемся обновить access токен
+      console.log('🔁 Refresh token request: /auth/token/refresh/');
       const refreshResult = await baseQuery(
         { url: '/auth/token/refresh/', method: 'POST', body: { refresh: refreshToken } },
         api,
         extraOptions
       );
+
+      console.log('🔁 Refresh token response:', {
+        status: refreshResult?.error?.status || refreshResult?.meta?.response?.status || 'success',
+        hasAccess: !!refreshResult?.data?.access,
+        hasError: !!refreshResult?.error,
+      });
       
       if (refreshResult?.data) {
         // Сохраняем новый access токен

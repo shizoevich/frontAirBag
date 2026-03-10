@@ -106,7 +106,14 @@ const GooglePayButton = ({
       const res = await googlePay({ gToken }).unwrap();
       console.log('Google Pay backend response:', res);
     } catch (e) {
-      console.error('Google Pay click error:', e);
+      console.error('Google Pay click error:', {
+        message: e?.message || String(e),
+        name: e?.name,
+        code: e?.code,
+        stack: e?.stack,
+        keys: e ? Object.getOwnPropertyNames(e) : [],
+        raw: e,
+      });
       setError(e?.message || String(e));
     }
   }, [buildPaymentDataRequest, googlePay, gatewayMerchantId, ready]);

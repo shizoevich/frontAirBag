@@ -5,12 +5,13 @@ import { useTranslations } from 'next-intl';
 import { notifyError, notifyInfo, notifySuccess } from '@/utils/toast';
 import { useDispatch } from 'react-redux';
 import { clearCart } from '@/redux/features/cartSlice';
-import { useUpdateOrderMutation } from '@/redux/features/ordersApi';
+import { useGetOrderByIdQuery, useUpdateOrderMutation } from '@/redux/features/ordersApi';
 
 const PaymentModal = ({
   isOpen,
   onClose,
   iframeUrl,
+  orderId: orderIdProp,
   title = 'Payment',
   onPaymentResult,
 }) => {
@@ -19,6 +20,27 @@ const PaymentModal = ({
   const t = useTranslations('Payments');
   const dispatch = useDispatch();
   const [updateOrder] = useUpdateOrderMutation();
+  const handledSuccessRef = React.useRef(false);
+  const { data: orderData } = useGetOrderByIdQuery(orderIdProp, {
+    skip: !isOpen || !orderIdProp,
+    pollingInterval: isOpen && orderIdProp ? 5000 : 0,
+    refetchOnFocus: true,
+  });
+
+  const handlePaymentSuccess = React.useCallback(
+    (orderId) => {
+      if (handledSuccessRef.current) return;
+      handledSuccessRef.current = true;
+      notifySuccess(t('payment_success'));
+      if (orderId) {
+        updateOrder({ id: orderId, is_paid: true, is_completed: true }).catch(() => null);
+      }
+      dispatch(clearCart());
+      onClose?.();
+      router.push(`/${locale}/orders`);
+    },
+    [dispatch, locale, onClose, router, t, updateOrder]
+  );
 
   const resolveFailureMessage = React.useCallback(
     ({ errCode, reason }) => {
@@ -52,20 +74,12 @@ const PaymentModal = ({
       const result = String(data.result || 'unknown').toLowerCase();
       const reason = data.reason ? String(data.reason) : null;
       const errCode = data.errCode ? String(data.errCode) : null;
-      const orderId = data.orderId ? String(data.orderId) : null;
+      const orderId = data.orderId ? String(data.orderId) : (orderIdProp ? String(orderIdProp) : null);
 
       onPaymentResult?.({ result, reason, errCode, orderId });
 
       if (result === 'success') {
-        notifySuccess(t('payment_success'));
-        // Best-effort: mark order as paid on backend so it counts as paid in UI.
-        // If backend rejects the patch, we still proceed with UX flow.
-        if (orderId) {
-          updateOrder({ id: orderId, is_paid: true, is_completed: true }).catch(() => null);
-        }
-        dispatch(clearCart());
-        onClose?.();
-        router.push(`/${locale}`);
+        handlePaymentSuccess(orderId);
         return;
       }
 
@@ -83,6 +97,12 @@ const PaymentModal = ({
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
   }, [dispatch, isOpen, locale, onClose, onPaymentResult, resolveFailureMessage, router, t, updateOrder]);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    if (!orderData?.is_paid) return;
+    handlePaymentSuccess(orderIdProp ? String(orderIdProp) : null);
+  }, [handlePaymentSuccess, isOpen, orderData?.is_paid, orderIdProp]);
 
   // Prevent background scroll when modal is open.
   React.useEffect(() => {

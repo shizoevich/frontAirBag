@@ -52,6 +52,15 @@ async function resolveCartItemGoodId(item) {
   return null;
 }
 
+function getRemonlineId(client) {
+  if (!client) return null;
+  const direct = client?.id_remonline ?? client?.remonline_id ?? client?.remonlineId;
+  if (direct !== undefined && direct !== null && String(direct).trim() !== "") {
+    return direct;
+  }
+  return null;
+}
+
 // Валидационная схема для checkout формы
 const buildCheckoutSchema = (t) =>
   Yup.object().shape({
@@ -187,6 +196,7 @@ const useOrderCheckout = () => {
 
       // After first order, persist user-entered checkout fields into the Client profile.
       // This enables prefilling the checkout form next time.
+      let updatedClient = null;
       try {
         const userId = currentUser?.id;
         const canUpdateClient = Boolean(accessToken && userId);
@@ -195,16 +205,27 @@ const useOrderCheckout = () => {
             ...currentUser,
             name: data.firstName || currentUser?.name || null,
             last_name: data.lastName || currentUser?.last_name || null,
-            phone: data.phone || currentUser?.phone || null,
             nova_post_address: novaPostAddress || currentUser?.nova_post_address || null,
             // Keep required email if backend enforces it
             email: currentUser?.email,
           };
-          await updateClientPut({ id: userId, data: merged }).unwrap();
+          updatedClient = await updateClientPut({ id: userId, data: merged }).unwrap();
         }
       } catch (e) {
         // Non-blocking: order creation should still succeed
         console.warn('Client profile update failed (non-blocking):', e);
+      }
+
+      // Guard: backend requires remonline id for syncing orders.
+      // Try to use updated client response if available; otherwise fallback to current user.
+      if (accessToken) {
+        const remonlineId = getRemonlineId(updatedClient || currentUser);
+        if (!remonlineId) {
+          const message = 'У клиента отсутствует Remonline ID. Пожалуйста, обратитесь в поддержку.';
+          notifyError(message);
+          setIsCheckoutSubmit(false);
+          return;
+        }
       }
 
       // Добавляем description только если оно не пустое
