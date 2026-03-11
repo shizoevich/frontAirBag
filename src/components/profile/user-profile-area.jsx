@@ -9,6 +9,7 @@ import { useGetUserQuery, useUpdateProfileMutation } from "@/redux/features/auth
 import Loader from "../loader/loader";
 import ErrorMsg from "../common/error-msg";
 import { notifyError, notifySuccess } from '@/utils/toast';
+import '@/styles/register-form.css';
 
 const UserProfileArea = () => {
   const router = useRouter();
@@ -529,11 +530,10 @@ const UserProfileArea = () => {
                         <div className="col-xxl-6 col-md-6">
                           <div className="profile__input-box">
                             <label className="form-label fw-medium mb-2">{t('city')}</label>
-                            <div className="tp-register-input-dropdown">
+                            <div className="tp-login-input city-input" style={{ position: 'relative' }}>
                               <input
                                 ref={cityInputRef}
                                 type="text"
-                                className="form-control"
                                 placeholder={t('city')}
                                 value={searchCity}
                                 onChange={handleCityChange}
@@ -544,20 +544,21 @@ const UserProfileArea = () => {
                                 autoComplete="off"
                               />
                               {showCityDropdown && cities.length > 0 && (
-                                <div className="tp-register-dropdown">
-                                  {cities.map((city) => (
-                                    <div
-                                      key={city.Ref || city.DeliveryCity || city.SettlementRef || city.Present}
-                                      className="tp-register-dropdown-item"
-                                      onMouseDown={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        handleCitySelect(city);
-                                      }}
-                                    >
-                                      {city.Present}
-                                    </div>
-                                  ))}
+                                <div className="dropdown-list city-dropdown">
+                                  <ul>
+                                    {cities.map((city) => (
+                                      <li
+                                        key={city.Ref || city.DeliveryCity || city.SettlementRef || city.Present}
+                                        onMouseDown={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          handleCitySelect(city);
+                                        }}
+                                      >
+                                        {city.Present}
+                                      </li>
+                                    ))}
+                                  </ul>
                                 </div>
                               )}
                             </div>
@@ -567,11 +568,10 @@ const UserProfileArea = () => {
                         <div className="col-xxl-6 col-md-6">
                           <div className="profile__input-box">
                             <label className="form-label fw-medium mb-2">{t('warehouse')}</label>
-                            <div className="tp-register-input-dropdown">
+                            <div className="tp-login-input warehouse-input" style={{ position: 'relative' }}>
                               <input
                                 ref={warehouseInputRef}
                                 type="text"
-                                className="form-control"
                                 placeholder={t('warehouse')}
                                 value={searchWarehouse}
                                 onChange={handleWarehouseChange}
@@ -586,20 +586,21 @@ const UserProfileArea = () => {
                                 autoComplete="off"
                               />
                               {showWarehouseDropdown && warehouses.length > 0 && (
-                                <div className="tp-register-dropdown">
-                                  {warehouses.map((warehouse) => (
-                                    <div
-                                      key={warehouse.Ref}
-                                      className="tp-register-dropdown-item"
-                                      onMouseDown={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        handleWarehouseSelect(warehouse);
-                                      }}
-                                    >
-                                      {warehouse.Description}
-                                    </div>
-                                  ))}
+                                <div className="dropdown-list warehouse-dropdown">
+                                  <ul>
+                                    {warehouses.map((warehouse) => (
+                                      <li
+                                        key={warehouse.Ref}
+                                        onMouseDown={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          handleWarehouseSelect(warehouse);
+                                        }}
+                                      >
+                                        {warehouse.Description}
+                                      </li>
+                                    ))}
+                                  </ul>
                                 </div>
                               )}
                             </div>

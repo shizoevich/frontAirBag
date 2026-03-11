@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+import '@/styles/register-form.css';
 
 const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
   const t = useTranslations('Checkout');
@@ -211,7 +212,21 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
     setValue('phone', user.phone || '');
     // Если у пользователя есть сохраненный адрес НП, парсим его
     if (user.nova_post_address) {
-      setValue('novaPostAddress', user.nova_post_address);
+      const parsedAddress = String(user.nova_post_address).split(',');
+      const parsedCity = parsedAddress.shift()?.trim() || '';
+      const parsedWarehouse = parsedAddress.join(',').trim();
+
+      if (parsedCity) {
+        setSearchCity(parsedCity);
+        setSelectedCityName(parsedCity);
+        setValue('city', parsedCity);
+      }
+
+      if (parsedWarehouse) {
+        setSearchWarehouse(parsedWarehouse);
+        setSelectedWarehouseName(parsedWarehouse);
+        setValue('warehouse', parsedWarehouse);
+      }
     }
   }, [setValue, user]);
 
@@ -299,46 +314,39 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
             <div className="col-md-6">
               <div className="tp-checkout-input">
                 <label>{t('nova_post_city')} *</label>
-                <div className="tp-register-input-dropdown">
-                  {(() => {
-                    const { ref: rhfCityRef, onChange: rhfCityOnChange, ...cityReg } = register('city', { required: t('city_required') });
-                    return (
-                      <input
-                        {...cityReg}
-                        ref={makeCombinedRef(rhfCityRef, cityInputRef)}
-                        type="text"
-                        placeholder={t('select_city')}
-                        value={searchCity}
-                        onChange={(e) => {
-                          handleCityChange(e);
-                          rhfCityOnChange?.(e);
-                        }}
-                        onFocus={() => {
-                          if (cities.length > 0) setShowCityDropdown(true);
-                          else if (searchCity.trim().length >= 2) fetchCities();
-                        }}
-                        // NOTE: do not close on blur (it closes too aggressively during selection).
-                        // Closing is handled by outside click handler + selecting an item.
-                        autoComplete="off"
-                      />
-                    );
-                  })()}
+                <div className="tp-login-input city-input" style={{ position: 'relative' }}>
+                  <input
+                    ref={cityInputRef}
+                    type="text"
+                    placeholder={t('select_city')}
+                    value={searchCity}
+                    onChange={(e) => {
+                      handleCityChange(e);
+                      setValue('city', e.target.value, { shouldValidate: true });
+                    }}
+                    onFocus={() => {
+                      if (cities.length > 0) setShowCityDropdown(true);
+                      else if (searchCity.trim().length >= 2) fetchCities();
+                    }}
+                    autoComplete="off"
+                  />
+                  <input {...register('city', { required: t('city_required') })} type="hidden" />
                   {showCityDropdown && cities.length > 0 && (
-                    <div className="tp-register-dropdown">
-                      {cities.map((city) => (
-                        <div
-                          key={city.Ref || city.DeliveryCity || city.SettlementRef || city.Present}
-                          className="tp-register-dropdown-item"
-                          onMouseDown={(e) => {
-                            // предотвращаем blur инпута до выбора
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleCitySelect(city);
-                          }}
-                        >
-                          {city.Present}
-                        </div>
-                      ))}
+                    <div className="dropdown-list city-dropdown">
+                      <ul>
+                        {cities.map((city) => (
+                          <li
+                            key={city.Ref || city.DeliveryCity || city.SettlementRef || city.Present}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleCitySelect(city);
+                            }}
+                          >
+                            {city.Present}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
                 </div>
@@ -352,49 +360,43 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
             <div className="col-md-6">
               <div className="tp-checkout-input">
                 <label>{t('nova_post_warehouse')} *</label>
-                <div className="tp-register-input-dropdown">
-                  {(() => {
-                    const { ref: rhfWhRef, onChange: rhfWhOnChange, ...whReg } = register('warehouse', { required: t('warehouse_required') });
-                    return (
-                      <input
-                        {...whReg}
-                        ref={makeCombinedRef(rhfWhRef, warehouseInputRef)}
-                        type="text"
-                        placeholder={t('select_warehouse')}
-                        value={searchWarehouse}
-                        onChange={(e) => {
-                          handleWarehouseChange(e);
-                          rhfWhOnChange?.(e);
-                        }}
-                        disabled={!selectedCity}
-                        onFocus={() => {
-                          if (warehouses.length > 0) setShowWarehouseDropdown(true);
-                          else if (selectedCity) {
-                            setShowWarehouseDropdown(true);
-                            fetchWarehouses();
-                          }
-                        }}
-                        // NOTE: do not close on blur (it closes too aggressively during selection).
-                        // Closing is handled by outside click handler + selecting an item.
-                        autoComplete="off"
-                      />
-                    );
-                  })()}
+                <div className="tp-login-input warehouse-input" style={{ position: 'relative' }}>
+                  <input
+                    ref={warehouseInputRef}
+                    type="text"
+                    placeholder={t('select_warehouse')}
+                    value={searchWarehouse}
+                    onChange={(e) => {
+                      handleWarehouseChange(e);
+                      setValue('warehouse', e.target.value, { shouldValidate: true });
+                    }}
+                    disabled={!selectedCity}
+                    onFocus={() => {
+                      if (warehouses.length > 0) setShowWarehouseDropdown(true);
+                      else if (selectedCity) {
+                        setShowWarehouseDropdown(true);
+                        fetchWarehouses();
+                      }
+                    }}
+                    autoComplete="off"
+                  />
+                  <input {...register('warehouse', { required: t('warehouse_required') })} type="hidden" />
                   {showWarehouseDropdown && warehouses.length > 0 && (
-                    <div className="tp-register-dropdown">
-                      {warehouses.map((warehouse) => (
-                        <div
-                          key={warehouse.Ref}
-                          className="tp-register-dropdown-item"
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleWarehouseSelect(warehouse);
-                          }}
-                        >
-                          {warehouse.Description}
-                        </div>
-                      ))}
+                    <div className="dropdown-list warehouse-dropdown">
+                      <ul>
+                        {warehouses.map((warehouse) => (
+                          <li
+                            key={warehouse.Ref}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleWarehouseSelect(warehouse);
+                            }}
+                          >
+                            {warehouse.Description}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
                 </div>
