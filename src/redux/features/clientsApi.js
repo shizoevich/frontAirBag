@@ -62,12 +62,12 @@ export const clientsApi = apiSlice.injectEndpoints({
       invalidatesTags: ['Clients'],
     }),
 
-    // Обновление клиента
+    // Обновление клиента (Swagger: PUT /clients/{id}/)
     updateClient: builder.mutation({
-      query: ({ id, ...patch }) => ({
+      query: ({ id, ...data }) => ({
         url: `/clients/${id}/`,
-        method: 'PATCH',
-        body: patch,
+        method: 'PUT',
+        body: data,
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Clients', id }],
     }),

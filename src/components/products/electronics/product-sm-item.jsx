@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { useLocalizedLink } from '@/utils/localeLink';
 import { Cart } from "@/svg";
 import { add_cart_product } from "@/redux/features/cartSlice";
 import BlurImage from "@/components/common/BlurImage";
@@ -12,6 +12,7 @@ import { slugify } from '@/utils/slugify';
 const ProductSmItem = ({ product }) => {
   const t = useTranslations('ProductItem');
   const locale = useLocale();
+  const getLocalizedLink = useLocalizedLink();
   const {_id, img, images, imageURLs, category, title, price_minor, reviews, residue } = product || {};
   const dispatch = useDispatch();
   const { cart_products } = useSelector((state) => state.cart);
@@ -92,7 +93,7 @@ const ProductSmItem = ({ product }) => {
           <div>
             {isAddedToCart ? (
               <Link
-                href="/cart"
+                href={getLocalizedLink('/cart', 'product-sm-item button')}
                 className="tp-btn-sm w-100 d-inline-block text-center"
                 style={{
                   fontSize: '13px',

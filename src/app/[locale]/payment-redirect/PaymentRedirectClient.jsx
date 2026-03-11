@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
 export default function PaymentRedirectClient() {
   const { locale } = useParams();
+  const router = useRouter();
   const sp = useSearchParams();
   const t = useTranslations('Payments');
 
@@ -37,6 +38,14 @@ export default function PaymentRedirectClient() {
     }
   }, [errCode, invoiceId, locale, orderId, reason, result]);
 
+  React.useEffect(() => {
+    if (result !== 'success') return;
+    const timer = setTimeout(() => {
+      router.push(`/${locale}/orders`);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [locale, result, router]);
+
   // Fallback UI (if opened in a new tab, or postMessage is blocked)
   return (
     <div className="container" style={{ padding: '40px 0' }}>
@@ -45,4 +54,3 @@ export default function PaymentRedirectClient() {
     </div>
   );
 }
-

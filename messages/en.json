@@ -162,6 +162,7 @@
     "errorLoadingProfile": "Error loading profile",
     "profileUpdateSuccess": "Profile updated successfully",
     "profileUpdateError": "Error updating profile",
+    "emailCannotBeChanged": "Email cannot be changed",
     "username": "Username",
     "address": "Address",
     "usernameRequired": "Username is required",

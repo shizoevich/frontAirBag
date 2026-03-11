@@ -216,17 +216,7 @@ const useOrderCheckout = () => {
         console.warn('Client profile update failed (non-blocking):', e);
       }
 
-      // Guard: backend requires remonline id for syncing orders.
-      // Try to use updated client response if available; otherwise fallback to current user.
-      if (accessToken) {
-        const remonlineId = getRemonlineId(updatedClient || currentUser);
-        if (!remonlineId) {
-          const message = 'У клиента отсутствует Remonline ID. Пожалуйста, обратитесь в поддержку.';
-          notifyError(message);
-          setIsCheckoutSubmit(false);
-          return;
-        }
-      }
+      // No remonline id validation on the client. Backend should not require it for checkout.
 
       // Добавляем description только если оно не пустое
       if (data.orderNotes && data.orderNotes.trim() !== "") {

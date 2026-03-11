@@ -152,6 +152,7 @@
     "errorLoadingProfile": "Помилка завантаження профілю",
     "profileUpdateSuccess": "Профіль успішно оновлено",
     "profileUpdateError": "Помилка оновлення профілю",
+    "emailCannotBeChanged": "Email не можна змінити",
     "username": "Ім'я користувача",
     "address": "Адреса",
     "usernameRequired": "Ім'я користувача обов'язкове",

@@ -88,9 +88,10 @@ const UserProfileArea = () => {
   // Обработчик изменения полей формы
   const handleChange = (e) => {
     const { name, value } = e.target;
+    const normalizedValue = name === 'phone' ? value.replace(/\s+/g, '') : value;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: normalizedValue,
     }));
   };
   
@@ -106,8 +107,14 @@ const UserProfileArea = () => {
       
       // Отправляем данные на сервер
       await updateProfile({
-        ...formData,
-        nova_post_address: novaPostAddress
+        id: user?.id,
+        data: {
+          email: user?.email || '',
+          name: formData.name,
+          last_name: formData.last_name,
+          phone: formData.phone,
+          nova_post_address: novaPostAddress,
+        },
       }).unwrap();
       
       // Показываем уведомление об успешном обновлении

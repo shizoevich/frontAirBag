@@ -213,7 +213,7 @@ const OrderConfirmation = ({ orderId }) => {
 
                 <div className="tp-order-confirmation-actions text-center mt-5">
                   <div className="tp-order-confirmation-buttons">
-                    <Link href="/orders" className="tp-btn tp-btn-2 me-3">
+                    <Link href={`/${locale}/orders`} className="tp-btn tp-btn-2 me-3">
                       {t('view_all_orders')}
                     </Link>
                     <Link href="/shop" className="tp-btn">

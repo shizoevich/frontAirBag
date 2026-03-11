@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations, useLocale } from 'next-intl';
+import { useLocalizedLink } from '@/utils/localeLink';
 // internal
 import { Cart, QuickView } from "@/svg";
 import { handleProductModal } from "@/redux/features/productModalSlice";
@@ -14,6 +15,7 @@ import { slugify } from '@/utils/slugify';
 const ProductItem = ({ product }) => {
   const t = useTranslations('ProductItem');
   const locale = useLocale();
+  const getLocalizedLink = useLocalizedLink();
   const [isClient, setIsClient] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
@@ -129,7 +131,7 @@ const handleMouseLeave = () => {
           <div className="tp-product-action-item d-flex flex-column">
             {isAddedToCart ? (
               <Link
-                href="/cart"
+                href={getLocalizedLink('/cart', 'product-item action')}
                 className={`tp-product-action-btn ${isAddedToCart ? 'active' : ''} tp-product-add-cart-btn`}
               >
                 <Cart /> <span className="tp-product-tooltip">{t('viewCart')}</span>
@@ -181,7 +183,7 @@ const handleMouseLeave = () => {
           <div>
             {isAddedToCart ? (
               <Link
-                href="/cart"
+                href={getLocalizedLink('/cart', 'product-item button')}
                 className="tp-btn-sm w-100 d-inline-block text-center"
                 style={{
                   fontSize: '14px',

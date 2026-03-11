@@ -477,11 +477,11 @@ export const authApi = apiSlice.injectEndpoints({
         };
       },
     }),
-    // Обновление профиля пользователя
+    // Обновление профиля пользователя (Swagger: PUT /clients/{id}/)
     updateProfile: builder.mutation({
-      query: (data) => ({
-        url: "/auth/me/",
-        method: "PATCH",
+      query: ({ id, data }) => ({
+        url: `/clients/${id}/`,
+        method: "PUT",
         body: data,
       }),
       
