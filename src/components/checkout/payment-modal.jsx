@@ -21,6 +21,7 @@ const PaymentModal = ({
   const dispatch = useDispatch();
   const [updateOrder] = useUpdateOrderMutation();
   const handledSuccessRef = React.useRef(false);
+  const hasConfirmedRef = React.useRef(false);
   const { data: orderData } = useGetOrderByIdQuery(orderIdProp, {
     skip: !isOpen || !orderIdProp,
     pollingInterval: isOpen && orderIdProp ? 5000 : 0,
@@ -100,9 +101,29 @@ const PaymentModal = ({
 
   React.useEffect(() => {
     if (!isOpen) return;
+    if (hasConfirmedRef.current) return;
     if (!orderData?.is_paid) return;
+    hasConfirmedRef.current = true;
     handlePaymentSuccess(orderIdProp ? String(orderIdProp) : null);
   }, [handlePaymentSuccess, isOpen, orderData?.is_paid, orderIdProp]);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const storageKey = orderIdProp ? `paymentResult:${orderIdProp}` : 'paymentResult:last';
+    const stored = localStorage.getItem(storageKey);
+    if (!stored) return;
+    try {
+      const payload = JSON.parse(stored);
+      if (payload?.result === 'success') {
+        hasConfirmedRef.current = true;
+        handlePaymentSuccess(orderIdProp ? String(orderIdProp) : null);
+      }
+    } catch {
+      // ignore
+    } finally {
+      localStorage.removeItem(storageKey);
+    }
+  }, [handlePaymentSuccess, isOpen, orderIdProp]);
 
   // Prevent background scroll when modal is open.
   React.useEffect(() => {

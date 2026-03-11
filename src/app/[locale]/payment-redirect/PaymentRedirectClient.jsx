@@ -20,6 +20,13 @@ export default function PaymentRedirectClient() {
     // If we are inside an iframe (checkout modal), notify the parent page.
     // Parent will close the iframe, show localized toast, and route accordingly.
     try {
+      if (result === 'success') {
+        const key = orderId ? `paymentResult:${orderId}` : 'paymentResult:last';
+        localStorage.setItem(
+          key,
+          JSON.stringify({ result, orderId: orderId ? String(orderId) : null, ts: Date.now() })
+        );
+      }
       const payload = {
         type: 'monobank-payment-result',
         result,
@@ -40,9 +47,18 @@ export default function PaymentRedirectClient() {
 
   React.useEffect(() => {
     if (result !== 'success') return;
+    const target = `/${locale}/orders`;
     const timer = setTimeout(() => {
-      router.push(`/${locale}/orders`);
-    }, 800);
+      try {
+        if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+          window.parent.location.assign(target);
+          return;
+        }
+      } catch {
+        // ignore and fallback to client navigation
+      }
+      router.push(target);
+    }, 300);
     return () => clearTimeout(timer);
   }, [locale, result, router]);
 

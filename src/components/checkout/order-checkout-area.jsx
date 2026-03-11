@@ -13,18 +13,13 @@ import UserInfoModal from "./user-info-modal";
 import GuestRegistrationModal from './guest-registration-modal';
 import PaymentModal from './payment-modal';
 import GooglePayButton from './google-pay-button';
-import ApplePayButton from './apple-pay-button';
-import MonoPayWidget from './monopay-widget';
 import useOrderCheckout from "@/hooks/use-order-checkout";
 import useCartInfo from "@/hooks/use-cart-info";
 import { useGetOrdersQuery } from "@/redux/features/ordersApi";
 import { useGetDiscountsQuery } from "@/redux/features/discountsApi";
 import { useCreatePaymentMutation } from "@/redux/features/paymentsApi";
 import { notifyError, notifyInfo } from '@/utils/toast';
-import {
-  buildMonopayWidgetConfig,
-  resolveMonobankPageUrl,
-} from '@/utils/monobank-widget';
+import { resolveMonobankPageUrl } from '@/utils/monobank-url';
 
 const OrderCheckoutArea = () => {
   const t = useTranslations('Checkout');
@@ -36,7 +31,6 @@ const OrderCheckoutArea = () => {
   const [isCreatingPayment, setIsCreatingPayment] = React.useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = React.useState(false);
   const [monoPaymentError, setMonoPaymentError] = React.useState(null);
-  const [monopayWidgetConfig, setMonopayWidgetConfig] = React.useState(null);
 
   const [createPayment] = useCreatePaymentMutation();
 
@@ -159,73 +153,8 @@ const OrderCheckoutArea = () => {
 
   const currentDiscountPercent = calculateCurrentDiscount();
 
-  // Create payment via Next.js API route (proxy to backend).
+  // Create payment via backend API (api/v2/payments/create/).
   // NOTE: backend requires `order_id`, so we can only create payment AFTER order is created.
-  const createMonoPaymentFromApiRoute = React.useCallback(async (orderId) => {
-    try {
-      setIsCreatingPayment(true);
-      setMonoPaymentError(null);
-      setMonopayWidgetConfig(null);
-      setMonopayWidgetConfig(null);
-
-      const resolvedOrderId = orderId ?? lastOrderId;
-      if (!resolvedOrderId) {
-        throw new Error('Order is not created yet. Please place the order first.');
-      }
-
-      // redirect_url MUST accept POST from the payment provider. We use an internal API route
-      // to receive POST and convert it into a user-facing GET page with toast + redirects.
-      const redirect_url = `${window.location.origin}/api/monobank/redirect?locale=${encodeURIComponent(
-        locale
-      )}&order_id=${encodeURIComponent(resolvedOrderId)}`;
-      const token = getCurrentAccessToken();
-
-      const res = await fetch('/api/create-monobank-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          order_id: resolvedOrderId,
-          redirect_url,
-        }),
-      });
-
-      console.log('[Monobank][api-route] response status:', res.status);
-
-      const data = await res.json();
-      console.log('[Monobank][api-route] response json:', data);
-      if (!res.ok) {
-        const msg = data?.error || data?.message || 'Monobank payment create failed';
-        throw new Error(msg);
-      }
-
-      const pageUrl = resolveMonobankPageUrl(data);
-      const widgetConfig = buildMonopayWidgetConfig(data);
-      if (widgetConfig) {
-        setMonopayWidgetConfig(widgetConfig);
-      }
-
-      if (pageUrl) {
-        setMonoPageUrl(pageUrl);
-        setIsPaymentModalOpen(true);
-        notifyInfo(t('monobank_payment_opened'));
-        return;
-      }
-
-      if (widgetConfig) {
-        return;
-      }
-
-      throw new Error('Payment created but pageUrl is missing');
-    } catch (err) {
-      console.error('Monobank payment error (api route):', err);
-      setMonoPaymentError(err?.message || String(err));
-    } finally {
-      setIsCreatingPayment(false);
-    }
-  }, [getCurrentAccessToken, lastOrderId, locale, t]);
  const customSubmitHandler = async (formData) => {
      const createdOrder = await submitHandler(formData);
 
@@ -242,8 +171,7 @@ const OrderCheckoutArea = () => {
     try {
       setIsCreatingPayment(true);
       setMonoPaymentError(null);
-      setMonopayWidgetConfig(null);
-      setMonopayWidgetConfig(null);
+      // Custom button only: do not render MonoPay widget.
 
       // New swagger contract: order_id + redirect_url are required
       const redirect_url = `${window.location.origin}/api/monobank/redirect?locale=${encodeURIComponent(
@@ -259,38 +187,16 @@ const OrderCheckoutArea = () => {
       console.log('Monobank payment raw response:', { data });
 
       // backend may return different field names depending on implementation
-      const pageUrl =
-        resolveMonobankPageUrl(data) ||
-        data?.page_url ||
-        data?.pageUrl ||
-        data?.mono_url ||
-        data?.monoUrl ||
-        data?.redirect_url ||
-        data?.redirectUrl ||
-        data?.invoice_url ||
-        data?.invoiceUrl ||
-        data?.url ||
-        data?.data?.page_url ||
-        data?.data?.pageUrl ||
-        data?.data?.mono_url ||
-        data?.data?.monoUrl ||
-        data?.data?.redirect_url ||
-        data?.data?.redirectUrl ||
-        data?.data?.invoice_url ||
-        data?.data?.invoiceUrl ||
-        data?.data?.url;
+      const pageUrl = resolveMonobankPageUrl(data);
 
       console.log('Monobank payment resolved pageUrl:', pageUrl);
-
-      const widgetConfig = buildMonopayWidgetConfig(data);
-      if (widgetConfig) setMonopayWidgetConfig(widgetConfig);
 
       if (pageUrl) {
         setMonoPageUrl(pageUrl);
         setIsPaymentModalOpen(true);
 
         // Modal-only UX: no inline iframe scroll
-      } else if (!widgetConfig) {
+      } else {
         throw new Error(`Payment creation succeeded but payment URL is missing. Response: ${JSON.stringify(data)}`);
       }
     } catch (error) {
@@ -558,7 +464,7 @@ const OrderCheckoutArea = () => {
                                merchantName="AirbagAD"
                                gatewayMerchantId={process.env.NEXT_PUBLIC_GOOGLE_PAY_MERCHANT_ID}
                              />
-                             <ApplePayButton />
+                              {/* Apple Pay button hidden: flow not implemented and should not be shown */}
                            </div>
 
                             <div className="mt-3" style={{ display: 'grid', gap: 10 }}>
@@ -566,29 +472,7 @@ const OrderCheckoutArea = () => {
                                 <p className="mb-2">{t('processing')}</p>
                               )}
 
-                              {monopayWidgetConfig ? (
-                                <MonoPayWidget
-                                  config={monopayWidgetConfig}
-                                  callbacks={{
-                                    onButtonReady: () => setMonoPaymentError(null),
-                                    onClick: () => setMonoPaymentError(null),
-                                    onInvoiceCreate: (data) => console.log('MonoPay invoice', data),
-                                    onSuccess: (result) => {
-                                      console.log('MonoPay success', result);
-                                      if (result?.status === 'success') {
-                                        if (monoPageUrl) {
-                                          setMonoPageUrl(null);
-                                        }
-                                      }
-                                    },
-                                    onError: (error) => {
-                                      console.error('MonoPay widget error', error);
-                                      setMonoPaymentError(error?.message || String(error));
-                                    },
-                                  }}
-                                />
-                              ) : (
-                                <div className="mt-3" style={{ display: 'grid', gap: 10 }}>
+                              <div style={{ display: 'grid', gap: 10 }}>
                                   <button
                                     type="button"
                                     className="monopay-btn monopay-btn--dark monopay-btn--corners-rounded monopay-btn--pay monopay-btn--with-text"
@@ -620,7 +504,7 @@ const OrderCheckoutArea = () => {
                                         if (!createdOrder?.id) return;
 
                                         setLastOrderId(createdOrder.id);
-                                        await createMonoPaymentFromApiRoute(createdOrder.id);
+                                        await createMonoPayment(createdOrder.id);
                                       })();
                                     }}
                                   >
@@ -639,8 +523,7 @@ const OrderCheckoutArea = () => {
                                       </svg>
                                     </div>
                                   </button>
-                                </div>
-                              )}
+                              </div>
 
                               {monoPaymentError && (
                                 <p className="mb-0" style={{ color: '#b00020' }}>

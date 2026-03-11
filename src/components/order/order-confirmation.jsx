@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { notifyError, notifyInfo } from '@/utils/toast';
+import { resolveMonobankPageUrl } from '@/utils/monobank-url';
 
 const OrderConfirmation = ({ orderId }) => {
   const t = useTranslations('Orders');
@@ -58,25 +59,7 @@ const OrderConfirmation = ({ orderId }) => {
       )}&order_id=${encodeURIComponent(displayOrder.id)}`;
       const data = await createPayment({ order_id: displayOrder.id, redirect_url }).unwrap();
 
-      const pageUrl =
-        data?.page_url ||
-        data?.pageUrl ||
-        data?.mono_url ||
-        data?.monoUrl ||
-        data?.redirect_url ||
-        data?.redirectUrl ||
-        data?.invoice_url ||
-        data?.invoiceUrl ||
-        data?.url ||
-        data?.data?.page_url ||
-        data?.data?.pageUrl ||
-        data?.data?.mono_url ||
-        data?.data?.monoUrl ||
-        data?.data?.redirect_url ||
-        data?.data?.redirectUrl ||
-        data?.data?.invoice_url ||
-        data?.data?.invoiceUrl ||
-        data?.data?.url;
+      const pageUrl = resolveMonobankPageUrl(data);
 
       if (!pageUrl) throw new Error('Payment URL is missing');
       setMonoPageUrl(pageUrl);
