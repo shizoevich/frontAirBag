@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from 'next-intl';
@@ -20,6 +20,22 @@ const UserProfileArea = () => {
   // /function%20translateFn(...)/login
   const locale = useLocale();
   const [editMode, setEditMode] = useState(false);
+
+  // Nova Poshta API state
+  const [searchCity, setSearchCity] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedCityName, setSelectedCityName] = useState('');
+  const [cities, setCities] = useState([]);
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
+
+  const [searchWarehouse, setSearchWarehouse] = useState('');
+  const [selectedWarehouse, setSelectedWarehouse] = useState('');
+  const [selectedWarehouseName, setSelectedWarehouseName] = useState('');
+  const [warehouses, setWarehouses] = useState([]);
+  const [showWarehouseDropdown, setShowWarehouseDropdown] = useState(false);
+
+  const cityInputRef = useRef(null);
+  const warehouseInputRef = useRef(null);
   
   // Состояние формы
   const [formData, setFormData] = useState({
@@ -53,14 +69,22 @@ const UserProfileArea = () => {
   // Инициализация данных формы при загрузке пользователя
   useEffect(() => {
     if (user) {
+      const parsedAddress = (user.nova_post_address || '').split(',');
+      const parsedCity = parsedAddress.shift()?.trim() || '';
+      const parsedWarehouse = parsedAddress.join(',').trim();
+
       setFormData({
         name: user.name || '',
         last_name: user.last_name || '',
         phone: user.phone || '',
-        city: user.city || '',
-        warehouse: user.warehouse || '',
+        city: user.city || parsedCity || '',
+        warehouse: user.warehouse || parsedWarehouse || '',
         nova_post_address: user.nova_post_address || ''
       });
+
+      setSearchCity(user.city || parsedCity || '');
+      setSearchWarehouse(user.warehouse || parsedWarehouse || '');
+      setSelectedCityName(user.city || parsedCity || '');
     }
   }, [user]);
 
@@ -74,14 +98,22 @@ const UserProfileArea = () => {
     setEditMode(false);
     // Сбрасываем форму к исходным значениям
     if (user) {
+      const parsedAddress = (user.nova_post_address || '').split(',');
+      const parsedCity = parsedAddress.shift()?.trim() || '';
+      const parsedWarehouse = parsedAddress.join(',').trim();
+
       setFormData({
         name: user.name || '',
         last_name: user.last_name || '',
         phone: user.phone || '',
-        city: user.city || '',
-        warehouse: user.warehouse || '',
+        city: user.city || parsedCity || '',
+        warehouse: user.warehouse || parsedWarehouse || '',
         nova_post_address: user.nova_post_address || ''
       });
+
+      setSearchCity(user.city || parsedCity || '');
+      setSearchWarehouse(user.warehouse || parsedWarehouse || '');
+      setSelectedCityName(user.city || parsedCity || '');
     }
   };
   
@@ -94,6 +126,185 @@ const UserProfileArea = () => {
       [name]: normalizedValue,
     }));
   };
+
+  // Nova Poshta search: cities
+  const fetchCities = useCallback(async () => {
+    if (searchCity.length < 2) return;
+
+    try {
+      const response = await fetch('https://api.novaposhta.ua/v2.0/json/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          apiKey: '1690358338d20ac90d792f5da5bb1292',
+          modelName: 'Address',
+          calledMethod: 'searchSettlements',
+          methodProperties: {
+            CityName: searchCity,
+            Limit: 20,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data[0]?.Addresses) {
+        setCities(data.data[0].Addresses);
+        setShowCityDropdown(true);
+      } else {
+        setCities([]);
+      }
+    } catch (error) {
+      console.error('Error searching cities:', error);
+      setCities([]);
+    }
+  }, [searchCity]);
+
+  // Nova Poshta search: warehouses
+  const fetchWarehouses = useCallback(async () => {
+    if (!selectedCity) {
+      setWarehouses([]);
+      setShowWarehouseDropdown(false);
+      return;
+    }
+
+    try {
+      const payload = {
+        apiKey: '1690358338d20ac90d792f5da5bb1292',
+        modelName: 'AddressGeneral',
+        calledMethod: 'getWarehouses',
+        methodProperties: {
+          CityRef: selectedCity,
+          Page: '1',
+          Limit: '50',
+          Language: 'ua',
+        },
+      };
+
+      if (searchWarehouse && searchWarehouse.trim().length > 0) {
+        payload.methodProperties.FindByString = searchWarehouse.trim();
+      }
+
+      const response = await fetch('https://api.novaposhta.ua/v2.0/json/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (data.success && Array.isArray(data.data)) {
+        setWarehouses(data.data);
+        setShowWarehouseDropdown(true);
+      } else {
+        setWarehouses([]);
+      }
+    } catch (error) {
+      console.error('Error searching warehouses:', error);
+      setWarehouses([]);
+    }
+  }, [searchWarehouse, selectedCity]);
+
+  const handleCityChange = (e) => {
+    const query = e.target.value;
+    setSearchCity(query);
+    setSelectedCity('');
+    setSelectedCityName('');
+    setFormData((prev) => ({ ...prev, city: query }));
+
+    setSelectedWarehouse('');
+    setSelectedWarehouseName('');
+    setSearchWarehouse('');
+    setFormData((prev) => ({ ...prev, warehouse: '' }));
+    setWarehouses([]);
+
+    if (query && query.trim().length >= 2) {
+      setShowCityDropdown(true);
+    } else {
+      setShowCityDropdown(false);
+    }
+  };
+
+  const handleCitySelect = (city) => {
+    const cityRef = city.DeliveryCity || city.CityRef || city.Ref || city.SettlementRef;
+    setSelectedCity(cityRef || '');
+    setSelectedCityName(city.Present);
+    setSearchCity(city.Present);
+    setFormData((prev) => ({ ...prev, city: city.Present }));
+    setShowCityDropdown(false);
+
+    setSelectedWarehouse('');
+    setSelectedWarehouseName('');
+    setSearchWarehouse('');
+    setFormData((prev) => ({ ...prev, warehouse: '' }));
+    setWarehouses([]);
+    setShowWarehouseDropdown(false);
+
+    if (cityRef) {
+      fetchWarehouses();
+    } else {
+      console.warn('CityRef is missing on selected city item:', city);
+    }
+    cityInputRef.current?.blur();
+  };
+
+  const handleWarehouseChange = (e) => {
+    setSearchWarehouse(e.target.value);
+    setFormData((prev) => ({ ...prev, warehouse: e.target.value }));
+    setShowWarehouseDropdown(true);
+  };
+
+  const handleWarehouseSelect = (warehouse) => {
+    setSelectedWarehouse(warehouse.Ref);
+    setSelectedWarehouseName(warehouse.Description);
+    setSearchWarehouse(warehouse.Description);
+    setFormData((prev) => ({ ...prev, warehouse: warehouse.Description }));
+    setShowWarehouseDropdown(false);
+  };
+
+  useEffect(() => {
+    if (!selectedCity && selectedCityName) {
+      setShowWarehouseDropdown(false);
+    }
+  }, [selectedCity, selectedCityName]);
+
+  useEffect(() => {
+    if (searchCity.length >= 2 && !selectedCity) {
+      fetchCities();
+    }
+  }, [fetchCities, searchCity, selectedCity]);
+
+  useEffect(() => {
+    if (selectedCity) {
+      fetchWarehouses();
+    }
+  }, [fetchWarehouses, selectedCity]);
+
+  useEffect(() => {
+    if (!selectedCity) return;
+    const timer = setTimeout(() => {
+      fetchWarehouses();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [fetchWarehouses, searchWarehouse, selectedCity]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.tp-register-input-dropdown')) {
+        setShowCityDropdown(false);
+        setShowWarehouseDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
   
   // Обработчик отправки формы
   const handleSubmit = async (e) => {
@@ -318,15 +529,37 @@ const UserProfileArea = () => {
                         <div className="col-xxl-6 col-md-6">
                           <div className="profile__input-box">
                             <label className="form-label fw-medium mb-2">{t('city')}</label>
-                            <div className="profile__input">
-                              <input 
-                                type="text" 
-                                name="city"
+                            <div className="tp-register-input-dropdown">
+                              <input
+                                ref={cityInputRef}
+                                type="text"
                                 className="form-control"
-                                placeholder={t('city')} 
-                                value={formData.city}
-                                onChange={handleChange}
+                                placeholder={t('city')}
+                                value={searchCity}
+                                onChange={handleCityChange}
+                                onFocus={() => {
+                                  if (cities.length > 0) setShowCityDropdown(true);
+                                  else if (searchCity.trim().length >= 2) fetchCities();
+                                }}
+                                autoComplete="off"
                               />
+                              {showCityDropdown && cities.length > 0 && (
+                                <div className="tp-register-dropdown">
+                                  {cities.map((city) => (
+                                    <div
+                                      key={city.Ref || city.DeliveryCity || city.SettlementRef || city.Present}
+                                      className="tp-register-dropdown-item"
+                                      onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleCitySelect(city);
+                                      }}
+                                    >
+                                      {city.Present}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -334,15 +567,41 @@ const UserProfileArea = () => {
                         <div className="col-xxl-6 col-md-6">
                           <div className="profile__input-box">
                             <label className="form-label fw-medium mb-2">{t('warehouse')}</label>
-                            <div className="profile__input">
-                              <input 
-                                type="text" 
-                                name="warehouse"
+                            <div className="tp-register-input-dropdown">
+                              <input
+                                ref={warehouseInputRef}
+                                type="text"
                                 className="form-control"
-                                placeholder={t('warehouse')} 
-                                value={formData.warehouse}
-                                onChange={handleChange}
+                                placeholder={t('warehouse')}
+                                value={searchWarehouse}
+                                onChange={handleWarehouseChange}
+                                disabled={!selectedCity}
+                                onFocus={() => {
+                                  if (warehouses.length > 0) setShowWarehouseDropdown(true);
+                                  else if (selectedCity) {
+                                    setShowWarehouseDropdown(true);
+                                    fetchWarehouses();
+                                  }
+                                }}
+                                autoComplete="off"
                               />
+                              {showWarehouseDropdown && warehouses.length > 0 && (
+                                <div className="tp-register-dropdown">
+                                  {warehouses.map((warehouse) => (
+                                    <div
+                                      key={warehouse.Ref}
+                                      className="tp-register-dropdown-item"
+                                      onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleWarehouseSelect(warehouse);
+                                      }}
+                                    >
+                                      {warehouse.Description}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
