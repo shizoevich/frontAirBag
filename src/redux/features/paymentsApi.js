@@ -4,12 +4,14 @@ export const paymentsApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
     createPayment: builder.mutation({
-      query: ({ order_id, redirect_url }) => ({
+      query: ({ order_id, redirect_url, success_url, fail_url }) => ({
         url: "/payments/create/",
         method: "POST",
         body: {
           order_id,
           redirect_url,
+          success_url,
+          fail_url,
         },
       }),
     }),

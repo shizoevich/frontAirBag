@@ -46,8 +46,20 @@ export default function PaymentRedirectClient() {
   }, [errCode, invoiceId, locale, orderId, reason, result]);
 
   React.useEffect(() => {
-    if (result !== 'success') return;
-    const target = `/${locale}/orders`;
+    if (result !== 'success' && result !== 'failed') return;
+
+    const target =
+      result === 'success'
+        ? `/${locale}/order-success`
+        : `/${locale}/payment-error${(() => {
+            const qs = new URLSearchParams();
+            if (orderId) qs.set('orderId', String(orderId));
+            if (errCode) qs.set('errCode', String(errCode));
+            if (reason) qs.set('reason', String(reason));
+            const str = qs.toString();
+            return str ? `?${str}` : '';
+          })()}`;
+
     const timer = setTimeout(() => {
       try {
         if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
@@ -60,7 +72,7 @@ export default function PaymentRedirectClient() {
       router.push(target);
     }, 300);
     return () => clearTimeout(timer);
-  }, [locale, result, router]);
+  }, [errCode, locale, orderId, reason, result, router]);
 
   // Fallback UI (if opened in a new tab, or postMessage is blocked)
   return (

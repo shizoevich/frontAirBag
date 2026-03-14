@@ -27,6 +27,7 @@ const PaymentModal = ({
     pollingInterval: isOpen && orderIdProp ? 5000 : 0,
     refetchOnFocus: true,
   });
+  const [handledFailure, setHandledFailure] = React.useState(false);
 
   const handlePaymentSuccess = React.useCallback(
     (orderId) => {
@@ -38,7 +39,7 @@ const PaymentModal = ({
       }
       dispatch(clearCart());
       onClose?.();
-      router.push(`/${locale}/orders`);
+      router.push(`/${locale}/order-success`);
     },
     [dispatch, locale, onClose, router, t, updateOrder]
   );
@@ -86,8 +87,12 @@ const PaymentModal = ({
 
       if (result === 'failed') {
         notifyError(resolveFailureMessage({ errCode, reason }));
-        // Stay on checkout page, just close modal
+        const qs = new URLSearchParams();
+        if (orderId) qs.set('orderId', String(orderId));
+        if (errCode) qs.set('errCode', String(errCode));
+        if (reason) qs.set('reason', String(reason));
         onClose?.();
+        router.push(`/${locale}/payment-error${qs.toString() ? `?${qs.toString()}` : ''}`);
         return;
       }
 
@@ -106,6 +111,50 @@ const PaymentModal = ({
     hasConfirmedRef.current = true;
     handlePaymentSuccess(orderIdProp ? String(orderIdProp) : null);
   }, [handlePaymentSuccess, isOpen, orderData?.is_paid, orderIdProp]);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    if (handledFailure) return;
+
+    const status = String(orderData?.last_payment_status || '').toLowerCase();
+    if (!status) return;
+    if (!['failure', 'failed', 'canceled', 'cancelled', 'expired', 'error'].includes(status)) return;
+
+    const errCode = orderData?.last_payment_failure_code
+      ? String(orderData.last_payment_failure_code)
+      : null;
+    const reason = orderData?.last_payment_failure_reason
+      ? String(orderData.last_payment_failure_reason)
+      : null;
+    const orderId = orderIdProp ? String(orderIdProp) : null;
+
+    setHandledFailure(true);
+    notifyError(resolveFailureMessage({ errCode, reason }));
+
+    const qs = new URLSearchParams();
+    if (orderId) qs.set('orderId', orderId);
+    if (errCode) qs.set('errCode', errCode);
+    if (reason) qs.set('reason', reason);
+
+    onClose?.();
+    router.push(`/${locale}/payment-error${qs.toString() ? `?${qs.toString()}` : ''}`);
+  }, [
+    handledFailure,
+    isOpen,
+    locale,
+    onClose,
+    orderData?.last_payment_failure_code,
+    orderData?.last_payment_failure_reason,
+    orderData?.last_payment_status,
+    orderIdProp,
+    resolveFailureMessage,
+    router,
+  ]);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    setHandledFailure(false);
+  }, [isOpen, orderIdProp]);
 
   React.useEffect(() => {
     if (!isOpen) return;

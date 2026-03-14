@@ -9,6 +9,7 @@ function pickFirst(obj, keys) {
 }
 
 function normalizeResult(payload) {
+  const explicitResult = pickFirst(payload, ['result', 'paymentResult', 'outcome']);
   const statusRaw = pickFirst(payload, ['status', 'paymentStatus', 'state']);
   const errCode = pickFirst(payload, ['errCode', 'errorCode', 'code']);
   const errText = pickFirst(payload, ['errText', 'errorText', 'message', 'detail']);
@@ -16,6 +17,25 @@ function normalizeResult(payload) {
   const hasSuccessFlag = ['true', '1', 'yes', 'ok', 'success', 'paid'].includes(
     String(pickFirst(payload, ['success', 'isPaid', 'paid']) || '').toLowerCase()
   );
+
+  const normalizedExplicitResult = explicitResult ? String(explicitResult).toLowerCase() : null;
+  if (normalizedExplicitResult) {
+    if (['success', 'succeeded', 'ok', 'paid', 'approved', 'complete', 'completed'].includes(normalizedExplicitResult)) {
+      return { result: 'success', errCode: null, reason: null };
+    }
+
+    if (['failed', 'failure', 'error', 'declined', 'rejected', 'canceled', 'cancelled'].includes(normalizedExplicitResult)) {
+      return {
+        result: 'failed',
+        errCode: errCode ? String(errCode) : null,
+        reason: failureReason || errText || null,
+      };
+    }
+
+    if (['pending', 'processing', 'created', 'hold', 'in_progress'].includes(normalizedExplicitResult)) {
+      return { result: 'pending', errCode: null, reason: null };
+    }
+  }
 
   const status = statusRaw ? String(statusRaw).toLowerCase() : null;
   const hasFailureSignal =
