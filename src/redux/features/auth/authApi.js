@@ -352,6 +352,18 @@ export const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
+
+    // Смена пароля пользователя
+    changePassword: builder.mutation({
+      query: ({ current_password, new_password }) => ({
+        url: "/auth/change-password/",
+        method: "POST",
+        body: {
+          current_password,
+          new_password,
+        },
+      }),
+    }),
     
     // Регистрация пользователя
     register: builder.mutation({
@@ -506,6 +518,7 @@ export const authApi = apiSlice.injectEndpoints({
 
 export const {
   useLoginMutation,
+  useChangePasswordMutation,
   useRegisterMutation,
   useRegisterMutation: useRegisterUserMutation,
   useCreateGuestMutation,

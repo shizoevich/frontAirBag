@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from 'next-intl';
 import { getAuth } from "@/utils/authStorage";
 import Link from "next/link";
-import { useGetUserQuery, useUpdateProfileMutation } from "@/redux/features/auth/authApi";
+import {
+  useChangePasswordMutation,
+  useGetUserQuery,
+  useUpdateProfileMutation,
+} from "@/redux/features/auth/authApi";
 import Loader from "../loader/loader";
 import ErrorMsg from "../common/error-msg";
 import { notifyError, notifySuccess } from '@/utils/toast';
@@ -21,6 +25,11 @@ const UserProfileArea = () => {
   // /function%20translateFn(...)/login
   const locale = useLocale();
   const [editMode, setEditMode] = useState(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+  });
 
   // Nova Poshta API state
   const [searchCity, setSearchCity] = useState('');
@@ -53,6 +62,7 @@ const UserProfileArea = () => {
     skip: true // TODO: Включить когда бэкенд исправит /auth/me/
   });
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
+  const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
   const { user, accessToken } = useSelector((state) => state.auth);
   
   // Проверяем авторизацию
@@ -115,6 +125,53 @@ const UserProfileArea = () => {
       setSearchCity(user.city || parsedCity || '');
       setSearchWarehouse(user.warehouse || parsedWarehouse || '');
       setSelectedCityName(user.city || parsedCity || '');
+    }
+  };
+
+  const handleOpenChangePasswordModal = () => {
+    setIsChangePasswordModalOpen(true);
+  };
+
+  const handleCloseChangePasswordModal = () => {
+    setIsChangePasswordModalOpen(false);
+    setPasswordForm({
+      currentPassword: '',
+      newPassword: '',
+    });
+  };
+
+  const handlePasswordFieldChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleChangePasswordSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!passwordForm.currentPassword || !passwordForm.newPassword) {
+      notifyError(t('passwordFieldsRequired'));
+      return;
+    }
+
+    try {
+      const result = await changePassword({
+        current_password: passwordForm.currentPassword,
+        new_password: passwordForm.newPassword,
+      }).unwrap();
+
+      notifySuccess(result?.message || t('passwordDataAccepted'));
+      handleCloseChangePasswordModal();
+    } catch (error) {
+      notifyError(
+        error?.data?.current_password?.[0] ||
+        error?.data?.new_password?.[0] ||
+        error?.data?.detail ||
+        error?.data?.message ||
+        t('profileUpdateError')
+      );
     }
   };
   
@@ -437,7 +494,7 @@ const UserProfileArea = () => {
                   {/* Кнопки действий */}
                   <div className="profile__btn mt-40">
                     <div className="row g-3">
-                      <div className="col-xxl-6 col-md-6">
+                      <div className="col-xxl-4 col-md-6">
                         <button 
                           onClick={handleEditProfile} 
                           className="tp-btn w-100 d-flex align-items-center justify-content-center shadow-sm"
@@ -446,13 +503,110 @@ const UserProfileArea = () => {
                           <i className="far fa-edit me-2"></i> {t('editProfile')}
                         </button>
                       </div>
-                      <div className="col-xxl-6 col-md-6">
+                      <div className="col-xxl-4 col-md-6">
+                        <button
+                          type="button"
+                          onClick={handleOpenChangePasswordModal}
+                          className="tp-btn tp-btn-2 w-100 d-flex align-items-center justify-content-center shadow-sm"
+                        >
+                          <i className="fas fa-key me-2"></i> {t('changePassword')}
+                        </button>
+                      </div>
+                      <div className="col-xxl-4 col-md-12">
                         <Link href={`/${locale}/orders`} className="tp-btn tp-btn-2 w-100 d-flex align-items-center justify-content-center shadow-sm">
                           <i className="fas fa-shopping-bag me-2"></i> {t('myOrders')}
                         </Link>
                       </div>
                     </div>
                   </div>
+
+                  {isChangePasswordModalOpen && (
+                    <div
+                      className="tp-modal-overlay"
+                      role="dialog"
+                      aria-modal="true"
+                      aria-label={t('changePasswordModalTitle')}
+                      onMouseDown={(e) => {
+                        if (e.target === e.currentTarget) {
+                          handleCloseChangePasswordModal();
+                        }
+                      }}
+                      style={{
+                        position: 'fixed',
+                        inset: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        zIndex: 9999,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '16px',
+                      }}
+                    >
+                      <div
+                        className="tp-modal-content bg-white rounded-3 shadow"
+                        style={{
+                          width: '100%',
+                          maxWidth: '520px',
+                        }}
+                      >
+                        <div className="tp-modal-header d-flex justify-content-between align-items-center p-4 border-bottom">
+                          <h4 className="mb-0">{t('changePasswordModalTitle')}</h4>
+                          <button
+                            type="button"
+                            className="btn-close"
+                            onClick={handleCloseChangePasswordModal}
+                            aria-label={t('close')}
+                          />
+                        </div>
+
+                        <form onSubmit={handleChangePasswordSubmit} className="p-4">
+                          <div className="mb-3">
+                            <label htmlFor="currentPassword" className="form-label fw-medium">
+                              {t('currentPassword')}
+                            </label>
+                            <input
+                              id="currentPassword"
+                              name="currentPassword"
+                              type="password"
+                              className="form-control"
+                              value={passwordForm.currentPassword}
+                              onChange={handlePasswordFieldChange}
+                              required
+                            />
+                          </div>
+
+                          <div className="mb-4">
+                            <label htmlFor="newPassword" className="form-label fw-medium">
+                              {t('newPassword')}
+                            </label>
+                            <input
+                              id="newPassword"
+                              name="newPassword"
+                              type="password"
+                              className="form-control"
+                              value={passwordForm.newPassword}
+                              onChange={handlePasswordFieldChange}
+                              required
+                            />
+                          </div>
+
+                          <div className="d-flex gap-2 justify-content-end">
+                            <button
+                              type="button"
+                              className="tp-btn tp-btn-2"
+                              onClick={handleCloseChangePasswordModal}
+                              disabled={isChangingPassword}
+                            >
+                              {t('cancel')}
+                            </button>
+                            <button type="submit" className="tp-btn" disabled={isChangingPassword}>
+                              {isChangingPassword ? profileExtra('updating') : t('savePassword')}
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Форма редактирования профиля */}
