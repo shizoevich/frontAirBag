@@ -87,6 +87,28 @@ function normalizeGuestCreateResponse(data) {
   return { access, refresh, guest_id };
 }
 
+function mergeAuthUsers(existingUser, incomingUser) {
+  if (!existingUser && !incomingUser) return null;
+
+  const existing = existingUser || {};
+  const incoming = incomingUser || {};
+
+  const merged = {
+    ...existing,
+    ...incoming,
+  };
+
+  // Canonical frontend profile fields used across account/profile/checkout
+  merged.name = incoming.name ?? incoming.first_name ?? existing.name ?? existing.first_name ?? "";
+  merged.last_name = incoming.last_name ?? existing.last_name ?? "";
+  merged.email = incoming.email ?? existing.email ?? "";
+  merged.phone = incoming.phone ?? existing.phone ?? "";
+  merged.nova_post_address = incoming.nova_post_address ?? incoming.address ?? existing.nova_post_address ?? existing.address ?? "";
+  merged.login = incoming.login ?? incoming.username ?? existing.login ?? existing.username ?? "";
+
+  return merged;
+}
+
 export const authApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
@@ -125,6 +147,7 @@ export const authApi = apiSlice.injectEndpoints({
           const minimalUser = userId ? {
             id: userId,
             email: arg.email, // Используем email из формы логина
+            login: arg.email,
           } : null;
           
           setAuth({ 
@@ -159,18 +182,16 @@ export const authApi = apiSlice.injectEndpoints({
             console.error('Failed to set cookies userInfo after login:', cookieErr);
           }
           
-          // Временно отключено: /auth/me/ возвращает HTML вместо JSON
-          // TODO: Включить когда бэкенд исправит endpoint
-          /*
+          // Загружаем полный профиль и даем onQueryStarted(getUser) слить данные в auth state/storage
           try {
             console.log('Fetching user data...');
-            const userResult = await dispatch(authApi.endpoints.getUser.initiate()).unwrap();
+            const userResult = await dispatch(
+              authApi.endpoints.getUser.initiate(undefined, { forceRefetch: true })
+            ).unwrap();
             console.log('User data loaded successfully:', userResult);
           } catch (userError) {
             console.error('Failed to load user data after login:', userError);
           }
-          */
-          console.log('⚠️ Skipping /auth/me/ - endpoint returns HTML instead of JSON');
         } catch (err) {
           console.log('🔧 LOGIN API: queryFulfilled rejected, error:', err);
           // RTK Query may attach the error under err.error or err.data
@@ -212,18 +233,27 @@ export const authApi = apiSlice.injectEndpoints({
           console.log('🔍 GET USER: Waiting for response...');
           const result = await queryFulfilled;
           console.log('✅ GetUser successful, received user data:', result.data);
+
+          if (!result?.data || typeof result.data !== 'object') {
+            console.warn('⚠️ GET USER returned empty or non-object payload, skipping auth user merge');
+            return;
+          }
           
           // Получаем текущие данные из localStorage для сохранения токена
           const existing = getAuth();
           console.log('Current auth data in localStorage:', existing);
+
+          const mergedUser = mergeAuthUsers(existing?.user || null, result.data);
+          const mergedIsGuest = mergedUser?.is_guest ?? existing?.isGuest ?? false;
+          const mergedGuestId = mergedUser?.guest_id ?? existing?.guestId ?? null;
           
           // Обновляем данные пользователя в store с сохранением токена
           dispatch(
             userLoggedIn({
               accessToken: existing?.accessToken || null, // Сохраняем токен
-              user: result.data,
-              isGuest: result.data.is_guest || false,
-              guestId: result.data.guest_id || null,
+              user: mergedUser,
+              isGuest: mergedIsGuest,
+              guestId: mergedGuestId,
             })
           );
           console.log('Redux state updated with user data and token');
@@ -232,9 +262,9 @@ export const authApi = apiSlice.injectEndpoints({
           if (existing) {
             try {
               const updatedData = {
-                user: result.data,
-                isGuest: result.data.is_guest || false,
-                guestId: result.data.guest_id || null,
+                user: mergedUser,
+                isGuest: mergedIsGuest,
+                guestId: mergedGuestId,
               };
               updateAuth(updatedData);
               console.log('Updated localStorage with user data:', updatedData);
@@ -258,9 +288,9 @@ export const authApi = apiSlice.injectEndpoints({
               JSON.stringify({
                 accessToken: cookieTokens.accessToken || existing?.accessToken || null,
                 refreshToken: cookieTokens.refreshToken || null,
-                user: result.data,
-                isGuest: result.data.is_guest || false,
-                guestId: result.data.guest_id || null,
+                user: mergedUser,
+                isGuest: mergedIsGuest,
+                guestId: mergedGuestId,
               }),
               { expires: 7 }
             );

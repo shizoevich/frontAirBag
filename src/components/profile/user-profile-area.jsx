@@ -57,13 +57,13 @@ const UserProfileArea = () => {
     nova_post_address: ''
   });
   
-  // Временно отключаем загрузку пользователя - /auth/me/ возвращает HTML
+  const { user, accessToken } = useSelector((state) => state.auth);
+  // Загружаем актуальный профиль с бэкенда при наличии токена
   const { data: userData, isLoading, isError } = useGetUserQuery(undefined, {
-    skip: true // TODO: Включить когда бэкенд исправит /auth/me/
+    skip: !(getAuth()?.accessToken || accessToken)
   });
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
   const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
-  const { user, accessToken } = useSelector((state) => state.auth);
   
   // Проверяем авторизацию
   useEffect(() => {
@@ -77,27 +77,35 @@ const UserProfileArea = () => {
     }
   }, [router, locale, accessToken]);
   
+  const profileUser = userData || user;
+  const profileName = profileUser?.name || profileUser?.first_name || '';
+  const profileLastName = profileUser?.last_name || '';
+  const profileEmail = profileUser?.email || '';
+  const profilePhone = profileUser?.phone || '';
+  const profileNovaAddress = profileUser?.nova_post_address || profileUser?.address || '';
+  const profileLogin = profileUser?.login || profileUser?.username || profileEmail;
+
   // Инициализация данных формы при загрузке пользователя
   useEffect(() => {
-    if (user) {
-      const parsedAddress = (user.nova_post_address || '').split(',');
+    if (profileUser) {
+      const parsedAddress = (profileNovaAddress || '').split(',');
       const parsedCity = parsedAddress.shift()?.trim() || '';
       const parsedWarehouse = parsedAddress.join(',').trim();
 
       setFormData({
-        name: user.name || '',
-        last_name: user.last_name || '',
-        phone: user.phone || '',
-        city: user.city || parsedCity || '',
-        warehouse: user.warehouse || parsedWarehouse || '',
-        nova_post_address: user.nova_post_address || ''
+        name: profileName,
+        last_name: profileLastName,
+        phone: profilePhone,
+        city: profileUser.city || parsedCity || '',
+        warehouse: profileUser.warehouse || parsedWarehouse || '',
+        nova_post_address: profileNovaAddress
       });
 
-      setSearchCity(user.city || parsedCity || '');
-      setSearchWarehouse(user.warehouse || parsedWarehouse || '');
-      setSelectedCityName(user.city || parsedCity || '');
+      setSearchCity(profileUser.city || parsedCity || '');
+      setSearchWarehouse(profileUser.warehouse || parsedWarehouse || '');
+      setSelectedCityName(profileUser.city || parsedCity || '');
     }
-  }, [user]);
+  }, [profileUser, profileName, profileLastName, profilePhone, profileNovaAddress]);
 
   // Обработчик для включения режима редактирования
   const handleEditProfile = () => {
@@ -108,23 +116,23 @@ const UserProfileArea = () => {
   const handleCancelEdit = () => {
     setEditMode(false);
     // Сбрасываем форму к исходным значениям
-    if (user) {
-      const parsedAddress = (user.nova_post_address || '').split(',');
+    if (profileUser) {
+      const parsedAddress = (profileNovaAddress || '').split(',');
       const parsedCity = parsedAddress.shift()?.trim() || '';
       const parsedWarehouse = parsedAddress.join(',').trim();
 
       setFormData({
-        name: user.name || '',
-        last_name: user.last_name || '',
-        phone: user.phone || '',
-        city: user.city || parsedCity || '',
-        warehouse: user.warehouse || parsedWarehouse || '',
-        nova_post_address: user.nova_post_address || ''
+        name: profileName,
+        last_name: profileLastName,
+        phone: profilePhone,
+        city: profileUser.city || parsedCity || '',
+        warehouse: profileUser.warehouse || parsedWarehouse || '',
+        nova_post_address: profileNovaAddress
       });
 
-      setSearchCity(user.city || parsedCity || '');
-      setSearchWarehouse(user.warehouse || parsedWarehouse || '');
-      setSelectedCityName(user.city || parsedCity || '');
+      setSearchCity(profileUser.city || parsedCity || '');
+      setSearchWarehouse(profileUser.warehouse || parsedWarehouse || '');
+      setSelectedCityName(profileUser.city || parsedCity || '');
     }
   };
 
@@ -376,9 +384,9 @@ const UserProfileArea = () => {
       
       // Отправляем данные на сервер
       await updateProfile({
-        id: user?.id,
+        id: profileUser?.id,
         data: {
-          email: user?.email || '',
+          email: profileEmail,
           name: formData.name,
           last_name: formData.last_name,
           phone: formData.phone,
@@ -438,13 +446,13 @@ const UserProfileArea = () => {
                         {/* Аватар пользователя */}
                         <div className="profile__avatar mb-3 mb-md-0 me-md-4">
                           <div className="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white shadow-sm" style={{ width: '100px', height: '100px', fontSize: '2.5rem', background: 'linear-gradient(135deg, #3a7bd5, #00d2ff)' }}>
-                            {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                            {user?.last_name ? user.last_name.charAt(0).toUpperCase() : ''}
+                            {profileName ? profileName.charAt(0).toUpperCase() : 'U'}
+                            {profileLastName ? profileLastName.charAt(0).toUpperCase() : ''}
                           </div>
                         </div>
                         <div className="profile__meta-content text-center text-md-start">
-                          <h3 className="profile__meta-title mb-2 fs-4">{user?.name} {user?.last_name}</h3>
-                          <p className="text-muted mb-0"><i className="far fa-calendar-alt me-2"></i>{t('accountCreated')}: {new Date(user?.date_joined || Date.now()).toLocaleDateString()}</p>
+                          <h3 className="profile__meta-title mb-2 fs-4">{profileName} {profileLastName}</h3>
+                          <p className="text-muted mb-0"><i className="far fa-user me-2"></i>{profileLogin || t('notSpecified')}</p>
                         </div>
                       </div>
                     </div>
@@ -459,7 +467,7 @@ const UserProfileArea = () => {
                             </div>
                             <div className="tp-contact-content">
                               <h5 className="mb-2 fs-6 fw-bold">{t('email')}</h5>
-                              <p className="text-primary mb-0 small text-break">{user?.email}</p>
+                              <p className="text-primary mb-0 small text-break">{profileEmail || t('notSpecified')}</p>
                             </div>
                           </div>
                         </div>
@@ -471,7 +479,7 @@ const UserProfileArea = () => {
                             </div>
                             <div className="tp-contact-content">
                               <h5 className="mb-2 fs-6 fw-bold">{t('phone')}</h5>
-                              <p className="text-success mb-0 small">{user?.phone || t('notSpecified')}</p>
+                              <p className="text-success mb-0 small">{profilePhone || t('notSpecified')}</p>
                             </div>
                           </div>
                         </div>
@@ -483,7 +491,7 @@ const UserProfileArea = () => {
                             </div>
                             <div className="tp-contact-content">
                               <h5 className="mb-2 fs-6 fw-bold">{t('novaPostAddress')}</h5>
-                              <p className="text-info mb-0 small">{user?.nova_post_address || t('notSpecified')}</p>
+                              <p className="text-info mb-0 small">{profileNovaAddress || t('notSpecified')}</p>
                             </div>
                           </div>
                         </div>
@@ -657,7 +665,7 @@ const UserProfileArea = () => {
                                 type="email" 
                                 className="form-control bg-light"
                                 placeholder={t('email')} 
-                                value={user?.email || ''}
+                                value={profileEmail}
                                 readOnly
                               />
                               <small className="text-muted">{t('emailCannotBeChanged')}</small>
