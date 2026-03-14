@@ -712,10 +712,14 @@
     "go_to_orders": "Go to orders",
     "back_to_home": "Back to home",
     "err_59": "Incorrect CVV code",
+    "err_CVV": "Incorrect CVV/CVC code",
     "err_INSUFFICIENT_FUNDS": "Insufficient funds",
     "err_CARD_BLOCKED": "Card blocked",
     "err_EXPIRED_CARD": "Card expired",
-    "err_DECLINED": "Payment declined by issuer"
+    "err_DECLINED": "Payment declined by issuer",
+    "err_3DS": "3D Secure authentication failed",
+    "err_LIMIT_EXCEEDED": "Card operation limit exceeded",
+    "err_BANK_UNAVAILABLE": "Bank is temporarily unavailable. Please try again later"
   },
   "PreCheckout": {
     "title": "Checkout",
@@ -791,12 +795,14 @@
   },
   "OrderSuccess": {
     "title": "Order Successfully Placed!",
-    "description": "Thank you for your order! We will contact you shortly to confirm delivery details.",
+    "description": "Your order has been created successfully. We will prepare and ship it no later than within 24 hours.",
+    "statusBadge": "Payment confirmed",
     "nextSteps": "What's next?",
-    "step1": "We will process your order within 1-2 business days",
+    "step1": "We will prepare and ship your order no later than within 24 hours",
     "step2": "Our manager will contact you for confirmation",
     "step3": "After confirmation, we will prepare the item for shipment",
     "step4": "We will notify you when ready for pickup",
+    "myOrders": "My orders",
     "continueShopping": "Continue Shopping",
     "backToHome": "Back to Home"
   },
