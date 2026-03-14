@@ -173,15 +173,21 @@ const OrderCheckoutArea = () => {
       setMonoPaymentError(null);
       // Custom button only: do not render MonoPay widget.
 
-      // New swagger contract: order_id + redirect_url are required
-      const redirect_url = `${window.location.origin}/api/monobank/redirect?locale=${encodeURIComponent(
+      // Monobank supports dedicated success/fail return URLs.
+      const success_url = `${window.location.origin}/api/monobank/redirect?locale=${encodeURIComponent(
         locale
-      )}&order_id=${encodeURIComponent(orderId)}`;
-      console.log('Creating Monobank payment (RTK):', { orderId, redirect_url });
+      )}&order_id=${encodeURIComponent(orderId)}&result=success`;
+      const fail_url = `${window.location.origin}/api/monobank/redirect?locale=${encodeURIComponent(
+        locale
+      )}&order_id=${encodeURIComponent(orderId)}&result=failed`;
+      const redirect_url = fail_url;
+      console.log('Creating Monobank payment (RTK):', { orderId, redirect_url, success_url, fail_url });
 
       const data = await createPayment({
         order_id: orderId,
         redirect_url,
+        success_url,
+        fail_url,
       }).unwrap();
 
       console.log('Monobank payment raw response:', { data });

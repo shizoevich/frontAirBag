@@ -579,7 +579,19 @@
     "payment_failed": "Оплата не пройшла.",
     "payment_failed_with_reason": "Оплата не пройшла: {reason}",
     "payment_status_unknown": "Статус оплати ще не підтверджено. Перевірте статус замовлення.",
-    "err_59": "Невірний CVV код"
+    "payment_error_title": "Виникла помилка під час оплати замовлення",
+    "payment_error_description": "Не вдалося завершити оплату. Перевірте причину нижче.",
+    "payment_error_order_label": "Замовлення",
+    "payment_error_code_label": "Код помилки",
+    "payment_error_reason_label": "Причина",
+    "payment_error_unknown_reason": "Невідома помилка оплати",
+    "go_to_orders": "Перейти до замовлень",
+    "back_to_home": "На головну",
+    "err_59": "Невірний CVV код",
+    "err_INSUFFICIENT_FUNDS": "Недостатньо коштів",
+    "err_CARD_BLOCKED": "Картку заблоковано",
+    "err_EXPIRED_CARD": "Термін дії картки минув",
+    "err_DECLINED": "Платіж відхилено банком"
   },
   "CheckoutValidation": {
     "first_name_required": "Ім'я обов'язкове",

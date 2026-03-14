@@ -53,11 +53,20 @@ const OrderConfirmation = ({ orderId }) => {
       setPaymentError(null);
       setIsCreatingPayment(true);
 
-      // New swagger contract: order_id + redirect_url are required
-      const redirect_url = `${window.location.origin}/api/monobank/redirect?locale=${encodeURIComponent(
+      // Monobank supports dedicated success/fail return URLs.
+      const success_url = `${window.location.origin}/api/monobank/redirect?locale=${encodeURIComponent(
         locale
-      )}&order_id=${encodeURIComponent(displayOrder.id)}`;
-      const data = await createPayment({ order_id: displayOrder.id, redirect_url }).unwrap();
+      )}&order_id=${encodeURIComponent(displayOrder.id)}&result=success`;
+      const fail_url = `${window.location.origin}/api/monobank/redirect?locale=${encodeURIComponent(
+        locale
+      )}&order_id=${encodeURIComponent(displayOrder.id)}&result=failed`;
+      const redirect_url = fail_url;
+      const data = await createPayment({
+        order_id: displayOrder.id,
+        redirect_url,
+        success_url,
+        fail_url,
+      }).unwrap();
 
       const pageUrl = resolveMonobankPageUrl(data);
 

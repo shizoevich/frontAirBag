@@ -706,7 +706,19 @@
     "payment_failed": "Оплата не прошла.",
     "payment_failed_with_reason": "Оплата не прошла: {reason}",
     "payment_status_unknown": "Статус оплаты ещё не подтверждён. Проверьте статус заказа.",
-    "err_59": "Неверный CVV код"
+    "payment_error_title": "Возникла ошибка при оплате заказа",
+    "payment_error_description": "Не удалось завершить оплату. Проверьте причину ниже.",
+    "payment_error_order_label": "Заказ",
+    "payment_error_code_label": "Код ошибки",
+    "payment_error_reason_label": "Причина",
+    "payment_error_unknown_reason": "Неизвестная ошибка оплаты",
+    "go_to_orders": "Перейти к заказам",
+    "back_to_home": "На главную",
+    "err_59": "Неверный CVV код",
+    "err_INSUFFICIENT_FUNDS": "Недостаточно средств",
+    "err_CARD_BLOCKED": "Карта заблокирована",
+    "err_EXPIRED_CARD": "Срок действия карты истек",
+    "err_DECLINED": "Платеж отклонен банком"
   },
   "CheckoutValidation": {
     "first_name_required": "Имя обязательно",

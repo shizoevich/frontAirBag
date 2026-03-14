@@ -703,7 +703,19 @@
     "payment_failed": "Payment failed.",
     "payment_failed_with_reason": "Payment failed: {reason}",
     "payment_status_unknown": "Payment status is not confirmed yet. Please check your order status.",
-    "err_59": "Incorrect CVV code"
+    "payment_error_title": "There was an error while paying for the order",
+    "payment_error_description": "We could not complete your payment. Please check the reason below.",
+    "payment_error_order_label": "Order",
+    "payment_error_code_label": "Error code",
+    "payment_error_reason_label": "Reason",
+    "payment_error_unknown_reason": "Unknown payment error",
+    "go_to_orders": "Go to orders",
+    "back_to_home": "Back to home",
+    "err_59": "Incorrect CVV code",
+    "err_INSUFFICIENT_FUNDS": "Insufficient funds",
+    "err_CARD_BLOCKED": "Card blocked",
+    "err_EXPIRED_CARD": "Card expired",
+    "err_DECLINED": "Payment declined by issuer"
   },
   "PreCheckout": {
     "title": "Checkout",
