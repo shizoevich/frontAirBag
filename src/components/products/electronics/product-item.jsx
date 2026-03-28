@@ -5,11 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslations, useLocale } from 'next-intl';
 import { useLocalizedLink } from '@/utils/localeLink';
 // internal
-import { Cart, QuickView } from "@/svg";
+import { Cart, QuickView, Minus, Plus } from "@/svg";
 import { handleProductModal } from "@/redux/features/productModalSlice";
-import { add_cart_product } from "@/redux/features/cartSlice";
+import { add_cart_product, quantityDecrement, quantityIncrement } from "@/redux/features/cartSlice";
 import BlurImage from "@/components/common/BlurImage";
-import { getProductImage, getProductId } from "@/utils/image-utils";
+import { getProductImage } from "@/utils/image-utils";
 import { slugify } from '@/utils/slugify';
 
 const ProductItem = ({ product }) => {
@@ -50,13 +50,35 @@ const ProductItem = ({ product }) => {
     const currentId = id || product._id;
     return prdId === currentId;
   });
+
+  const cartItem = cart_products.find((prd) => {
+    const prdId = prd.id || prd._id;
+    const currentId = id || product._id;
+    return prdId === currentId;
+  });
+
+  const currentOrderQuantity = Number(cartItem?.orderQuantity || 1);
  
   const normalizedResidue = Number(residue ?? 0);
   const isOutOfStock = normalizedResidue <= 0;
+  const canDecreaseQty = currentOrderQuantity > 1;
+  const canIncreaseQty = currentOrderQuantity < normalizedResidue;
 
   // handle add product
   const handleAddProduct = (prd) => {
     dispatch(add_cart_product(prd));
+  };
+
+  const handleIncreaseQty = () => {
+    if (cartItem && canIncreaseQty) {
+      dispatch(quantityIncrement(cartItem));
+    }
+  };
+
+  const handleDecreaseQty = () => {
+    if (cartItem && canDecreaseQty) {
+      dispatch(quantityDecrement(cartItem));
+    }
   };
 
 // Получаем вторую картинку для hover эффекта
@@ -186,22 +208,58 @@ const handleMouseLeave = () => {
           </div>
           <div>
             {isAddedToCart ? (
-              <Link
-                href={getLocalizedLink('/cart', 'product-item button')}
-                className="tp-btn-sm w-100 d-inline-block text-center"
+              <div
                 style={{
-                  fontSize: '14px',
-                  padding: '8px 15px',
-                  backgroundColor: '#010F1C',
-                  color: '#fff',
-                  borderRadius: '4px'
+                  display: 'flex',
+                  alignItems: 'stretch',
+                  justifyContent: 'space-between',
+                  gap: '0'
                 }}
               >
-                <span style={{ marginRight: '5px', display: 'inline-block', verticalAlign: 'middle' }}>
+                <div
+                  className="tp-product-quantity"
+                  style={{
+                    margin: 0,
+                    height: '40px',
+                    flex: 1,
+                    borderRadius: '4px 0 0 4px',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <span
+                    className={`tp-cart-minus ${!canDecreaseQty ? 'disabled' : ''}`}
+                    onClick={handleDecreaseQty}
+                    style={{ borderRadius: 0 }}
+                  >
+                    <Minus />
+                  </span>
+                  <input className="tp-cart-input" type="text" readOnly value={currentOrderQuantity} style={{ borderRadius: 0, height: '100%' }} />
+                  <span
+                    className={`tp-cart-plus ${!canIncreaseQty ? 'disabled' : ''}`}
+                    onClick={handleIncreaseQty}
+                    style={{ borderRadius: 0 }}
+                  >
+                    <Plus />
+                  </span>
+                </div>
+
+                <Link
+                  href={getLocalizedLink('/cart', 'product-item button')}
+                  className="d-inline-flex align-items-center justify-content-center"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    minWidth: '40px',
+                    backgroundColor: '#010F1C',
+                    color: '#fff',
+                    borderRadius: '0 4px 4px 0'
+                  }}
+                  aria-label={t('viewCart')}
+                  title={t('viewCart')}
+                >
                   <Cart width={16} height={16} />
-                </span>
-                {t('viewCart')}
-              </Link>
+                </Link>
+              </div>
             ) : (
               <>
                 <button
@@ -212,6 +270,11 @@ const handleMouseLeave = () => {
                   style={{
                     fontSize: '14px',
                     padding: '8px 15px',
+                    height: '40px',
+                    minHeight: '40px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     backgroundColor: isOutOfStock ? '#f0f0f0' : '#de8043',
                     color: isOutOfStock ? '#a0a0a0' : '#fff',
                     border: '1px solid #e0e0e0',
