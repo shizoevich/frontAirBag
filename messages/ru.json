@@ -126,7 +126,8 @@
     "viewCart": "Перейти в корзину",
     "addToCart": "Добавить в корзину",
     "quickView": "Быстрый просмотр",
-    "addToWishlist": "Добавить в список желаний"
+    "addToWishlist": "Добавить в список желаний",
+    "remainingStock": "Остаток: {count} шт."
   },
   "ProductModal": {
     "contentLabel": "Детали товара"

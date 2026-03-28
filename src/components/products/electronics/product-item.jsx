@@ -51,7 +51,8 @@ const ProductItem = ({ product }) => {
     return prdId === currentId;
   });
  
-  const isOutOfStock = residue === 0;
+  const normalizedResidue = Number(residue ?? 0);
+  const isOutOfStock = normalizedResidue <= 0;
 
   // handle add product
   const handleAddProduct = (prd) => {
@@ -177,8 +178,11 @@ const handleMouseLeave = () => {
           </h3>
         </div>
         <div className="d-flex flex-column gap-2">
-          <div className="tp-product-price-wrapper">
+          <div className="tp-product-price-wrapper" style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '8px' }}>
             <span className="tp-product-price">{(Number(price_minor || 0) / 100).toFixed(2)} ₴</span>
+            <span style={{ fontSize: '13px', color: '#6c757d', whiteSpace: 'nowrap' }}>
+              {t('remainingStock', { count: normalizedResidue })}
+            </span>
           </div>
           <div>
             {isAddedToCart ? (

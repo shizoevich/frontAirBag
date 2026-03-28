@@ -127,7 +127,8 @@
     "viewCart": "Переглянути кошик",
     "quickView": "Швидкий перегляд",
     "outOfStock": "Немає в наявності",
-    "notAvailable": "Товара немає в наявності"
+    "notAvailable": "Товара немає в наявності",
+    "remainingStock": "Залишок: {count} шт."
   },
   "ProductModal": {
     "contentLabel": "Деталі товару"

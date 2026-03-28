@@ -137,7 +137,8 @@
     "viewCart": "View Cart",
     "addToCart": "Add to Cart",
     "quickView": "Quick View",
-    "addToWishlist": "Add To Wishlist"
+    "addToWishlist": "Add To Wishlist",
+    "remainingStock": "Remaining: {count} pcs."
   },
   "ProductModal": {
     "contentLabel": "Product Details"
