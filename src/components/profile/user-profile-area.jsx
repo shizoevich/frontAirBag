@@ -3,13 +3,18 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from 'next-intl';
+import { toast } from "@/utils/toast";
 import { getAuth } from "@/utils/authStorage";
 import Link from "next/link";
 import {
   useChangePasswordMutation,
   useGetUserQuery,
   useUpdateProfileMutation,
+  useTelegramLinkQuery,
+  useTelegramAutoLinkMutation,
 } from "@/redux/features/auth/authApi";
+import useTelegramWebApp from "@/hooks/use-telegram-webapp";
+import { buildTelegramInitPayload } from "@/utils/telegram";
 import Loader from "../loader/loader";
 import ErrorMsg from "../common/error-msg";
 import { notifyError, notifySuccess } from '@/utils/toast';
@@ -58,6 +63,8 @@ const UserProfileArea = () => {
   });
   
   const { user, accessToken } = useSelector((state) => state.auth);
+  const { hasInitData, rawInitData, user: telegramUser } = useTelegramWebApp();
+  const [telegramAutoLink, { isLoading: isTelegramLinking }] = useTelegramAutoLinkMutation();
   // Загружаем актуальный профиль с бэкенда при наличии токена
   const { data: userData, isLoading, isError } = useGetUserQuery(undefined, {
     skip: !(getAuth()?.accessToken || accessToken)
@@ -78,6 +85,7 @@ const UserProfileArea = () => {
   }, [router, locale, accessToken]);
   
   const profileUser = userData || user;
+  const isTelegramLinked = Boolean(profileUser?.telegram_id || profileUser?.telegram_username);
   const profileName = profileUser?.name || profileUser?.first_name || '';
   const profileLastName = profileUser?.last_name || '';
   const profileEmail = profileUser?.email || '';
@@ -110,6 +118,17 @@ const UserProfileArea = () => {
   // Обработчик для включения режима редактирования
   const handleEditProfile = () => {
     setEditMode(true);
+  };
+
+  const handleTelegramAutoLink = async () => {
+    try {
+      const payload = buildTelegramInitPayload({ rawInitData }) || {};
+      await telegramAutoLink(payload).unwrap();
+      notifySuccess(profileExtra('telegramLinkedSuccess'));
+    } catch (error) {
+      const message = error?.data?.detail || error?.data?.message || profileExtra('telegramLinkedError');
+      notifyError(message);
+    }
   };
 
   // Обработчик для отмены редактирования
@@ -440,7 +459,7 @@ const UserProfileArea = () => {
                 
                 {/* Профиль пользователя */}
                 <div className="profile__info-content">
-                  <div className="row">
+                    <div className="row">
                     <div className="col-12 mb-30">
                       <div className="profile__meta d-flex flex-column flex-md-row align-items-center">
                         {/* Аватар пользователя */}
@@ -452,7 +471,18 @@ const UserProfileArea = () => {
                         </div>
                         <div className="profile__meta-content text-center text-md-start">
                           <h3 className="profile__meta-title mb-2 fs-4">{profileName} {profileLastName}</h3>
-                          <p className="text-muted mb-0"><i className="far fa-user me-2"></i>{profileLogin || t('notSpecified')}</p>
+                          <p className="text-muted mb-1"><i className="far fa-user me-2"></i>{profileLogin || t('notSpecified')}</p>
+                          {hasInitData && (
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2"
+                              onClick={handleTelegramAutoLink}
+                              disabled={isTelegramLinking}
+                            >
+                              <i className="fab fa-telegram" aria-hidden="true" />
+                              {isTelegramLinked ? profileExtra('telegramLinked') : profileExtra('telegramLinkCTA')}
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>

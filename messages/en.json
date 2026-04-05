@@ -318,7 +318,11 @@
     "update": "Update Profile",
     "updating": "Updating...",
     "profileUpdateSuccess": "Profile updated successfully",
-    "profileUpdateError": "Error updating profile"
+    "profileUpdateError": "Error updating profile",
+    "telegramLinkCTA": "Link Telegram",
+    "telegramLinked": "Telegram linked",
+    "telegramLinkedSuccess": "Telegram account linked successfully",
+    "telegramLinkedError": "Failed to link Telegram"
   },
   "Categories": {
   "allCategories": "All Categories",
@@ -551,6 +555,9 @@
     "authenticated_discount_message": "You are authenticated! Your discounts will be automatically applied.",
     "login_button": "Login",
     "register_button": "Register",
+    "telegram_link": "Link Telegram",
+    "telegram_linking": "Linking...",
+    "telegramAutoLinkFailed": "Telegram auto-link failed. Please try again.",
     "billing_details": "Billing Details",
     "your_order": "Your Order",
     "product": "Product",

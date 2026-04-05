@@ -316,7 +316,11 @@
     "enterPhone": "Введіть номер телефону",
     "enterAddress": "Введіть адресу",
     "phoneRequired": "Телефон обов'язковий",
-    "addressRequired": "Адреса обов'язкова"
+    "addressRequired": "Адреса обов'язкова",
+    "telegramLinkCTA": "Прив'язати Telegram",
+    "telegramLinked": "Telegram прив'язано",
+    "telegramLinkedSuccess": "Telegram-акаунт успішно прив'язано",
+    "telegramLinkedError": "Не вдалося прив'язати Telegram"
   },
   "Categories": {
     "allCategories": "Всі категорії",
@@ -509,6 +513,9 @@
     "authenticated_discount_message": "Ви авторизовані! Ваші знижки будуть автоматично застосовані.",
     "login_button": "Увійти",
     "register_button": "Зареєструватися",
+    "telegram_link": "Прив'язати Telegram",
+    "telegram_linking": "Прив'язка...",
+    "telegramAutoLinkFailed": "Не вдалося прив'язати Telegram. Спробуйте ще раз.",
     "billing_details": "Деталі замовлення",
     "your_order": "Ваше замовлення",
     "product": "Товар",

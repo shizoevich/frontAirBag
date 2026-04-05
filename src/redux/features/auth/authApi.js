@@ -3,6 +3,8 @@ import { userLoggedIn, userLoggedOut } from "./authSlice";
 import { setAuth, updateAuth, removeAuth, getAuth } from "@/utils/authStorage";
 import { decodeJWT, getUserIdFromToken } from "@/utils/jwtDecode";
 import Cookies from "js-cookie";
+import { toast, notifySuccess, notifyError } from "@/utils/toast";
+import { buildTelegramInitPayload } from "@/utils/telegram";
 
 function isBlankString(v) {
   return v === undefined || v === null || String(v).trim() === "";
@@ -519,6 +521,79 @@ export const authApi = apiSlice.injectEndpoints({
         };
       },
     }),
+
+    telegramLink: builder.query({
+      query: () => ({
+        url: "/telegram/link",
+        method: "GET",
+      }),
+      providesTags: ['User'],
+      transformResponse: (response = {}) => ({
+        ...response,
+        link: response?.link || response?.url || null,
+      }),
+    }),
+
+    telegramAutoLink: builder.mutation({
+      query: (body = {}) => {
+        const payload = buildTelegramInitPayload(body) || body;
+        return {
+          url: "/telegram/auto-link",
+          method: "POST",
+          body: payload,
+        };
+      },
+      invalidatesTags: ['User'],
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const { data } = await queryFulfilled;
+          const detail = data?.detail || data?.message;
+          if (detail) notifySuccess(detail);
+          dispatch(authApi.endpoints.getUser.initiate(undefined, { forceRefetch: true }));
+        } catch (error) {
+          const message = error?.data?.detail || error?.data?.message || 'Telegram auto-link failed';
+          notifyError(message);
+          console.warn('Telegram auto link failed', error);
+        }
+      },
+    }),
+
+    telegramAuth: builder.mutation({
+      query: (body) => ({
+        url: "/telegram/auth",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ['User'],
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          const { access, refresh, user, detail, message } = result.data || {};
+          if (access) {
+            setAuth({
+              accessToken: access,
+              refreshToken: refresh ?? null,
+              user: user || null,
+            });
+            dispatch(
+              userLoggedIn({
+                accessToken: access,
+                user: user || null,
+              })
+            );
+            dispatch(
+              authApi.endpoints.getUser.initiate(undefined, { forceRefetch: true })
+            );
+            notifySuccess(detail || message || 'Telegram authorization successful');
+          }
+        } catch (error) {
+          const message = error?.data?.detail || error?.data?.message || 'Telegram auth failed';
+          notifyError(message);
+          console.error('Telegram auth failed', error);
+        }
+      },
+    }),
+
     // Обновление профиля пользователя (Swagger: PUT /clients/{id}/)
     updateProfile: builder.mutation({
       query: ({ id, data }) => ({
@@ -553,6 +628,9 @@ export const {
   useRegisterMutation: useRegisterUserMutation,
   useCreateGuestMutation,
   useGetUserQuery,
+  useTelegramLinkQuery,
+  useTelegramAutoLinkMutation,
+  useTelegramAuthMutation,
   useRefreshTokenMutation,
   useVerifyTokenMutation,
   useLogoutMutation,
