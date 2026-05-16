@@ -40,6 +40,7 @@
     "checkout": "Оформление заказа",
     "myOrders": "Мои заказы",
     "logout": "Выйти",
+    "myProfile": "Мой профиль",
     "search": "Поиск",
     "searchCatalog": "Поиск по каталогу",
     "searchByVin": "Поиск по VIN",
@@ -319,7 +320,9 @@
     "enterAddress": "Введите адрес",
     "telegramLinkCTA": "Привязать Telegram",
     "telegramLinked": "Telegram привязан",
+    "telegramChangeCTA": "Сменить аккаунт",
     "telegramLinkedSuccess": "Telegram-аккаунт успешно привязан",
+    "telegramChangedSuccess": "Telegram-аккаунт успешно заменён",
     "telegramLinkedError": "Не удалось привязать Telegram"
   },
   "YouTube": {

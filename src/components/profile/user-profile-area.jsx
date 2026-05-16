@@ -10,7 +10,7 @@ import {
   useChangePasswordMutation,
   useGetUserQuery,
   useUpdateProfileMutation,
-  useTelegramLinkQuery,
+  useLazyTelegramLinkQuery,
   useTelegramAutoLinkMutation,
 } from "@/redux/features/auth/authApi";
 import useTelegramWebApp from "@/hooks/use-telegram-webapp";
@@ -65,6 +65,8 @@ const UserProfileArea = () => {
   const { user, accessToken } = useSelector((state) => state.auth);
   const { hasInitData, rawInitData, user: telegramUser } = useTelegramWebApp();
   const [telegramAutoLink, { isLoading: isTelegramLinking }] = useTelegramAutoLinkMutation();
+  const [fetchTelegramLink, { isLoading: isFetchingLink }] = useLazyTelegramLinkQuery();
+  const autoLinkRef = useRef(false);
   // Загружаем актуальный профиль с бэкенда при наличии токена
   const { data: userData, isLoading, isError } = useGetUserQuery(undefined, {
     skip: !(getAuth()?.accessToken || accessToken)
@@ -86,6 +88,29 @@ const UserProfileArea = () => {
   
   const profileUser = userData || user;
   const isTelegramLinked = Boolean(profileUser?.telegram_id || profileUser?.telegram_username);
+
+  // Auto-link / auto-replace Telegram when profile is opened via Telegram WebApp.
+  // Fires if: in WebApp context, profile loaded, and the WebApp Telegram ID differs
+  // from the currently linked one (or nothing is linked yet).
+  useEffect(() => {
+    if (!hasInitData || !rawInitData) return;
+    if (!profileUser) return;
+    if (autoLinkRef.current) return;
+
+    const webAppTgId = telegramUser?.id ? Number(telegramUser.id) : null;
+    if (!webAppTgId) return;
+    // Same Telegram already linked — nothing to do
+    if (profileUser.telegram_id && Number(profileUser.telegram_id) === webAppTgId) return;
+
+    autoLinkRef.current = true;
+    const payload = buildTelegramInitPayload({ rawInitData }) || {};
+    const isChange = Boolean(profileUser.telegram_id);
+    telegramAutoLink(payload)
+      .unwrap()
+      .then(() => notifySuccess(profileExtra(isChange ? 'telegramChangedSuccess' : 'telegramLinkedSuccess')))
+      .catch(() => null);
+  }, [hasInitData, rawInitData, telegramUser, profileUser, telegramAutoLink, profileExtra]);
+
   const profileName = profileUser?.name || profileUser?.first_name || '';
   const profileLastName = profileUser?.last_name || '';
   const profileEmail = profileUser?.email || '';
@@ -120,14 +145,35 @@ const UserProfileArea = () => {
     setEditMode(true);
   };
 
-  const handleTelegramAutoLink = async () => {
-    try {
-      const payload = buildTelegramInitPayload({ rawInitData }) || {};
-      await telegramAutoLink(payload).unwrap();
-      notifySuccess(profileExtra('telegramLinkedSuccess'));
-    } catch (error) {
-      const message = error?.data?.detail || error?.data?.message || profileExtra('telegramLinkedError');
-      notifyError(message);
+  const handleTelegramLink = async (isChange = false) => {
+    if (hasInitData) {
+      // Telegram WebApp — link/replace via initData automatically
+      try {
+        autoLinkRef.current = true; // prevent duplicate from useEffect
+        const payload = buildTelegramInitPayload({ rawInitData }) || {};
+        await telegramAutoLink(payload).unwrap();
+        notifySuccess(profileExtra(isChange ? 'telegramChangedSuccess' : 'telegramLinkedSuccess'));
+      } catch (error) {
+        autoLinkRef.current = false;
+        const message = error?.data?.detail || error?.data?.message || profileExtra('telegramLinkedError');
+        notifyError(message);
+      }
+    } else {
+      // Regular browser — open blank window BEFORE await to avoid popup blocker
+      const win = window.open('', '_blank');
+      try {
+        const result = await fetchTelegramLink().unwrap();
+        const link = result?.link || result?.url;
+        if (link && win) {
+          win.location.href = link;
+        } else {
+          win?.close();
+        }
+      } catch (error) {
+        win?.close();
+        const message = error?.data?.detail || error?.data?.message || profileExtra('telegramLinkedError');
+        notifyError(message);
+      }
     }
   };
 
@@ -472,15 +518,31 @@ const UserProfileArea = () => {
                         <div className="profile__meta-content text-center text-md-start">
                           <h3 className="profile__meta-title mb-2 fs-4">{profileName} {profileLastName}</h3>
                           <p className="text-muted mb-1"><i className="far fa-user me-2"></i>{profileLogin || t('notSpecified')}</p>
-                          {hasInitData && (
+                          {isTelegramLinked ? (
+                            <div className="d-inline-flex align-items-center gap-2 flex-wrap">
+                              <span className="btn btn-sm btn-success d-inline-flex align-items-center gap-2" style={{ pointerEvents: 'none' }}>
+                                <i className="fab fa-telegram" aria-hidden="true" />
+                                {profileExtra('telegramLinked')}
+                              </span>
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1"
+                                onClick={() => handleTelegramLink(true)}
+                                disabled={isTelegramLinking || isFetchingLink}
+                              >
+                                <i className="fas fa-sync-alt" aria-hidden="true" />
+                                {profileExtra('telegramChangeCTA')}
+                              </button>
+                            </div>
+                          ) : (
                             <button
                               type="button"
                               className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2"
-                              onClick={handleTelegramAutoLink}
-                              disabled={isTelegramLinking}
+                              onClick={() => handleTelegramLink(false)}
+                              disabled={isTelegramLinking || isFetchingLink}
                             >
                               <i className="fab fa-telegram" aria-hidden="true" />
-                              {isTelegramLinked ? profileExtra('telegramLinked') : profileExtra('telegramLinkCTA')}
+                              {profileExtra('telegramLinkCTA')}
                             </button>
                           )}
                         </div>

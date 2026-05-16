@@ -7,7 +7,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCreateOrderMutation } from "@/redux/features/ordersApi";
-import { useGetUserQuery, useCreateGuestMutation } from "@/redux/features/auth/authApi";
+import { useGetUserQuery, useCreateGuestMutation, useTelegramAutoLinkMutation } from "@/redux/features/auth/authApi";
+import useTelegramWebApp from "@/hooks/use-telegram-webapp";
+import { buildTelegramInitPayload } from "@/utils/telegram";
 import { useUpdateClientPutMutation } from '@/redux/features/clientsApi';
 import { userLoggedIn } from "@/redux/features/auth/authSlice";
 import { clearCart } from "@/redux/features/cartSlice";
@@ -104,6 +106,8 @@ const useOrderCheckout = () => {
   const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
   const [createGuest, { isLoading: isCreatingGuest }] = useCreateGuestMutation();
   const [updateClientPut] = useUpdateClientPutMutation();
+  const [telegramAutoLink] = useTelegramAutoLinkMutation();
+  const { hasInitData, rawInitData } = useTelegramWebApp();
 
   const { register, handleSubmit, setValue, formState: { errors }, watch } = useForm({
     resolver: yupResolver(checkoutSchema),
@@ -297,6 +301,14 @@ const useOrderCheckout = () => {
         try {
           const guestResult = await createGuest(guestData).unwrap();
           console.log("Guest account created successfully:", guestResult);
+          if (hasInitData) {
+            try {
+              const tgPayload = buildTelegramInitPayload({ rawInitData });
+              if (tgPayload) await telegramAutoLink(tgPayload).unwrap();
+            } catch {
+              // Некритично — гость создан, привязка Telegram не обязательна
+            }
+          }
         } catch (guestError) {
           console.error("Failed to create guest account:", guestError);
           console.error("Guest error details:", {

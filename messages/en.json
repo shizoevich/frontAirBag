@@ -58,7 +58,8 @@
     "discounts": "Discounts",
     "login": "Login",
     "register": "Register",
-    "logout": "Logout"
+    "logout": "Logout",
+    "myProfile": "My Profile"
   },
   "features": {
     "fastDelivery": "Fast Delivery",
@@ -321,7 +322,9 @@
     "profileUpdateError": "Error updating profile",
     "telegramLinkCTA": "Link Telegram",
     "telegramLinked": "Telegram linked",
+    "telegramChangeCTA": "Change account",
     "telegramLinkedSuccess": "Telegram account linked successfully",
+    "telegramChangedSuccess": "Telegram account changed successfully",
     "telegramLinkedError": "Failed to link Telegram"
   },
   "Categories": {

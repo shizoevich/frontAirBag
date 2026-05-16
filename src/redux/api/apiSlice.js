@@ -2,6 +2,74 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { userLoggedOut } from "../features/auth/authSlice";
 import { getAccessToken, getRefreshToken, setAuth, getAuth } from "@/utils/authStorage";
 
+function decodeJwtPayload(token) {
+  try {
+    if (!token || typeof token !== 'string') return null;
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    const payload = parts[1]
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+    const normalized = payload + '='.repeat((4 - (payload.length % 4)) % 4);
+    const decoded = atob(normalized);
+    return JSON.parse(decoded);
+  } catch {
+    return null;
+  }
+}
+
+function getTokenMeta(token, source) {
+  const payload = decodeJwtPayload(token);
+  return {
+    token,
+    source,
+    exp: payload?.exp || 0,
+    userId: payload?.user_id || null,
+  };
+}
+
+function resolveBestAccessToken() {
+  let localToken = null;
+  let cookieToken = null;
+
+  try {
+    localToken = getAccessToken();
+  } catch {
+    localToken = null;
+  }
+
+  try {
+    if (typeof window !== 'undefined') {
+      // eslint-disable-next-line global-require
+      const Cookies = require('js-cookie');
+      const cookieRaw = Cookies.get('userInfo');
+      if (cookieRaw) {
+        const parsed = JSON.parse(cookieRaw);
+        cookieToken = parsed?.accessToken || null;
+      }
+    }
+  } catch {
+    cookieToken = null;
+  }
+
+  const localMeta = getTokenMeta(localToken, 'localStorage');
+  const cookieMeta = getTokenMeta(cookieToken, 'cookie');
+
+  // Prefer the token with the latest exp to avoid stale-token 403 loops.
+  let selected = null;
+  if (localMeta.token && cookieMeta.token) {
+    selected = localMeta.exp >= cookieMeta.exp ? localMeta : cookieMeta;
+  } else {
+    selected = localMeta.token ? localMeta : cookieMeta;
+  }
+
+  return {
+    selected,
+    localMeta,
+    cookieMeta,
+  };
+}
+
 function isAccessTokenExpiredError(result) {
   const status = result?.error?.status;
   const data = result?.error?.data;
@@ -78,27 +146,35 @@ const baseQuery = fetchBaseQuery({
         return headers;
       }
 
-      // Prefer localStorage token
-      let token = getAccessToken();
+      const { selected, localMeta, cookieMeta } = resolveBestAccessToken();
 
-      // Fallback to cookie token (some environments block localStorage or it may be stale)
-      if (!token) {
+      if (selected?.token) {
+        headers.set('Authorization', `Bearer ${selected.token}`);
+
+        // Keep storage and cookie in sync to avoid repeated stale-token selection.
         try {
-          if (typeof window !== 'undefined') {
-            // eslint-disable-next-line global-require
-            const Cookies = require('js-cookie');
-            const cookieRaw = Cookies.get('userInfo');
-            if (cookieRaw) {
-              const parsed = JSON.parse(cookieRaw);
-              token = parsed?.accessToken || null;
-            }
+          const existing = getAuth() || {};
+          if (existing?.accessToken !== selected.token) {
+            setAuth({ ...existing, accessToken: selected.token });
           }
         } catch {
-          // ignore cookie parse errors
+          // ignore sync failures
         }
-      }
+        syncCookieAccessToken(selected.token);
 
-      if (token) headers.set('Authorization', `Bearer ${token}`);
+        console.log('🔐 prepareHeaders auth token selected:', {
+          endpoint,
+          source: selected.source,
+          selectedExp: selected.exp,
+          selectedUserId: selected.userId,
+          localUserId: localMeta.userId,
+          localExp: localMeta.exp,
+          cookieUserId: cookieMeta.userId,
+          cookieExp: cookieMeta.exp,
+        });
+      } else {
+        console.log('🔐 prepareHeaders auth token missing:', { endpoint });
+      }
     } catch (error) {
       console.error('Error reading auth from storage:', error);
     }

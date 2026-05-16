@@ -46,7 +46,7 @@ const CheckoutLoginDiscount = ({ user, accessToken }) => {
                     <Link href={`/${locale}/register?redirect=/${locale}/checkout`} className="btn btn-sm btn-primary">
                       {t('register_button')}
                     </Link>
-                    {hasInitData && (
+                    {hasInitData && !user?.telegram_id && (
                       <button
                         type="button"
                         className="btn btn-sm btn-success d-flex align-items-center gap-2"

@@ -3,8 +3,7 @@ import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import { useRouter, usePathname } from 'next/navigation';
-import { useDispatch } from 'react-redux';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 // internal
 import { CloseEye, OpenEye } from '@/svg';
@@ -20,10 +19,8 @@ const LoginForm = () => {
   const [showPass, setShowPass] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [login, { isLoading }] = useLoginMutation();
-  const dispatch = useDispatch();
-  const router = useRouter();
   const pathname = usePathname();
-  const locale = pathname.split('/')[1]; // Получаем текущую локаль из URL
+  const locale = pathname.split('/')[1];
   const t = useTranslations('Common');
 
 
@@ -76,36 +73,8 @@ const LoginForm = () => {
           console.warn('Login form: failed to persist tokens to localStorage', e);
         }
 
-        // Токены уже сохранены в authApi.js через onQueryStarted
-        // Здесь только показываем уведомление и делаем редирект
-        console.log('✅ Login form: Login successful, tokens saved by authApi');
-        
         notifySuccess(t('loginSuccess'));
-        
-        // Проверяем, есть ли параметр redirect в URL или localStorage
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirectUrl = urlParams.get('redirect') || localStorage.getItem('redirectAfterLogin');
-        
-        // Очищаем сохраненный redirect в любом случае
-        localStorage.removeItem('redirectAfterLogin');
-        
-        if (redirectUrl) {
-          // Проверяем, что redirect URL не ведет на страницы авторизации
-          const isAuthPage = redirectUrl.includes('/login') || 
-                           redirectUrl.includes('/register') || 
-                           redirectUrl.includes('/forgot');
-          
-          if (!isAuthPage) {
-            // Безопасный редирект на сохраненную страницу
-            router.push(redirectUrl);
-          } else {
-            // Если redirect ведет на страницу авторизации, идем на главную
-            router.push(`/${locale}`);
-          }
-        } else {
-          // По умолчанию перенаправляем на главную страницу с учетом локали
-          router.push(`/${locale}`);
-        }
+        // Редирект обрабатывает LoginArea через useEffect когда accessToken появляется в Redux
       })
       .catch((error) => {
         console.error('Login error details:', {

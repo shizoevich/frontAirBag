@@ -152,10 +152,12 @@ export const authApi = apiSlice.injectEndpoints({
             login: arg.email,
           } : null;
           
-          setAuth({ 
-            accessToken: access, 
+          setAuth({
+            accessToken: access,
             refreshToken: refresh,
-            user: minimalUser 
+            user: minimalUser,
+            isGuest: false,
+            guestId: null,
           });
           console.log('Tokens and minimal user data saved to localStorage');
 
@@ -164,6 +166,8 @@ export const authApi = apiSlice.injectEndpoints({
             userLoggedIn({
               accessToken: access,
               user: minimalUser,
+              isGuest: false,
+              guestId: null,
             })
           );
           console.log('Redux state updated with access token and minimal user data');
@@ -175,7 +179,9 @@ export const authApi = apiSlice.injectEndpoints({
               JSON.stringify({
                 accessToken: access,
                 refreshToken: refresh,
-                user: minimalUser, // Сохраняем минимальные данные пользователя
+                user: minimalUser,
+                isGuest: false,
+                guestId: null,
               }),
               { expires: 7 }
             );
@@ -246,8 +252,9 @@ export const authApi = apiSlice.injectEndpoints({
           console.log('Current auth data in localStorage:', existing);
 
           const mergedUser = mergeAuthUsers(existing?.user || null, result.data);
-          const mergedIsGuest = mergedUser?.is_guest ?? existing?.isGuest ?? false;
-          const mergedGuestId = mergedUser?.guest_id ?? existing?.guestId ?? null;
+          // Explicitly use is_guest from user object; don't inherit from a previous guest session
+          const mergedIsGuest = mergedUser?.is_guest === true;
+          const mergedGuestId = mergedIsGuest ? (mergedUser?.guest_id ?? existing?.guestId ?? null) : null;
           
           // Обновляем данные пользователя в store с сохранением токена
           dispatch(
@@ -569,18 +576,40 @@ export const authApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
           const { access, refresh, user, detail, message } = result.data || {};
+          console.log('📲 TELEGRAM AUTH: response received', {
+            hasAccess: !!access,
+            hasRefresh: !!refresh,
+            hasUser: !!user,
+          });
           if (access) {
             setAuth({
               accessToken: access,
               refreshToken: refresh ?? null,
               user: user || null,
             });
+            try {
+              Cookies.set(
+                'userInfo',
+                JSON.stringify({
+                  accessToken: access,
+                  refreshToken: refresh ?? null,
+                  user: user || null,
+                  isGuest: user?.is_guest ?? false,
+                  guestId: user?.guest_id ?? null,
+                }),
+                { expires: 7 }
+              );
+              console.log('📲 TELEGRAM AUTH: cookie userInfo synced');
+            } catch (cookieErr) {
+              console.error('📲 TELEGRAM AUTH: failed to sync cookie userInfo', cookieErr);
+            }
             dispatch(
               userLoggedIn({
                 accessToken: access,
                 user: user || null,
               })
             );
+            console.log('📲 TELEGRAM AUTH: redux state updated, fetching /auth/me');
             dispatch(
               authApi.endpoints.getUser.initiate(undefined, { forceRefetch: true })
             );
@@ -629,6 +658,7 @@ export const {
   useCreateGuestMutation,
   useGetUserQuery,
   useTelegramLinkQuery,
+  useLazyTelegramLinkQuery,
   useTelegramAutoLinkMutation,
   useTelegramAuthMutation,
   useRefreshTokenMutation,

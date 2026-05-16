@@ -48,7 +48,8 @@
     "discounts": "Знижки",
     "login": "Вхід",
     "register": "Реєстрація",
-    "logout": "Вихід"
+    "logout": "Вихід",
+    "myProfile": "Мій профіль"
   },
   "features": {
     "fastDelivery": "Швидка доставка",
@@ -319,7 +320,9 @@
     "addressRequired": "Адреса обов'язкова",
     "telegramLinkCTA": "Прив'язати Telegram",
     "telegramLinked": "Telegram прив'язано",
+    "telegramChangeCTA": "Змінити акаунт",
     "telegramLinkedSuccess": "Telegram-акаунт успішно прив'язано",
+    "telegramChangedSuccess": "Telegram-акаунт успішно замінено",
     "telegramLinkedError": "Не вдалося прив'язати Telegram"
   },
   "Categories": {

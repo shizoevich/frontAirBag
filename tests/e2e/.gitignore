@@ -1,0 +1,4 @@
+.env
+.telegram-session.json
+playwright-report/
+test-results/
