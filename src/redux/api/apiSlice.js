@@ -120,6 +120,7 @@ console.log('API Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
 const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
   prepareHeaders: async (headers, { endpoint }) => {
+    headers.set('ngrok-skip-browser-warning', '1');
     try {
       // Public endpoints should not send Authorization at all.
       // Sending an expired token can make some backends return 401 even for public resources.
