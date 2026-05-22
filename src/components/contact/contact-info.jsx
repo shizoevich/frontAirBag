@@ -43,7 +43,7 @@ const ContactInfo = ({ locale }) => {
                     </div>
                     <div className="tp-contact-content">
                       <h5 className="mb-2 fs-6 fw-bold">{t('phone')}</h5>
-                      <a href="tel:+380989998928" className="text-success text-decoration-none">
+                      <a href="tel:+380989999828" className="text-success text-decoration-none">
                         {t('phoneNumber')}
                       </a>
                       <p className="text-secondary mb-0 small">{t('messendgers')}</p>
