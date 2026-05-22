@@ -403,29 +403,53 @@ const MOCK_DISCOUNTS = {
                 )}
 
                 {/* Milestones progress header */}
-                {milestones.length > 0 && (
-                  <div className="milestones mt-4 mb-50">
-                    <div className="milestones-bar">
-                      <div className="milestones-fill" style={{ width: `${spentRatio}%` }} />
-                      <div className="milestones-circles">
-                        {milestones.map((m, idx) => (
-                          <div
-                            key={idx}
-                            className={`milestone ${userTotalSpent >= m.amountUAH ? 'reached' : ''}`}
-                            style={{ left: `${(m.amountUAH / Math.max(maxMilestone, 1)) * 100}%` }}
-                            title={`≥ ${m.amountUAH.toLocaleString()} ₴ → ${m.percentage}%`}
-                          >
-                            <div className="dot" />
-                            <div className="label">
-                              <span className="amount">{m.amountUAH.toLocaleString()} ₴</span>
-                              <span className="percent">{m.percentage}%</span>
+                {milestones.length > 0 && (() => {
+                  const OVERLAP_THRESHOLD = 15; // % ширины бара
+                  const LABEL_H = 30;
+                  const STAGGER_PX = LABEL_H + 8; // больше высоты лейбла, иначе вертикальный overlap
+                  const BASE_MT = 6;
+                  const DOT_BELOW = 8;
+
+                  const positions = milestones.map(m => (m.amountUAH / Math.max(maxMilestone, 1)) * 100);
+
+                  // Жадное присвоение уровня каждой метке
+                  const levels = [];
+                  for (let i = 0; i < milestones.length; i++) {
+                    let level = 0;
+                    while (levels.some((lvl, j) => lvl === level && Math.abs(positions[i] - positions[j]) < OVERLAP_THRESHOLD)) {
+                      level++;
+                    }
+                    levels.push(level);
+                  }
+                  const maxLevel = Math.max(0, ...levels);
+                  const dynamicPB = DOT_BELOW + BASE_MT + LABEL_H + maxLevel * STAGGER_PX + 8;
+
+                  return (
+                    <div className="milestones mt-4" style={{ marginBottom: '20px' }}>
+                      <div className="milestones-wrapper" style={{ paddingBottom: `${dynamicPB}px` }}>
+                        <div className="milestones-bar">
+                          <div className="milestones-fill" style={{ width: `${spentRatio}%` }} />
+                        </div>
+                        <div className="milestones-circles">
+                          {milestones.map((m, idx) => (
+                            <div
+                              key={idx}
+                              className={`milestone ${userTotalSpent >= m.amountUAH ? 'reached' : ''}`}
+                              style={{ left: `${positions[idx]}%` }}
+                              title={`≥ ${m.amountUAH.toLocaleString()} ₴ → ${m.percentage}%`}
+                            >
+                              <div className="dot" />
+                              <div className="label" style={{ marginTop: `${BASE_MT + levels[idx] * STAGGER_PX}px` }}>
+                                <span className="amount">{m.amountUAH.toLocaleString()} ₴</span>
+                                <span className="percent">{m.percentage}%</span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -532,33 +556,33 @@ const MOCK_DISCOUNTS = {
 
         /* Milestones progress header */
         .milestones { text-align: left; }
+        .milestones-wrapper {
+          position: relative;
+          max-width: 600px;
+          margin: 18px auto 0;
+        }
         .milestones-bar {
           position: relative;
           height: 10px;
-          background:rgb(164, 164, 164);
+          background: rgb(164, 164, 164);
           border-radius: 6px;
-          overflow: visible;
-          margin-top: 18px;
-          max-width: 600px;
-
-
-          margin-left: auto;
-          margin-right: auto;
+          overflow: hidden;
         }
         .milestones-fill {
           position: absolute;
           left: 0; top: 0; bottom: 0;
-          background: linear-gradient(90deg,rgb(253, 197, 13),rgb(185, 23, 23));
+          background: linear-gradient(90deg, rgb(253, 197, 13), rgb(185, 23, 23));
           border-radius: 6px;
           transition: width 0.3s ease;
         }
         .milestones-circles {
-          position: relative;
+          position: absolute;
+          top: 0; left: 0; right: 0;
           height: 0;
         }
         .milestone {
           position: absolute;
-          top: -10px;
+          top: -3px;
           transform: translateX(-50%);
           display: flex;
           flex-direction: column;
@@ -566,21 +590,40 @@ const MOCK_DISCOUNTS = {
         }
         .milestone .dot {
           width: 16px; height: 16px; border-radius: 50%;
-          background: #fff; border: 3px solidrgb(125, 113, 108);
+          background: #fff; border: 3px solid rgb(125, 113, 108);
           box-shadow: 0 0 0 2px #000;
         }
-        .milestone.reached .dot { border-color:rgb(217, 112, 8); }
+        .milestone.reached .dot { border-color: rgb(217, 112, 8); }
         .milestone .label {
-          margin-top: 6px;
+          position: relative;
           display: flex; gap: 6px;
-          background: rgba(255,255,255,0.9);
-          border: 1px solidrgb(239, 236, 233);
+          background: rgba(255, 255, 255, 0.95);
+          border: 1px solid rgb(220, 213, 205);
           border-radius: 6px;
           padding: 4px 8px;
           white-space: nowrap;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
-        .milestone .label .amount { color:rgb(87, 83, 73); font-size: 12px; }
-        .milestone .label .percent { color:rgb(253, 113, 13); font-weight: 600; font-size: 12px; }
+        .milestone .label::before {
+          content: '';
+          position: absolute;
+          bottom: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          border: 5px solid transparent;
+          border-bottom-color: rgb(220, 213, 205);
+        }
+        .milestone .label::after {
+          content: '';
+          position: absolute;
+          bottom: calc(100% - 1px);
+          left: 50%;
+          transform: translateX(-50%);
+          border: 4px solid transparent;
+          border-bottom-color: rgba(255, 255, 255, 0.95);
+        }
+        .milestone .label .amount { color: rgb(87, 83, 73); font-size: 12px; }
+        .milestone .label .percent { color: rgb(253, 113, 13); font-weight: 600; font-size: 12px; }
         
         /* Rules Section Styles */
         .rules-section {
