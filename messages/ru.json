@@ -120,7 +120,8 @@
     "messendgers": "доступный на Telegram и Viber",
     "emailAddress": "Noxnew@hotmail.com",
     "address": "Украина, г. Одесса, ул. В. Самофалова, 16А/1, AirbagAD",
-    "copyright": " {year} Все права защищены | Шаблон Next.js от ThemePure"
+    "copyright": "© {year} AirbagAD — Все права защищены",
+    "madeBy": "Разработано:"
   },
   "ProductItem": {
     "outOfStock": "Нет в наличии",

@@ -137,6 +137,12 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                 <div className="col-md-6">
                   <div className="tp-footer-copyright">
                     <p>{t('copyright', { year: new Date().getFullYear() })}</p>
+                    <p style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>
+                      {t('madeBy')}{' '}
+                      <a href="https://t.me/fallenreds" target="_blank" rel="noopener noreferrer" style={{ color: '#888', textDecoration: 'underline' }}>
+                        Artur Khobotkov
+                      </a>
+                    </p>
                   </div>
                 </div>
                 <div className="col-md-6">
