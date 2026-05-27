@@ -234,6 +234,19 @@
     "showing": "Показано",
     "products": "товарів"
   },
+  "ProductsFilterBar": {
+    "filtersTitle": "Фільтри",
+    "sortLabel": "Сортування",
+    "priceLabel": "Ціна",
+    "sortDefault": "За замовчуванням",
+    "sortPriceAsc": "Ціна: низька → висока",
+    "sortPriceDesc": "Ціна: висока → низька",
+    "priceFrom": "Від",
+    "priceTo": "До",
+    "currency": "грн",
+    "inStock": "В наявності",
+    "reset": "Скинути"
+  },
   "SearchPage": {
     "title": "AirBag - Пошук товарів",
     "searchProducts": "Пошук товарів",

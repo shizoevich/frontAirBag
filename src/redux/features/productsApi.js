@@ -5,17 +5,33 @@ export const productsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Получение всех товаров с фильтрацией и пагинацией
     getAllProducts: builder.query({
-      query: ({ limit = 12, offset = 0, categoryId = null, searchText = '' } = {}) => {
+      query: ({ limit = 12, offset = 0, categoryId = null, searchText = '', ordering = '', priceMin = '', priceMax = '', inStock = false } = {}) => {
         let url = `/goods/?limit=${limit}&offset=${offset}`;
-        
+
         if (categoryId) {
           url += `&category_id=${categoryId}`;
         }
-        
+
         if (searchText) {
           url += `&title__icontains=${encodeURIComponent(searchText)}`;
         }
-        
+
+        if (ordering) {
+          url += `&ordering=${ordering}`;
+        }
+
+        if (priceMin !== '' && priceMin !== null) {
+          url += `&price_minor__gte=${Math.round(Number(priceMin) * 100)}`;
+        }
+
+        if (priceMax !== '' && priceMax !== null) {
+          url += `&price_minor__lte=${Math.round(Number(priceMax) * 100)}`;
+        }
+
+        if (inStock) {
+          url += `&residue__gt=0`;
+        }
+
         console.log('Запрос всех товаров:', url);
         return url;
       },

@@ -244,6 +244,19 @@
     "showing": "Showing",
     "products": "products"
   },
+  "ProductsFilterBar": {
+    "filtersTitle": "Filters",
+    "sortLabel": "Sort",
+    "priceLabel": "Price",
+    "sortDefault": "Default",
+    "sortPriceAsc": "Price: low → high",
+    "sortPriceDesc": "Price: high → low",
+    "priceFrom": "From",
+    "priceTo": "To",
+    "currency": "UAH",
+    "inStock": "In stock",
+    "reset": "Reset"
+  },
   "SearchPage": {
     "title": "AirBag - Search Products",
     "searchProducts": "Search Products",

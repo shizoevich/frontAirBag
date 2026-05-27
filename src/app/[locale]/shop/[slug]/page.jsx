@@ -8,7 +8,7 @@ import { getTranslations } from 'next-intl/server';
 // Helper function to fetch a single category by its slug
 async function fetchCategory(slug) {
   if (!slug) return null;
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const base = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
   const res = await fetch(`${base}/good-categories/?slug=${slug}`, { next: { revalidate: 600 } });
   if (!res.ok) return null;
   const data = await res.json();

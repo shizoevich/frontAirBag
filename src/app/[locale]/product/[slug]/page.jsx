@@ -20,7 +20,7 @@ async function fetchProduct(slug) {
     return null;
   }
 
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const base = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
   const res = await fetch(`${base}/goods/${id}/`, { next: { revalidate: 600 } });
 
   if (!res.ok) {

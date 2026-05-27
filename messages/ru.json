@@ -234,6 +234,19 @@
     "showing": "Показано",
     "products": "товаров"
   },
+  "ProductsFilterBar": {
+    "filtersTitle": "Фильтры",
+    "sortLabel": "Сортировка",
+    "priceLabel": "Цена",
+    "sortDefault": "По умолчанию",
+    "sortPriceAsc": "Цена: низкая → высокая",
+    "sortPriceDesc": "Цена: высокая → низкая",
+    "priceFrom": "От",
+    "priceTo": "До",
+    "currency": "грн",
+    "inStock": "В наличии",
+    "reset": "Сбросить"
+  },
   "SearchPage": {
     "title": "AirBag - Поиск товаров",
     "searchProducts": "Поиск товаров",

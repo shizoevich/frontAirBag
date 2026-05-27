@@ -1,5 +1,5 @@
 'use client';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import ReactPaginate from 'react-paginate';
@@ -8,6 +8,7 @@ import ParentCategories from '@/components/categories/parent-categories';
 import CategoryCarousel from '@/components/categories/category-carousel';
 import HomePrdLoader from '@/components/loader/home/home-prd-loader';
 import ErrorMsg from '@/components/common/error-msg';
+import ProductsFilterBar from '@/components/products/products-filter-bar';
 import { useGetAllProductsQuery, useGetFeaturedProductsQuery } from '@/redux/features/productsApi';
 import { useGetCategoryTreeQuery } from '@/redux/features/categoryApi';
 import { getChildrenAtLevel, hasChildren, sortAlphabetically, getCategoryFromTree } from '@/utils/categoryTreeHelpers';
@@ -19,6 +20,8 @@ const HomeProductsArea = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const itemsPerPage = 12;
+
+  const [filters, setFilters] = useState({ ordering: '', priceMin: '', priceMax: '', inStock: false });
 
   // Состояние выбранных категорий и страницы — в URL
   const selectedPath = useMemo(() => {
@@ -35,7 +38,8 @@ const HomeProductsArea = () => {
   // Загружаем дерево категорий
   const { data: categoryTree, isLoading: catLoading, isError: catError } = useGetCategoryTreeQuery();
 
-  const isFeatured = selectedPath.length === 0;
+  const hasActiveFilters = !!(filters.ordering || filters.priceMin || filters.priceMax || filters.inStock);
+  const isFeatured = selectedPath.length === 0 && !hasActiveFilters;
 
   const { data: featuredData, isLoading: featuredLoading, isError: featuredError } = useGetFeaturedProductsQuery(
     undefined,
@@ -44,7 +48,15 @@ const HomeProductsArea = () => {
 
   // Загружаем товары с серверной фильтрацией и пагинацией
   const { data: productsData, isLoading: productsLoading, isError: productsError } = useGetAllProductsQuery(
-    { limit: itemsPerPage, offset: currentPage * itemsPerPage, categoryId: activeCategoryId },
+    {
+      limit: itemsPerPage,
+      offset: currentPage * itemsPerPage,
+      categoryId: activeCategoryId,
+      ordering: filters.ordering,
+      priceMin: filters.priceMin,
+      priceMax: filters.priceMax,
+      inStock: filters.inStock,
+    },
     { skip: isFeatured }
   );
 
@@ -62,6 +74,21 @@ const HomeProductsArea = () => {
   }, [isFeatured, featuredData, productsData]);
 
   const pageCount = Math.ceil(totalCount / itemsPerPage);
+
+  // Обработка изменения фильтров
+  const handleFilterChange = (changed) => {
+    setFilters((prev) => ({ ...prev, ...changed }));
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('page');
+    const qs = params.toString();
+    router.replace(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
+  };
+
+  // Сброс всех фильтров и URL
+  const handleReset = () => {
+    setFilters({ ordering: '', priceMin: '', priceMax: '', inStock: false });
+    router.replace(pathname, { scroll: false });
+  };
 
   // Обработка смены страницы
   const handlePageClick = (event) => {
@@ -194,6 +221,17 @@ const HomeProductsArea = () => {
             </div>
           );
         })}
+
+        {/* Панель фильтров */}
+        <div className="row">
+          <div className="col-12">
+            <ProductsFilterBar
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onReset={handleReset}
+            />
+          </div>
+        </div>
 
         {/* Хлебные крошки вместо заголовка */}
         <div className="row">

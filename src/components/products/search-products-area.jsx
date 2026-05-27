@@ -7,6 +7,7 @@ import ProductItem from './electronics/product-item';
 import HomePrdLoader from '@/components/loader/home/home-prd-loader';
 import ErrorMsg from '@/components/common/error-msg';
 import ShapeLine from '@/svg/shape-line';
+import ProductsFilterBar from '@/components/products/products-filter-bar';
 import { useGetAllProductsQuery } from '@/redux/features/productsApi';
 
 const SearchProductsArea = () => {
@@ -14,6 +15,7 @@ const SearchProductsArea = () => {
   const tPagination = useTranslations('SearchArea');
   const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(0);
+  const [filters, setFilters] = useState({ ordering: '', priceMin: '', priceMax: '', inStock: false });
   const itemsPerPage = 12;
 
   // Get search text from URL
@@ -24,7 +26,21 @@ const SearchProductsArea = () => {
     limit: itemsPerPage,
     offset: currentPage * itemsPerPage,
     searchText: searchText,
+    ordering: filters.ordering,
+    priceMin: filters.priceMin,
+    priceMax: filters.priceMax,
+    inStock: filters.inStock,
   });
+
+  const handleFilterChange = (changed) => {
+    setFilters((prev) => ({ ...prev, ...changed }));
+    setCurrentPage(0);
+  };
+
+  const handleReset = () => {
+    setFilters({ ordering: '', priceMin: '', priceMax: '', inStock: false });
+    setCurrentPage(0);
+  };
 
   // Process products
   const { products, totalCount } = React.useMemo(() => {
@@ -89,6 +105,16 @@ const SearchProductsArea = () => {
           </div>
         )}
         
+        <div className="row">
+          <div className="col-12">
+            <ProductsFilterBar
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onReset={handleReset}
+            />
+          </div>
+        </div>
+
         <div className="row">{content}</div>
         
         {pageCount > 1 && (

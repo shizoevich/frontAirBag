@@ -10,6 +10,7 @@ import { useGetAllProductsQuery } from "@/redux/features/productsApi";
 import ReactPaginate from 'react-paginate';
 import CategoryCarousel from "@/components/categories/category-carousel";
 import ParentCategories from "@/components/categories/parent-categories";
+import ProductsFilterBar from "@/components/products/products-filter-bar";
 import { getChildrenAtLevel, hasChildren, sortAlphabetically, getCategoryFromTree, getCategoryPath } from '@/utils/categoryTreeHelpers';
 
 const AllProductsArea = () => {
@@ -20,6 +21,7 @@ const AllProductsArea = () => {
   const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedPath, setSelectedPath] = useState([]); // Массив ID выбранных категорий
+  const [filters, setFilters] = useState({ ordering: '', priceMin: '', priceMax: '', inStock: false });
   const itemsPerPage = 12;
 
   // Загружаем дерево категорий
@@ -71,6 +73,10 @@ const AllProductsArea = () => {
       offset: currentPage * itemsPerPage,
       categoryId: activeCategoryId,
       searchText: searchText,
+      ordering: filters.ordering,
+      priceMin: filters.priceMin,
+      priceMax: filters.priceMax,
+      inStock: filters.inStock,
     };
     
     console.log('AllProductsArea - API call with params:', apiParams);
@@ -93,6 +99,20 @@ const AllProductsArea = () => {
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
     document.getElementById('all-products-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Обработка изменения фильтров
+  const handleFilterChange = (changed) => {
+    setFilters((prev) => ({ ...prev, ...changed }));
+    setCurrentPage(0);
+  };
+
+  // Сброс всех фильтров и URL
+  const handleReset = () => {
+    setFilters({ ordering: '', priceMin: '', priceMax: '', inStock: false });
+    setSelectedPath([]);
+    setCurrentPage(0);
+    router.push(`/${locale}/shop`);
   };
 
   // Обработка выбора категории на любом уровне
@@ -200,6 +220,17 @@ const AllProductsArea = () => {
           );
         })}
         
+        {/* Панель фильтров */}
+        <div className="row">
+          <div className="col-12">
+            <ProductsFilterBar
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onReset={handleReset}
+            />
+          </div>
+        </div>
+
         {/* Хлебные крошки вместо заголовка */}
         {breadcrumbs.length > 0 && (
           <div className="row">
