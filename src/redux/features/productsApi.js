@@ -98,9 +98,8 @@ export const productsApi = apiSlice.injectEndpoints({
       providesTags: (result, error, params) => [{ type: 'products', id: params.categoryId }],
     }),
 
-    // Получение рекомендуемых товаров по категории
     getFeaturedProducts: builder.query({
-      query: (categoryId) => `/goods/?featured=true&category_id=${categoryId}`,
+      query: () => `/goods/featured/`,
       providesTags: ['FeaturedProducts'],
     }),
 
