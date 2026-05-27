@@ -87,8 +87,11 @@ const ProductSmItem = ({ product }) => {
           </h3>
         </div>
         <div className="d-flex flex-column gap-2">
-          <div className="tp-product-price-wrapper">
+          <div className="tp-product-price-wrapper" style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '8px' }}>
             <span className="tp-product-price">{(Number(price_minor || 0) / 100).toFixed(2)} ₴</span>
+            <span style={{ fontSize: '12px', color: residue > 0 ? '#28a745' : '#dc3545', whiteSpace: 'nowrap', fontWeight: 500 }}>
+              {t('remainingStock', { count: residue ?? 0 })}
+            </span>
           </div>
           <div>
             {isAddedToCart ? (

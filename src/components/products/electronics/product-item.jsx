@@ -202,7 +202,7 @@ const handleMouseLeave = () => {
         <div className="d-flex flex-column gap-2">
           <div className="tp-product-price-wrapper" style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '8px' }}>
             <span className="tp-product-price">{(Number(price_minor || 0) / 100).toFixed(2)} ₴</span>
-            <span style={{ fontSize: '13px', color: '#6c757d', whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: '13px', color: normalizedResidue > 0 ? '#28a745' : '#dc3545', whiteSpace: 'nowrap', fontWeight: 500 }}>
               {t('remainingStock', { count: normalizedResidue })}
             </span>
           </div>
