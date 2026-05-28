@@ -2,11 +2,12 @@
 import React, { useMemo, useState } from 'react';
 import { useGetOrdersQuery, useGetOrderByIdQuery } from '@/redux/features/ordersApi';
 import { useSelector } from 'react-redux';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 
 const OrderPage = () => {
   const t = useTranslations('Orders');
+  const locale = useLocale();
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   
   // Получаем данные пользователя из Redux (не вызываем /auth/me/)
@@ -62,7 +63,7 @@ const OrderPage = () => {
               <div className="text-center py-5">
                 <h4>{t('no_orders_found')}</h4>
                 <p className="mb-4">{t('no_orders_description')}</p>
-                <Link href="/shop" className="tp-btn">
+                <Link href={`/${locale}`} className="tp-btn">
                   {t('start_shopping')}
                 </Link>
               </div>
