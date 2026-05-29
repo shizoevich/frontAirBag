@@ -536,14 +536,17 @@
     min-height: 100px !important;
     padding: 15px !important;
   }
-  
+
   .tp-feature-content h3 {
     font-size: 15px !important;
   }
-  
+
   .tp-feature-content p {
     font-size: 13px !important;
     -webkit-line-clamp: 2;
     line-clamp: 2;
   }
 }
+
+
+

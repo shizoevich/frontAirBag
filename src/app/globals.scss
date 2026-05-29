@@ -3,6 +3,69 @@
 @import '~react-modal-video/scss/modal-video.scss';
 @import '../../public/assets/scss/main.scss';
 
+/* ===== CHIP STYLES FOR CATALOG DROPDOWN ===== */
+.tp-cat-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 10px;
+}
+.tp-cat-chips-row--root {
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 6px;
+}
+.tp-cat-chips-row--sub {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 8px 12px 10px;
+  margin-bottom: 6px;
+  border: 1px solid #f0f0f0;
+}
+.tp-cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid #dde1e7;
+  background: #fff;
+  color: #333;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  user-select: none;
+}
+.tp-cat-chip:hover {
+  border-color: #de8043;
+  color: #de8043;
+  background: #fff8f4;
+}
+.tp-cat-chip--active {
+  background: #de8043 !important;
+  border-color: #de8043 !important;
+  color: #fff !important;
+}
+.tp-cat-chip--active:hover {
+  background: #c96e31 !important;
+  border-color: #c96e31 !important;
+}
+.tp-cat-chip__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  line-height: 0;
+}
+.tp-cat-chip__arrow {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-left: 2px;
+  flex-shrink: 0;
+}
+
 /* Mobile pagination styles */
 .tp-pagination {
   @media (max-width: 768px) {

@@ -1,9 +1,8 @@
 'use client';
-'use client';
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useTranslations, useLocale } from 'next-intl';
 // internal
 import Menus from "./header-com/menus";
@@ -11,21 +10,18 @@ import useSticky from "@/hooks/use-sticky";
 import logo from "@assets/img/logo/auto-delivery-logo-nobg.png";
 import useCartInfo from "@/hooks/use-cart-info";
 import OffCanvas from "@/components/common/off-canvas";
-import { openCartMini, closeCartMini } from "@/redux/features/cartSlice";
-import HeaderCategory from "./header-com/header-category";
+import { openCartMini } from "@/redux/features/cartSlice";
 import HeaderTopRight from "./header-com/header-top-right";
 import HeaderMainRight from "./header-com/header-main-right";
 import CartMiniSidebar from "@/components/common/cart-mini-sidebar";
 import HeaderSearchForm from "@/components/forms/header-search-form";
-import { CartTwo, CategoryMenu, Compare, Menu, Phone, Discount } from "@/svg";
+import { CartTwo, Compare, Menu, Phone, Discount } from "@/svg";
 
 const Header = () => {
   const t = useTranslations('Header');
   const locale = useLocale();
 
-  const { cartMiniOpen } = useSelector((state) => state.cart);
   const [isOffCanvasOpen, setIsCanvasOpen] = useState(false);
-  const [isCategoryActive, setIsCategoryActive] = useState(false);
   const { quantity } = useCartInfo();
   const { sticky } = useSticky();
   const dispatch = useDispatch();
@@ -47,28 +43,6 @@ const Header = () => {
     }
   };
   
-  // Close category menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isCategoryActive && !event.target.closest('.tp-header-category')) {
-        setIsCategoryActive(false);
-      }
-    };
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isCategoryActive]);
-  
-  // Handle cart mini sidebar
-  const handleCartMini = () => {
-    dispatch(openCartMini());
-  };
-  
-  const handleCloseCartMini = () => {
-    dispatch(closeCartMini());
-  };
   return (
     <>
       {/* Cart Mini Sidebar */}
@@ -142,17 +116,7 @@ const Header = () => {
             <div className="container">
               <div className="tp-mega-menu-wrapper p-relative">
                 <div className="row align-items-center">
-                  <div className="col-xl-1 col-lg-0">
-                    {/* category start */}
-                    <div className="tp-header-category tp-category-menu tp-header-category-toggle">
-
-                      <nav className="tp-category-menu-content">
-                        <HeaderCategory categoryType="electronics" isCategoryActive={isCategoryActive} />
-                      </nav>
-                    </div>
-                    {/* category end */}
-                  </div>
-                  <div className="col-xl-7 col-lg-7">
+                  <div className="col-xl-8 col-lg-8">
                     <div className="main-menu menu-style-1">
                       <nav className="tp-main-menu-content">
                         <Menus />
@@ -177,6 +141,7 @@ const Header = () => {
               </div>
             </div>
           </div>
+
         </div>
       </header>
 

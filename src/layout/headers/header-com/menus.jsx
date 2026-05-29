@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import menu_data from "@/data/menu-data";
 import Link from "next/link";
 import { useTranslations, useLocale } from 'next-intl';
@@ -15,7 +15,9 @@ const Menus = () => {
   const router = useRouter();
   const { user, accessToken, isGuest } = useSelector((state) => state.auth);
   const [logout] = useLogoutMutation();
-  const [expandedCategories, setExpandedCategories] = useState({});
+  const [catalogPath, setCatalogPath] = useState([]);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   
   // Загружаем дерево категорий
   const { data: categoryTree } = useGetCategoryTreeQuery();
@@ -72,111 +74,90 @@ const Menus = () => {
     }
   };
 
-  // Переключение раскрытия категории
-  const toggleCategory = (categoryId) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [categoryId]: !prev[categoryId]
-    }));
-  };
-
-  // Рекурсивный компонент для отображения категории
-  const CategoryItem = ({ category, level = 0 }) => {
-    const hasChildren = category.children && category.children.length > 0;
-    const isExpanded = expandedCategories[category.id];
-    const sortedChildren = hasChildren ? sortAlphabetically(category.children) : [];
-
-    if (!hasChildren) {
-      // Конечная категория без детей
-      return (
-        <li style={{ marginBottom: '8px' }}>
-          <Link 
-            href={getLocalizedLink(`/shop?category=${category.id}`)}
-            style={{ 
-              fontSize: '14px', 
-              color: '#666',
-              transition: 'color 0.3s ease',
-              display: 'block'
-            }}
-          >
-            {category.title}
-          </Link>
-        </li>
-      );
+  // Handle chip click: navigate (via Link) + expand children if any
+  const handleCatalogExpand = (cat, levelIndex) => {
+    const isSame = catalogPath[levelIndex]?.id === cat.id;
+    if (isSame) {
+      setCatalogPath((prev) => prev.slice(0, levelIndex));
+    } else {
+      // Add to path (for leaves this won't produce a child row since children is empty)
+      setCatalogPath((prev) => [...prev.slice(0, levelIndex), cat]);
     }
-
-    // Категория с детьми
-    return (
-      <li style={{ marginBottom: level === 0 ? '20px' : '12px' }}>
-        <div
-          onClick={() => toggleCategory(category.id)}
-          style={{
-            fontSize: level === 0 ? '16px' : '14px',
-            fontWeight: level === 0 ? '600' : '500',
-            color: level === 0 ? '#222' : '#444',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            marginBottom: '8px',
-            transition: 'color 0.3s ease'
-          }}
-        >
-          <span style={{ 
-            fontSize: '12px', 
-            color: '#999',
-            minWidth: '12px'
-          }}>
-            {isExpanded ? '−' : '+'}
-          </span>
-          {category.title}
-        </div>
-        {isExpanded && (
-          <ul style={{ 
-            marginLeft: level === 0 ? '20px' : '15px',
-            listStyle: 'none',
-            padding: 0
-          }}>
-            {sortedChildren.map((child) => (
-              <CategoryItem key={child.id} category={child} level={level + 1} />
-            ))}
-          </ul>
-        )}
-      </li>
-    );
   };
 
   return (
     <ul style={{ display: 'flex', justifyContent: 'space-between', width: '100%', margin: 0, padding: 0 }}>
       {menu_data.map((menu) =>
         menu.products ? (
-          <li key={menu.id} className="has-dropdown has-mega-menu">
+          <li key={menu.id} className="has-dropdown has-mega-menu" onMouseLeave={() => setCatalogPath([])}>
             <Link href={getLocalizedLink(menu.link)}>
               {menu.titleKey ? safeTranslate(menu.titleKey.replace('menu.', '')) : menu.title}
             </Link>
-            <div 
-              className="tp-submenu tp-mega-menu tp-mega-menu-wrapper p-relative" 
-              style={{ 
+            <div
+              className="tp-submenu tp-mega-menu tp-mega-menu-wrapper"
+              style={{
                 left: '0',
                 right: '0',
                 width: '100vw',
                 marginLeft: 'calc(-50vw + 50%)',
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(3, 1fr)', 
-                gap: '40px',
-                padding: '30px 60px',
+                padding: '16px 40px 20px',
+                boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
+                backgroundColor: '#fff',
                 borderRadius: '0',
-                boxShadow: '0 5px 20px rgba(0, 0, 0, 0.08)',
-                backgroundColor: '#fff'
               }}
             >
-              {firstLevelCategories.map((category) => (
-                <div key={category.id} className="mega-menu-column">
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    <CategoryItem category={category} level={0} />
-                  </ul>
-                </div>
-              ))}
+              {mounted && (
+                <>
+                  {/* Level 0: root categories */}
+                  <div className="tp-cat-chips-row tp-cat-chips-row--root">
+                    {firstLevelCategories.map((cat) => {
+                      const isSelected = catalogPath[0]?.id === cat.id;
+                      const hasChildren = cat.children?.length > 0;
+                      return (
+                        <Link
+                          key={cat.id}
+                          href={getLocalizedLink(`/shop?category=${cat.id}`)}
+                          className={`tp-cat-chip${isSelected ? ' tp-cat-chip--active' : ''}`}
+                          onClick={() => handleCatalogExpand(cat, 0)}
+                        >
+                          <span className="tp-cat-chip__label">{cat.title}</span>
+                          {hasChildren && (
+                            <span className="tp-cat-chip__arrow">{isSelected ? '▴' : '▾'}</span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+
+                  {/* Subcategory rows */}
+                  {catalogPath.map((selected, idx) => {
+                    const children = sortAlphabetically(selected.children || []);
+                    if (!children.length) return null;
+                    const levelIndex = idx + 1;
+                    return (
+                      <div key={selected.id} className="tp-cat-chips-row tp-cat-chips-row--sub">
+                        {children.map((cat) => {
+                          const isSelected = catalogPath[levelIndex]?.id === cat.id;
+                          const hasChildren = cat.children?.length > 0;
+                          return (
+                            <Link
+                              key={cat.id}
+                              href={getLocalizedLink(`/shop?category=${cat.id}`)}
+                              className={`tp-cat-chip${isSelected ? ' tp-cat-chip--active' : ''}`}
+                              onClick={() => handleCatalogExpand(cat, levelIndex)}
+                            >
+                              <span className="tp-cat-chip__label">{cat.title}</span>
+                              {hasChildren && (
+                                <span className="tp-cat-chip__arrow">{isSelected ? '▴' : '▾'}</span>
+                              )}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </>
+              )}
             </div>
           </li>
         ) : menu.user_account ? (
