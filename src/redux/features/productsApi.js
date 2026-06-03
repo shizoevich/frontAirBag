@@ -91,7 +91,7 @@ export const productsApi = apiSlice.injectEndpoints({
 
           // Получение всех товаров без лимита (для фильтров)
     getAllProductsNoLimit: builder.query({
-      query: () => 'goods/',
+      query: () => '/goods/',
       transformResponse: (response) => {
         return {
           data: response.results || [],
