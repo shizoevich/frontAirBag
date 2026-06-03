@@ -559,7 +559,7 @@ const UserProfileArea = () => {
                             </div>
                             <div className="tp-contact-content">
                               <h5 className="mb-2 fs-6 fw-bold">{t('email')}</h5>
-                              <p className="text-primary mb-0 fw-semibold text-break">{profileEmail || t('notSpecified')}</p>
+                              <p className="text-primary mb-0 fw-semibold text-break fs-6">{profileEmail || t('notSpecified')}</p>
                             </div>
                           </div>
                         </div>
@@ -571,7 +571,7 @@ const UserProfileArea = () => {
                             </div>
                             <div className="tp-contact-content">
                               <h5 className="mb-2 fs-6 fw-bold">{t('phone')}</h5>
-                              <p className="text-success mb-0 fw-semibold">{profilePhone || t('notSpecified')}</p>
+                              <p className="text-success mb-0 fw-semibold fs-6">{profilePhone || t('notSpecified')}</p>
                             </div>
                           </div>
                         </div>
@@ -583,7 +583,7 @@ const UserProfileArea = () => {
                             </div>
                             <div className="tp-contact-content">
                               <h5 className="mb-2 fs-6 fw-bold">{t('novaPostAddress')}</h5>
-                              <p className="text-info mb-0 fw-semibold">{profileNovaAddress || t('notSpecified')}</p>
+                              <p className="text-info mb-0 fw-semibold fs-6">{profileNovaAddress || t('notSpecified')}</p>
                             </div>
                           </div>
                         </div>
