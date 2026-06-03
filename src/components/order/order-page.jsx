@@ -12,7 +12,8 @@ const OrderPage = () => {
   
   // Получаем данные пользователя из Redux (не вызываем /auth/me/)
   const { user } = useSelector((state) => state.auth);
-  const { data: orders, isLoading: ordersLoading, error: ordersError } = useGetOrdersQuery();
+  // Pass user ID so admins also see only their own orders
+  const { data: orders, isLoading: ordersLoading, error: ordersError } = useGetOrdersQuery(user?.id);
   const { data: selectedOrder, isLoading: orderLoading } = useGetOrderByIdQuery(selectedOrderId, {
     skip: !selectedOrderId
   });
@@ -24,6 +25,15 @@ const OrderPage = () => {
 
   const formatPrice = (priceMinor) => {
     return (Number(priceMinor || 0) / 100).toFixed(2);
+  };
+
+  // Fallback: calculate total from items if grand_total_minor is 0
+  const getOrderTotal = (order) => {
+    if (order?.grand_total_minor > 0) return order.grand_total_minor;
+    if (order?.items?.length > 0) {
+      return order.items.reduce((sum, item) => sum + (item.original_price_minor || 0) * (item.quantity || 1), 0);
+    }
+    return 0;
   };
 
   const formatDate = (dateString) => {
@@ -86,7 +96,7 @@ const OrderPage = () => {
                       <tr key={order.id}>
                         <td>#{order.id}</td>
                         <td>{formatDate(order.date)}</td>
-                        <td>₴{formatPrice(order.grand_total_minor)}</td>
+                        <td>₴{formatPrice(getOrderTotal(order))}</td>
                         <td>
                           <span className="badge bg-secondary">{renderStatus(order)}</span>
                         </td>
@@ -244,7 +254,7 @@ const OrderPage = () => {
                             <div className="row justify-content-end">
                               <div className="col-md-5">
                                 <div className="card">
-                                  <div className="card-header bg-dark text-white">
+                                  <div className="card-header bg-success text-white">
                                     <h6 className="mb-0">
                                       <i className="fas fa-calculator me-2"></i>
                                       {t('order_summary')}
@@ -264,7 +274,7 @@ const OrderPage = () => {
                                     <hr />
                                     <div className="d-flex justify-content-between">
                                       <strong className="fs-5">{t('total')}:</strong>
-                                      <strong className="fs-5 text-primary">₴{formatPrice(orderToShow.grand_total_minor)}</strong>
+                                      <strong className="fs-5 text-primary">₴{formatPrice(getOrderTotal(orderToShow))}</strong>
                                     </div>
                                   </div>
                                 </div>

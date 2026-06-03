@@ -671,7 +671,9 @@
     "order_completed": "Выполнен",
     "order_paid": "Оплачен",
     "order_pending": "В обработке",
-    "actions": "Действия"
+    "actions": "Действия",
+    "order_summary": "Итог заказа",
+    "error_loading_orders": "Ошибка загрузки заказов"
   },
   "Checkout": {
     "returning_customer": "Постоянный клиент? Нажмите здесь для входа",
