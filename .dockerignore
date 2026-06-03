@@ -5,10 +5,6 @@ out/
 # Dependencies — installed in deps stage
 node_modules/
 
-# Dev / local config
-.env.local
-.env*.local
-
 # Git
 .git/
 .gitignore
