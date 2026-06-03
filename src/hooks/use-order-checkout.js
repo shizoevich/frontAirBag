@@ -427,8 +427,8 @@ const useOrderCheckout = () => {
           paymentMethod
         }));
       } else {
-        // Если наложка — обычный редирект
-        router.push(`/${locale}/order-success`);
+        // Самовывоз / оплата потом — заказ создан, оплата не подтверждена
+        router.push(`/${locale}/order-success?payment=pending`);
       }
       
     } catch (error) {

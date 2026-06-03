@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { useTranslations } from 'next-intl';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Wrapper from '@/layout/wrapper';
 import Header from '@/layout/headers/header';
@@ -10,6 +10,8 @@ import Footer from '@/layout/footers/footer';
 export default function OrderSuccessPage() {
   const t = useTranslations('OrderSuccess');
   const { locale } = useParams();
+  const searchParams = useSearchParams();
+  const isPaid = searchParams.get('payment') === 'paid';
 
   return (
     <Wrapper>
@@ -55,7 +57,9 @@ export default function OrderSuccessPage() {
                       letterSpacing: '0.02em',
                     }}
                   >
-                    {t('statusBadge', { defaultValue: 'Оплата підтверджена' })}
+                    {isPaid
+                      ? t('statusBadgePaid', { defaultValue: 'Оплата підтверджена' })
+                      : t('statusBadgePending', { defaultValue: 'Замовлення успішно створено' })}
                   </span>
                 </div>
 
