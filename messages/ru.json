@@ -673,6 +673,8 @@
     "order_pending": "В обработке",
     "actions": "Действия",
     "order_summary": "Итог заказа",
+    "payment_status": "Статус оплаты",
+    "pickup_payment": "Оплата в магазине",
     "error_loading_orders": "Ошибка загрузки заказов"
   },
   "Checkout": {
@@ -696,6 +698,8 @@
     "payment_method": "Способ оплаты",
     "cash_on_delivery": "Оплата при получении",
     "cash_on_delivery_description": "Оплатите заказ наличными при получении на отделении Новой Почты",
+    "pickup_payment": "Оплата в магазине",
+    "pickup_payment_description": "Оплатите заказ наличными или картой в нашем магазине",
     "pay_now": "Оплатить сейчас",
     "pay_now_description": "Оплатите заказ сейчас онлайн картой",
     "place_order": "Оформить заказ",
