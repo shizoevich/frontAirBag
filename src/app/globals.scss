@@ -12,8 +12,12 @@
   padding: 8px 0 10px;
 }
 .tp-cat-chips-row--root {
+  flex-direction: column;
+  align-items: flex-start;
   border-bottom: 1px solid #f0f0f0;
   margin-bottom: 6px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 .tp-cat-chips-row--sub {
   background: #fafafa;
