@@ -41,7 +41,7 @@ export const categoryApi = apiSlice.injectEndpoints({
 
     // Получение всех категорий (плоский список)
     getShowCategory: builder.query({
-      query: () => 'good-categories/',
+      query: () => '/good-categories/',
       transformResponse: (response) => {
         console.log('📋 API ответ категорий (список):', response);
         
@@ -67,7 +67,7 @@ export const categoryApi = apiSlice.injectEndpoints({
 
     // Получение товаров по категории (используем category_id для учета всех детей)
     getProductsByCategoryId: builder.query({
-      query: (category_id) => `goods/?category_id=${category_id}`,
+      query: (category_id) => `/goods/?category_id=${category_id}`,
       transformResponse: (response) => response.results || [],
       providesTags: (result, error, category_id) => [{ type: 'products', id: category_id }],
     }),
