@@ -13,9 +13,7 @@ const CouponItem = ({ coupon, handleCopied, copiedCode, copied }) => {
       <span className="tp-coupon-border"></span>
       <div className="tp-coupon-item-left d-sm-flex align-items-center">
         <div className="tp-coupon-thumb">
-          <a href="#">
-            <Image src={coupon.logo} alt="logo" width={120} height={120}  />
-          </a>
+          <Image src={coupon.logo} alt="logo" width={120} height={120}  />
         </div>
         <div className="tp-coupon-content">
           <h3 className="tp-coupon-title">{coupon.title}</h3>

@@ -11,6 +11,7 @@ import RenderCartProgress from './render-cart-progress';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
 import { closeCartMini, remove_product } from '@/redux/features/cartSlice';
 import { getProductImage, getProductId } from '@/utils/image-utils';
+import { slugify } from '@/utils/slugify';
 
 const CartMiniSidebar = () => {
   const { cart_products, cartMiniOpen } = useSelector((state) => state.cart);
@@ -59,7 +60,7 @@ const handleCloseCartMini = () => {
   const productImage = getProductImage(item);
   
   return (
-    <Link href={`/${locale}/product-details/${productId}`}>
+    <Link href={`/${locale}/product/${slugify(item.title)}-${productId}`}>
       <Image src={productImage} width={70} height={60} alt="product img" />
     </Link>
   );
@@ -68,7 +69,7 @@ const handleCloseCartMini = () => {
                   </div>
                   <div className="cartmini__content">
                     <h5 className="cartmini__title">
-                      <Link href={`/${locale}/product-details/${getProductId(item)}`}>{item.title}</Link>
+                      <Link href={`/${locale}/product/${slugify(item.title)}-${getProductId(item)}`}>{item.title}</Link>
                     </h5>
                     <div className="cartmini__price-wrapper">
                       {item.discount > 0 ? <span className="cartmini__price">${(Number(item.price_minor / 100 || 0)  - (Number(item.price_minor / 100 || 0) * Number(item.discount))).toFixed(2)}</span> : <span className="cartmini__price">{(Number(item.price_minor / 100 || 0)).toFixed(2)}₴</span>}

@@ -73,7 +73,7 @@ const ProductSmItem = ({ product }) => {
       <div className="tp-product-sm-content" style={{ height: '140px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
           <div className="tp-product-category">
-            <a href="#">{category?.name}</a>
+            <span>{category?.name}</span>
           </div>
           <h3 className="tp-product-title" style={{ 
             height: '48px', 

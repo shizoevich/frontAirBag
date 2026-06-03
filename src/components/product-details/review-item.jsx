@@ -9,9 +9,7 @@ const ReviewItem = ({ review }) => {
     <div className="tp-product-details-review-avater d-flex align-items-start">
       <div className="tp-product-details-review-avater-thumb">
         {!userId?.imageURL && <h5 className="review-name">{userId?.name[0]}</h5>}
-        <a href="#">
-          {userId?.imageURL && <Image src={userId?.imageURL} alt="user img" width={60} height={60} />}
-        </a>
+        {userId?.imageURL && <Image src={userId?.imageURL} alt="user img" width={60} height={60} />}
       </div>
       <div className="tp-product-details-review-avater-content">
         <div className="tp-product-details-review-avater-rating d-flex align-items-center">

@@ -67,7 +67,7 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                     <ul>
                       <li><Link href={getLocalizedLink("/profile")}>{t('myAccount')}</Link></li>
                       <li><Link href={getLocalizedLink("/profile")}>{t('orderHistory')}</Link></li>
-                      <li><Link href={getLocalizedLink("/returns")}>{t('returns')}</Link></li>
+                      <li><Link href={getLocalizedLink("/contact")}>{t('returns')}</Link></li>
                     </ul>
                   </div>
                 </div>
