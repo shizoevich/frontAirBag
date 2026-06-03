@@ -3,9 +3,9 @@ import { apiSlice } from "../api/apiSlice";
 export const ordersApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
-    // Получение всех заказов
+    // Получение заказов (с фильтром по клиенту чтобы админ видел только свои)
     getOrders: builder.query({
-      query: () => '/orders/',
+      query: (clientId) => clientId ? `/orders/?client=${clientId}` : '/orders/',
       providesTags: ['Orders'],
     }),
 
