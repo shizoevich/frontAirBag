@@ -22,6 +22,8 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
   // Refs for inputs
   const cityInputRef = useRef(null);
   const warehouseInputRef = useRef(null);
+  // Prevents dropdown from opening during pre-fill from saved user data
+  const userTypingRef = useRef(false);
 
   // Combine RHF ref callback with our own ref without mutating RHF internals
   // (new React hooks lint rule in Next 16).
@@ -60,7 +62,7 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
       
       if (data.success && data.data[0]?.Addresses) {
         setCities(data.data[0].Addresses);
-        setShowCityDropdown(true);
+        if (userTypingRef.current) setShowCityDropdown(true);
       } else {
         setCities([]);
       }
@@ -115,6 +117,7 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
   // Обработка изменения поля города
   const handleCityChange = (e) => {
     const query = e.target.value;
+    userTypingRef.current = true;
     setSearchCity(query);
     // При вводе текста считаем, что выбирается новый город
     setSelectedCity('');
