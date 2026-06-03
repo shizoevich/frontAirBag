@@ -15,7 +15,7 @@ import HeaderTopRight from "./header-com/header-top-right";
 import HeaderMainRight from "./header-com/header-main-right";
 import CartMiniSidebar from "@/components/common/cart-mini-sidebar";
 import HeaderSearchForm from "@/components/forms/header-search-form";
-import { CartTwo, Compare, Menu, Phone, Discount } from "@/svg";
+import { CartTwo, Menu, Phone, Discount } from "@/svg";
 
 const Header = () => {
   const t = useTranslations('Header');
@@ -178,12 +178,6 @@ const Header = () => {
               </div>
               <div className="col-xl-3 col-lg-3 col-md-3 col-6">
                 <div className="tp-header-action d-flex align-items-center justify-content-end ml-50">
-                  <div className="tp-header-action-item d-none d-lg-block">
-                    <Link href={getLocalizedLink("/compare")} className="tp-header-action-btn">
-                      <Compare />
-                    </Link>
-                  </div>
-
                   <div className="tp-header-action-item">
                     <button onClick={() => dispatch(openCartMini())} type="button" className="tp-header-action-btn cartmini-open-btn">
                       <CartTwo />
