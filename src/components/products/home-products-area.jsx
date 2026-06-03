@@ -9,7 +9,7 @@ import CategoryCarousel from '@/components/categories/category-carousel';
 import HomePrdLoader from '@/components/loader/home/home-prd-loader';
 import ErrorMsg from '@/components/common/error-msg';
 import ProductsFilterBar from '@/components/products/products-filter-bar';
-import { useGetAllProductsQuery } from '@/redux/features/productsApi';
+import { useGetAllProductsQuery, useGetFeaturedProductsQuery } from '@/redux/features/productsApi';
 import { useGetCategoryTreeQuery } from '@/redux/features/categoryApi';
 import { getChildrenAtLevel, hasChildren, sortAlphabetically, getCategoryFromTree } from '@/utils/categoryTreeHelpers';
 
@@ -35,10 +35,19 @@ const HomeProductsArea = () => {
   // Получаем ID активной категории (последняя в пути)
   const activeCategoryId = selectedPath.length > 0 ? selectedPath[selectedPath.length - 1] : null;
 
+  // Use shuffled featured products when no filters are active
+  const useFeatured = !activeCategoryId && !filters.ordering && !filters.priceMin && !filters.priceMax && !filters.inStock && currentPage === 0;
+
   // Загружаем дерево категорий
   const { data: categoryTree, isLoading: catLoading, isError: catError } = useGetCategoryTreeQuery();
 
-  // Загружаем товары с серверной фильтрацией и пагинацией
+  // Featured products with 15-min polling (shown when no filters active)
+  const { data: featuredData, isLoading: featuredLoading, isError: featuredError } = useGetFeaturedProductsQuery(undefined, {
+    skip: !useFeatured,
+    pollingInterval: 900000,
+  });
+
+  // Paginated products (shown when filters are active)
   const { data: productsData, isLoading: productsLoading, isError: productsError } = useGetAllProductsQuery({
     limit: itemsPerPage,
     offset: currentPage * itemsPerPage,
@@ -47,15 +56,19 @@ const HomeProductsArea = () => {
     priceMin: filters.priceMin,
     priceMax: filters.priceMax,
     inStock: filters.inStock,
-  });
+  }, { skip: useFeatured });
 
   // Обрабатываем товары
   const { products, totalCount } = useMemo(() => {
+    if (useFeatured) {
+      const results = Array.isArray(featuredData) ? featuredData : [];
+      return { products: results, totalCount: results.length };
+    }
     if (!productsData) return { products: [], totalCount: 0 };
     const results = productsData.results || productsData.data || productsData || [];
     const count = productsData.count || results.length;
     return { products: results, totalCount: count };
-  }, [productsData]);
+  }, [useFeatured, featuredData, productsData]);
 
   const pageCount = Math.ceil(totalCount / itemsPerPage);
 
@@ -145,8 +158,8 @@ const HomeProductsArea = () => {
     }).filter(Boolean);
   }, [categoryTree, selectedPath]);
 
-  const isLoading = productsLoading;
-  const isError = productsError;
+  const isLoading = useFeatured ? featuredLoading : productsLoading;
+  const isError = useFeatured ? featuredError : productsError;
 
   // Контент товаров
   let content = null;
