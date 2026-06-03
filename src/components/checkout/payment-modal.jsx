@@ -39,7 +39,7 @@ const PaymentModal = ({
       }
       dispatch(clearCart());
       onClose?.();
-      router.push(`/${locale}/order-success`);
+      router.push(`/${locale}/order-success?payment=paid`);
     },
     [dispatch, locale, onClose, router, t, updateOrder]
   );

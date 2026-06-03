@@ -50,7 +50,7 @@ export default function PaymentRedirectClient() {
 
     const target =
       result === 'success'
-        ? `/${locale}/order-success`
+        ? `/${locale}/order-success?payment=paid`
         : `/${locale}/payment-error${(() => {
             const qs = new URLSearchParams();
             if (orderId) qs.set('orderId', String(orderId));

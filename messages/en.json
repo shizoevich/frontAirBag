@@ -822,6 +822,8 @@
     "title": "Order Successfully Placed!",
     "description": "Your order has been created successfully. We will prepare and ship it no later than within 24 hours.",
     "statusBadge": "Payment confirmed",
+    "statusBadgePaid": "Payment confirmed",
+    "statusBadgePending": "Order successfully created",
     "nextSteps": "What's next?",
     "step1": "We will prepare and ship your order no later than within 24 hours",
     "step2": "Our manager will contact you for confirmation",
