@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 // internal
 import { AskQuestion} from '@/svg';
 import DetailsBottomInfo from './details-bottom-info';
@@ -14,6 +14,7 @@ import { handleModalClose } from '@/redux/features/productModalSlice';
 
 const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBottom = false }) => {
   const t = useTranslations('ProductDetails');
+  const locale = useLocale();
   const { sku, img, title, imageURLs, category, description, discount, price_minor, status, tags, offerDate, residue = 0 } = productItem || {};
   // Определяем доступность товара на основе residue
   const isAvailable = residue > 0;
@@ -124,10 +125,10 @@ const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBott
       </div>
       {/* product-details-action-sm start */}
       <div className="tp-product-details-action-sm">
-        <button type="button" className="tp-product-details-action-sm-btn">
+        <Link href={`/${locale}/contact`} className="tp-product-details-action-sm-btn">
           <AskQuestion />
           {t('askQuestion')}
-        </button>
+        </Link>
       </div>
       {/* product-details-action-sm end */}
 

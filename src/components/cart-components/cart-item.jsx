@@ -9,6 +9,7 @@ import { Close, Minus, Plus } from "@/svg";
 import { add_cart_product, quantityDecrement, remove_product } from "@/redux/features/cartSlice";
 import BlurImage from "@/components/common/BlurImage";
 import { getProductImage, getProductId } from "@/utils/image-utils";
+import { slugify } from "@/utils/slugify";
 
 const CartItem = ({product}) => {
   const { title, price_minor, category, status, orderQuantity = 0 } = product || {};
@@ -39,7 +40,7 @@ const CartItem = ({product}) => {
     <tr>
       {/* img */}
       <td className="tp-cart-img">
-        <Link href={`/${locale}/product-details/${productId}`}>
+        <Link href={`/${locale}/product/${slugify(title)}-${productId}`}>
           <div style={{ width: '70px', height: '100px', position: 'relative' }}>
             <BlurImage image={productImage} alt={title || 'Product Image'} />
           </div>
@@ -47,7 +48,7 @@ const CartItem = ({product}) => {
       </td>
       {/* title */}
       <td className="tp-cart-title">
-        <Link href={`/${locale}/product-details/${productId}`}>{title}</Link>
+        <Link href={`/${locale}/product/${slugify(title)}-${productId}`}>{title}</Link>
       </td>
       {/* price */}
       <td className="tp-cart-price">

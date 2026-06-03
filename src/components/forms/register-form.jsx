@@ -9,7 +9,8 @@ import { CloseEye, OpenEye } from "@/svg";
 import ErrorMsg from "../common/error-msg";
 import { notifyError, notifySuccess } from "@/utils/toast";
 import { useRegisterUserMutation } from "@/redux/features/auth/authApi";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import Link from 'next/link';
 
 const RegisterForm = () => {
   const [showPass, setShowPass] = useState(false);
@@ -200,7 +201,7 @@ const RegisterForm = () => {
             type="checkbox"
           />
           <label htmlFor="remember">
-            I accept the terms of the Service & <a href="#">Privacy Policy</a>.
+            I accept the terms of the Service & <Link href={`/${locale}/privacy-policy`}>Privacy Policy</Link>.
           </label>
           <ErrorMsg msg={errors.remember?.message} />
         </div>

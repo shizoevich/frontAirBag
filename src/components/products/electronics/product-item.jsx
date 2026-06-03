@@ -186,7 +186,7 @@ const handleMouseLeave = () => {
       <div className="tp-product-content" style={{ height: '160px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
           <div className="tp-product-category">
-            <a href="#">{category?.name}</a>
+            <span>{category?.name}</span>
           </div>
           <h3 className="tp-product-title" style={{ 
             height: '48px', 

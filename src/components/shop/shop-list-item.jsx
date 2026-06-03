@@ -90,7 +90,7 @@ const ShopListItem = ({ product }) => {
       <div className="tp-product-list-content">
         <div className="tp-product-content-2 pt-15">
           <div className="tp-product-tag-2">
-            {tags?.map((t, i) => <a key={i} href="#">{t}</a>)}
+            {tags?.map((t, i) => <span key={i}>{t}</span>)}
           </div>
           <h3 className="tp-product-title-2">
             <Link href={`/${locale}/product/${slugify(title)}-${_id}`}>{title}</Link>
