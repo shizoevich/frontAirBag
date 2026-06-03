@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useParams, useRouter } from "next/navigation";
@@ -61,6 +61,8 @@ const OrderCheckoutArea = () => {
     total,
     isCheckoutSubmit
   } = useOrderCheckout();
+
+  const [isPickup, setIsPickup] = useState(false);
 
   const getCurrentAccessToken = React.useCallback(() => {
     // Redux token can be stale inside an async handler before re-render.
@@ -344,7 +346,7 @@ const OrderCheckoutArea = () => {
                                     name="shippingOption"
                                     value="nova_post"
                                     defaultChecked
-                                    onChange={() => handleShippingCost(0)}
+                                    onChange={() => { handleShippingCost(0); setIsPickup(false); }}
                                   />
                                   <label
                                     className="form-check-label d-flex justify-content-between w-100"
@@ -365,7 +367,7 @@ const OrderCheckoutArea = () => {
                                     type="radio"
                                     name="shippingOption"
                                     value="pickup"
-                                    onChange={() => handleShippingCost(0)}
+                                    onChange={() => { handleShippingCost(0); setIsPickup(true); }}
                                   />
                                   <label
                                     className="form-check-label d-flex justify-content-between w-100"
@@ -410,10 +412,10 @@ const OrderCheckoutArea = () => {
                             onChange={(e) => setPaymentMethod(e.target.value)}
                           />
                           <label htmlFor="cash_on_delivery">
-                            {t('cash_on_delivery')}
+                            {isPickup ? t('pickup_payment') : t('cash_on_delivery')}
                           </label>
                           <div className="direct-bank-transfer">
-                            <p>{t('cash_on_delivery_description')}</p>
+                            <p>{isPickup ? t('pickup_payment_description') : t('cash_on_delivery_description')}</p>
                           </div>
                         </div>
 
