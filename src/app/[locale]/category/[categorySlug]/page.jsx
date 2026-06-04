@@ -4,6 +4,7 @@ import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
 import ShopCategoryArea from '@/components/categories/shop-category-area';
 import { getTranslations } from 'next-intl/server';
+import { buildAlternates } from '@/utils/seo';
 
 // Helper function to fetch a single category by slug
 async function fetchCategory(slug) {
@@ -25,7 +26,10 @@ export async function generateMetadata({ params: awaitedParams }) {
   }
   return {
     title: category.title || t('default_seo_title'),
-    description: category.description || `Products in the ${category.title} category`,
+    description:
+      category.description ||
+      `${category.title} — подушки безопасности, ремни и пиропатроны в AirbagAD. Доставка по Днепру и Украине.`,
+    alternates: buildAlternates(`category/${params.categorySlug}`, params.locale),
   };
 }
 
