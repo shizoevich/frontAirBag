@@ -16,7 +16,9 @@ export default function Orders() {
       <SEO pageTitle={t('myOrders')} />
       <Header />
       <main>
-        <AuthGuard requireAuth="user">
+        {/* requireAuth=true (не "user"): гости с заказами тоже должны видеть свои заказы.
+            Бэкенд (get_own_queryset) уже фильтрует заказы по client=request.user. */}
+        <AuthGuard requireAuth={true}>
           <OrderPage />
         </AuthGuard>
       </main>
