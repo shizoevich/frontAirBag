@@ -6,14 +6,17 @@ import ShopCategoryArea from '@/components/categories/shop-category-area';
 import { getTranslations } from 'next-intl/server';
 import { buildAlternates } from '@/utils/seo';
 
-// Helper function to fetch a single category by slug
+// Helper function to fetch a single category by the id embedded at the end of the slug
+// (slug format is `transliterated-title-<id>`, matching how category links are built).
 async function fetchCategory(slug) {
+  if (!slug || typeof slug !== 'string') return null;
+  const id = slug.split('-').pop();
+  if (!id || isNaN(parseInt(id, 10))) return null;
+
   const base = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
-  const res = await fetch(`${base}/good-categories/?slug=${slug}`, { next: { revalidate: 600 } });
+  const res = await fetch(`${base}/good-categories/${id}/`, { next: { revalidate: 600 } });
   if (!res.ok) return null;
-  const data = await res.json();
-  // The API returns a list, so we take the first item
-  return data.results?.[0] || data.data?.[0] || data?.[0];
+  return res.json();
 }
 
 // Generate metadata for the page
@@ -25,8 +28,9 @@ export async function generateMetadata({ params: awaitedParams }) {
     return { title: 'Category Not Found' };
   }
   return {
-    title: category.title || t('default_seo_title'),
+    title: category.meta_title || category.title || t('default_seo_title'),
     description:
+      category.meta_description ||
       category.description ||
       `${category.title} — подушки безопасности, ремни и пиропатроны в AirbagAD. Доставка по Днепру и Украине.`,
     alternates: buildAlternates(`category/${params.categorySlug}`, params.locale),
