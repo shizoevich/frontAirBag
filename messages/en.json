@@ -326,7 +326,6 @@
     "passwordLettersAndNumbers": "Password must contain letters and numbers",
     "agreeToTerms": "You must agree to the terms of service"
   },
-  
   "ProfileExtra": {
     "enterPhone": "Enter your phone number",
     "enterAddress": "Enter your address",
@@ -342,16 +341,16 @@
     "telegramLinkedError": "Failed to link Telegram"
   },
   "Categories": {
-  "allCategories": "All Categories",
-  "categories": "Categories",
-  "subcategories": "Subcategories",
-  "subcategoriesOf": "Subcategories",
-  "viewProducts": "View Products",
-  "back": "Back",
-  "loading": "Loading categories...",
-  "errorLoading": "Error loading categories",
-  "pageTitle": "Catalog categories - AirBag",
-  "pageDescription": "View all categories of products",
+    "allCategories": "All Categories",
+    "categories": "Categories",
+    "subcategories": "Subcategories",
+    "subcategoriesOf": "Subcategories",
+    "viewProducts": "View Products",
+    "back": "Back",
+    "loading": "Loading categories...",
+    "errorLoading": "Error loading categories",
+    "pageTitle": "Catalog categories - AirBag",
+    "pageDescription": "View all categories of products",
     "all_covers": "All Covers",
     "car_brands": "Car Brands",
     "select_car_brand": "Select Car Brand",
@@ -383,37 +382,26 @@
     "curtain_pyrotechnics_description": "Curtain pyrotechnics for side protection during side impacts",
     "steering_pyrotechnics_description": "Pyrotechnics for steering wheel airbag with one or two igniters",
     "dashboard_pyrotechnics_description": "Pyrotechnics for passenger airbag in dashboard with one or two igniters",
-    
     "connectors_seo_title": "Connectors and Plugs for Airbag SRS Safety Systems",
     "connectors_seo_description": "Wide selection of connectors and plugs for vehicle safety systems. Quality connectors for airbags and other SRS components.",
-    
     "mounts_seo_title": "Mounts for Airbag SRS Safety Systems",
     "mounts_seo_description": "Reliable mounts and mounting elements for vehicle safety systems. Brackets and fasteners for Airbag SRS components.",
-    
     "resistors_seo_title": "Resistors and Simulators for Airbag SRS Safety Systems",
     "resistors_seo_description": "Resistors for diagnostics and airbag simulation. Quality simulators for vehicle safety systems.",
-    
     "airbags_seo_title": "Airbags for Vehicles",
     "airbags_seo_description": "Pneumatic bags (Airbag) of various types and sizes for vehicle safety systems. Quality airbags for different car brands.",
-    
     "belt_parts_seo_title": "Seat Belt Parts for Vehicles",
     "belt_parts_seo_description": "Hardware and components for seat belts. Quality parts for repair and maintenance of vehicle seat belts.",
-    
     "pyro_belts_seo_title": "Pyrotechnics in Seat Belts",
     "pyro_belts_seo_description": "Pyrotechnics for seat belts, ensuring quick activation in emergency situations. Quality pyrotechnic devices for safety systems.",
-    
     "pyro_seats_seo_title": "Pyrotechnics in Legs/Seats",
     "pyro_seats_seo_description": "Pyrotechnics for driver and passenger leg protection, as well as seat pyrotechnics. Additional protection in emergency situations.",
-    
     "pyro_curtains_seo_title": "Pyrotechnics in Curtains (Side)",
     "pyro_curtains_seo_description": "Curtain pyrotechnics for side protection during side impacts. Pyrotechnic devices for side airbags.",
-    
     "pyro_steering_seo_title": "Pyrotechnics in Steering Wheel (1-2 igniters)",
     "pyro_steering_seo_description": "Pyrotechnics for steering wheel airbag with one or two igniters. Quality pyrotechnic devices for driver airbag.",
-    
     "pyro_dashboard_seo_title": "Pyrotechnics in Dashboard (1-2 igniters)",
     "pyro_dashboard_seo_description": "Pyrotechnics for passenger airbag in dashboard with one or two igniters. Pyrotechnic devices for instrument panel.",
-    
     "covers_seo_title": "Covers and Overlays for Safety Systems",
     "covers_seo_description": "Covers, overlays and decorative elements for vehicle safety systems. Quality accessories for Airbag SRS components."
   },
@@ -594,8 +582,8 @@
     "cash_on_delivery_description": "Pay for your order with cash when you receive it at Nova Post office",
     "pickup_payment": "Pay in Store",
     "pickup_payment_description": "Pay for your order with cash or card at our store",
-    "bank_transfer": "Bank Transfer",
-    "bank_transfer_description": "Pay using the provided bank details and attach the payment document",
+    "bank_transfer": "Pay by Bank Details",
+    "bank_transfer_description": "Pay using the provided bank details and attach a payment confirmation document",
     "bank_details_title": "Payment Details",
     "bank_full_name": "Recipient",
     "bank_card_number": "Card Number",
@@ -609,18 +597,6 @@
     "loading": "Loading...",
     "pay_now": "Pay Now",
     "pay_now_description": "Pay for your order now online with card",
-    "bank_transfer": "Pay by Bank Details",
-    "bank_transfer_description": "Pay using the provided bank details and attach a payment confirmation document",
-    "bank_details_title": "Payment Details",
-    "bank_full_name": "Recipient",
-    "bank_card_number": "Card Number",
-    "bank_account_number": "Account",
-    "bank_edrpou": "EDRPOU",
-    "bank_payment_purpose": "Payment Purpose",
-    "bank_details_unavailable": "Bank details temporarily unavailable",
-    "upload_payment_doc": "Attach payment document",
-    "upload_payment_doc_hint": "Screenshot or PDF of the payment receipt. Required.",
-    "upload_payment_doc_required": "Attach a payment document to continue",
     "place_order": "Place Order",
     "processing": "Processing...",
     "open_payment": "Open payment",
@@ -670,7 +646,13 @@
     "benefit_faster_checkout": "Faster checkout for future orders",
     "register_now": "Register Now",
     "maybe_later": "Maybe Later",
-    "continue_as_guest": "Continue as Guest"
+    "continue_as_guest": "Continue as Guest",
+    "dropzone_title": "Click or drag a file here",
+    "dropzone_subtitle": "JPG, PNG or PDF · up to 10 MB",
+    "upload_invalid_type": "Only images or PDF are allowed",
+    "upload_too_large": "File is too large (max 10 MB)",
+    "replace_file": "Replace",
+    "remove_file": "Remove"
   },
   "CheckoutValidation": {
     "first_name_required": "First name is required",
