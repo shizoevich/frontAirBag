@@ -194,9 +194,11 @@ const OrderPage = () => {
                                   <span className="ms-2">
                                     {orderToShow.prepayment
                                       ? t('pay_now')
-                                      : orderToShow.nova_post_address
-                                        ? t('cash_on_delivery')
-                                        : t('pickup_payment')}
+                                      : orderToShow.bank_transfer
+                                        ? t('bank_transfer')
+                                        : orderToShow.nova_post_address
+                                          ? t('cash_on_delivery')
+                                          : t('pickup_payment')}
                                   </span>
                                 </div>
                                 <div className="mb-2">
@@ -205,6 +207,14 @@ const OrderPage = () => {
                                     {orderToShow.is_paid ? t('paid') : t('notPaid')}
                                   </span>
                                 </div>
+                                {orderToShow.payment_document && (
+                                  <div className="mb-2">
+                                    <strong className="text-muted">{t('payment_document', { defaultValue: 'Документ про оплату' })}:</strong>
+                                    <a href={orderToShow.payment_document} target="_blank" rel="noopener noreferrer" className="ms-2">
+                                      {t('view_document', { defaultValue: 'Переглянути' })}
+                                    </a>
+                                  </div>
+                                )}
                                 {orderToShow.ttn && (
                                   <div className="mb-2">
                                     <strong className="text-muted">{t('tracking_number')}:</strong>
