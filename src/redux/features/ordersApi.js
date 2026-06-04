@@ -44,6 +44,25 @@ export const ordersApi = apiSlice.injectEndpoints({
       invalidatesTags: ['Orders'],
     }),
 
+    // Банковские реквизиты для оплаты по реквизитам
+    getBankDetails: builder.query({
+      query: () => '/bank-details/',
+    }),
+
+    // Загрузка документа об оплате (для оплаты по реквизитам)
+    uploadPaymentDoc: builder.mutation({
+      query: ({ orderId, file }) => {
+        const formData = new FormData();
+        formData.append('document', file);
+        return {
+          url: `/orders/${orderId}/upload-payment-doc/`,
+          method: 'POST',
+          body: formData,
+        };
+      },
+      invalidatesTags: (result, error, { orderId }) => [{ type: 'Orders', id: orderId }],
+    }),
+
     // Получение товаров заказа
     getOrderItems: builder.query({
       query: (orderId) => `/order-items/?order=${orderId}`,
@@ -103,6 +122,8 @@ export const {
   useCreateOrderMutation,
   useUpdateOrderMutation,
   useDeleteOrderMutation,
+  useGetBankDetailsQuery,
+  useUploadPaymentDocMutation,
   useGetOrderItemsQuery,
   useAddOrderItemMutation,
   useUpdateOrderItemMutation,

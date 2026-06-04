@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useCreateOrderMutation } from "@/redux/features/ordersApi";
+import { useCreateOrderMutation, useUploadPaymentDocMutation } from "@/redux/features/ordersApi";
 import { useGetUserQuery, useCreateGuestMutation, useTelegramAutoLinkMutation } from "@/redux/features/auth/authApi";
 import useTelegramWebApp from "@/hooks/use-telegram-webapp";
 import { buildTelegramInitPayload } from "@/utils/telegram";
@@ -93,7 +93,9 @@ const useOrderCheckout = () => {
   const [showUserInfoModal, setShowUserInfoModal] = useState(false);
   const [showGuestRegistrationModal, setShowGuestRegistrationModal] = useState(false);
   // Checkout UX: default to card payment ("pay now").
-  const [paymentMethod, setPaymentMethod] = useState("pay_now"); // "cash_on_delivery" | "pay_now"
+  const [paymentMethod, setPaymentMethod] = useState("pay_now"); // "cash_on_delivery" | "pay_now" | "bank_transfer"
+  // Bank transfer payment confirmation document (uploaded after order creation)
+  const [bankTransferFile, setBankTransferFile] = useState(null);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -104,6 +106,7 @@ const useOrderCheckout = () => {
   // Backend can return 403 or non-JSON in some environments; checkout works with token-only.
   const { data: userData } = useGetUserQuery(undefined, { skip: true });
   const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
+  const [uploadPaymentDoc] = useUploadPaymentDocMutation();
   const [createGuest, { isLoading: isCreatingGuest }] = useCreateGuestMutation();
   const [updateClientPut] = useUpdateClientPutMutation();
   const [telegramAutoLink] = useTelegramAutoLinkMutation();
@@ -195,6 +198,7 @@ const useOrderCheckout = () => {
         phone: data.phone || currentUser?.phone || "",
         nova_post_address: novaPostAddress,
         prepayment: paymentMethod === "pay_now",
+        bank_transfer: paymentMethod === "bank_transfer",
         items: resolvedItems.map(({ good, quantity }) => ({ good, quantity })),
       };
 
@@ -396,6 +400,15 @@ const useOrderCheckout = () => {
       // Создаем заказ
       const result = await createOrder(orderData).unwrap();
 
+      // Bank transfer: upload the payment confirmation document (order_id is now available)
+      if (paymentMethod === "bank_transfer" && bankTransferFile) {
+        try {
+          await uploadPaymentDoc({ orderId: result.id, file: bankTransferFile }).unwrap();
+        } catch (uploadErr) {
+          console.warn("Payment document upload failed (non-blocking):", uploadErr);
+        }
+      }
+
       // For pay-now flow we keep the cart until payment is completed.
       // Clearing immediately makes the checkout totals show 0 while payment iframe is open.
       if (paymentMethod !== 'pay_now') {
@@ -565,6 +578,8 @@ const useOrderCheckout = () => {
     handleGuestRegistrationRegister,
     paymentMethod,
     setPaymentMethod,
+    bankTransferFile,
+    setBankTransferFile,
     user: userData || user,
     accessToken
   };

@@ -13,6 +13,7 @@ import UserInfoModal from "./user-info-modal";
 import GuestRegistrationModal from './guest-registration-modal';
 import PaymentModal from './payment-modal';
 import GooglePayButton from './google-pay-button';
+import BankTransferDetails from './bank-transfer-details';
 import useOrderCheckout from "@/hooks/use-order-checkout";
 import useCartInfo from "@/hooks/use-cart-info";
 import { useGetOrdersQuery } from "@/redux/features/ordersApi";
@@ -53,6 +54,8 @@ const OrderCheckoutArea = () => {
     handleGuestRegistrationRegister,
     paymentMethod,
     setPaymentMethod,
+    bankTransferFile,
+    setBankTransferFile,
     user,
     accessToken,
     subtotal,
@@ -441,6 +444,30 @@ const OrderCheckoutArea = () => {
 
                            {/* Payment iframe is rendered in the pay-now buttons section below to avoid duplication */}
                          </div>
+
+                        {/* Bank transfer (pay by bank details) */}
+                        <div className="tp-checkout-payment-item">
+                          <input
+                            type="radio"
+                            id="bank_transfer"
+                            name="payment"
+                            value="bank_transfer"
+                            checked={paymentMethod === "bank_transfer"}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                          />
+                          <label htmlFor="bank_transfer">
+                            {t('bank_transfer', { defaultValue: 'Оплата за реквізитами' })}
+                          </label>
+                          <div className="direct-bank-transfer">
+                            <p>{t('bank_transfer_description', { defaultValue: 'Сплатіть за наданими реквізитами та прикріпіть документ про оплату' })}</p>
+                          </div>
+                          {paymentMethod === 'bank_transfer' && (
+                            <BankTransferDetails
+                              onFileSelect={setBankTransferFile}
+                              selectedFile={bankTransferFile}
+                            />
+                          )}
+                        </div>
                        </div>
 
                        {paymentMethod === 'cash_on_delivery' && (
@@ -452,6 +479,23 @@ const OrderCheckoutArea = () => {
                            >
                              {isCheckoutSubmit ? t('processing') : t('place_order')}
                            </button>
+                         </div>
+                       )}
+
+                       {paymentMethod === 'bank_transfer' && (
+                         <div className="tp-checkout-btn-wrapper">
+                           <button
+                             type="submit"
+                             className="tp-checkout-btn w-100"
+                             disabled={isCheckoutSubmit || !bankTransferFile}
+                           >
+                             {isCheckoutSubmit ? t('processing') : t('place_order')}
+                           </button>
+                           {!bankTransferFile && (
+                             <small className="text-danger d-block mt-2 text-center">
+                               {t('upload_payment_doc_required', { defaultValue: 'Прикріпіть документ про оплату щоб продовжити' })}
+                             </small>
+                           )}
                          </div>
                        )}
 
