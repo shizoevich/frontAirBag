@@ -1,10 +1,10 @@
-import { SITE_URL, locales, defaultLocale } from '@/utils/seo';
+import { SITE_URL, locales, defaultLocale, getServerApiBase } from '@/utils/seo';
 import { slugify } from '@/utils/slugify';
 
 // Regenerate at most once per hour.
 export const revalidate = 3600;
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
+const API_BASE = getServerApiBase();
 
 // Static, indexable routes (path WITHOUT locale prefix).
 const STATIC_PATHS = [

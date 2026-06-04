@@ -9,6 +9,23 @@ export const SITE_URL = (
 export { locales, defaultLocale };
 
 /**
+ * API base URL for SERVER-SIDE fetches (generateMetadata, sitemap, RSC).
+ *
+ * In Docker, the browser-facing `NEXT_PUBLIC_API_BASE_URL` (e.g. http://localhost:8000)
+ * is NOT reachable from inside the frontend container — there `localhost` is the
+ * container itself. Set `API_BASE_URL_INTERNAL` to the in-network URL
+ * (e.g. http://backend:8000/api/v2) so server-side fetches resolve. Falls back to the
+ * public URL for local (non-container) dev where they're the same host.
+ */
+export function getServerApiBase() {
+  return (
+    process.env.API_BASE_URL_INTERNAL ||
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    ''
+  ).replace(/\/$/, '');
+}
+
+/**
  * Build `alternates` for a page's metadata: canonical + hreflang for every locale.
  * @param {string} path - path WITHOUT locale prefix, leading slash optional (e.g. 'shop', '/product/x').
  * @param {string} locale - current locale (used for canonical).

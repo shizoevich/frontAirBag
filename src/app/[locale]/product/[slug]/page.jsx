@@ -4,7 +4,7 @@ import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
 import ProductDetailsContent from '@/components/product-details/product-details-content';
 import { getTranslations } from 'next-intl/server';
-import { SITE_URL, buildAlternates } from '@/utils/seo';
+import { SITE_URL, buildAlternates, getServerApiBase } from '@/utils/seo';
 import { slugify } from '@/utils/slugify';
 
 // Extract a usable image URL from a product's `images` field (JSON: array of urls or objects).
@@ -32,15 +32,18 @@ async function fetchProduct(slug) {
     return null;
   }
 
-  const base = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
-  const res = await fetch(`${base}/goods/${id}/`, { next: { revalidate: 600 } });
-
-  if (!res.ok) {
-    // This will be caught by notFound() in the page component
+  const base = getServerApiBase();
+  try {
+    const res = await fetch(`${base}/goods/${id}/`, { next: { revalidate: 600 } });
+    if (!res.ok) {
+      // This will be caught by notFound() in the page component
+      return null;
+    }
+    return res.json();
+  } catch (e) {
+    console.error('fetchProduct failed:', e?.message || e);
     return null;
   }
-  
-  return res.json();
 }
 
 // Generate metadata for the page

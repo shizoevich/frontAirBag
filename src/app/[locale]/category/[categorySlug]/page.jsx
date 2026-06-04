@@ -4,7 +4,7 @@ import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
 import ShopCategoryArea from '@/components/categories/shop-category-area';
 import { getTranslations } from 'next-intl/server';
-import { buildAlternates } from '@/utils/seo';
+import { buildAlternates, getServerApiBase } from '@/utils/seo';
 
 // Helper function to fetch a single category by the id embedded at the end of the slug
 // (slug format is `transliterated-title-<id>`, matching how category links are built).
@@ -13,10 +13,15 @@ async function fetchCategory(slug) {
   const id = slug.split('-').pop();
   if (!id || isNaN(parseInt(id, 10))) return null;
 
-  const base = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
-  const res = await fetch(`${base}/good-categories/${id}/`, { next: { revalidate: 600 } });
-  if (!res.ok) return null;
-  return res.json();
+  const base = getServerApiBase();
+  try {
+    const res = await fetch(`${base}/good-categories/${id}/`, { next: { revalidate: 600 } });
+    if (!res.ok) return null;
+    return res.json();
+  } catch (e) {
+    console.error('fetchCategory failed:', e?.message || e);
+    return null;
+  }
 }
 
 // Generate metadata for the page
