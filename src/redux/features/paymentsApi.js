@@ -24,7 +24,19 @@ export const paymentsApi = apiSlice.injectEndpoints({
         body: { gToken },
       }),
     }),
+
+    getPaymentConfig: builder.query({
+      // Публичная конфигурация оплаты: { mode, google_pay_environment }.
+      query: () => ({
+        url: "/payments/config/",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useCreatePaymentMutation, useGooglePayMutation } = paymentsApi;
+export const {
+  useCreatePaymentMutation,
+  useGooglePayMutation,
+  useGetPaymentConfigQuery,
+} = paymentsApi;

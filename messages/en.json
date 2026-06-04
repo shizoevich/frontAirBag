@@ -736,6 +736,7 @@
     }
   },
   "Payments": {
+    "test_mode_badge": "TEST MODE — no real charge",
     "processing_title": "Processing payment",
     "processing_description": "Please wait, we are finalizing the payment status...",
     "payment_success": "Payment successful. Thank you!",

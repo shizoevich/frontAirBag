@@ -6,6 +6,7 @@ import { notifyError, notifyInfo, notifySuccess } from '@/utils/toast';
 import { useDispatch } from 'react-redux';
 import { clearCart } from '@/redux/features/cartSlice';
 import { useGetOrderByIdQuery, useUpdateOrderMutation } from '@/redux/features/ordersApi';
+import { useGetPaymentConfigQuery } from '@/redux/features/paymentsApi';
 
 const PaymentModal = ({
   isOpen,
@@ -28,6 +29,8 @@ const PaymentModal = ({
     refetchOnFocus: true,
   });
   const [handledFailure, setHandledFailure] = React.useState(false);
+  const { data: paymentConfig } = useGetPaymentConfigQuery();
+  const isTestMode = paymentConfig?.mode === 'test';
 
   const handlePaymentSuccess = React.useCallback(
     (orderId) => {
@@ -240,7 +243,25 @@ const PaymentModal = ({
             gap: 12,
           }}
         >
-          <div style={{ fontWeight: 600 }}>{title}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <div style={{ fontWeight: 600 }}>{title}</div>
+            {isTestMode && (
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: '#92400e',
+                  background: '#fef3c7',
+                  border: '1px solid #f59e0b',
+                  borderRadius: 999,
+                  padding: '3px 10px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                🧪 {t('test_mode_badge')}
+              </span>
+            )}
+          </div>
           <button
             type="button"
             className="tp-btn tp-btn-border"

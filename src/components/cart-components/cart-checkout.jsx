@@ -5,12 +5,16 @@ import useCartInfo from "@/hooks/use-cart-info";
 import { useState } from "react";
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
+import { useGetPaymentConfigQuery } from '@/redux/features/paymentsApi';
 
 const CartCheckout = () => {
   const {total} = useCartInfo();
   const [shipCost,setShipCost] = useState(0);
   const t = useTranslations('Cart');
+  const tPay = useTranslations('Payments');
   const { locale } = useParams();
+  const { data: paymentConfig } = useGetPaymentConfigQuery();
+  const isTestMode = paymentConfig?.mode === 'test';
   // handle shipping cost 
   const handleShippingCost = (value) => {
     if(value === 'free'){
@@ -31,6 +35,23 @@ const CartCheckout = () => {
         <span>{(total + shipCost).toFixed(2)}₴</span>
       </div>
       <div className="tp-cart-checkout-proceed">
+        {isTestMode && (
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: '#92400e',
+              background: '#fef3c7',
+              border: '1px solid #f59e0b',
+              borderRadius: 8,
+              padding: '8px 12px',
+              marginBottom: 12,
+              textAlign: 'center',
+            }}
+          >
+            🧪 {tPay('test_mode_badge')}
+          </div>
+        )}
         <Link href={`/${locale}/checkout`} className="tp-cart-checkout-btn w-100">
           {t('proceedToCheckout')}
         </Link>

@@ -1,6 +1,9 @@
 'use client';
 import React from 'react';
-import { useGooglePayMutation } from '@/redux/features/paymentsApi';
+import {
+  useGooglePayMutation,
+  useGetPaymentConfigQuery,
+} from '@/redux/features/paymentsApi';
 import { useParams } from 'next/navigation';
 
 function loadScriptOnce(src) {
@@ -27,6 +30,9 @@ const GooglePayButton = ({
   const [ready, setReady] = React.useState(false);
   const [error, setError] = React.useState(null);
   const [googlePay, { isLoading }] = useGooglePayMutation();
+  const { data: paymentConfig } = useGetPaymentConfigQuery();
+  // Режим Google Pay управляется бэком (PaymentSettings). Fallback — TEST.
+  const gpayEnvironment = paymentConfig?.google_pay_environment || 'TEST';
 
   const paymentsClientRef = React.useRef(null);
   const buttonRootRef = React.useRef(null);
@@ -42,14 +48,14 @@ const GooglePayButton = ({
     if (typeof window === 'undefined') return;
     if (!window.google?.payments?.api) return;
     paymentsClientRef.current = new window.google.payments.api.PaymentsClient({
-      // TEST environment for development/testing.
-      // Switch to PRODUCTION only when merchant is approved and IDs are live.
-      environment: 'TEST',
+      // Режим (TEST/PRODUCTION) приходит с бэка через /payments/config/.
+      // Переключается в Django admin или из админ-бота.
+      environment: gpayEnvironment,
       // Locale affects the Google Pay UI language.
       locale,
     });
-    console.log('Google Pay client initialized');
-  }, [locale, ready]);
+    console.log('Google Pay client initialized', { environment: gpayEnvironment });
+  }, [locale, ready, gpayEnvironment]);
 
   const buildPaymentDataRequest = React.useCallback(() => {
     const totalPrice = (Number(amountMinor || 0) / 100).toFixed(2);
