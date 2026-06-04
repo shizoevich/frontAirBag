@@ -20,9 +20,41 @@ const YouTubeVideosSlider = () => {
   const observerRef = useRef(null);
   const isVisibleRef = useRef(true);
 
-  // YouTube channel ID для @dmytro_gekalo
-  const CHANNEL_ID = 'UCncoevDhvLF6Ek_0bqO12ug';
+  // Канал @dmytro_gekalo: UCncoevDhvLF6Ek_0bqO12ug
+  // Uploads-плейлист = channel ID с префиксом UU вместо UC (стандарт YouTube).
+  // Используем playlistItems.list вместо search.list: search для этого ключа
+  // отдаёт 403 accountDelegationForbidden, а playlistItems работает + дешевле (1 ед. квоты vs 100).
+  const UPLOADS_PLAYLIST_ID = 'UUncoevDhvLF6Ek_0bqO12ug';
   const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
+
+  // Клиентский кэш: не дёргать YouTube на каждой перезагрузке.
+  const CACHE_KEY = 'yt_videos_cache_v1';
+  const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 часов
+
+  const readCache = useCallback(() => {
+    try {
+      if (typeof window === 'undefined') return null;
+      const raw = window.localStorage.getItem(CACHE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed?.videos?.length) return null;
+      return parsed; // { ts, videos }
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const writeCache = useCallback((videosToCache) => {
+    try {
+      if (typeof window === 'undefined') return;
+      window.localStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({ ts: Date.now(), videos: videosToCache })
+      );
+    } catch {
+      // ignore storage failures (private mode / disabled storage)
+    }
+  }, []);
 
   const cleanupPlayers = useCallback(() => {
   // Останавливаем все видео перед уничтожением
@@ -54,24 +86,63 @@ const YouTubeVideosSlider = () => {
  useEffect(() => {
     mountedRef.current = true;
 
+    const applyStaleOrEmpty = () => {
+      // Фолбэк при ошибке/пустом ответе: показать любой (даже просроченный) кэш,
+      // чтобы не выпадала плашка "temporarily unavailable" при разовом сбое.
+      const stale = readCache();
+      if (mountedRef.current && stale?.videos?.length) {
+        setVideos(stale.videos);
+      }
+    };
+
     const fetchVideos = async () => {
+      // 1) Свежий кэш — отдать без запроса к YouTube.
+      const cached = readCache();
+      if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
+        if (mountedRef.current) {
+          setVideos(cached.videos);
+          setLoading(false);
+        }
+        return;
+      }
+
+      // 2) Нет ключа — не делать заведомо провальный запрос.
+      if (!API_KEY) {
+        applyStaleOrEmpty();
+        if (mountedRef.current) setLoading(false);
+        return;
+      }
+
       try {
         const res = await fetch(
-          `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=10&type=video`
+          `https://www.googleapis.com/youtube/v3/playlistItems?key=${API_KEY}&playlistId=${UPLOADS_PLAYLIST_ID}&part=snippet&maxResults=10`
         );
         const data = await res.json();
 
-        if (mountedRef.current && data.items) {
-          const formatted = data.items.map((item) => ({
-            id: item.id.videoId,
-            videoId: item.id.videoId,
-            title: item.snippet.title,
-            thumbnail: item.snippet.thumbnails.medium.url,
-          }));
-          setVideos(formatted);
+        const formatted = (data.items || [])
+          .map((item) => {
+            const videoId = item?.snippet?.resourceId?.videoId;
+            if (!videoId) return null; // приватные/удалённые видео
+            const thumbs = item?.snippet?.thumbnails;
+            return {
+              id: videoId,
+              videoId,
+              title: item.snippet.title,
+              thumbnail: thumbs?.medium?.url || thumbs?.default?.url || '',
+            };
+          })
+          .filter(Boolean);
+
+        if (formatted.length > 0) {
+          if (mountedRef.current) setVideos(formatted);
+          writeCache(formatted);
+        } else {
+          // Пустой ответ / ошибка API (403 и т.п.) — фолбэк на кэш.
+          applyStaleOrEmpty();
         }
       } catch (err) {
         console.error('YouTube fetch error:', err);
+        applyStaleOrEmpty();
       } finally {
         if (mountedRef.current) setLoading(false);
       }
@@ -83,7 +154,7 @@ const YouTubeVideosSlider = () => {
       mountedRef.current = false;
       cleanupPlayers();
     };
-  }, [API_KEY, CHANNEL_ID, cleanupPlayers]);
+  }, [API_KEY, UPLOADS_PLAYLIST_ID, cleanupPlayers, readCache, writeCache, CACHE_TTL_MS]);
 
   /* =========================
      2️⃣ Page visibility
