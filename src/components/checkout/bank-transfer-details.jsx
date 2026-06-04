@@ -1,32 +1,61 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useGetBankDetailsQuery } from '@/redux/features/ordersApi';
 
 /**
- * Bank transfer payment block: shows bank details + file upload with preview.
+ * Bank transfer payment block: shows bank details + drag-and-drop / click file
+ * upload with preview. Responsive — works on mobile (tap) and desktop (drag or click).
  * The selected file is lifted up via onFileSelect so the parent can upload it
  * after the order is created (order_id is required for the upload endpoint).
  */
+const ACCEPTED = 'image/*,application/pdf';
+const MAX_MB = 10;
+
 const BankTransferDetails = ({ onFileSelect, selectedFile }) => {
   const t = useTranslations('Checkout');
   const { data: bank, isLoading } = useGetBankDetailsQuery();
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [fileError, setFileError] = useState('');
+  const inputRef = useRef(null);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
+  const acceptFile = useCallback((file) => {
     if (!file) return;
-    onFileSelect(file);
-    if (file.type.startsWith('image/')) {
-      setPreviewUrl(URL.createObjectURL(file));
-    } else {
-      setPreviewUrl(null);
+    setFileError('');
+    const isAllowed = file.type.startsWith('image/') || file.type === 'application/pdf';
+    if (!isAllowed) {
+      setFileError(t('upload_invalid_type', { defaultValue: 'Дозволені лише зображення або PDF' }));
+      return;
     }
+    if (file.size > MAX_MB * 1024 * 1024) {
+      setFileError(t('upload_too_large', { defaultValue: `Файл завеликий (макс ${MAX_MB} МБ)` }));
+      return;
+    }
+    onFileSelect(file);
+    setPreviewUrl(file.type.startsWith('image/') ? URL.createObjectURL(file) : null);
+  }, [onFileSelect, t]);
+
+  const handleFileChange = (e) => acceptFile(e.target.files?.[0]);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    acceptFile(e.dataTransfer.files?.[0]);
+  }, [acceptFile]);
+
+  const handleDragOver = (e) => { e.preventDefault(); setIsDragging(true); };
+  const handleDragLeave = (e) => { e.preventDefault(); setIsDragging(false); };
+  const openPicker = () => inputRef.current?.click();
+  const onKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPicker(); }
   };
 
   const handleRemove = () => {
     onFileSelect(null);
     setPreviewUrl(null);
+    setFileError('');
+    if (inputRef.current) inputRef.current.value = '';
   };
 
   const detailRow = (label, value) =>
@@ -61,29 +90,63 @@ const BankTransferDetails = ({ onFileSelect, selectedFile }) => {
           <span className="text-danger"> *</span>
         </label>
 
+        {/* Hidden native input — opened via click/tap or Enter/Space */}
+        <input
+          ref={inputRef}
+          type="file"
+          accept={ACCEPTED}
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
+
         {!selectedFile ? (
-          <input
-            type="file"
-            className="form-control"
-            accept="image/*,application/pdf"
-            onChange={handleFileChange}
-          />
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={openPicker}
+            onKeyDown={onKeyDown}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            className="tp-dropzone text-center"
+            style={{
+              border: `2px dashed ${isDragging ? '#de8043' : '#c5ccd6'}`,
+              background: isDragging ? '#fff8f4' : '#fff',
+              borderRadius: 10,
+              padding: '22px 16px',
+              cursor: 'pointer',
+              transition: 'border-color .15s ease, background .15s ease',
+            }}
+          >
+            <div style={{ fontSize: 34, lineHeight: 1 }}>⬆️</div>
+            <div className="fw-medium mt-2" style={{ fontSize: 14 }}>
+              {t('dropzone_title', { defaultValue: 'Натисніть або перетягніть файл' })}
+            </div>
+            <div className="text-muted" style={{ fontSize: 12, marginTop: 2 }}>
+              {t('dropzone_subtitle', { defaultValue: 'JPG, PNG або PDF · до 10 МБ' })}
+            </div>
+          </div>
         ) : (
           <div className="d-flex align-items-center gap-3 p-2 rounded" style={{ background: '#fff', border: '1px solid #dde1e7' }}>
             {previewUrl ? (
-              <img src={previewUrl} alt="preview" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 6 }} />
+              <img src={previewUrl} alt="preview" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
             ) : (
-              <span style={{ fontSize: 28 }}>📄</span>
+              <span style={{ fontSize: 28, flexShrink: 0 }}>📄</span>
             )}
-            <div className="flex-grow-1">
+            <div className="flex-grow-1 min-w-0">
               <div className="fw-medium text-break" style={{ fontSize: 13 }}>{selectedFile.name}</div>
               <div className="text-muted" style={{ fontSize: 12 }}>{(selectedFile.size / 1024).toFixed(0)} KB</div>
             </div>
-            <button type="button" className="btn btn-sm btn-outline-danger" onClick={handleRemove}>
+            <button type="button" className="btn btn-sm btn-outline-secondary" onClick={openPicker} title={t('replace_file', { defaultValue: 'Замінити' })}>
+              ↻
+            </button>
+            <button type="button" className="btn btn-sm btn-outline-danger" onClick={handleRemove} title={t('remove_file', { defaultValue: 'Видалити' })}>
               ✕
             </button>
           </div>
         )}
+
+        {fileError && <small className="text-danger d-block mt-1">{fileError}</small>}
         <small className="text-muted d-block mt-1">
           {t('upload_payment_doc_hint', { defaultValue: 'Скриншот або PDF чеку про оплату. Обов\'язково.' })}
         </small>
