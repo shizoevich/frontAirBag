@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 // internal
 import { AskQuestion} from '@/svg';
@@ -15,6 +16,7 @@ import { handleModalClose } from '@/redux/features/productModalSlice';
 const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBottom = false }) => {
   const t = useTranslations('ProductDetails');
   const locale = useLocale();
+  const router = useRouter();
   const { sku, img, title, imageURLs, category, description, discount, price_minor, status, tags, offerDate, residue = 0 } = productItem || {};
   // Определяем доступность товара на основе residue
   const isAvailable = residue > 0;
@@ -94,7 +96,12 @@ const DetailsWrapper = ({ productItem, handleImageActive, activeImg, detailsBott
           {isAvailable && <ProductQuantity maxQuantity={residue} />}
           <div className="tp-product-details-add-to-cart mb-15 w-100">
             <button
-              onClick={() => isAvailable && dispatch(handleModalClose()) && router.push('/cart')}
+              onClick={() => {
+                if (!isAvailable) return;
+                handleAddProduct(productItem);
+                dispatch(handleModalClose());
+                router.push(`/${locale}/checkout`);
+              }}
               disabled={!isAvailable}
               className="tp-product-details-buy-now-btn w-100"
               style={{

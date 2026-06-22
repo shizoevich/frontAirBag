@@ -97,7 +97,6 @@ const handleCloseCartMini = () => {
             </div>
             <div className="cartmini__checkout-btn">
               <Link href={`/${locale}/cart`} onClick={handleCloseCartMini} className="tp-btn mb-10 w-100">{t('viewCart')}</Link>
-              <Link href={`/${locale}/checkout`} onClick={handleCloseCartMini} className="tp-btn tp-btn-border w-100">{t('checkout')}</Link>
             </div>
           </div>
         </div>
