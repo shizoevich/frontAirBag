@@ -4,7 +4,7 @@ import Footer from "@/layout/footers/footer";
 import AboutArea from "@/components/about/about-area";
 
 export async function generateMetadata({ params }) {
-  const locale = params.locale;
+  const { locale } = await params;
   const titles = { uk: 'Про нас', ru: 'О нас', en: 'About us' };
   const descs = {
     uk: 'AirbagAD — постачальник запчастин AirBag SRS: подушки безпеки, ремені безпеки, піропатрони. Гарантія якості та доставка по Україні.',

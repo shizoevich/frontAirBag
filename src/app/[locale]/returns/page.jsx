@@ -4,7 +4,7 @@ import Footer from "@/layout/footers/footer";
 import ReturnsArea from "@/components/returns/returns-area";
 
 export async function generateMetadata({ params }) {
-  const locale = params.locale;
+  const { locale } = await params;
   const titles = { uk: 'Повернення товару', ru: 'Возврат товара', en: 'Returns' };
   const descs = {
     uk: 'Правила повернення та обміну товару в AirbagAD згідно із законодавством України.',
