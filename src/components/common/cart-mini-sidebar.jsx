@@ -84,7 +84,7 @@ const handleCloseCartMini = () => {
             {cart_products.length === 0 && <div className="cartmini__empty text-center">
               <Image src={empty_cart_img} alt="empty-cart-img" />
               <p>{t('yourCartIsEmpty')}</p>
-              <Link href={`/${locale}/shop`} className="tp-btn">{t('goToShop')}</Link>
+              <Link href={`/${locale}/shop`} onClick={handleCloseCartMini} className="tp-btn">{t('goToShop')}</Link>
             </div>}
           </div>
           <div className="cartmini__checkout">
