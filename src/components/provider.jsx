@@ -26,7 +26,7 @@ export default function Providers({ children, locale, messages }) {
               zIndex: 9999,
             }}
             toastOptions={{
-              duration: 4000,
+              duration: 2500,
               style: {
                 fontSize: '14px',
                 fontWeight: '500',
@@ -34,6 +34,8 @@ export default function Providers({ children, locale, messages }) {
                 borderRadius: '8px',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
                 maxWidth: '400px',
+                /* AIRBAG-75: тост не должен перехватывать тап по кнопке корзины — клик проходит сквозь него */
+                pointerEvents: 'none',
               },
               success: {
                 style: { background: '#10B981', color: '#fff' },
@@ -64,6 +66,8 @@ export default function Providers({ children, locale, messages }) {
                         fontSize: 16,
                         lineHeight: 1,
                         flexShrink: 0,
+                        /* AIRBAG-75: тело тоста pointer-events:none, но крестик оставляем кликабельным */
+                        pointerEvents: 'auto',
                       }}
                       aria-label="Закрити"
                     >
