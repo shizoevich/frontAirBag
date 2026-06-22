@@ -5,6 +5,18 @@
   cursor: not-allowed;
 }
 
+/* AIRBAG-78: не выделять текст/иконку при многократном клике по +/- */
+.tp-product-quantity,
+.tp-cart-plus,
+.tp-cart-minus,
+.tp-cart-input {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Стили для кнопки "Купить сейчас" */
 .tp-product-details-buy-now-btn {
   background-color: #ffffff;
