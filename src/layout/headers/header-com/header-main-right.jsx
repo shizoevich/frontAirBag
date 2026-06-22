@@ -83,7 +83,7 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
           <div className="tp-header-login-icon">
             <span>
               {isAuthenticatedUser && currentUser?.imageURL ? (
-                <Link href={`/${locale}/profile`}>
+                <Link href={`/${locale}/cabinet`}>
                   <Image
                     src={currentUser.imageURL}
                     alt="user img"
@@ -93,7 +93,7 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
                   />
                 </Link>
               ) : isAuthenticatedUser && currentUser ? (
-                <Link href={`/${locale}/profile`}>
+                <Link href={`/${locale}/cabinet`}>
                   <h2 className="text-uppercase login_text">
                     {(currentUser.name || currentUser.first_name || currentUser.email || 'U')[0].toUpperCase()}
                   </h2>
@@ -112,7 +112,7 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
             {isAuthenticatedUser && currentUser && <span>{t('helloWithName', { name: [currentUser.name || currentUser.first_name, currentUser.last_name].filter(Boolean).join(' ') || currentUser.username || 'User' })}</span>}
             <div className="tp-header-login-title">
               {!isAuthenticatedUser && <Link href={`/${locale}/login`}>{t('signIn')}</Link>}
-              {isAuthenticatedUser && <Link href={`/${locale}/profile`}>{t('yourAccount')}</Link>}
+              {isAuthenticatedUser && <Link href={`/${locale}/cabinet`}>{t('yourAccount')}</Link>}
             </div>
           </div>
         </div>
