@@ -17,6 +17,13 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* AIRBAG-78: поле количества только для отображения (readOnly) — браузеры
+   игнорируют user-select:none на <input>, поэтому отключаем pointer-events,
+   чтобы промах мимо +/- не выделял число. Клики по +/- не затрагиваются. */
+.tp-cart-input {
+  pointer-events: none;
+}
+
 /* Стили для кнопки "Купить сейчас" */
 .tp-product-details-buy-now-btn {
   background-color: #ffffff;
