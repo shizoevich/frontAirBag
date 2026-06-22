@@ -61,7 +61,7 @@ const handleCloseCartMini = () => {
   
   return (
     <Link href={`/${locale}/product/${slugify(item.title)}-${productId}`}>
-      <Image src={productImage} width={70} height={60} alt="product img" />
+      <Image src={productImage} width={70} height={60} alt="product img" style={{ width: '70px', height: '60px', objectFit: 'contain' }} />
     </Link>
   );
 })()}
