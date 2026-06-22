@@ -66,8 +66,8 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                   <div className="tp-footer-widget-content">
                     <ul>
                       <li><Link href={getLocalizedLink("/profile")}>{t('myAccount')}</Link></li>
-                      <li><Link href={getLocalizedLink("/profile")}>{t('orderHistory')}</Link></li>
-                      <li><Link href={getLocalizedLink("/contact")}>{t('returns')}</Link></li>
+                      <li><Link href={getLocalizedLink("/orders")}>{t('orderHistory')}</Link></li>
+                      <li><Link href={getLocalizedLink("/returns")}>{t('returns')}</Link></li>
                     </ul>
                   </div>
                 </div>
@@ -77,7 +77,7 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                   <h4 className="tp-footer-widget-title">{t('informationTitle')}</h4>
                   <div className="tp-footer-widget-content">
                     <ul>
-                      {/*<li><Link href="/about">{t('ourStory')}</Link></li>*/}
+                      <li><Link href={getLocalizedLink("/about")}>{t('aboutUs')}</Link></li>
                       <li><Link href={getLocalizedLink("/privacy-policy")}>{t('privacyPolicy')}</Link></li>
                       <li><Link href={getLocalizedLink("/terms")}>{t('termsAndConditions')}</Link></li>
                       {/*<li><Link href="/blog">{t('latestNews')}</Link></li>*/}

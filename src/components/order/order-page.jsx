@@ -281,10 +281,13 @@ const OrderPage = () => {
                                     </h6>
                                   </div>
                                   <div className="card-body">
-                                    <div className="d-flex justify-content-between mb-2">
-                                      <span className="text-muted">{t('subtotal')}:</span>
-                                      <span>₴{formatPrice(orderToShow.subtotal_minor)}</span>
-                                    </div>
+                                    {/* AIRBAG-90: скрываем строку подытога, когда она 0 (лишняя/путает) */}
+                                    {orderToShow.subtotal_minor > 0 && (
+                                      <div className="d-flex justify-content-between mb-2">
+                                        <span className="text-muted">{t('subtotal')}:</span>
+                                        <span>₴{formatPrice(orderToShow.subtotal_minor)}</span>
+                                      </div>
+                                    )}
                                     {orderToShow.discount_total_minor > 0 && (
                                       <div className="d-flex justify-content-between mb-2">
                                         <span className="text-muted">{t('discount')}:</span>

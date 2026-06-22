@@ -9,6 +9,8 @@ export default function OrderSuccessContent() {
   const { locale } = useParams();
   const searchParams = useSearchParams();
   const isPaid = searchParams.get('payment') === 'paid';
+  // AIRBAG-83: при самовывозе не показываем текст про отправку
+  const isPickup = searchParams.get('delivery') === 'pickup';
 
   return (
     <main className="main" style={{ background: '#f7f9fc' }}>
@@ -63,9 +65,9 @@ export default function OrderSuccessContent() {
               </h2>
 
               <p className="tp-order-success-desc mb-4">
-                {t('description', {
-                  defaultValue: 'Спасибо за ваш заказ! Мы свяжемся с вами в ближайшее время для подтверждения деталей доставки.',
-                })}
+                {isPickup
+                  ? t('pickupDescription', { defaultValue: 'Дякуємо за замовлення! Ми підготуємо його до самовивозу та повідомимо, коли можна забрати.' })
+                  : t('description', { defaultValue: 'Спасибо за ваш заказ! Мы свяжемся с вами в ближайшее время для подтверждения деталей доставки.' })}
               </p>
 
               <div className="tp-order-success-info mb-4">
@@ -73,9 +75,13 @@ export default function OrderSuccessContent() {
                   <strong>{t('nextSteps', { defaultValue: 'Что дальше?' })}</strong>
                 </p>
                 <ul className="list-unstyled">
-                  <li>✓ {t('step1', { defaultValue: 'Мы обработаем ваш заказ в течение 1-2 рабочих дней' })}</li>
+                  <li>✓ {isPickup
+                    ? t('pickupStep1', { defaultValue: 'Підготуємо ваше замовлення до видачі' })
+                    : t('step1', { defaultValue: 'Мы обработаем ваш заказ в течение 1-2 рабочих дней' })}</li>
                   <li>✓ {t('step2', { defaultValue: 'Наш менеджер свяжется с вами для подтверждения' })}</li>
-                  <li>✓ {t('step3', { defaultValue: 'Отправим товар в выбранное отделение Новой Почты' })}</li>
+                  <li>✓ {isPickup
+                    ? t('pickupStep3', { defaultValue: 'Повідомимо, коли замовлення можна забрати в магазині' })
+                    : t('step3', { defaultValue: 'Отправим товар в выбранное отделение Новой Почты' })}</li>
                   <li>✓ {t('step4', { defaultValue: 'Уведомим вас о готовности к получению' })}</li>
                 </ul>
               </div>
