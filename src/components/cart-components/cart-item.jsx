@@ -41,7 +41,7 @@ const CartItem = ({product}) => {
       {/* img */}
       <td className="tp-cart-img">
         <Link href={`/${locale}/product/${slugify(title)}-${productId}`}>
-          <div style={{ width: '70px', height: '100px', position: 'relative' }}>
+          <div style={{ width: '70px', height: '70px', position: 'relative' }}>
             <BlurImage image={productImage} alt={title || 'Product Image'} />
           </div>
         </Link>
