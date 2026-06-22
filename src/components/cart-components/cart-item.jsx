@@ -39,9 +39,9 @@ const CartItem = ({product}) => {
   return (
     <tr>
       {/* img */}
-      <td className="tp-cart-img">
-        <Link href={`/${locale}/product/${slugify(title)}-${productId}`}>
-          <div style={{ width: '70px', height: '70px', position: 'relative' }}>
+      <td className="tp-cart-img" style={{ textAlign: 'center' }}>
+        <Link href={`/${locale}/product/${slugify(title)}-${productId}`} style={{ display: 'inline-block' }}>
+          <div style={{ width: '70px', height: '70px', position: 'relative', overflow: 'hidden', margin: '0 auto' }}>
             <BlurImage image={productImage} alt={title || 'Product Image'} />
           </div>
         </Link>
