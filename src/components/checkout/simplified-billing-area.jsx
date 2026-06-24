@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import '@/styles/register-form.css';
 
-const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
+const SimplifiedBillingArea = ({ register, errors, user, setValue, isPickup = false }) => {
   const t = useTranslations('Checkout');
   
   // Состояние для Nova Poshta API
@@ -313,6 +313,9 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
               </div>
             </div>
 
+            {/* AIRBAG-82: город/отделение только для доставки НП; при самовывозе скрыты и необязательны */}
+            {!isPickup && (
+            <>
             {/* Nova Post City */}
             <div className="col-md-6">
               <div className="tp-checkout-input">
@@ -408,6 +411,8 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue }) => {
                 )}
               </div>
             </div>
+            </>
+            )}
 
             {/* Order Notes */}
             <div className="col-md-12">

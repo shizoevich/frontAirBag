@@ -288,11 +288,12 @@ const OrderCheckoutArea = () => {
                >
                 <div className="row">
                   <div className="col-lg-7">
-                    <SimplifiedBillingArea 
-                      register={register} 
-                      errors={errors} 
+                    <SimplifiedBillingArea
+                      register={register}
+                      errors={errors}
                       user={user}
                       setValue={setValue}
+                      isPickup={isPickup}
                     />
                   </div>
                   
