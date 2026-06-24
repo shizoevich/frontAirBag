@@ -39,7 +39,8 @@ const HeaderSearchForm = () => {
             
       categories.forEach(cat => {
         options.push({
-          value: cat.id_remonline || cat.id,
+          // AIRBAG-96: используем DB id (как каталог /shop?category=), не id_remonline
+          value: cat.id,
           text: cat.title
         });
       });
@@ -52,21 +53,15 @@ const HeaderSearchForm = () => {
   const selectCategoryHandle = (e) => {
     setCategory(e.value);
     
-    // Если выбрана реальная категория (не "Select Category"), запускаем поиск автоматически
+    // AIRBAG-96: выбор категории открывает её в каталоге (как в меню каталога),
+    // /search категории не фильтрует. Ведём на /shop?category=<id>.
     if (e.value !== "Select Category") {
-      // Создаем прямой переход на страницу поиска без сброса полей
-      const queryParams = [];
-      if (searchText) {
-        queryParams.push(`searchText=${searchText}`);
-      }
-      queryParams.push(`categoryId=${e.value}`);
-
-      // Extract current locale from pathname
       const locale = pathname.split('/')[1] || 'uk';
-      const route = `/${locale}/search?${queryParams.join('&')}`;
-      
-      // Используем Next.js router для немедленного перехода
-      router.push(route);
+      const queryParams = [`category=${e.value}`];
+      if (searchText) {
+        queryParams.push(`searchText=${encodeURIComponent(searchText)}`);
+      }
+      router.push(`/${locale}/shop?${queryParams.join('&')}`);
     }
   };
 
