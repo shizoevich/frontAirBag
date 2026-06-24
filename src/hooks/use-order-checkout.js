@@ -170,9 +170,11 @@ const useOrderCheckout = () => {
       const currentUser = userData || user;
       
       // Формируем адрес Nova Poshta из города и отделения.
-      // AIRBAG-82: при самовывозе city/warehouse пустые — отправляем пустой адрес,
-      // иначе бэкенд считает заказ доставкой и ставит "Накладений платіж".
-      const novaPostAddress = (data.city && data.warehouse)
+      // AIRBAG-82/83: при самовывозе (shippingOption === 'pickup') адрес НЕ отправляем,
+      // даже если поля города/отделения остались заполнены — иначе бэкенд считает
+      // заказ доставкой ("Накладений платіж") и success-страница показывает доставку.
+      const isPickup = data.shippingOption === 'pickup';
+      const novaPostAddress = (!isPickup && data.city && data.warehouse)
         ? `${data.city}, ${data.warehouse}`
         : "";
       
