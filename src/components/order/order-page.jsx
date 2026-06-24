@@ -292,19 +292,22 @@ const OrderPage = () => {
                                   const discountMinor = orderToShow.discount_total_minor > 0 ? orderToShow.discount_total_minor : Math.max(0, subtotalMinor - totalMinor);
                                   return (
                                     <>
-                                      <div className="d-flex justify-content-between mb-2">
-                                        <span className="text-muted">{t('amount_no_discount')}:</span>
-                                        <span>₴{formatPrice(subtotalMinor)}</span>
-                                      </div>
+                                      {/* Строки "без скидки" и "скидка" — только если реальная скидка > 0 */}
                                       {discountMinor > 0 && (
-                                        <div className="d-flex justify-content-between mb-2">
-                                          <span className="text-muted">{t('discount')}:</span>
-                                          <span className="text-success">-₴{formatPrice(discountMinor)}</span>
-                                        </div>
+                                        <>
+                                          <div className="d-flex justify-content-between mb-2">
+                                            <span className="text-muted">{t('amount_no_discount')}:</span>
+                                            <span>₴{formatPrice(subtotalMinor)}</span>
+                                          </div>
+                                          <div className="d-flex justify-content-between mb-2">
+                                            <span className="text-muted">{t('discount')}:</span>
+                                            <span className="text-success">-₴{formatPrice(discountMinor)}</span>
+                                          </div>
+                                          <hr />
+                                        </>
                                       )}
-                                      <hr />
                                       <div className="d-flex justify-content-between">
-                                        <strong className="fs-5">{t('amount_with_discount')}:</strong>
+                                        <strong className="fs-5">{t('grand_total_label')}:</strong>
                                         <strong className="fs-5 text-primary">₴{formatPrice(totalMinor)}</strong>
                                       </div>
                                     </>

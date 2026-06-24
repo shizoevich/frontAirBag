@@ -672,6 +672,7 @@
     "pickup_payment": "Оплата в магазине",
     "amount_no_discount": "Сумма без скидки",
     "amount_with_discount": "Сумма со скидкой",
+    "grand_total_label": "Итого",
     "error_loading_orders": "Ошибка загрузки заказов"
   },
   "Checkout": {
