@@ -261,7 +261,7 @@ const OrderCheckoutArea = () => {
           {cart_products.length === 0 && !showPaymentFrame ? (
             <div className="text-center py-5">
               <h4>{t('no_items_in_cart')}</h4>
-              <Link href="/shop" className="tp-btn">
+              <Link href={`/${locale}`} className="tp-btn">
                 {t('return_to_shop')}
               </Link>
             </div>
