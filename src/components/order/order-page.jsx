@@ -13,13 +13,13 @@ const L = {
     dateFrom: 'Дата від', dateTo: 'Дата до', allStatuses: 'Усі статуси', reset: 'Скинути',
     sort: 'Сортування', newest: 'Спочатку нові', oldest: 'Спочатку старі',
     found: 'Знайдено', ordersWord: 'замовлень', sumWord: 'на суму', loadingMore: 'Завантаження…',
-    statusPending: 'В обробці', statusPaid: 'Оплачено', statusCompleted: 'Виконано', close: 'Закрити',
+    statusPending: 'В обробці', statusPaid: 'Оплачено', statusCompleted: 'Виконано', close: 'Закрити', pickup: 'Самовивіз',
   },
   ru: {
     dateFrom: 'Дата от', dateTo: 'Дата до', allStatuses: 'Все статусы', reset: 'Сбросить',
     sort: 'Сортировка', newest: 'Сначала новые', oldest: 'Сначала старые',
     found: 'Найдено', ordersWord: 'заказов', sumWord: 'на сумму', loadingMore: 'Загрузка…',
-    statusPending: 'В обработке', statusPaid: 'Оплачено', statusCompleted: 'Выполнено', close: 'Закрыть',
+    statusPending: 'В обработке', statusPaid: 'Оплачено', statusCompleted: 'Выполнено', close: 'Закрыть', pickup: 'Самовывоз',
   },
 };
 
@@ -222,7 +222,7 @@ const OrderPage = () => {
                               <div className="card-body">
                                 <div className="mb-2"><strong className="text-muted">{t('name')}:</strong><span className="ms-2">{orderToShow.name} {orderToShow.last_name}</span></div>
                                 <div className="mb-2"><strong className="text-muted">{t('phone')}:</strong><span className="ms-2">{orderToShow.phone}</span></div>
-                                <div className="mb-2"><strong className="text-muted">{t('address')}:</strong><span className="ms-2">{orderToShow.nova_post_address}</span></div>
+                                <div className="mb-2"><strong className="text-muted">{t('address')}:</strong><span className="ms-2">{(orderToShow.nova_post_address || '').replace(/[\s,]+/g, '') ? orderToShow.nova_post_address : l.pickup}</span></div>
                                 {orderToShow.description && (<div><strong className="text-muted">{t('description')}:</strong><span className="ms-2">{orderToShow.description}</span></div>)}
                               </div>
                             </div>
