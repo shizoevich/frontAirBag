@@ -663,10 +663,15 @@
     "actions": "Действия",
     "order_summary": "Итог заказа",
     "payment_status": "Статус оплаты",
+    "payment_method": "Способ оплаты",
+    "pay_now": "Оплата сейчас",
+    "cash_on_delivery": "Оплата при получении",
     "bank_transfer": "Оплата по реквизитам",
     "payment_document": "Документ об оплате",
     "view_document": "Посмотреть",
     "pickup_payment": "Оплата в магазине",
+    "amount_no_discount": "Сумма без скидки",
+    "amount_with_discount": "Сумма со скидкой",
     "error_loading_orders": "Ошибка загрузки заказов"
   },
   "Checkout": {

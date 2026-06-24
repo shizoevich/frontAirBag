@@ -510,6 +510,8 @@
     "order_confirmed": "Замовлення підтверджено!",
     "view_all_orders": "Всі замовлення",
     "order_summary": "Підсумок замовлення",
+    "amount_no_discount": "Сума без знижки",
+    "amount_with_discount": "Сума зі знижкою",
     "payment_status": "Статус оплати",
     "pickup_payment": "Оплата в магазині",
     "bank_transfer": "Оплата за реквізитами",

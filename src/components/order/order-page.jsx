@@ -284,14 +284,32 @@ const OrderPage = () => {
                             <div className="card">
                               <div className="card-header bg-success text-white"><h6 className="mb-0"><i className="fas fa-calculator me-2"></i>{t('order_summary')}</h6></div>
                               <div className="card-body">
-                                {orderToShow.subtotal_minor > 0 && (
-                                  <div className="d-flex justify-content-between mb-2"><span className="text-muted">{t('subtotal')}:</span><span>₴{formatPrice(orderToShow.subtotal_minor)}</span></div>
-                                )}
-                                {orderToShow.discount_total_minor > 0 && (
-                                  <div className="d-flex justify-content-between mb-2"><span className="text-muted">{t('discount')}:</span><span className="text-success">-₴{formatPrice(orderToShow.discount_total_minor)}</span></div>
-                                )}
-                                <hr />
-                                <div className="d-flex justify-content-between"><strong className="fs-5">{t('total')}:</strong><strong className="fs-5 text-primary">₴{formatPrice(getOrderTotal(orderToShow))}</strong></div>
+                                {(() => {
+                                  // AIRBAG-90/доработка: показываем и сумму без скидки, и со скидкой
+                                  const totalMinor = getOrderTotal(orderToShow);
+                                  const itemsSum = orderToShow.items?.reduce((s, it) => s + (it.original_price_minor || 0) * (it.quantity || 1), 0) || 0;
+                                  const subtotalMinor = orderToShow.subtotal_minor > 0 ? orderToShow.subtotal_minor : (itemsSum || totalMinor);
+                                  const discountMinor = orderToShow.discount_total_minor > 0 ? orderToShow.discount_total_minor : Math.max(0, subtotalMinor - totalMinor);
+                                  return (
+                                    <>
+                                      <div className="d-flex justify-content-between mb-2">
+                                        <span className="text-muted">{t('amount_no_discount')}:</span>
+                                        <span>₴{formatPrice(subtotalMinor)}</span>
+                                      </div>
+                                      {discountMinor > 0 && (
+                                        <div className="d-flex justify-content-between mb-2">
+                                          <span className="text-muted">{t('discount')}:</span>
+                                          <span className="text-success">-₴{formatPrice(discountMinor)}</span>
+                                        </div>
+                                      )}
+                                      <hr />
+                                      <div className="d-flex justify-content-between">
+                                        <strong className="fs-5">{t('amount_with_discount')}:</strong>
+                                        <strong className="fs-5 text-primary">₴{formatPrice(totalMinor)}</strong>
+                                      </div>
+                                    </>
+                                  );
+                                })()}
                               </div>
                             </div>
                           </div>
