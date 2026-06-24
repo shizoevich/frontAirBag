@@ -169,8 +169,14 @@ const useOrderCheckout = () => {
       // Подготавливаем данные заказа
       const currentUser = userData || user;
       
-      // Формируем адрес Nova Poshta из города и отделения
-      const novaPostAddress = `${data.city}, ${data.warehouse}`;
+      // Формируем адрес Nova Poshta из города и отделения.
+      // AIRBAG-82/83: при самовывозе (shippingOption === 'pickup') адрес НЕ отправляем,
+      // даже если поля города/отделения остались заполнены — иначе бэкенд считает
+      // заказ доставкой ("Накладений платіж") и success-страница показывает доставку.
+      const isPickup = data.shippingOption === 'pickup';
+      const novaPostAddress = (!isPickup && data.city && data.warehouse)
+        ? `${data.city}, ${data.warehouse}`
+        : "";
       
       // Resolve Good PKs for cart items (prevents backend: Invalid pk ".." - object does not exist)
       const resolvedItems = await Promise.all(
@@ -440,8 +446,11 @@ const useOrderCheckout = () => {
           paymentMethod
         }));
       } else {
-        // Самовывоз / оплата потом — заказ создан, оплата не подтверждена
-        router.push(`/${locale}/order-success?payment=pending`);
+        // Самовывоз / оплата потом — заказ создан, оплата не подтверждена.
+        // AIRBAG-83: прокидываем способ доставки, чтобы на странице успеха
+        // не показывать текст про отправку при самовывозе.
+        const deliveryParam = novaPostAddress ? "shipping" : "pickup";
+        router.push(`/${locale}/order-success?payment=pending&delivery=${deliveryParam}`);
       }
       
     } catch (error) {

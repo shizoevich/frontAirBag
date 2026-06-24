@@ -43,14 +43,14 @@ const ContactInfo = ({ locale }) => {
                     </div>
                     <div className="tp-contact-content">
                       <h5 className="mb-2 fs-6 fw-bold">{t('phone')}</h5>
-                      <a href="tel:+380989999828" className="text-success text-decoration-none">
+                      <a href="tel:+380989989828" className="text-success text-decoration-none">
                         {t('phoneNumber')}
                       </a>
                       <div className="d-flex gap-2 mt-1">
                         <a href="https://t.me/airbagsale" target="_blank" rel="noopener noreferrer" title="Telegram" style={{fontSize: '1.4rem', color: '#0088cc'}}>
                           <i className="fab fa-telegram"></i>
                         </a>
-                        <a href="viber://add?number=380989999828" title="Viber" style={{fontSize: '1.4rem', color: '#7360f2'}}>
+                        <a href="viber://add?number=380989989828" title="Viber" style={{fontSize: '1.4rem', color: '#7360f2'}}>
                           <i className="fab fa-viber"></i>
                         </a>
                       </div>

@@ -7,7 +7,6 @@ import { useParams } from 'next/navigation';
 // internal
 import { Close, Minus, Plus } from "@/svg";
 import { add_cart_product, quantityDecrement, remove_product } from "@/redux/features/cartSlice";
-import BlurImage from "@/components/common/BlurImage";
 import { getProductImage, getProductId } from "@/utils/image-utils";
 import { slugify } from "@/utils/slugify";
 
@@ -39,11 +38,14 @@ const CartItem = ({product}) => {
   return (
     <tr>
       {/* img */}
-      <td className="tp-cart-img">
-        <Link href={`/${locale}/product/${slugify(title)}-${productId}`}>
-          <div style={{ width: '70px', height: '100px', position: 'relative' }}>
-            <BlurImage image={productImage} alt={title || 'Product Image'} />
-          </div>
+      <td className="tp-cart-img" style={{ textAlign: 'center' }}>
+        <Link href={`/${locale}/product/${slugify(title)}-${productId}`} style={{ display: 'inline-block' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={productImage}
+            alt={title || 'Product Image'}
+            style={{ width: '70px', height: '70px', objectFit: 'cover', display: 'block', margin: '0 auto', borderRadius: '8px', background: '#f8f9fa' }}
+          />
         </Link>
       </td>
       {/* title */}

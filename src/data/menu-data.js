@@ -60,7 +60,7 @@ const menu_data = [
     id: 6,
     user_account: true,
     titleKey: 'menu.myAccount',
-    link: '/profile',
+    link: '/cabinet',
     account_pages: [
       { titleKey: 'menu.cart', link: '/cart', showAlways: true },
       { titleKey: 'menu.checkout', link: '/checkout', showAlways: true },

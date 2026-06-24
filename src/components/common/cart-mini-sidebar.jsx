@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import Image from 'next/image';
+import BlurImage from '@/components/common/BlurImage';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslations } from 'next-intl';
@@ -61,7 +62,9 @@ const handleCloseCartMini = () => {
   
   return (
     <Link href={`/${locale}/product/${slugify(item.title)}-${productId}`}>
-      <Image src={productImage} width={70} height={60} alt="product img" />
+      <div style={{ width: '70px', height: '70px', position: 'relative' }}>
+        <BlurImage image={productImage} alt={item.title || 'product img'} />
+      </div>
     </Link>
   );
 })()}
@@ -84,7 +87,7 @@ const handleCloseCartMini = () => {
             {cart_products.length === 0 && <div className="cartmini__empty text-center">
               <Image src={empty_cart_img} alt="empty-cart-img" />
               <p>{t('yourCartIsEmpty')}</p>
-              <Link href={`/${locale}/shop`} className="tp-btn">{t('goToShop')}</Link>
+              <Link href={`/${locale}/shop`} onClick={handleCloseCartMini} className="tp-btn">{t('goToShop')}</Link>
             </div>}
           </div>
           <div className="cartmini__checkout">

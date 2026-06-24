@@ -288,11 +288,12 @@ const OrderCheckoutArea = () => {
                >
                 <div className="row">
                   <div className="col-lg-7">
-                    <SimplifiedBillingArea 
-                      register={register} 
-                      errors={errors} 
+                    <SimplifiedBillingArea
+                      register={register}
+                      errors={errors}
                       user={user}
                       setValue={setValue}
+                      isPickup={isPickup}
                     />
                   </div>
                   
@@ -312,7 +313,7 @@ const OrderCheckoutArea = () => {
                           {cart_products.map((item, index) => (
                             <li key={item._id || item.id || index} className="tp-order-info-list-desc">
                               <p>
-                                {item.title} <span> x {item.orderQuantity}</span>
+                                {item.title} <span style={{ color: '#de8043', fontWeight: 600, whiteSpace: 'nowrap' }}>×{item.orderQuantity} шт</span>
                               </p>
                               <span>₴{((Number(item.price_minor || 0) / 100) * item.orderQuantity).toFixed(2)}</span>
                             </li>

@@ -23,7 +23,7 @@ export default async function HomePage({ params }) {
   return (
     <Wrapper>
       <Header/>
-      <FeatureArea/>
+      <FeatureArea locale={locale}/>
       <MobileSearch/>
       {/* Оставляем клиентский раздел для интерактива, фильтров и пагинации */}
       <Suspense fallback={<HomePrdLoader loading />}>

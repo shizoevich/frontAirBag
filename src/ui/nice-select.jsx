@@ -42,6 +42,11 @@ const NiceSelect = ({options,defaultCurrent, placeholder,className,onChange,name
                 role="menubar"
                 onClick={(e) => e.stopPropagation()}
                 onKeyPress={(e) => e.stopPropagation()}
+                style={
+                    className?.includes('custom-nice-select')
+                        ? { maxHeight: '320px', overflowY: 'auto' }
+                        : undefined
+                }
             >
                 {options?.map((item) => (
                     <li

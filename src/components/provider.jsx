@@ -17,11 +17,11 @@ export default function Providers({ children, locale, messages }) {
             {children}
           </AuthInitializer>
           <Toaster
-            position="top-right"
+            position="bottom-right"
             reverseOrder={false}
             gutter={8}
             containerStyle={{
-              top: 80,  /* below sticky header (~70–80px) */
+              bottom: 20,  /* AIRBAG-75: правый нижний угол — не перекрывает кнопку корзины */
               right: 20,
               zIndex: 9999,
             }}

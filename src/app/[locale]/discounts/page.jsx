@@ -268,7 +268,17 @@ const MOCK_DISCOUNTS = {
         break;
       }
     }
-    
+
+    // AIRBAG-98: предполагаемая скидка на следующий месяц — по сумме ТЕКУЩЕГО месяца
+    let predictedDiscount = 0;
+    for (const discount of sortedDiscounts) {
+      const threshold = (discount.month_payment || 0) / 100;
+      if (currentMonthTotal >= threshold) {
+        predictedDiscount = parseFloat(discount.percentage);
+        break;
+      }
+    }
+
     console.log('💰 Monthly spent calculation:', {
       currentMonth: {
         start: currentMonthStart.toLocaleDateString('ru-RU'),
@@ -285,14 +295,15 @@ const MOCK_DISCOUNTS = {
       paidOrders: orders.filter(o => o.is_paid || o.is_completed).length
     });
     
-    return { 
-      currentMonth: currentMonthTotal, 
+    return {
+      currentMonth: currentMonthTotal,
       previousMonth: previousMonthTotal,
-      currentDiscount 
+      currentDiscount,
+      predictedDiscount,
     };
   };
-  
-  const { currentMonth: currentMonthSpent, previousMonth: previousMonthSpent, currentDiscount } = calculateMonthlySpent();
+
+  const { currentMonth: currentMonthSpent, previousMonth: previousMonthSpent, currentDiscount, predictedDiscount } = calculateMonthlySpent();
   
   // Для прогресс-бара используем сумму текущего месяца
   const userTotalSpent = currentMonthSpent;
@@ -383,16 +394,14 @@ const MOCK_DISCOUNTS = {
                       </div>
                     )}
                     
-                    {/* Сумма текущего месяца */}
-                    <p className="mb-2">
+                    {/* AIRBAG-98: текущий месяц + предполагаемая скидка — фиолетовый блок */}
+                    <div className="alert mb-0" style={{ background: '#f3e8ff', border: '1px solid #d8b4fe', color: '#6b21a8' }}>
                       <strong>{t('rules_current_month', { amount: currentMonthSpent.toLocaleString() })}</strong>
-                    </p>
-                    
-                    {/* Сумма прошлого месяца */}
-                    <p className="mb-0 text-muted small">
-                      {t('previous_month_spent')}: {previousMonthSpent.toLocaleString()} ₴
-                    </p>
-                    
+                      <p className="mb-0 small mt-1">
+                        {t('predicted_next_month_discount', { percentage: predictedDiscount })}
+                      </p>
+                    </div>
+
                     {ordersLoading && (
                       <small className="text-muted d-block mt-2">
                         <span className="spinner-border spinner-border-sm me-2" role="status"></span>

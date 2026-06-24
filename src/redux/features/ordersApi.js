@@ -9,6 +9,50 @@ export const ordersApi = apiSlice.injectEndpoints({
       providesTags: ['Orders'],
     }),
 
+    // AIRBAG-88: серверная фильтрация/сортировка/пагинация + infinite scroll.
+    // Отдельный endpoint, чтобы не влиять на getOrders (discounts/checkout).
+    getOrdersList: builder.query({
+      query: ({ client, ordering = '-date', limit = 20, offset = 0, dateFrom, dateTo, status } = {}) => {
+        const p = new URLSearchParams();
+        if (client) p.set('client', String(client));
+        p.set('ordering', ordering);
+        p.set('limit', String(limit));
+        p.set('offset', String(offset));
+        if (dateFrom) p.set('date__gte', dateFrom);
+        if (dateTo) p.set('date__lte', `${dateTo}T23:59:59`);
+        // Бэкенд принимает 1/0 для булевых полей (не 'true'/'false')
+        if (status === 'completed') {
+          p.set('is_completed', '1');
+        } else if (status === 'paid') {
+          p.set('is_completed', '0');
+          p.set('is_paid', '1');
+        } else if (status === 'pending') {
+          p.set('is_completed', '0');
+          p.set('is_paid', '0');
+        }
+        return `/orders/?${p.toString()}`;
+      },
+      // Один кэш-энтри на набор фильтров (без offset) — страницы склеиваются
+      serializeQueryArgs: ({ queryArgs }) => {
+        const { offset, ...rest } = queryArgs || {};
+        return rest;
+      },
+      merge: (currentCache, newItems, { arg }) => {
+        if (!arg || (arg.offset ?? 0) === 0) {
+          return newItems; // первая страница / смена фильтра — заменить
+        }
+        if (currentCache?.results && newItems?.results) {
+          currentCache.results.push(...newItems.results);
+          currentCache.next = newItems.next;
+          currentCache.count = newItems.count;
+          currentCache.total_amount_minor = newItems.total_amount_minor;
+        }
+      },
+      forceRefetch: ({ currentArg, previousArg }) =>
+        (currentArg?.offset ?? 0) !== (previousArg?.offset ?? 0),
+      providesTags: ['Orders'],
+    }),
+
     // Получение заказа по ID
     getOrderById: builder.query({
       query: (id) => `/orders/${id}/`,
@@ -118,6 +162,7 @@ export const ordersApi = apiSlice.injectEndpoints({
 
 export const {
   useGetOrdersQuery,
+  useGetOrdersListQuery,
   useGetOrderByIdQuery,
   useCreateOrderMutation,
   useUpdateOrderMutation,

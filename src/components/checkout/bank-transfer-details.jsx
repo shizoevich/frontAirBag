@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useRef, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useGetBankDetailsQuery } from '@/redux/features/ordersApi';
 
 /**
@@ -14,6 +14,8 @@ const MAX_MB = 10;
 
 const BankTransferDetails = ({ onFileSelect, selectedFile }) => {
   const t = useTranslations('Checkout');
+  const locale = useLocale();
+  const orWord = locale === 'ru' ? 'ИЛИ' : locale === 'en' ? 'OR' : 'АБО';
   const { data: bank, isLoading } = useGetBankDetailsQuery();
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -74,8 +76,24 @@ const BankTransferDetails = ({ onFileSelect, selectedFile }) => {
         <p className="text-muted mb-0">{t('loading', { defaultValue: 'Завантаження...' })}</p>
       ) : bank ? (
         <div className="mb-3">
+          {/* AIRBAG-84: вариант 1 — оплата на карту */}
+          {bank.card_number && (
+            <div className="mb-2">
+              {detailRow(t('bank_card_number', { defaultValue: 'Номер картки' }), bank.card_number)}
+            </div>
+          )}
+
+          {/* Разделитель «ИЛИ/АБО» — между картой и реквизитами */}
+          {bank.card_number && (bank.full_name || bank.account_number || bank.edrpou) && (
+            <div className="d-flex align-items-center my-2" aria-hidden="true">
+              <span style={{ flex: 1, height: 1, background: '#d7dde6' }} />
+              <span className="px-3 text-muted fw-semibold small">{orWord}</span>
+              <span style={{ flex: 1, height: 1, background: '#d7dde6' }} />
+            </div>
+          )}
+
+          {/* AIRBAG-84: вариант 2 — оплата по банковским реквизитам */}
           {detailRow(t('bank_full_name', { defaultValue: 'Отримувач' }), bank.full_name)}
-          {detailRow(t('bank_card_number', { defaultValue: 'Номер картки' }), bank.card_number)}
           {detailRow(t('bank_account_number', { defaultValue: 'Рахунок' }), bank.account_number)}
           {detailRow(t('bank_edrpou', { defaultValue: 'ЄДРПОУ' }), bank.edrpou)}
           {detailRow(t('bank_payment_purpose', { defaultValue: 'Призначення платежу' }), bank.payment_purpose)}
