@@ -20,14 +20,15 @@ export const ordersApi = apiSlice.injectEndpoints({
         p.set('offset', String(offset));
         if (dateFrom) p.set('date__gte', dateFrom);
         if (dateTo) p.set('date__lte', `${dateTo}T23:59:59`);
+        // Бэкенд принимает 1/0 для булевых полей (не 'true'/'false')
         if (status === 'completed') {
-          p.set('is_completed', 'true');
+          p.set('is_completed', '1');
         } else if (status === 'paid') {
-          p.set('is_completed', 'false');
-          p.set('is_paid', 'true');
+          p.set('is_completed', '0');
+          p.set('is_paid', '1');
         } else if (status === 'pending') {
-          p.set('is_completed', 'false');
-          p.set('is_paid', 'false');
+          p.set('is_completed', '0');
+          p.set('is_paid', '0');
         }
         return `/orders/?${p.toString()}`;
       },
