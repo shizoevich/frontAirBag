@@ -33,7 +33,8 @@ const OrderPage = () => {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [status, setStatus] = useState('all');
-  const [ordering, setOrdering] = useState('-date'); // новые сверху по умолчанию
+  const [sortField, setSortField] = useState('date'); // сортировка по колонке
+  const [sortDir, setSortDir] = useState('desc'); // по умолчанию новые сверху
   const [offset, setOffset] = useState(0);
 
   const scrollRef = useRef(null);
@@ -41,6 +42,18 @@ const OrderPage = () => {
 
   // Смена фильтра/сортировки → запрос на бэкенд с начала
   const resetTo = (setter) => (val) => { setter(val); setOffset(0); };
+
+  // AIRBAG-88: сортировка по колонкам (дата/сумма/статус) через бэкенд ordering
+  const FIELD_ORDERING = { date: 'date', grand_total_minor: 'grand_total_minor', status: 'is_completed,is_paid' };
+  const ordering = sortDir === 'desc'
+    ? FIELD_ORDERING[sortField].split(',').map((f) => `-${f}`).join(',')
+    : FIELD_ORDERING[sortField];
+  const toggleSort = (field) => {
+    if (sortField === field) setSortDir((d) => (d === 'desc' ? 'asc' : 'desc'));
+    else { setSortField(field); setSortDir('desc'); }
+    setOffset(0);
+  };
+  const sortIcon = (field) => (sortField !== field ? 'fa-sort text-muted' : sortDir === 'desc' ? 'fa-sort-down' : 'fa-sort-up');
 
   const { data, isLoading, isFetching, error } = useGetOrdersListQuery({
     client: user?.id, ordering, dateFrom, dateTo, status, limit: LIMIT, offset,
@@ -82,7 +95,7 @@ const OrderPage = () => {
     return () => io.disconnect();
   }, [hasMore, isFetching, displayOrders.length]);
 
-  const resetFilters = () => { setDateFrom(''); setDateTo(''); setStatus('all'); setOrdering('-date'); setOffset(0); };
+  const resetFilters = () => { setDateFrom(''); setDateTo(''); setStatus('all'); setSortField('date'); setSortDir('desc'); setOffset(0); };
 
   const orderToShow = selectedOrder || displayOrders.find((o) => o.id === selectedOrderId);
 
@@ -114,14 +127,7 @@ const OrderPage = () => {
                       <option value="completed">{l.statusCompleted}</option>
                     </select>
                   </div>
-                  <div className="col-6 col-md-2">
-                    <label className="form-label small text-muted mb-1">{l.sort}</label>
-                    <select className="form-select form-select-sm" value={ordering} onChange={(e) => resetTo(setOrdering)(e.target.value)}>
-                      <option value="-date">{l.newest}</option>
-                      <option value="date">{l.oldest}</option>
-                    </select>
-                  </div>
-                  <div className="col-12 col-md-2">
+                  <div className="col-12 col-md-4">
                     <button type="button" className="btn btn-outline-secondary btn-sm w-100" onClick={resetFilters}>{l.reset}</button>
                   </div>
                 </div>
@@ -158,9 +164,15 @@ const OrderPage = () => {
                   <thead className="table-light" style={{ position: 'sticky', top: 0, zIndex: 1 }}>
                     <tr>
                       <th>{t('orderNumber')}</th>
-                      <th>{t('date')}</th>
-                      <th>{t('total')}</th>
-                      <th>{t('status')}</th>
+                      <th role="button" style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => toggleSort('date')}>
+                        {t('date')} <i className={`fas ${sortIcon('date')} ms-1`} />
+                      </th>
+                      <th role="button" style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => toggleSort('grand_total_minor')}>
+                        {t('total')} <i className={`fas ${sortIcon('grand_total_minor')} ms-1`} />
+                      </th>
+                      <th role="button" style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => toggleSort('status')}>
+                        {t('status')} <i className={`fas ${sortIcon('status')} ms-1`} />
+                      </th>
                       <th></th>
                     </tr>
                   </thead>
