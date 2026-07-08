@@ -7,6 +7,9 @@ import { SITE_URL } from '@/utils/seo';
 import { TELEGRAM_WEBAPP_SRC, TELEGRAM_WEBAPP_SCRIPT_ID } from '@/utils/telegram';
 // NOTE: global styles are imported once in [`RootLayout`](src/app/layout.jsx:1)
 
+// Google Analytics 4 Measurement ID (override via NEXT_PUBLIC_GA_ID env).
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-L14V6DVVN6';
+
 // Font definitions
 const body = Jost({
   weight: ["300", "400", "500", "600", "700", "800", "900"],
@@ -196,6 +199,27 @@ export default async function RootLayout({ children, params }) {
   return (
     <html lang={lang} suppressHydrationWarning={true}>
       <body className={`${body.variable} ${heading.variable} ${p.variable} ${jost.variable} ${roboto.variable} ${oregano.variable} ${charm.variable}`} suppressHydrationWarning={true}>
+        {/* Google Analytics 4 — loaded only in production to keep dev traffic out of reports */}
+        {process.env.NODE_ENV === 'production' && GA_MEASUREMENT_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script
+              id="ga4-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_MEASUREMENT_ID}');
+                `,
+              }}
+            />
+          </>
+        )}
         <Script src={TELEGRAM_WEBAPP_SRC} strategy="afterInteractive" id={TELEGRAM_WEBAPP_SCRIPT_ID} />
         <Script
           id="telegram-webapp-bootstrap"
