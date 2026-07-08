@@ -4,20 +4,22 @@ import Footer from "@/layout/footers/footer";
 import ContactInfo from "@/components/contact/contact-info";
 import ContactArea from "@/components/contact/contact-area";
 import { getTranslations } from 'next-intl/server';
+import { buildAlternates } from '@/utils/seo';
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Contact' });
-  
+
   return {
     title: t('pageTitle'),
     description: t('pageDescription'),
+    alternates: buildAlternates('contact', locale),
     openGraph: {
       title: t('pageTitle'),
       description: t('pageDescription'),
       type: 'website',
       locale: locale,
-      siteName: 'AirBag',
+      siteName: 'AirbagAD',
     }
   };
 }
