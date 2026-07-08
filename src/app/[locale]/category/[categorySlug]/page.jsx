@@ -37,7 +37,7 @@ export async function generateMetadata({ params: awaitedParams }) {
     description:
       category.meta_description ||
       category.description ||
-      `${category.title} — подушки безопасности, ремни и пиропатроны в AirbagAD. Доставка по Днепру и Украине.`,
+      `${category.title} — подушки безопасности, ремни и пиропатроны в AirbagAD. Доставка по всей Украине.`,
     alternates: buildAlternates(`category/${params.categorySlug}`, params.locale),
   };
 }

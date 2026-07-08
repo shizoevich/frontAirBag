@@ -15,11 +15,11 @@ export async function generateMetadata({ params }) {
     },
     ru: {
       title: 'Магазин автозапчастей безопасности',
-      description: 'Каталог AirbagAD: подушки безопасности, ремни безопасности, пиропатроны, пульки и парашюты. Покупка и доставка по Днепру и Украине.',
+      description: 'Каталог AirbagAD: подушки безопасности, ремни безопасности, пиропатроны, пульки и парашюты. Покупка и доставка по всей Украине.',
     },
     en: {
       title: 'Shop — car safety parts',
-      description: 'AirbagAD catalog: airbags, seat belts, pyrotechnics (squibs) and airbag bags. Purchase and delivery across Dnipro and Ukraine.',
+      description: 'AirbagAD catalog: airbags, seat belts, pyrotechnics (squibs) and airbag bags. Purchase and delivery across all Ukraine.',
     },
   };
   const m = meta[locale] || meta.ru;

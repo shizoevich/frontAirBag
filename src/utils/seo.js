@@ -8,6 +8,19 @@ export const SITE_URL = (
 
 export { locales, defaultLocale };
 
+// Primary business city (home base — used for LocalBusiness / Google Business Profile).
+export const CITY = { uk: 'Одеса', ru: 'Одесса', en: 'Odesa' };
+export const REGION = { uk: 'Одеська область', ru: 'Одесская область', en: 'Odesa Oblast' };
+
+// Delivery geography: major Ukrainian cities we ship to. Rendered as a visible
+// "delivery cities" block and exposed via LocalBusiness `areaServed` — this is the
+// legitimate way to gain visibility across cities (NOT hidden keyword stuffing).
+export const UA_CITIES = {
+  uk: ['Київ', 'Одеса', 'Харків', 'Дніпро', 'Львів', 'Запоріжжя', 'Кривий Ріг', 'Миколаїв', 'Вінниця', 'Полтава', 'Чернігів', 'Черкаси', 'Житомир', 'Суми', 'Хмельницький', 'Чернівці', 'Рівне', 'Івано-Франківськ', 'Тернопіль', 'Луцьк', 'Ужгород', 'Кропивницький'],
+  ru: ['Киев', 'Одесса', 'Харьков', 'Днепр', 'Львов', 'Запорожье', 'Кривой Рог', 'Николаев', 'Винница', 'Полтава', 'Чернигов', 'Черкассы', 'Житомир', 'Сумы', 'Хмельницкий', 'Черновцы', 'Ровно', 'Ивано-Франковск', 'Тернополь', 'Луцк', 'Ужгород', 'Кропивницкий'],
+  en: ['Kyiv', 'Odesa', 'Kharkiv', 'Dnipro', 'Lviv', 'Zaporizhzhia', 'Kryvyi Rih', 'Mykolaiv', 'Vinnytsia', 'Poltava', 'Chernihiv', 'Cherkasy', 'Zhytomyr', 'Sumy', 'Khmelnytskyi', 'Chernivtsi', 'Rivne', 'Ivano-Frankivsk', 'Ternopil', 'Lutsk', 'Uzhhorod', 'Kropyvnytskyi'],
+};
+
 /**
  * API base URL for SERVER-SIDE fetches (generateMetadata, sitemap, RSC).
  *

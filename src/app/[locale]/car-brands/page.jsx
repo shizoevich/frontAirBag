@@ -4,7 +4,8 @@ import Footer from "@/layout/footers/footer";
 import CarBrandsArea from "@/components/categories/car-brands-area";
 import { buildAlternates } from "@/utils/seo";
 
-export async function generateMetadata({ params: { locale } }) {
+export async function generateMetadata({ params }) {
+  const { locale } = await params;
   const meta = {
     uk: {
       title: "Підбір за маркою авто",
@@ -12,11 +13,11 @@ export async function generateMetadata({ params: { locale } }) {
     },
     ru: {
       title: "Подбор по марке авто",
-      description: "Подушки безопасности, ремни и пиропатроны по марке автомобиля — Jeep, Ford, Audi и другие. Доставка по Днепру и Украине — AirbagAD.",
+      description: "Подушки безопасности, ремни и пиропатроны по марке автомобиля — Jeep, Ford, Audi и другие. Доставка по всей Украине — AirbagAD.",
     },
     en: {
       title: "Search by car brand",
-      description: "Airbags, seat belts and pyrotechnics by car brand — Jeep, Ford, Audi and more. Delivery across Dnipro and Ukraine — AirbagAD.",
+      description: "Airbags, seat belts and pyrotechnics by car brand — Jeep, Ford, Audi and more. Delivery across all Ukraine — AirbagAD.",
     },
   };
   const m = meta[locale] || meta.uk;
