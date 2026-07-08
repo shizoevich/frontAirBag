@@ -3,6 +3,7 @@ import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
 import CtaArea from "@/components/cta/cta-area";
 import FeatureArea from "@/components/features/feature-area";
+import DeliveryCities from "@/components/features/delivery-cities";
 import InstagramArea from "@/components/instagram/instagram-area";
 import NewArrivals from "@/components/products/electronics/new-arrivals";
 import ProductBanner from "@/components/products/electronics/product-banner";
@@ -31,6 +32,7 @@ export default async function HomePage({ params }) {
       </Suspense>
       {/*<NewArrivals/>*/}
       <YouTubeVideosSlider key={`youtube-${Date.now()}`} />
+      <DeliveryCities locale={locale}/>
       <CtaArea/>
       <Footer/>
     </Wrapper>

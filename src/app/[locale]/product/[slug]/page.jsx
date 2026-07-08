@@ -66,7 +66,7 @@ export async function generateMetadata({ params: awaitedParams }) {
   const description =
     product.meta_description ||
     product.description ||
-    `${product.title} — купить в AirbagAD. Подушки безопасности, ремни, пиропатроны с доставкой по Днепру и Украине.`;
+    `${product.title} — купить в AirbagAD. Подушки безопасности, ремни, пиропатроны с доставкой по всей Украине.`;
 
   return {
     title: product.meta_title || product.title || t('default_seo_title'),

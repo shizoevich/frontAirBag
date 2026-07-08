@@ -11,11 +11,11 @@ export async function generateMetadata({ params }) {
     },
     ru: {
       title: 'Скидки и акции',
-      description: 'Скидки и акционные предложения AirbagAD на подушки безопасности, ремни и пиропатроны. Доставка по Днепру и Украине.',
+      description: 'Скидки и акционные предложения AirbagAD на подушки безопасности, ремни и пиропатроны. Доставка по всей Украине.',
     },
     en: {
       title: 'Discounts and deals',
-      description: 'AirbagAD discounts and special offers on airbags, seat belts and pyrotechnics. Delivery across Dnipro and Ukraine.',
+      description: 'AirbagAD discounts and special offers on airbags, seat belts and pyrotechnics. Delivery across all Ukraine.',
     },
   };
   const m = meta[locale] || meta.ru;
