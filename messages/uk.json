@@ -118,7 +118,6 @@
     "contactUs": "Зв'яжіться з нами",
     "talkToUsTitle": "Зв'яжіться з нами",
     "gotQuestions": "Є питання? Телефонуйте нам",
-    "phoneNumber": "+38 098 998 9828",
     "messendgers": "доступний на Telegram та Viber",
     "emailAddress": "Noxnew@hotmail.com",
     "address": "Українa, м. Одеса, вул. В. Самофалова, 16А/1, AirbagAD",
@@ -684,7 +683,6 @@
     "email": "Електронна пошта",
     "emailAddress": "Noxnew@hotmail.com",
     "phone": "Телефон",
-    "phoneNumber": "+38 (098) 998-98-28",
     "messendgers": "доступний на Telegram та Viber",
     "delivery": "Доставка та самовивіз",
     "deliveryInfo": "Нова Пошта, день у день, при замовленні до 19:00. Самовивіз: вул. В. Самофалова, 16А/1, Одеса",
@@ -832,7 +830,7 @@
     "section7": {
       "title": "7. Контакти",
       "description": "З усіх питань звертайтесь:",
-      "phone": "+38 (098) 998-98-28",
+      "phone": "+38 (098) 998-98-28, +38 (093) 998-98-28",
       "email": "Noxnew@hotmail.com",
       "telegram": "Telegram-бот"
     }

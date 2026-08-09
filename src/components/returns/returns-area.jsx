@@ -1,6 +1,9 @@
 'use client';
 import React from 'react';
 import { useLocale } from 'next-intl';
+import phones from '@/data/contact-data';
+
+const PHONES_TEXT = phones.map((phone) => phone.displayFull).join(', ');
 
 // AIRBAG-92: страница «Повернення» с правилами возврата.
 const CONTENT = {
@@ -27,7 +30,7 @@ const CONTENT = {
       {
         h: 'Як оформити повернення',
         items: [
-          'Зв’яжіться з нами за телефоном +38 (098) 998-98-28 або у Telegram.',
+          `Зв’яжіться з нами за телефонами ${PHONES_TEXT} або у Telegram.`,
           'Вкажіть номер замовлення та причину повернення.',
           'Наш менеджер підкаже подальші кроки та адресу для відправки.',
         ],
@@ -57,7 +60,7 @@ const CONTENT = {
       {
         h: 'Как оформить возврат',
         items: [
-          'Свяжитесь с нами по телефону +38 (098) 998-98-28 или в Telegram.',
+          `Свяжитесь с нами по телефонам ${PHONES_TEXT} или в Telegram.`,
           'Укажите номер заказа и причину возврата.',
           'Наш менеджер подскажет дальнейшие шаги и адрес для отправки.',
         ],

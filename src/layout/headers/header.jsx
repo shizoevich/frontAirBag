@@ -14,6 +14,7 @@ import { openCartMini } from "@/redux/features/cartSlice";
 import HeaderTopRight from "./header-com/header-top-right";
 import HeaderMainRight from "./header-com/header-main-right";
 import CartMiniSidebar from "@/components/common/cart-mini-sidebar";
+import phones from "@/data/contact-data";
 import HeaderSearchForm from "@/components/forms/header-search-form";
 import { CartTwo, Menu, Phone, Discount } from "@/svg";
 
@@ -130,10 +131,12 @@ const Header = () => {
                           <Phone />
                         </span>
                       </div>
-                      <div className="tp-footer-talk" style={{display: 'flex', alignItems: 'center'}}>
-                        <h4 style={{margin: 0, lineHeight: 1}}>
-                          <a href="tel:+380989989828">+38 098 998 9828</a>
-                        </h4>
+                      <div className="tp-footer-talk" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px'}}>
+                        {phones.map((phone) => (
+                          <h4 key={phone.id} style={{margin: 0, lineHeight: 1.2, fontSize: '16px', whiteSpace: 'nowrap'}}>
+                            <a href={`tel:${phone.tel}`}>{phone.display}</a>
+                          </h4>
+                        ))}
                       </div>
                     </div>
                   </div>
