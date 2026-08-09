@@ -7,6 +7,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import logo from '@assets/img/logo/auto-delivery-logo-nobg.png';
 import pay from '@assets/img/footer/footer-pay.png';
 import social_data from '@/data/social-data';
+import phones from '@/data/contact-data';
 import { Email, Location } from '@/svg';
 
 const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
@@ -92,7 +93,11 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                   <div className="tp-footer-widget-content">
                     <div className="tp-footer-talk mb-20">
                       <span>{t('gotQuestions')}</span>
-                      <h4><a href="tel:+38 098 998 9828">{t('phoneNumber')}</a></h4>
+                      {phones.map((phone, index) => (
+                        <h4 key={phone.id} style={index === 0 ? undefined : {fontSize: '14px', marginTop: '2px'}}>
+                          <a href={`tel:${phone.tel}`}>{phone.display}</a>
+                        </h4>
+                      ))}
                     </div>
                     <div className="tp-footer-contact">
                       <div className="tp-footer-contact-item d-flex align-items-start">

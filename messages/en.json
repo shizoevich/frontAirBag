@@ -127,7 +127,6 @@
     "contactUs": "Contact Us",
     "talkToUsTitle": "Talk To Us",
     "gotQuestions": "Got Questions? Call us",
-    "phoneNumber": "+38 098 998 9828",
     "messendgers": "available on Telegram and Viber",
     "emailAddress": "Noxnew@hotmail.com",
     "address": "AirbagAD, Одеса, вул. В. Самофалова, 16А/1",
@@ -418,7 +417,6 @@
     "email": "Email",
     "emailAddress": "Noxnew@hotmail.com",
     "phone": "Phone",
-    "phoneNumber": "+38 (098) 998-98-28",
     "messendgers": "available on Telegram and Viber",
     "delivery": "Delivery & Pickup",
     "deliveryInfo": "Nova Poshta, same day delivery if ordered before 7:00 PM. Pickup: Samofalova St., 16A/1, Odesa",
@@ -828,7 +826,7 @@
     "section7": {
       "title": "7. Contacts",
       "description": "For all inquiries, please contact:",
-      "phone": "+38 (098) 998-98-28",
+      "phone": "+38 (098) 998-98-28, +38 (093) 998-98-28",
       "email": "Noxnew@hotmail.com",
       "telegram": "Telegram bot"
     }
