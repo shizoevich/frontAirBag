@@ -74,15 +74,47 @@ const Menus = () => {
     }
   };
 
-  // Handle chip click: navigate (via Link) + expand children if any
+  // Раскрытие/сворачивание категории внутри выпадающего меню (без навигации)
   const handleCatalogExpand = (cat, levelIndex) => {
     const isSame = catalogPath[levelIndex]?.id === cat.id;
     if (isSame) {
       setCatalogPath((prev) => prev.slice(0, levelIndex));
     } else {
-      // Add to path (for leaves this won't produce a child row since children is empty)
       setCatalogPath((prev) => [...prev.slice(0, levelIndex), cat]);
     }
+  };
+
+  // Категория с подкатегориями только раскрывается, лист — ведёт в каталог
+  const renderCategoryChip = (cat, levelIndex) => {
+    const isSelected = catalogPath[levelIndex]?.id === cat.id;
+    const hasChildren = cat.children?.length > 0;
+    const className = `tp-cat-chip${isSelected ? ' tp-cat-chip--active' : ''}`;
+
+    if (hasChildren) {
+      return (
+        <button
+          key={cat.id}
+          type="button"
+          className={className}
+          aria-expanded={isSelected}
+          onClick={() => handleCatalogExpand(cat, levelIndex)}
+        >
+          <span className="tp-cat-chip__label">{cat.title}</span>
+          <span className="tp-cat-chip__arrow">{isSelected ? '▴' : '▾'}</span>
+        </button>
+      );
+    }
+
+    return (
+      <Link
+        key={cat.id}
+        href={getLocalizedLink(`/shop?category=${cat.id}`)}
+        className={className}
+        onClick={() => setCatalogPath([])}
+      >
+        <span className="tp-cat-chip__label">{cat.title}</span>
+      </Link>
+    );
   };
 
   return (
@@ -110,23 +142,7 @@ const Menus = () => {
                 <>
                   {/* Level 0: root categories */}
                   <div className="tp-cat-chips-row tp-cat-chips-row--root">
-                    {firstLevelCategories.map((cat) => {
-                      const isSelected = catalogPath[0]?.id === cat.id;
-                      const hasChildren = cat.children?.length > 0;
-                      return (
-                        <Link
-                          key={cat.id}
-                          href={getLocalizedLink(`/shop?category=${cat.id}`)}
-                          className={`tp-cat-chip${isSelected ? ' tp-cat-chip--active' : ''}`}
-                          onClick={() => handleCatalogExpand(cat, 0)}
-                        >
-                          <span className="tp-cat-chip__label">{cat.title}</span>
-                          {hasChildren && (
-                            <span className="tp-cat-chip__arrow">{isSelected ? '▴' : '▾'}</span>
-                          )}
-                        </Link>
-                      );
-                    })}
+                    {firstLevelCategories.map((cat) => renderCategoryChip(cat, 0))}
                   </div>
 
                   {/* Subcategory rows */}
@@ -136,23 +152,7 @@ const Menus = () => {
                     const levelIndex = idx + 1;
                     return (
                       <div key={selected.id} className="tp-cat-chips-row tp-cat-chips-row--sub">
-                        {children.map((cat) => {
-                          const isSelected = catalogPath[levelIndex]?.id === cat.id;
-                          const hasChildren = cat.children?.length > 0;
-                          return (
-                            <Link
-                              key={cat.id}
-                              href={getLocalizedLink(`/shop?category=${cat.id}`)}
-                              className={`tp-cat-chip${isSelected ? ' tp-cat-chip--active' : ''}`}
-                              onClick={() => handleCatalogExpand(cat, levelIndex)}
-                            >
-                              <span className="tp-cat-chip__label">{cat.title}</span>
-                              {hasChildren && (
-                                <span className="tp-cat-chip__arrow">{isSelected ? '▴' : '▾'}</span>
-                              )}
-                            </Link>
-                          );
-                        })}
+                        {children.map((cat) => renderCategoryChip(cat, levelIndex))}
                       </div>
                     );
                   })}
