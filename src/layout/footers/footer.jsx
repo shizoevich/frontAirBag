@@ -93,8 +93,10 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                   <div className="tp-footer-widget-content">
                     <div className="tp-footer-talk mb-20">
                       <span>{t('gotQuestions')}</span>
-                      {phones.map((phone) => (
-                        <h4 key={phone.id}><a href={`tel:${phone.tel}`}>{phone.display}</a></h4>
+                      {phones.map((phone, index) => (
+                        <h4 key={phone.id} style={index === 0 ? undefined : {fontSize: '14px', marginTop: '2px'}}>
+                          <a href={`tel:${phone.tel}`}>{phone.display}</a>
+                        </h4>
                       ))}
                     </div>
                     <div className="tp-footer-contact">

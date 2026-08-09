@@ -131,9 +131,9 @@ const Header = () => {
                           <Phone />
                         </span>
                       </div>
-                      <div className="tp-footer-talk" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px'}}>
-                        {phones.map((phone) => (
-                          <h4 key={phone.id} style={{margin: 0, lineHeight: 1.2, fontSize: '16px', whiteSpace: 'nowrap'}}>
+                      <div className="tp-footer-talk" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '1px'}}>
+                        {phones.map((phone, index) => (
+                          <h4 key={phone.id} style={{margin: 0, lineHeight: 1.2, fontSize: index === 0 ? '18px' : '12px', whiteSpace: 'nowrap'}}>
                             <a href={`tel:${phone.tel}`}>{phone.display}</a>
                           </h4>
                         ))}
