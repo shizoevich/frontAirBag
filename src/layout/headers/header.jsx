@@ -99,12 +99,12 @@ const Header = () => {
                     </Link>
                   </div>
                 </div>
-                <div className="col-xl-6 col-lg-7 d-none d-lg-block">
-                  <div className="tp-header-search pl-70">
+                <div className="col-xl-7 col-lg-7 d-none d-lg-block">
+                  <div className="tp-header-search d-flex justify-content-end">
                     <HeaderSearchForm />
                   </div>
                 </div>
-                <div className="col-xl-4 col-lg-3 col-md-8 col-6">
+                <div className="col-xl-3 col-lg-3 col-md-8 col-6">
                   <HeaderMainRight setIsCanvasOpen={setIsCanvasOpen} />
                 </div>
               </div>

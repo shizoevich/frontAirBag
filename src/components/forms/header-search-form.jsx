@@ -1,93 +1,80 @@
 'use client';
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslations } from 'next-intl';
-import { useRouter, usePathname } from "next/navigation";
 // internal
 import { Search } from "@/svg";
-import NiceSelect from "@/ui/nice-select";
 import useSearchFormSubmit from "@/hooks/use-search-form-submit";
-import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
 
 const HeaderSearchForm = () => {
   const tForm = useTranslations('HeaderSearchForm');
-  const t = useTranslations('ParentCategories');
-  const router = useRouter();
-  const pathname = usePathname();
-  const { setSearchText, setCategory, handleSubmit, searchText } = useSearchFormSubmit();
-  const [categoryOptions, setCategoryOptions] = useState([
-    { value: "Select Category", text: t('selectCategory') }
-  ]);
-  
-  // Get categories from API
-  const { data: categoriesData, isLoading } = useGetShowCategoryQuery();
-  
-  useEffect(() => {
-    if (categoriesData && !isLoading) {
-      // Format categories for the dropdown
-      const options = [
-        { value: "Select Category", text: t('selectCategory') }
-      ];
-      
-      // Add categories from API
-      const categories = Array.isArray(categoriesData) 
-        ? categoriesData 
-        : Array.isArray(categoriesData?.data) 
-          ? categoriesData.data 
-          : Array.isArray(categoriesData?.results) 
-            ? categoriesData.results 
-            : [];
-            
-      categories.forEach(cat => {
-        options.push({
-          // AIRBAG-96: используем DB id (как каталог /shop?category=), не id_remonline
-          value: cat.id,
-          text: cat.title
-        });
-      });
-      
-      setCategoryOptions(options);
-    }
-  }, [categoriesData, isLoading, t]);
+  const { setSearchText, handleSubmit, searchText } = useSearchFormSubmit();
+  const [expanded, setExpanded] = useState(false);
+  const wrapperRef = useRef(null);
+  const inputRef = useRef(null);
 
-  // selectHandle - автоматически запускаем поиск после выбора категории
-  const selectCategoryHandle = (e) => {
-    setCategory(e.value);
-    
-    // AIRBAG-96: выбор категории открывает её в каталоге (как в меню каталога),
-    // /search категории не фильтрует. Ведём на /shop?category=<id>.
-    if (e.value !== "Select Category") {
-      const locale = pathname.split('/')[1] || 'uk';
-      const queryParams = [`category=${e.value}`];
-      if (searchText) {
-        queryParams.push(`searchText=${encodeURIComponent(searchText)}`);
+  // Сворачиваем виджет по клику вне него, но только если запрос не введён
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target) &&
+        !searchText
+      ) {
+        setExpanded(false);
       }
-      router.push(`/${locale}/shop?${queryParams.join('&')}`);
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [searchText]);
+
+  const expand = () => {
+    setExpanded(true);
+    inputRef.current?.focus();
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape' && !searchText) {
+      setExpanded(false);
+      inputRef.current?.blur();
+    }
+  };
+
+  // Клик по лупе в свёрнутом состоянии только раскрывает виджет
+  const handleButtonClick = (e) => {
+    if (!expanded && !searchText) {
+      e.preventDefault();
+      expand();
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="tp-header-search-wrapper d-flex align-items-center">
+    <form onSubmit={handleSubmit} role="search">
+      <div
+        ref={wrapperRef}
+        className={`tp-header-search-wrapper tp-header-search-widget d-flex align-items-center ${expanded ? 'is-expanded' : ''}`}
+        aria-expanded={expanded}
+      >
         <div className="tp-header-search-box">
           <input
+            ref={inputRef}
             onChange={(e) => setSearchText(e.target.value)}
+            onFocus={() => setExpanded(true)}
+            onClick={expand}
+            onKeyDown={handleKeyDown}
             value={searchText}
             type="text"
             placeholder={tForm('placeholder')}
           />
         </div>
-        <div className="tp-header-search-category">
-          <NiceSelect
-            options={categoryOptions}
-            defaultCurrent={0}
-            onChange={selectCategoryHandle}
-            name="category"
-            placeholder={t('selectCategory')}
-            className="custom-nice-select"
-          />
-        </div>
         <div className="tp-header-search-btn">
-          <button type="submit">
+          <button
+            type="submit"
+            onClick={handleButtonClick}
+            aria-label={tForm('placeholder')}
+          >
             <Search />
           </button>
         </div>
