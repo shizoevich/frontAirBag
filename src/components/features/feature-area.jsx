@@ -30,7 +30,7 @@ const FeatureArea = ({ locale = 'ru' }) => {
   const hero = HERO[locale] || HERO.ru;
 
   return (
-    <section className="tp-subscribe-area pt-70 pb-65 mb-50 theme-bg p-relative z-index-1">
+    <section className="tp-subscribe-area tp-hero-seo mb-50 theme-bg p-relative z-index-1">
       <div className="tp-subscribe-shape">
         <Shape img={shape_1} num="1" />
       </div>
