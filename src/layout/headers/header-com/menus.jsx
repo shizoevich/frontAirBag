@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { useLogoutMutation } from '@/redux/features/auth/authApi';
 import { useGetCategoryTreeQuery } from '@/redux/features/categoryApi';
 import { sortAlphabetically } from '@/utils/categoryTreeHelpers';
+import { categoryPath } from '@/utils/category-link';
 import { useRouter } from 'next/navigation';
 
 const Menus = () => {
@@ -108,7 +109,7 @@ const Menus = () => {
     return (
       <Link
         key={cat.id}
-        href={getLocalizedLink(`/shop?category=${cat.id}`)}
+        href={getLocalizedLink(categoryPath(cat))}
         className={className}
         onClick={() => setCatalogPath([])}
       >

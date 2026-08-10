@@ -4,6 +4,11 @@ import Header from '@/layout/headers/header';
 import Footer from '@/layout/footers/footer';
 import OrderSuccessContent from './OrderSuccessContent';
 
+import { NOINDEX } from '@/utils/seo';
+
+// Transactional step — never indexable.
+export const metadata = { robots: NOINDEX };
+
 export default function OrderSuccessPage() {
   return (
     <Wrapper>

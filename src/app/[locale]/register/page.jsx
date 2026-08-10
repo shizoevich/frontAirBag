@@ -1,5 +1,6 @@
 import React from 'react';
 import RegisterPageContent from '@/components/register/register-page-content';
+import { NOINDEX } from '@/utils/seo';
 
 export async function generateMetadata({ params }) {
   // Используем await для получения locale, чтобы избежать ошибки
@@ -7,6 +8,7 @@ export async function generateMetadata({ params }) {
   const locale = await params.locale;
   return {
     title: `AirBag - ${locale === 'uk' ? 'Реєстрація' : locale === 'ru' ? 'Регистрация' : 'Register'} Page`,
+    robots: NOINDEX,
   };
 }
 
