@@ -860,5 +860,17 @@
     "description": "Description",
     "specifications": "Specifications",
     "related_products": "Related Products"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "text": "The part may have been discontinued, or the address has changed. Try the catalogue or the search — we most likely still stock what you need.",
+    "to_shop": "Go to catalogue",
+    "to_home": "Home",
+    "to_brands": "Search by car brand",
+    "to_contact": "Contact us",
+    "product_title": "This part is no longer available",
+    "product_text": "It has been discontinued, or the address never existed. Here is what customers buy most right now:",
+    "category_title": "Category not found",
+    "category_text": "The category may have been renamed or removed. Pick a section of the catalogue:"
   }
 }

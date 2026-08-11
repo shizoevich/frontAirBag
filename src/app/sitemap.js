@@ -1,4 +1,4 @@
-import { SITE_URL, locales, defaultLocale, getServerApiBase } from '@/utils/seo';
+import { locales, defaultLocale, getServerApiBase, localeUrl } from '@/utils/seo';
 import { slugify } from '@/utils/slugify';
 
 // Regenerate at most once per hour.
@@ -16,18 +16,21 @@ const STATIC_PATHS = [
   'airbag-components',
   'car-brands',
   'contact',
+  'about',
+  'returns',
   'terms',
   'privacy-policy',
 ];
 
 // Build a single sitemap entry with hreflang alternates for every locale.
 function entry(path, { lastModified, changeFrequency, priority } = {}) {
-  const clean = path ? `/${path}` : '';
+  // `localeUrl` appends the trailing slash the site actually serves — building URLs by
+  // hand here is what made every single sitemap entry answer with a 308 redirect.
   const languages = {};
-  for (const l of locales) languages[l] = `${SITE_URL}/${l}${clean}`;
-  languages['x-default'] = `${SITE_URL}/${defaultLocale}${clean}`;
+  for (const l of locales) languages[l] = localeUrl(path, l);
+  languages['x-default'] = localeUrl(path, defaultLocale);
   return {
-    url: `${SITE_URL}/${defaultLocale}${clean}`,
+    url: localeUrl(path, defaultLocale),
     lastModified: lastModified || new Date(),
     changeFrequency: changeFrequency || 'weekly',
     priority: priority ?? 0.6,

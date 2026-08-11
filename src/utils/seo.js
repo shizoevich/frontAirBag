@@ -39,20 +39,45 @@ export function getServerApiBase() {
 }
 
 /**
+ * `robots` metadata for pages that must never reach the index: the personal cabinet,
+ * the checkout funnel and the theme's leftover shop variants.
+ *
+ * Note this is deliberately NOT the same list as `Disallow` in robots.js. A page blocked
+ * in robots.txt is never fetched, so Googlebot never sees this tag — pages already in the
+ * index need `noindex` first and may only be disallowed once they have dropped out.
+ */
+export const NOINDEX = { index: false, follow: false };
+
+/**
+ * Absolute URL of a page in a given locale.
+ *
+ * The trailing slash is mandatory: `next.config.js` sets `trailingSlash: true`, so a
+ * slash-less URL answers with a 308 redirect. Every place that emits a URL — canonical
+ * tags, hreflang alternates, sitemap.xml — must go through this helper, otherwise the
+ * sitemap advertises redirects instead of pages (which is exactly what happened before).
+ *
+ * @param {string} path - path WITHOUT locale prefix, slashes optional (e.g. 'shop', '/product/x').
+ * @param {string} locale - target locale.
+ */
+export function localeUrl(path = '', locale = defaultLocale) {
+  const clean = String(path).replace(/^\/+/, '').replace(/\/+$/, '');
+  return clean ? `${SITE_URL}/${locale}/${clean}/` : `${SITE_URL}/${locale}/`;
+}
+
+/**
  * Build `alternates` for a page's metadata: canonical + hreflang for every locale.
- * @param {string} path - path WITHOUT locale prefix, leading slash optional (e.g. 'shop', '/product/x').
+ * @param {string} path - path WITHOUT locale prefix (e.g. 'shop', '/product/x').
  * @param {string} locale - current locale (used for canonical).
  */
 export function buildAlternates(path = '', locale = defaultLocale) {
-  const clean = `/${String(path).replace(/^\/+/, '')}`.replace(/\/$/, '');
   const languages = {};
   for (const l of locales) {
-    languages[l] = `${SITE_URL}/${l}${clean === '/' ? '' : clean}`;
+    languages[l] = localeUrl(path, l);
   }
   // x-default points to the default locale version.
   languages['x-default'] = languages[defaultLocale];
   return {
-    canonical: `${SITE_URL}/${locale}${clean === '/' ? '' : clean}`,
+    canonical: localeUrl(path, locale),
     languages,
   };
 }

@@ -1,14 +1,12 @@
 import createMiddleware from 'next-intl/middleware';
+import { locales, defaultLocale, localePrefix } from '@/i18n-config';
 
+// Single source of truth is `src/i18n.js` — hardcoding the locale list here once
+// let the sitemap advertise `/ru/…` while the site redirected everyone to `/uk/`.
 export default createMiddleware({
-  // A list of all locales that are supported
-  locales: ['uk', 'ru', 'en'],
-
-  // Used when no locale matches
-  defaultLocale: 'uk',
-
-  // Always use a locale prefix
-  localePrefix: 'always',
+  locales,
+  defaultLocale,
+  localePrefix,
 });
 
 export const config = {
