@@ -1,8 +1,11 @@
 import {getRequestConfig} from 'next-intl/server';
 
-export const locales = ['en', 'ru', 'uk'];
-export const defaultLocale = 'ru';
-export const localePrefix = 'always'; // Options: 'always' | 'as-needed' | 'never'
+import {locales, defaultLocale, localePrefix} from './i18n-config';
+
+// Re-exported so existing `@/i18n` imports keep working. The values themselves live in
+// `i18n-config.js`, which the Edge middleware can import without pulling in
+// `next-intl/server`.
+export {locales, defaultLocale, localePrefix};
 
 export default getRequestConfig(async ({locale}) => {
   // Validate that the incoming `locale` parameter is valid

@@ -13,16 +13,16 @@ function Shape({ img, num }) {
 // SEO-meaningful hero copy (keyword-rich H1/H2) per locale.
 const HERO = {
   uk: {
-    h1: 'AirbagAD — подушки безпеки, ремені та піропатрони у Дніпрі',
-    h2: 'Продаж і доставка подушок безпеки, ременів безпеки, піропатронів, пульок і парашутів по Дніпру та всій Україні.',
+    h1: 'AirbagAD — подушки безпеки, ремені та піропатрони з доставкою по Україні',
+    h2: 'Продаж і доставка подушок безпеки, ременів безпеки, піропатронів, пульок і парашутів по всій Україні — Одеса, Київ, Харків, Дніпро, Львів та інші міста.',
   },
   ru: {
-    h1: 'AirbagAD — подушки безопасности, ремни и пиропатроны в Днепре',
-    h2: 'Продажа и доставка подушек безопасности, ремней безопасности, пиропатронов, пулек и парашютов по Днепру и всей Украине.',
+    h1: 'AirbagAD — подушки безопасности, ремни и пиропатроны с доставкой по Украине',
+    h2: 'Продажа и доставка подушек безопасности, ремней безопасности, пиропатронов, пулек и парашютов по всей Украине — Одесса, Киев, Харьков, Днепр, Львов и другие города.',
   },
   en: {
-    h1: 'AirbagAD — airbags, seat belts and pyrotechnics in Dnipro',
-    h2: 'Sale and delivery of airbags, seat belts, pyrotechnics (squibs) and airbag bags across Dnipro and Ukraine.',
+    h1: 'AirbagAD — airbags, seat belts and pyrotechnics delivered across Ukraine',
+    h2: 'Sale and delivery of airbags, seat belts, pyrotechnics (squibs) and airbag bags across all Ukraine — Odesa, Kyiv, Kharkiv, Dnipro, Lviv and other cities.',
   },
 };
 
@@ -30,7 +30,7 @@ const FeatureArea = ({ locale = 'ru' }) => {
   const hero = HERO[locale] || HERO.ru;
 
   return (
-    <section className="tp-subscribe-area pt-70 pb-65 mb-50 theme-bg p-relative z-index-1">
+    <section className="tp-subscribe-area tp-hero-seo mb-50 theme-bg p-relative z-index-1">
       <div className="tp-subscribe-shape">
         <Shape img={shape_1} num="1" />
       </div>

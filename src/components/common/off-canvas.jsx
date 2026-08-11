@@ -10,7 +10,8 @@ import logo from '@assets/img/logo/auto-delivery-logo-nobg.png';
 import contact_img from '@assets/img/icon/contact.png';
 import MobileCategory from '@/layout/headers/header-com/mobile-category';
 import MobileMenus from "./mobile-menus";
-import LanguageSwitcher from './language-switcher'; 
+import LanguageSwitcher from './language-switcher';
+import phones from '@/data/contact-data';
 
 const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
   const t = useTranslations('OffCanvas');
@@ -79,9 +80,11 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
                 </span>
               </div>
               <div className="offcanvas__contact-content">
-                <h3 className="offcanvas__contact-title">
-                  <a href="tel:098-852-987">004524865</a>
-                </h3>
+                {phones.map((phone) => (
+                  <h3 key={phone.id} className="offcanvas__contact-title">
+                    <a href={`tel:${phone.tel}`}>{phone.display}</a>
+                  </h3>
+                ))}
               </div>
             </div>
             <div className="offcanvas__btn">

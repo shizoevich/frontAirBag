@@ -7,6 +7,7 @@ import ContactForm from "../forms/contact-form";
 import contact_icon_1 from "@assets/img/contact/contact-icon-1.png";
 import contact_icon_2 from "@assets/img/contact/contact-icon-2.png";
 import contact_icon_3 from "@assets/img/contact/contact-icon-3.png";
+import phones from "@/data/contact-data";
 
 const ContactArea = () => {
   const t = useTranslations('Contact');
@@ -26,7 +27,11 @@ const ContactArea = () => {
                       <i className="far fa-phone-alt text-dark fs-5 me-3"></i>
                       <div>
                         <h5 className="mb-1">{t('phone')}</h5>
-                        <a href="tel:+380989989828" className="text-primary">+38 (098) 998-98-28</a>
+                        {phones.map((phone) => (
+                          <div key={phone.id}>
+                            <a href={`tel:${phone.tel}`} className="text-primary">{phone.displayFull}</a>
+                          </div>
+                        ))}
                       </div>
                     </div>
                     

@@ -2,10 +2,54 @@ const createNextIntlPlugin = require('next-intl/plugin');
 
 const withNextIntl = createNextIntlPlugin('./src/i18n.js');
 
+// Must match `defaultLocale` in src/i18n-config.js. Duplicated because next.config.js is
+// CommonJS and cannot import the ESM config; a mismatch only sends legacy URLs to a
+// different (still valid) locale, so it degrades gracefully.
+const DEFAULT_LOCALE = 'uk';
+
+// Paths that existed on the old WooCommerce site, before every route gained a locale
+// prefix. They are still in Google's index and still receive traffic, so each one gets a
+// permanent redirect instead of the 404 it used to return. Product and category slugs
+// carry over unchanged (the trailing number is the same id), so the mapping is mechanical.
+const LEGACY_STATIC_PATHS = [
+  'shop',
+  'about',
+  'returns',
+  'terms',
+  'contact',
+  'discounts',
+  'privacy-policy',
+  'car-brands',
+  'pyrotechnics',
+  'airbag-components',
+  'cart',
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 
   trailingSlash: true,
+
+  async redirects() {
+    return [
+      {
+        source: '/product/:slug',
+        destination: `/${DEFAULT_LOCALE}/product/:slug/`,
+        permanent: true,
+      },
+      {
+        source: '/category/:slug',
+        destination: `/${DEFAULT_LOCALE}/category/:slug/`,
+        permanent: true,
+      },
+      ...LEGACY_STATIC_PATHS.map((path) => ({
+        source: `/${path}`,
+        destination: `/${DEFAULT_LOCALE}/${path}/`,
+        permanent: true,
+      })),
+    ];
+  },
+
   sassOptions: {
     // Подавляем предупреждения Sass о устаревших функциях Bootstrap
     quietDeps: true,

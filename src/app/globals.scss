@@ -12,8 +12,9 @@
   padding: 8px 0 10px;
 }
 .tp-cat-chips-row--root {
-  flex-direction: column;
-  align-items: flex-start;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
   border-bottom: 1px solid #f0f0f0;
   margin-bottom: 6px;
   max-height: 400px;
@@ -42,6 +43,11 @@
   white-space: nowrap;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   user-select: none;
+}
+button.tp-cat-chip {
+  font-family: inherit;
+  text-align: left;
+  appearance: none;
 }
 .tp-cat-chip:hover {
   border-color: #de8043;
@@ -678,6 +684,37 @@
   &:hover {
     background-color: #9e9e9e !important;
     transform: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+   SEO-плашка на главной (FeatureArea).
+   Вертикальный размер уменьшен на 10% относительно исходного
+   (было pt-70 / pb-65): срезаны только вертикальные паддинги секции.
+   Типографика H1/H2 не тронута — заголовки остаются полноценными
+   для SEO и читаемости.
+   ------------------------------------------------------------------ */
+.tp-hero-seo {
+  padding-top: 56px;
+  padding-bottom: 49px;
+
+  /* На планшете заголовок занимает меньше строк — секция ниже,
+     поэтому и срезать нужно меньше, чтобы остаться в тех же 10%. */
+  @media (max-width: 991px) {
+    padding-top: 56px;
+    padding-bottom: 50px;
+  }
+
+  @media (max-width: 767px) {
+    padding-top: 53px;
+    padding-bottom: 48px;
+  }
+
+  /* На узких экранах заголовок переносится на большее число строк,
+     секция выше — срезаем больше, чтобы удержать те же 10%. */
+  @media (max-width: 575px) {
+    padding-top: 49px;
+    padding-bottom: 45px;
   }
 }
 

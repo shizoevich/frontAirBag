@@ -3,9 +3,12 @@ import { Jost, Roboto, Charm, Oregano } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import Providers from '@/components/provider';
 import { defaultLocale } from '@/i18n';
-import { SITE_URL } from '@/utils/seo';
+import { SITE_URL, CITY, REGION, UA_CITIES } from '@/utils/seo';
 import { TELEGRAM_WEBAPP_SRC, TELEGRAM_WEBAPP_SCRIPT_ID } from '@/utils/telegram';
 // NOTE: global styles are imported once in [`RootLayout`](src/app/layout.jsx:1)
+
+// Google Analytics 4 Measurement ID (override via NEXT_PUBLIC_GA_ID env).
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-L14V6DVVN6';
 
 // Font definitions
 const body = Jost({
@@ -77,17 +80,17 @@ export async function generateMetadata({ params }) {
 
   const title =
     lang === 'uk'
-      ? 'AirbagAD — подушки безпеки, ремені, піропатрони | Дніпро, Україна'
+      ? 'AirbagAD — подушки безпеки, ремені, піропатрони | Одеса та вся Україна'
       : lang === 'en'
-      ? 'AirbagAD — airbags, seat belts, pyrotechnics | Dnipro, Ukraine'
-      : 'AirbagAD — подушки безопасности, ремни, пиропатроны | Днепр, Украина';
+      ? 'AirbagAD — airbags, seat belts, pyrotechnics | Odesa & all Ukraine'
+      : 'AirbagAD — подушки безопасности, ремни, пиропатроны | Одесса и вся Украина';
 
   const description =
     lang === 'uk'
-      ? 'AirbagAD (Airbag Auto Delivery) — продаж і доставка подушок безпеки, ременів безпеки, піропатронів, пульок та парашутів по Дніпру та всій Україні.'
+      ? 'AirbagAD (Airbag Auto Delivery) — продаж і доставка подушок безпеки, ременів безпеки, піропатронів, пульок та парашутів по всій Україні: Одеса, Київ, Харків, Дніпро, Львів та інші міста.'
       : lang === 'en'
-      ? 'AirbagAD (Airbag Auto Delivery) — sale and delivery of airbags, seat belts, pyrotechnics (squibs) and airbag bags across Dnipro and Ukraine.'
-      : 'AirbagAD (Airbag Auto Delivery) — продажа и доставка подушек безопасности, ремней безопасности, пиропатронов, пулек и парашютов по Днепру и всей Украине.';
+      ? 'AirbagAD (Airbag Auto Delivery) — sale and delivery of airbags, seat belts, pyrotechnics (squibs) and airbag bags across all Ukraine: Odesa, Kyiv, Kharkiv, Dnipro, Lviv and other cities.'
+      : 'AirbagAD (Airbag Auto Delivery) — продажа и доставка подушек безопасности, ремней безопасности, пиропатронов, пулек и парашютов по всей Украине: Одесса, Киев, Харьков, Днепр, Львов и другие города.';
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -105,10 +108,13 @@ export async function generateMetadata({ params }) {
       'подушки безпеки',
       'ремни безопасности',
       'пиропатроны',
+      'купить пиропатроны',
+      'пиропатроны Украина',
       'пульки',
       'парашюты',
-      'airbag Днепр',
-      'Дніпро',
+      'подушки безопасности Украина',
+      'доставка по Украине',
+      'Одесса',
       'Украина',
     ],
     icons: {
@@ -159,14 +165,18 @@ const organizationJsonLd = {
   logo: `${SITE_URL}/assets/img/logo/auto-delivery-logo-nobg.png`,
   image: `${SITE_URL}/assets/img/logo/auto-delivery-logo.jpg`,
   description:
-    'Подушки безопасности, ремни безопасности, пиропатроны, пульки и парашюты. Продажа и доставка по Днепру и всей Украине.',
+    'Подушки безопасности, ремни безопасности, пиропатроны, пульки и парашюты. Продажа и доставка по всей Украине.',
   address: {
     '@type': 'PostalAddress',
-    addressLocality: 'Днепр',
-    addressRegion: 'Дніпропетровська область',
+    addressLocality: CITY.ru,
+    addressRegion: REGION.ru,
     addressCountry: 'UA',
   },
-  areaServed: 'UA',
+  // Ship nationwide: expose the country plus the served cities (legitimate areaServed).
+  areaServed: [
+    { '@type': 'Country', name: 'Україна' },
+    ...UA_CITIES.ru.map((c) => ({ '@type': 'City', name: c })),
+  ],
 };
 
 const websiteJsonLd = {
@@ -196,6 +206,27 @@ export default async function RootLayout({ children, params }) {
   return (
     <html lang={lang} suppressHydrationWarning={true}>
       <body className={`${body.variable} ${heading.variable} ${p.variable} ${jost.variable} ${roboto.variable} ${oregano.variable} ${charm.variable}`} suppressHydrationWarning={true}>
+        {/* Google Analytics 4 — loaded only in production to keep dev traffic out of reports */}
+        {process.env.NODE_ENV === 'production' && GA_MEASUREMENT_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script
+              id="ga4-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_MEASUREMENT_ID}');
+                `,
+              }}
+            />
+          </>
+        )}
         <Script src={TELEGRAM_WEBAPP_SRC} strategy="afterInteractive" id={TELEGRAM_WEBAPP_SCRIPT_ID} />
         <Script
           id="telegram-webapp-bootstrap"

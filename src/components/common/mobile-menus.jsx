@@ -9,6 +9,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useLogoutMutation } from '@/redux/features/auth/authApi';
 import { useGetCategoryTreeQuery } from '@/redux/features/categoryApi';
 import { sortAlphabetically } from '@/utils/categoryTreeHelpers';
+import { categoryPath } from '@/utils/category-link';
 
 const MobileMenus = ({setIsCanvasOpen}) => {
   const [isActiveMenu, setIsActiveMenu] = useState("");
@@ -96,8 +97,8 @@ const MobileMenus = ({setIsCanvasOpen}) => {
       return (
         <li key={category.id}>
           <Link 
-            href={getLocalizedLink(`/shop?category=${category.id}`)} 
-            onClick={() => handleNavigation(`/shop?category=${category.id}`)}
+            href={getLocalizedLink(categoryPath(category))}
+            onClick={() => handleNavigation(categoryPath(category))}
           >
             {category.title}
           </Link>

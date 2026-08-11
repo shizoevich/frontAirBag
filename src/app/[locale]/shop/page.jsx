@@ -4,11 +4,29 @@ import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
 import AllProductsArea from "@/components/products/all-products-area";
 import HomePrdLoader from "@/components/loader/home/home-prd-loader";
+import { buildAlternates } from "@/utils/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
+  const meta = {
+    uk: {
+      title: 'Магазин автозапчастин безпеки',
+      description: 'Каталог AirbagAD: подушки безпеки, ремені безпеки, піропатрони, пульки та парашути. Купівля та доставка по Дніпру та Україні.',
+    },
+    ru: {
+      title: 'Магазин автозапчастей безопасности',
+      description: 'Каталог AirbagAD: подушки безопасности, ремни безопасности, пиропатроны, пульки и парашюты. Покупка и доставка по всей Украине.',
+    },
+    en: {
+      title: 'Shop — car safety parts',
+      description: 'AirbagAD catalog: airbags, seat belts, pyrotechnics (squibs) and airbag bags. Purchase and delivery across all Ukraine.',
+    },
+  };
+  const m = meta[locale] || meta.ru;
   return {
-    title: `AirBag - ${locale === 'uk' ? 'Магазин' : locale === 'ru' ? 'Магазин' : 'Shop Page'}`,
+    title: m.title,
+    description: m.description,
+    alternates: buildAlternates('shop', locale),
   };
 }
 

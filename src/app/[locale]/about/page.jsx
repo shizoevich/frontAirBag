@@ -2,6 +2,7 @@ import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
 import AboutArea from "@/components/about/about-area";
+import { buildAlternates } from "@/utils/seo";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
@@ -14,6 +15,7 @@ export async function generateMetadata({ params }) {
   return {
     title: `AirBag - ${titles[locale] || titles.uk}`,
     description: descs[locale] || descs.uk,
+    alternates: buildAlternates('about', locale),
   };
 }
 
