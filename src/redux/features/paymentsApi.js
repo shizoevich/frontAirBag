@@ -17,11 +17,12 @@ export const paymentsApi = apiSlice.injectEndpoints({
     }),
 
     googlePay: builder.mutation({
-      // Backend accepts Google Pay token as gToken.
-      query: ({ gToken }) => ({
+      // Backend accepts Google Pay token as gToken и требует order_id:
+      // сумма списывается из заказа (order.grand_total_minor), а не из тела запроса.
+      query: ({ gToken, order_id, redirectUrl }) => ({
         url: "/payments/googlepay/",
         method: "POST",
-        body: { gToken },
+        body: { gToken, order_id, redirectUrl },
       }),
     }),
 

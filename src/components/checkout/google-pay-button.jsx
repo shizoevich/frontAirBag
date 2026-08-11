@@ -25,6 +25,11 @@ const GooglePayButton = ({
   currencyCode = 'UAH',
   merchantName = 'Merchant',
   gatewayMerchantId: gatewayMerchantIdProp,
+  // async () => orderId — создаёт заказ (или возвращает уже созданный).
+  // Бэкенд берёт сумму из заказа, поэтому без order_id оплата невозможна.
+  resolveOrderId,
+  // (response, orderId) => void — куда вести пользователя после списания.
+  onResult,
 }) => {
   const { locale } = useParams();
   const [ready, setReady] = React.useState(false);
@@ -116,9 +121,24 @@ const GooglePayButton = ({
 
       if (!gToken) throw new Error('gToken is empty');
 
-      // Send token to backend
-      const res = await googlePay({ gToken }).unwrap();
+      // Заказ создаём ПОСЛЕ шита Google Pay: loadPaymentData обязан вызываться
+      // из user gesture, а любой await до него ломает открытие окна.
+      // Списания на этом шаге ещё нет — оно происходит на нашем POST ниже,
+      // поэтому неудачное создание заказа деньги не трогает.
+      const orderId = await resolveOrderId?.();
+      if (!orderId) {
+        throw new Error('Не вдалося створити замовлення — перевірте поля форми');
+      }
+
+      const res = await googlePay({
+        gToken,
+        order_id: orderId,
+        redirectUrl: `${window.location.origin}/api/monobank/redirect?locale=${encodeURIComponent(
+          locale
+        )}&order_id=${encodeURIComponent(orderId)}&result=success`,
+      }).unwrap();
       console.log('Google Pay backend response:', res);
+      onResult?.(res, orderId);
     } catch (e) {
       console.error('Google Pay click error:', {
         message: e?.message || String(e),
@@ -128,9 +148,24 @@ const GooglePayButton = ({
         keys: e ? Object.getOwnPropertyNames(e) : [],
         raw: e,
       });
-      setError(e?.message || String(e));
+      // Пользователь закрыл шит Google Pay — это не ошибка, сообщение не нужно.
+      if (e?.statusCode === 'CANCELED') return;
+      setError(
+        e?.data?.detail ||
+          e?.data?.order_id?.[0] ||
+          e?.message ||
+          String(e)
+      );
     }
-  }, [buildPaymentDataRequest, googlePay, gatewayMerchantId, ready]);
+  }, [
+    buildPaymentDataRequest,
+    googlePay,
+    gatewayMerchantId,
+    ready,
+    resolveOrderId,
+    onResult,
+    locale,
+  ]);
 
   // Render official Google Pay button UI (via PaymentsClient.createButton)
   React.useEffect(() => {

@@ -172,6 +172,39 @@ const OrderCheckoutArea = () => {
      }
    };
 
+  // Google Pay: заказ создаётся уже после того, как пользователь подтвердил
+  // оплату в шите, поэтому нужен отдельный резолвер, а не общий submit-флоу.
+  const resolveGooglePayOrderId = async () => {
+    if (lastOrderId) return lastOrderId;
+
+    let createdId = null;
+    await handleSubmit(async (formData) => {
+      const createdOrder = await submitHandler(formData);
+      if (createdOrder?.id) {
+        createdId = createdOrder.id;
+        setLastOrderId(createdOrder.id);
+      }
+    })();
+
+    return createdId;
+  };
+
+  const handleGooglePayResult = (res, orderId) => {
+    // 3DS: Monobank отдаёт tdsUrl — открываем его в той же модалке, что и mono-флоу.
+    // resolveMonobankPageUrl здесь не подходит: он достраивает ссылку из invoiceId,
+    // который приходит всегда, и увёл бы в 3DS даже успешный платёж без челленджа.
+    const tdsUrl = res?.monobank?.tdsUrl;
+    if (tdsUrl) {
+      setMonoPageUrl(tdsUrl);
+      setIsPaymentModalOpen(true);
+      return;
+    }
+
+    const status = res?.payment?.status;
+    const result = status === 'success' ? 'success' : status === 'failure' ? 'failed' : 'pending';
+    router.push(`/${locale}/payment-redirect?result=${result}&orderId=${orderId}`);
+  };
+
   const createMonoPayment = async (orderId) => {
     try {
       setIsCreatingPayment(true);
@@ -516,6 +549,8 @@ const OrderCheckoutArea = () => {
                                currencyCode="UAH"
                                merchantName="AirbagAD"
                                gatewayMerchantId={process.env.NEXT_PUBLIC_GOOGLE_PAY_MERCHANT_ID}
+                               resolveOrderId={resolveGooglePayOrderId}
+                               onResult={handleGooglePayResult}
                              />
                               {/* Apple Pay button hidden: flow not implemented and should not be shown */}
                            </div>
