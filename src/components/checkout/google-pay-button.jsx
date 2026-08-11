@@ -24,15 +24,21 @@ const GooglePayButton = ({
   amountMinor,
   currencyCode = 'UAH',
   merchantName = 'Merchant',
-  gatewayMerchantId,
+  gatewayMerchantId: gatewayMerchantIdProp,
 }) => {
   const { locale } = useParams();
   const [ready, setReady] = React.useState(false);
   const [error, setError] = React.useState(null);
   const [googlePay, { isLoading }] = useGooglePayMutation();
-  const { data: paymentConfig } = useGetPaymentConfigQuery();
-  // Режим Google Pay управляется бэком (PaymentSettings). Fallback — TEST.
-  const gpayEnvironment = paymentConfig?.google_pay_environment || 'TEST';
+  const { data: paymentConfig, isError: isConfigError } =
+    useGetPaymentConfigQuery(undefined, { refetchOnMountOrArgChange: true });
+  // Режим и merchantId управляются бэком (PaymentSettings).
+  // Fallback'а на TEST здесь намеренно нет: молчаливый откат в тест на боевом
+  // режиме означал бы, что оплата не проходит по-настоящему.
+  const gpayEnvironment = paymentConfig?.google_pay_environment;
+  const gatewayMerchantId =
+    paymentConfig?.google_pay_merchant_id || gatewayMerchantIdProp;
+  const configReady = Boolean(gpayEnvironment && gatewayMerchantId);
 
   const paymentsClientRef = React.useRef(null);
   const buttonRootRef = React.useRef(null);
@@ -47,6 +53,8 @@ const GooglePayButton = ({
     if (!ready) return;
     if (typeof window === 'undefined') return;
     if (!window.google?.payments?.api) return;
+    // Без конфига с бэка клиент не создаём — иначе он залипнет в TEST.
+    if (!configReady) return;
     paymentsClientRef.current = new window.google.payments.api.PaymentsClient({
       // Режим (TEST/PRODUCTION) приходит с бэка через /payments/config/.
       // Переключается в Django admin или из админ-бота.
@@ -55,7 +63,7 @@ const GooglePayButton = ({
       locale,
     });
     console.log('Google Pay client initialized', { environment: gpayEnvironment });
-  }, [locale, ready, gpayEnvironment]);
+  }, [locale, ready, gpayEnvironment, configReady]);
 
   const buildPaymentDataRequest = React.useCallback(() => {
     const totalPrice = (Number(amountMinor || 0) / 100).toFixed(2);
@@ -127,6 +135,7 @@ const GooglePayButton = ({
   // Render official Google Pay button UI (via PaymentsClient.createButton)
   React.useEffect(() => {
     if (!ready) return;
+    if (!configReady) return;
     if (typeof window === 'undefined') return;
 
     const client = paymentsClientRef.current;
@@ -147,19 +156,24 @@ const GooglePayButton = ({
     button.style.width = '100%';
     button.style.borderRadius = '10px';
     root.appendChild(button);
-  }, [onClick, ready]);
+  }, [onClick, ready, configReady]);
 
   return (
     <div>
       <div ref={buttonRootRef} />
       {/* Fallback / loading state */}
-      {!ready && (
+      {(!ready || !configReady) && (
         <button type="button" className="tp-btn tp-btn-2 w-100" disabled>
           Google Pay
         </button>
       )}
       {isLoading && (
         <div style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>Processing…</div>
+      )}
+      {isConfigError && (
+        <div style={{ marginTop: 8, fontSize: 12, color: '#b00020' }}>
+          Не вдалося отримати конфігурацію оплати. Оновіть сторінку.
+        </div>
       )}
       {error && <div style={{ marginTop: 8, fontSize: 12, color: '#b00020' }}>{error}</div>}
     </div>

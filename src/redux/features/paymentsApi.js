@@ -26,11 +26,15 @@ export const paymentsApi = apiSlice.injectEndpoints({
     }),
 
     getPaymentConfig: builder.query({
-      // Публичная конфигурация оплаты: { mode, google_pay_environment }.
+      // Публичная конфигурация оплаты:
+      // { mode, google_pay_environment, google_pay_merchant_id }.
       query: () => ({
         url: "/payments/config/",
         method: "GET",
       }),
+      // Режим переключается в админке — не держим ответ в кеше долго,
+      // иначе открытая вкладка продолжит платить по старому режиму.
+      keepUnusedDataFor: 0,
     }),
   }),
 });
