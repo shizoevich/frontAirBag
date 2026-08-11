@@ -717,3 +717,51 @@ button.tp-cat-chip {
     padding-bottom: 45px;
   }
 }
+
+/* ===== COMPACT HEADER SEARCH WIDGET (desktop) ===== */
+/* Скоупим геометрию под .tp-header-search-widget: базовые .tp-header-search-*
+   классы переиспользует мобильный поиск (mobile-search.jsx) */
+/* form должна занимать всю колонку, чтобы виджет мог расшириться до её края */
+.tp-header-search > form {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tp-header-search-widget {
+  width: 260px;
+  max-width: 100%;
+  margin-left: 0 !important;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: width 0.3s ease;
+
+  &.is-expanded {
+    width: 100%;
+  }
+
+  .tp-header-search-box {
+    width: 100%;
+    flex: 1 1 auto;
+    padding-right: 60px; /* место под абсолютно позиционированную кнопку 60px */
+
+    input {
+      cursor: pointer;
+    }
+  }
+
+  &.is-expanded .tp-header-search-box input {
+    cursor: text;
+  }
+
+  /* lg: 992–1199px — узкое состояние компактнее, чтобы не наезжать на логотип */
+  @media (min-width: 992px) and (max-width: 1199px) {
+    width: 220px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-header-search-widget {
+    transition: none;
+  }
+}
