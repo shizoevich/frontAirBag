@@ -97,7 +97,9 @@
     "quantity": "Quantity",
     "remove": "Remove",
     "clearCart": "Clear Cart",
-    "proceedToCheckout": "Proceed to Checkout"
+    "proceedToCheckout": "Proceed to Checkout",
+    "quantityMin": "Minimum quantity: {min}",
+    "quantityMax": "Only {max} pcs. available!"
   },
   "HeaderSearchForm": {
     "placeholder": "Search for products..."

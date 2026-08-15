@@ -85,7 +85,9 @@
     "quantity": "Количество",
     "remove": "Удалить",
     "clearCart": "Очистить корзину",
-    "proceedToCheckout": "Перейти к оформлению"
+    "proceedToCheckout": "Перейти к оформлению",
+    "quantityMin": "Минимальное количество: {min}",
+    "quantityMax": "Доступно только {max} шт. товара!"
   },
   "HeaderSearchForm": {
     "placeholder": "Поиск товаров..."

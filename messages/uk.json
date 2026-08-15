@@ -87,7 +87,9 @@
     "remove": "Видалити",
     "clearCart": "Очистити кошик",
     "proceedToCheckout": "Перейти до оформлення",
-    "discountHint": "Ви додали товарів на суму {amount}. Незабаром стане доступна знижка."
+    "discountHint": "Ви додали товарів на суму {amount}. Незабаром стане доступна знижка.",
+    "quantityMin": "Мінімальна кількість: {min}",
+    "quantityMax": "Доступно лише {max} шт. товару!"
   },
   "HeaderSearchForm": {
     "placeholder": "Пошук товарів..."

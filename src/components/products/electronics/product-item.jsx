@@ -5,9 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslations, useLocale } from 'next-intl';
 import { useLocalizedLink } from '@/utils/localeLink';
 // internal
-import { Cart, QuickView, Minus, Plus } from "@/svg";
+import { Cart, QuickView } from "@/svg";
 import { handleProductModal } from "@/redux/features/productModalSlice";
-import { add_cart_product, quantityDecrement, quantityIncrement } from "@/redux/features/cartSlice";
+import { add_cart_product, setCartQuantity } from "@/redux/features/cartSlice";
+import QuantityInput from "@/components/common/quantity-input";
 import BlurImage from "@/components/common/BlurImage";
 import { getProductImage } from "@/utils/image-utils";
 import { slugify } from '@/utils/slugify';
@@ -61,23 +62,15 @@ const ProductItem = ({ product }) => {
  
   const normalizedResidue = Number(residue ?? 0);
   const isOutOfStock = normalizedResidue <= 0;
-  const canDecreaseQty = currentOrderQuantity > 1;
-  const canIncreaseQty = currentOrderQuantity < normalizedResidue;
 
   // handle add product
   const handleAddProduct = (prd) => {
     dispatch(add_cart_product(prd));
   };
 
-  const handleIncreaseQty = () => {
-    if (cartItem && canIncreaseQty) {
-      dispatch(quantityIncrement(cartItem));
-    }
-  };
-
-  const handleDecreaseQty = () => {
-    if (cartItem && canDecreaseQty) {
-      dispatch(quantityDecrement(cartItem));
+  const handleQuantityChange = (quantity) => {
+    if (cartItem) {
+      dispatch(setCartQuantity({ id: cartItem.id || cartItem._id, quantity }));
     }
   };
 
@@ -216,32 +209,20 @@ const handleMouseLeave = () => {
                   gap: '0'
                 }}
               >
-                <div
-                  className="tp-product-quantity"
-                  style={{
+                <QuantityInput
+                  value={currentOrderQuantity}
+                  max={normalizedResidue}
+                  onChange={handleQuantityChange}
+                  wrapperStyle={{
                     margin: 0,
                     height: '40px',
                     flex: 1,
                     borderRadius: '4px 0 0 4px',
                     overflow: 'hidden'
                   }}
-                >
-                  <span
-                    className={`tp-cart-minus ${!canDecreaseQty ? 'disabled' : ''}`}
-                    onClick={handleDecreaseQty}
-                    style={{ borderRadius: 0 }}
-                  >
-                    <Minus />
-                  </span>
-                  <input className="tp-cart-input" type="text" readOnly value={currentOrderQuantity} style={{ borderRadius: 0, height: '100%' }} />
-                  <span
-                    className={`tp-cart-plus ${!canIncreaseQty ? 'disabled' : ''}`}
-                    onClick={handleIncreaseQty}
-                    style={{ borderRadius: 0 }}
-                  >
-                    <Plus />
-                  </span>
-                </div>
+                  buttonStyle={{ borderRadius: 0 }}
+                  inputStyle={{ borderRadius: 0, height: '100%' }}
+                />
 
                 <Link
                   href={getLocalizedLink('/cart', 'product-item button')}

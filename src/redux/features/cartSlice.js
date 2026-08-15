@@ -86,6 +86,34 @@ export const cartSlice = createSlice({
       });
       setLocalStorage("cart_products", state.cart_products);
     },
+    setCartQuantity: (state, { payload }) => {
+      // Устанавливает точное количество товара в корзине (ручной ввод)
+      const productId = payload.id || payload._id;
+      const requested = Number(payload.quantity);
+
+      if (!Number.isInteger(requested) || requested < 1) {
+        return;
+      }
+
+      state.cart_products = state.cart_products.map((item) => {
+        const itemId = item.id || item._id;
+        if (itemId !== productId) {
+          return item;
+        }
+        // Страховка на случай, если остаток изменился после рендера
+        const maxQty = Number(item.residue ?? 0);
+        if (maxQty <= 0) {
+          notifyError(`Товар отсутствует на складе!`);
+          return item;
+        }
+        if (requested > maxQty) {
+          notifyError(`Доступно только ${maxQty} шт. товара!`);
+          return { ...item, orderQuantity: maxQty };
+        }
+        return { ...item, orderQuantity: requested };
+      });
+      setLocalStorage("cart_products", state.cart_products);
+    },
     quantityDecrement: (state, { payload }) => {
       const productId = payload.id || payload._id;
       state.cart_products = state.cart_products.map((item) => {
@@ -139,6 +167,7 @@ export const {
   remove_product,
   quantityIncrement,
   quantityDecrement,
+  setCartQuantity,
   initialOrderQuantity,
   clearCart,
   openCartMini,
