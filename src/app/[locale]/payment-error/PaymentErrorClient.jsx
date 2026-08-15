@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useGetOrderByIdQuery } from '@/redux/features/ordersApi';
+import { useCancelOrderMutation, useGetOrderByIdQuery } from '@/redux/features/ordersApi';
 import Wrapper from '@/layout/wrapper';
 import Header from '@/layout/headers/header';
 import Footer from '@/layout/footers/footer';
@@ -13,6 +13,7 @@ export default function PaymentErrorClient() {
   const { locale } = useParams();
   const sp = useSearchParams();
   const t = useTranslations('Payments');
+  const tOrders = useTranslations('Orders');
 
   const orderId = sp.get('orderId') || sp.get('order_id');
   const queryErrCode = sp.get('errCode') || sp.get('errorCode') || sp.get('code');
@@ -22,6 +23,20 @@ export default function PaymentErrorClient() {
     skip: !orderId,
     refetchOnFocus: true,
   });
+
+  const [cancelOrder, { isLoading: isCanceling }] = useCancelOrderMutation();
+  const [cancelError, setCancelError] = React.useState('');
+  const isCanceled = orderData?.cancel_state === 'canceled';
+
+  const handleCancelOrder = React.useCallback(async () => {
+    setCancelError('');
+    try {
+      // Причина фіксована: сюди потрапляють лише після невдалої оплати.
+      await cancelOrder({ id: orderId, reason: 'payment_failed' }).unwrap();
+    } catch (err) {
+      setCancelError(err?.data?.detail || tOrders('cancel_failed'));
+    }
+  }, [cancelOrder, orderId, tOrders]);
 
   const resolvedCode = orderData?.last_payment_failure_code || queryErrCode || null;
   const resolvedReason = orderData?.last_payment_failure_reason || queryReason || null;
@@ -133,7 +148,21 @@ export default function PaymentErrorClient() {
                   <Link href={`/${locale}`} className="tp-btn tp-btn-border">
                     {t('back_to_home')}
                   </Link>
+
+                  {/* Оплата не пройшла — замовлення інакше висить неоплаченим */}
+                  {orderData?.can_cancel && (
+                    <button
+                      type="button"
+                      className="tp-btn tp-btn-border"
+                      onClick={handleCancelOrder}
+                      disabled={isCanceling || isCanceled}
+                    >
+                      {isCanceled ? tOrders('status_canceled') : tOrders('cancel_order')}
+                    </button>
+                  )}
                 </div>
+
+                {cancelError && <p className="text-danger small mt-3 mb-0">{cancelError}</p>}
               </div>
             </div>
           </div>

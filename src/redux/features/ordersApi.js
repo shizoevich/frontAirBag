@@ -21,12 +21,19 @@ export const ordersApi = apiSlice.injectEndpoints({
         if (dateFrom) p.set('date__gte', dateFrom);
         if (dateTo) p.set('date__lte', `${dateTo}T23:59:59`);
         // Бэкенд принимает 1/0 для булевых полей (не 'true'/'false')
-        if (status === 'completed') {
+        // Скасовані відсіюємо через canceled_at: cancel_state='' у фільтрі
+        // прибрав би і замовлення із запитом на скасування, які ще активні.
+        if (status === 'canceled') {
+          p.set('canceled_at__isnull', 'false');
+        } else if (status === 'completed') {
+          p.set('canceled_at__isnull', 'true');
           p.set('is_completed', '1');
         } else if (status === 'paid') {
+          p.set('canceled_at__isnull', 'true');
           p.set('is_completed', '0');
           p.set('is_paid', '1');
         } else if (status === 'pending') {
+          p.set('canceled_at__isnull', 'true');
           p.set('is_completed', '0');
           p.set('is_paid', '0');
         }
@@ -79,13 +86,26 @@ export const ordersApi = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, { id }) => [{ type: 'Orders', id }],
     }),
 
-    // Удаление заказа
-    deleteOrder: builder.mutation({
-      query: (id) => ({
-        url: `/orders/${id}/`,
-        method: 'DELETE',
+    // Скасування замовлення. Доступно для неоплаченого і невідвантаженого
+    // замовлення — правила перевіряє бекенд (core/services/order_cancel.py),
+    // клієнт бачить їх у флагах can_cancel / can_request_cancel.
+    cancelOrder: builder.mutation({
+      query: ({ id, reason, comment = '' }) => ({
+        url: `/orders/${id}/cancel/`,
+        method: 'POST',
+        body: { reason, comment },
       }),
-      invalidatesTags: ['Orders'],
+      invalidatesTags: (result, error, { id }) => ['Orders', { type: 'Orders', id }],
+    }),
+
+    // Запит на скасування оплаченого замовлення — підтверджує адміністратор
+    requestCancelOrder: builder.mutation({
+      query: ({ id, reason, comment = '' }) => ({
+        url: `/orders/${id}/request-cancel/`,
+        method: 'POST',
+        body: { reason, comment },
+      }),
+      invalidatesTags: (result, error, { id }) => ['Orders', { type: 'Orders', id }],
     }),
 
     // Банковские реквизиты для оплаты по реквизитам
@@ -166,7 +186,8 @@ export const {
   useGetOrderByIdQuery,
   useCreateOrderMutation,
   useUpdateOrderMutation,
-  useDeleteOrderMutation,
+  useCancelOrderMutation,
+  useRequestCancelOrderMutation,
   useGetBankDetailsQuery,
   useUploadPaymentDocMutation,
   useGetOrderItemsQuery,

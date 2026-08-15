@@ -4,6 +4,7 @@ import { useGetOrdersListQuery, useGetOrderByIdQuery } from '@/redux/features/or
 import { useSelector } from 'react-redux';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
+import CancelOrderModal from './cancel-order-modal';
 
 const LIMIT = 20;
 
@@ -30,6 +31,8 @@ const OrderPage = () => {
   const { user } = useSelector((state) => state.auth);
 
   const [selectedOrderId, setSelectedOrderId] = useState(null);
+  // null | 'cancel' | 'request' — яку модалку скасування показати
+  const [cancelMode, setCancelMode] = useState(null);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [status, setStatus] = useState('all');
@@ -77,9 +80,44 @@ const OrderPage = () => {
     return 0;
   };
   const formatDate = (d) => (d ? new Date(d).toLocaleDateString('uk-UA') : '');
-  const statusOf = (o) => (o?.is_completed ? 'completed' : o?.is_paid ? 'paid' : 'pending');
-  const renderStatus = (o) => { const s = statusOf(o); return s === 'completed' ? l.statusCompleted : s === 'paid' ? l.statusPaid : l.statusPending; };
-  const statusBadgeClass = (o) => { const s = statusOf(o); return s === 'completed' ? 'bg-success' : s === 'paid' ? 'bg-info' : 'bg-secondary'; };
+  // Скасування важливіше за оплату/виконання: скасоване замовлення не має
+  // показуватись як «Оплачено».
+  const statusOf = (o) => {
+    if (o?.cancel_state === 'canceled') return 'canceled';
+    if (o?.cancel_state === 'requested') return 'cancel_requested';
+    return o?.is_completed ? 'completed' : o?.is_paid ? 'paid' : 'pending';
+  };
+  const STATUS_LABELS = {
+    canceled: t('status_canceled'),
+    cancel_requested: t('status_cancel_requested'),
+    completed: l.statusCompleted,
+    paid: l.statusPaid,
+    pending: l.statusPending,
+  };
+  const STATUS_BADGES = {
+    canceled: 'bg-danger',
+    cancel_requested: 'bg-warning text-dark',
+    completed: 'bg-success',
+    paid: 'bg-info',
+    pending: 'bg-secondary',
+  };
+  const renderStatus = (o) => STATUS_LABELS[statusOf(o)];
+  const statusBadgeClass = (o) => STATUS_BADGES[statusOf(o)];
+
+  // Адмінські причини (no_contact, out_of_stock…) клієнту не показуємо —
+  // перекладів для них немає, і вони не його справа.
+  const TRANSLATED_CANCEL_REASONS = [
+    'changed_mind', 'found_cheaper', 'wrong_items',
+    'delivery_too_long', 'duplicate', 'payment_failed', 'other',
+  ];
+  const cancelReasonLabel = (code) =>
+    (TRANSLATED_CANCEL_REASONS.includes(code) ? t(`cancel_reason_${code}`) : null);
+
+  const refundLabel = (o) => {
+    if (o?.refund_state === 'done' || o?.refund_state === 'manual') return t('refund_done');
+    if (o?.refund_state === 'pending') return t('refund_processing');
+    return null;
+  };
 
   // Бесконечный скролл: подгружаем следующую страницу при достижении низа списка
   useEffect(() => {
@@ -125,6 +163,7 @@ const OrderPage = () => {
                       <option value="pending">{l.statusPending}</option>
                       <option value="paid">{l.statusPaid}</option>
                       <option value="completed">{l.statusCompleted}</option>
+                      <option value="canceled">{t('status_canceled')}</option>
                     </select>
                   </div>
                   <div className="col-12 col-md-4">
@@ -245,6 +284,18 @@ const OrderPage = () => {
                                     <a href={orderToShow.payment_document} target="_blank" rel="noopener noreferrer" className="ms-2">{t('view_document', { defaultValue: 'Переглянути' })}</a></div>
                                 )}
                                 {orderToShow.ttn && (<div className="mb-2"><strong className="text-muted">{t('tracking_number')}:</strong><span className="ms-2 font-monospace">{orderToShow.ttn}</span></div>)}
+                                {orderToShow.cancel_state === 'canceled' && (
+                                  <div className="mb-2">
+                                    <strong className="text-muted">{t('canceled_at')}:</strong>
+                                    <span className="ms-2">{formatDate(orderToShow.canceled_at)}</span>
+                                    {cancelReasonLabel(orderToShow.cancel_reason) && (
+                                      <span className="ms-2 text-muted small">({cancelReasonLabel(orderToShow.cancel_reason)})</span>
+                                    )}
+                                    {refundLabel(orderToShow) && (
+                                      <div className="mt-1"><span className="badge bg-light text-dark">{refundLabel(orderToShow)}</span></div>
+                                    )}
+                                  </div>
+                                )}
                                 {orderToShow.discount_percent && (<div><strong className="text-muted">{t('discount')}:</strong><span className="ms-2 text-success fw-bold">{orderToShow.discount_percent}%</span></div>)}
                               </div>
                             </div>
@@ -317,11 +368,43 @@ const OrderPage = () => {
                             </div>
                           </div>
                         </div>
+
+                        {/* Дії із замовленням */}
+                        <div className="d-flex flex-column flex-sm-row justify-content-end align-items-stretch align-items-sm-center gap-2 mt-4">
+                          {orderToShow.cancel_state === 'requested' && (
+                            <span className="badge bg-warning text-dark py-2">{t('cancel_pending')}</span>
+                          )}
+                          {orderToShow.can_cancel && (
+                            <button type="button" className="btn btn-outline-danger btn-sm" onClick={() => setCancelMode('cancel')}>
+                              <i className="fas fa-ban me-2" />{t('cancel_order')}
+                            </button>
+                          )}
+                          {orderToShow.can_request_cancel && (
+                            <button type="button" className="btn btn-outline-warning btn-sm" onClick={() => setCancelMode('request')}>
+                              <i className="fas fa-rotate-left me-2" />{t('request_cancel')}
+                            </button>
+                          )}
+                          {orderToShow.cancel_block_reason === 'order_shipped' && (
+                            <span className="text-muted small">{t('cancel_not_allowed_shipped')}</span>
+                          )}
+                          {orderToShow.cancel_block_reason === 'order_completed' && (
+                            <span className="text-muted small">{t('cancel_not_allowed_completed')}</span>
+                          )}
+                        </div>
                       </div>
                     ) : null}
                   </div>
                 </div>
               </div>
+            )}
+
+            {cancelMode && orderToShow && (
+              <CancelOrderModal
+                order={orderToShow}
+                mode={cancelMode}
+                onClose={() => setCancelMode(null)}
+                onDone={() => setOffset(0)}
+              />
             )}
           </div>
         </div>
