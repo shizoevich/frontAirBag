@@ -7,7 +7,7 @@ import { useTranslations, useLocale } from 'next-intl';
 // internal
 import Menus from "./header-com/menus";
 import useSticky from "@/hooks/use-sticky";
-import logo from "@assets/img/logo/auto-delivery-logo-nobg.png";
+import logo from "@assets/img/logo/airbagad-logo.png";
 import useCartInfo from "@/hooks/use-cart-info";
 import OffCanvas from "@/components/common/off-canvas";
 import { openCartMini } from "@/redux/features/cartSlice";
@@ -88,14 +88,14 @@ const Header = () => {
                         src={logo} 
                         alt="logo" 
                         style={{
-                          maxWidth: '140px',
-                          maxHeight: '70px',
+                          maxWidth: '190px',
+                          maxHeight: '44px',
                           width: 'auto',
                           height: 'auto',
                           objectFit: 'contain'
                         }}
-                        width={140}
-                        height={70}
+                        width={190}
+                        height={31}
                       />
                     </Link>
                   </div>
@@ -160,14 +160,14 @@ const Header = () => {
                       src={logo} 
                       alt="logo" 
                       style={{
-                        maxWidth: '80px',
-                        maxHeight: '40px',
+                        maxWidth: '140px',
+                        maxHeight: '32px',
                         width: 'auto',
                         height: 'auto',
                         objectFit: 'contain'
                       }}
-                      width={80}
-                      height={40}
+                      width={140}
+                      height={23}
                     />
                   </Link>
                 </div>

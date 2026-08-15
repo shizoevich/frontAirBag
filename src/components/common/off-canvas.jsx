@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 // internal
 import { CloseTwo } from '@/svg';
-import logo from '@assets/img/logo/auto-delivery-logo-nobg.png';
+import logo from '@assets/img/logo/airbagad-logo.png';
 import contact_img from '@assets/img/icon/contact.png';
 import MobileCategory from '@/layout/headers/header-com/mobile-category';
 import MobileMenus from "./mobile-menus";
@@ -56,14 +56,14 @@ const OffCanvas = ({ isOffCanvasOpen, setIsCanvasOpen }) => {
                     src={logo} 
                     alt="logo" 
                     style={{
-                      maxWidth: '80px',
-                      maxHeight: '40px',
+                      maxWidth: '130px',
+                      maxHeight: '30px',
                       width: 'auto',
                       height: 'auto',
                       objectFit: 'contain'
                     }}
-                    width={80}
-                    height={40}
+                    width={130}
+                    height={21}
                   />
                 </Link>
               </div>

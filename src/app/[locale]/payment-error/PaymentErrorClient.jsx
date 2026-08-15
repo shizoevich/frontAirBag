@@ -79,7 +79,7 @@ export default function PaymentErrorClient() {
               >
                 <div className="mb-4">
                   <img
-                    src="/assets/img/logo/auto-delivery-logo-nobg.png"
+                    src="/assets/img/logo/airbagad-logo.png"
                     alt="AirBag"
                     style={{ maxWidth: 150, height: 'auto', opacity: 0.95 }}
                   />

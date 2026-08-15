@@ -4,7 +4,7 @@ import Image from "next/image";
 import dayjs from "dayjs";
 import ReactToPrint from "react-to-print";
 // internal
-import logo from "@assets/img/logo/auto-delivery-logo-nobg.png";
+import logo from "@assets/img/logo/airbagad-logo.png";
 import ErrorMsg from "@/components/common/error-msg";
 import { useGetUserOrderByIdQuery } from "@/redux/features/order/orderApi";
 import PrdDetailsLoader from "@/components/loader/prd-details-loader";
@@ -47,14 +47,14 @@ const OrderArea = ({ orderId }) => {
                               src={logo} 
                               alt="logo" 
                               style={{
-                                maxWidth: '120px',
-                                maxHeight: '60px',
+                                maxWidth: '170px',
+                                maxHeight: '40px',
                                 width: 'auto',
                                 height: 'auto',
                                 objectFit: 'contain'
                               }}
-                              width={120}
-                              height={60}
+                              width={170}
+                              height={28}
                             />
                             <p>2879 Elk Creek Road <br /> Stone Mountain, Georgia </p>
                           </div>

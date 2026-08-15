@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 // internal
-import logo from '@assets/img/logo/auto-delivery-logo-nobg.png';
+import logo from '@assets/img/logo/airbagad-logo.png';
 import pay from '@assets/img/footer/footer-pay.png';
 import social_data from '@/data/social-data';
 import phones from '@/data/contact-data';
@@ -38,16 +38,16 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                           src={logo} 
                           alt="logo" 
                           style={{
-                            maxWidth: '160px',
-                            maxHeight: '80px',
+                            maxWidth: '200px',
+                            maxHeight: '46px',
                             width: 'auto',
                             height: 'auto',
                             objectFit: 'contain',
                             display: 'block',
                             margin: '0 auto'
                           }}
-                          width={160}
-                          height={80}
+                          width={200}
+                          height={33}
                         />
                       </Link>
                     </div>

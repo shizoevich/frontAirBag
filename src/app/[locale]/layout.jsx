@@ -120,13 +120,13 @@ export async function generateMetadata({ params }) {
     icons: {
       icon: [
         { url: '/favicon.ico', sizes: 'any' },
-        { url: '/assets/img/logo/favicon.png', type: 'image/png' },
+        { url: '/assets/img/logo/apple-touch-icon.png', type: 'image/png' },
       ],
       shortcut: '/favicon.ico',
-      apple: '/assets/img/logo/favicon.png',
+      apple: '/assets/img/logo/apple-touch-icon.png',
       other: {
         rel: 'apple-touch-icon-precomposed',
-        url: '/assets/img/logo/favicon.png',
+        url: '/assets/img/logo/apple-touch-icon.png',
       },
     },
     openGraph: {
@@ -138,7 +138,7 @@ export async function generateMetadata({ params }) {
       locale: lang === 'uk' ? 'uk_UA' : lang === 'en' ? 'en_US' : 'ru_RU',
       images: [
         {
-          url: '/assets/img/logo/auto-delivery-logo.jpg',
+          url: '/assets/img/logo/og-image.jpg',
           width: 1200,
           height: 630,
           alt: 'AirbagAD',
@@ -149,7 +149,7 @@ export async function generateMetadata({ params }) {
       card: 'summary_large_image',
       title,
       description,
-      images: ['/assets/img/logo/auto-delivery-logo.jpg'],
+      images: ['/assets/img/logo/og-image.jpg'],
     },
   };
 }
@@ -162,8 +162,8 @@ const organizationJsonLd = {
   name: 'AirbagAD',
   alternateName: ['Airbag Auto Delivery', 'AirBag AD'],
   url: SITE_URL,
-  logo: `${SITE_URL}/assets/img/logo/auto-delivery-logo-nobg.png`,
-  image: `${SITE_URL}/assets/img/logo/auto-delivery-logo.jpg`,
+  logo: `${SITE_URL}/assets/img/logo/airbagad-logo.png`,
+  image: `${SITE_URL}/assets/img/logo/og-image.jpg`,
   description:
     'Подушки безопасности, ремни безопасности, пиропатроны, пульки и парашюты. Продажа и доставка по всей Украине.',
   address: {
