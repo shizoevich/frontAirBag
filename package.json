@@ -10,6 +10,8 @@
     "export": "STATIC_EXPORT=true next build && find out -name '*.txt' -type f -delete",
     "build:isr": "next build",
     "start:isr": "next start",
+    "test": "vitest run --config vitest.config.mjs",
+    "test:watch": "vitest --config vitest.config.mjs",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report",
@@ -48,9 +50,14 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@vitejs/plugin-react": "^6.0.5",
     "dotenv": "^16.4.5",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.1.6",
-    "typescript": "^5.9.3"
+    "jsdom": "^29.1.1",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
   }
 }
