@@ -85,7 +85,9 @@ const Menus = () => {
     }
   };
 
-  // Категория с подкатегориями только раскрывается, лист — ведёт в каталог
+  // У категории с подкатегориями два действия: название ведёт в саму категорию
+  // (её страница показывает товары всего поддерева), стрелка раскрывает уровень ниже.
+  // Раньше такая категория только раскрывалась, и перейти в неё было нельзя.
   const renderCategoryChip = (cat, levelIndex) => {
     const isSelected = catalogPath[levelIndex]?.id === cat.id;
     const hasChildren = cat.children?.length > 0;
@@ -93,16 +95,24 @@ const Menus = () => {
 
     if (hasChildren) {
       return (
-        <button
-          key={cat.id}
-          type="button"
-          className={className}
-          aria-expanded={isSelected}
-          onClick={() => handleCatalogExpand(cat, levelIndex)}
-        >
-          <span className="tp-cat-chip__label">{cat.title}</span>
-          <span className="tp-cat-chip__arrow">{isSelected ? '▴' : '▾'}</span>
-        </button>
+        <span key={cat.id} className={className}>
+          <Link
+            href={getLocalizedLink(categoryPath(cat))}
+            className="tp-cat-chip__label"
+            onClick={() => setCatalogPath([])}
+          >
+            {cat.title}
+          </Link>
+          <button
+            type="button"
+            className="tp-cat-chip__arrow"
+            aria-expanded={isSelected}
+            aria-label={`${cat.title} — ${isSelected ? safeTranslate('collapse') : safeTranslate('expand')}`}
+            onClick={() => handleCatalogExpand(cat, levelIndex)}
+          >
+            {isSelected ? '▴' : '▾'}
+          </button>
+        </span>
       );
     }
 
@@ -131,12 +141,11 @@ const Menus = () => {
               style={{
                 left: '0',
                 right: '0',
-                width: '100vw',
-                marginLeft: 'calc(-50vw + 50%)',
-                padding: '16px 40px 20px',
+                width: '100%',
+                padding: '16px 12px 20px',
                 boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
                 backgroundColor: '#fff',
-                borderRadius: '0',
+                borderRadius: '0 0 6px 6px',
               }}
             >
               {mounted && (

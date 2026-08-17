@@ -22,7 +22,7 @@ const CartArea = () => {
           {cart_products.length === 0 &&
             <div className='text-center pt-50'>
               <h3>{t('yourCartIsEmpty')}</h3>
-              <Link href={`/${locale}/shop`} className="tp-cart-checkout-btn mt-20">{t('goToShop')}</Link>
+              <Link href={`/${locale}`} className="tp-cart-checkout-btn mt-20">{t('goToShop')}</Link>
             </div>
           }
           {cart_products.length > 0 &&

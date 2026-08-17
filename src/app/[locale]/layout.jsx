@@ -1,5 +1,5 @@
 import Script from 'next/script';
-import { Jost, Roboto, Charm, Oregano } from 'next/font/google';
+import { Jost, Roboto, Charm, Oregano, Montserrat } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import Providers from '@/components/provider';
 import { defaultLocale } from '@/i18n';
@@ -45,6 +45,13 @@ const charm = Charm({
   weight: ["400", "700"],
   subsets: ["latin"],
   variable: "--tp-ff-charm",
+});
+// Шрифт баннера главной. Кириллица подключена явно: тексты слайдов — ru/uk.
+const montserrat = Montserrat({
+  weight: ["400", "700", "800"],
+  subsets: ["latin", "cyrillic"],
+  display: "swap",
+  variable: "--tp-ff-montserrat",
 });
 
 // Metadata определяется в generateMetadata
@@ -205,7 +212,7 @@ export default async function RootLayout({ children, params }) {
 
   return (
     <html lang={lang} suppressHydrationWarning={true}>
-      <body className={`${body.variable} ${heading.variable} ${p.variable} ${jost.variable} ${roboto.variable} ${oregano.variable} ${charm.variable}`} suppressHydrationWarning={true}>
+      <body className={`${body.variable} ${heading.variable} ${p.variable} ${jost.variable} ${roboto.variable} ${oregano.variable} ${charm.variable} ${montserrat.variable}`} suppressHydrationWarning={true}>
         {/* Google Analytics 4 — loaded only in production to keep dev traffic out of reports */}
         {process.env.NODE_ENV === 'production' && GA_MEASUREMENT_ID && (
           <>

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 // internal
 import { CloseEye, OpenEye } from '@/svg';
@@ -20,6 +20,7 @@ const LoginForm = () => {
   const [loginError, setLoginError] = useState('');
   const [login, { isLoading }] = useLoginMutation();
   const pathname = usePathname();
+  const router = useRouter();
   const locale = pathname.split('/')[1];
   const t = useTranslations('Common');
 
@@ -88,6 +89,19 @@ const LoginForm = () => {
         // Обработка различных типов ошибок с мультиязычными сообщениями
         let errorMessage = t('authenticationError');
         
+        // Почта не подтверждена — это не «неверный пароль». Пароль верный,
+        // не хватает только подтверждения, поэтому ведём на экран с кнопкой
+        // повторной отправки письма, а не показываем общую ошибку логина.
+        if (error?.data?.code === 'email_not_confirmed') {
+          const message = t('emailNotConfirmed');
+          setLoginError(message);
+          notifyError(message);
+          router.push(
+            `/${locale}/confirm-email?email=${encodeURIComponent(data.email)}`
+          );
+          return;
+        }
+
         // RTK Query ошибки имеют структуру { status, data, error }
         if (error?.data) {
           if (error.data.detail) {

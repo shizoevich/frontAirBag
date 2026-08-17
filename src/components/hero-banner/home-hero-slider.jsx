@@ -129,7 +129,7 @@ const HomeHeroSlider = () => {
                       </p>
 
                       <div className="tp-slider-btn">
-                        <Link href="/shop" className="tp-btn tp-btn-2 tp-btn-white">
+                        <Link href="/" className="tp-btn tp-btn-2 tp-btn-white">
                           {t('shopNow')}
                           {" "} <ArrowRightLong />
                         </Link>

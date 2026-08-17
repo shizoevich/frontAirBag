@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 // internal
-import { Close, Minus, Plus } from "@/svg";
-import { add_cart_product, quantityDecrement, remove_product } from "@/redux/features/cartSlice";
+import { Close } from "@/svg";
+import QuantityInput from "@/components/common/quantity-input";
+import { remove_product, setCartQuantity } from "@/redux/features/cartSlice";
 import { getProductImage, getProductId } from "@/utils/image-utils";
 import { slugify } from "@/utils/slugify";
 
 const CartItem = ({product}) => {
-  const { title, price_minor, category, status, orderQuantity = 0 } = product || {};
+  const { title, price_minor, category, status, orderQuantity = 0, residue } = product || {};
   
   // Используем утилиты для получения ID и изображения
   const productId = getProductId(product);
@@ -21,15 +22,11 @@ const CartItem = ({product}) => {
   const t = useTranslations('Cart');
   const { locale } = useParams();
 
-    // handle add product
-    const handleAddProduct = (prd) => {
-      dispatch(add_cart_product(prd))
+    // handle quantity change (+/- или ручной ввод)
+    const handleQuantityChange = (quantity) => {
+      dispatch(setCartQuantity({ id: productId, quantity }))
     }
-    // handle decrement product
-    const handleDecrement = (prd) => {
-      dispatch(quantityDecrement(prd))
-    }
-  
+
     // handle remove product
     const handleRemovePrd = (prd) => {
       dispatch(remove_product(prd))
@@ -58,15 +55,12 @@ const CartItem = ({product}) => {
       </td>
       {/* quantity */}
       <td className="tp-cart-quantity">
-        <div className="tp-product-quantity mt-10 mb-10">
-          <span onClick={()=> handleDecrement(product)} className="tp-cart-minus">
-            <Minus />
-          </span>
-          <input className="tp-cart-input" type="text" value={orderQuantity} readOnly />
-          <span onClick={()=> handleAddProduct(product)} className="tp-cart-plus">
-            <Plus />
-          </span>
-        </div>
+        <QuantityInput
+          className="mt-10 mb-10"
+          value={orderQuantity}
+          max={Number(residue ?? 0)}
+          onChange={handleQuantityChange}
+        />
       </td>
       {/* action */}
       <td className="tp-cart-action">

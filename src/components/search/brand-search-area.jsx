@@ -155,7 +155,7 @@ const BrandSearchArea = () => {
         .replace(/\s+/g, '-')
         .replace(/[()]/g, '');
       const categorySlug = `${brandSlug}-${brand.id}`;
-      router.push(`/${locale}/shop/${categorySlug}`);
+      router.push(`/${locale}/category/${categorySlug}`);
     }
     setCurrentPage(0); // Reset to first page when category changes
   };

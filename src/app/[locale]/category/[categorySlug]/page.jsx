@@ -1,17 +1,16 @@
 import { notFound } from 'next/navigation';
-import Wrapper from "@/layout/wrapper";
-import Header from "@/layout/headers/header";
-import Footer from "@/layout/footers/footer";
-import ShopCategoryArea from '@/components/categories/shop-category-area';
+import CatalogPageView from '@/components/catalog/catalog-page-view';
 import { getTranslations } from 'next-intl/server';
 import { buildAlternates, getServerApiBase } from '@/utils/seo';
+import { categoryIdFromSlug } from '@/utils/category-link';
+
+export const revalidate = 600; // ISR, как на главной
 
 // Helper function to fetch a single category by the id embedded at the end of the slug
 // (slug format is `transliterated-title-<id>`, matching how category links are built).
 async function fetchCategory(slug) {
-  if (!slug || typeof slug !== 'string') return null;
-  const id = slug.split('-').pop();
-  if (!id || isNaN(parseInt(id, 10))) return null;
+  const id = categoryIdFromSlug(slug);
+  if (!id) return null;
 
   const base = getServerApiBase();
   try {
@@ -42,7 +41,8 @@ export async function generateMetadata({ params: awaitedParams }) {
   };
 }
 
-// The main page component
+// Ровно тот же вид, что и главная (баннер, поиск, каталог, видео, города, CTA) —
+// отличается только предвыбранной категорией и метаданными.
 export default async function ShopCategoryPage({ params: awaitedParams }) {
   const params = await awaitedParams;
   const category = await fetchCategory(params.categorySlug);
@@ -51,11 +51,5 @@ export default async function ShopCategoryPage({ params: awaitedParams }) {
     notFound();
   }
 
-  return (
-    <Wrapper>
-      <Header />
-      <ShopCategoryArea category={category} />
-      <Footer />
-    </Wrapper>
-  );
+  return <CatalogPageView locale={params.locale} activeCategoryId={category.id} />;
 }

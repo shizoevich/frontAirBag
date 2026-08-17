@@ -90,7 +90,7 @@ export default function OrderSuccessContent() {
                 <Link href={`/${locale}/orders`} className="tp-btn tp-btn-2 me-3">
                   {t('myOrders', { defaultValue: 'Мои заказы' })}
                 </Link>
-                <Link href={`/${locale}/shop`} className="tp-btn me-3">
+                <Link href={`/${locale}`} className="tp-btn me-3">
                   {t('continueShopping', { defaultValue: 'Продолжить покупки' })}
                 </Link>
                 <Link href={`/${locale}`} className="tp-btn tp-btn-border">

@@ -68,7 +68,7 @@ const PaymentStub = ({ orderId }) => {
                   Перейти до підтвердження заказу
                 </Link>
                 <Link 
-                  href="/shop"
+                  href="/"
                   className="tp-btn tp-btn-border"
                 >
                   Продовжити покупки

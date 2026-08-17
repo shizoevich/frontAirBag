@@ -1,20 +1,8 @@
-import Wrapper from "@/layout/wrapper";
-import Header from "@/layout/headers/header";
-import Footer from "@/layout/footers/footer";
-import ShopCategoryArea from "@/components/categories/shop-category-area";
+import { redirect } from "next/navigation";
 
-export async function generateMetadata({ params: { locale } }) {
-  return {
-    title: `AirBag - ${locale === 'uk' ? 'Категорії' : locale === 'ru' ? 'Категории' : 'Category Page'}`,
-  };
-}
-
-export default function CategoryPage() {
-  return (
-    <Wrapper>
-      <Header />
-      <ShopCategoryArea />
-      <Footer primary_style={true} />
-    </Wrapper>
-  );
+// There is no "all categories" page any more: the catalog with every category level
+// lives on the home page, so a bare /category/ just goes there.
+export default async function CategoryPage({ params }) {
+  const { locale } = await params;
+  redirect(`/${locale}`);
 }

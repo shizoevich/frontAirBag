@@ -56,18 +56,19 @@ const RegisterForm = () => {
       email: data.email,
       password: data.password,
       confirm_password: data.password,
+      // Локаль определяет язык ссылки в письме с подтверждением.
+      locale,
     })
       .unwrap()
-      .then((result) => {
-        // Показываем детальное сообщение об успешной регистрации
-        const successMessage = result?.message || t('registerSuccessMessage');
-        setRegisterSuccess(successMessage);
-        notifySuccess(successMessage);
-        
-        // Небольшая задержка перед перенаправлением для показа сообщения
-        setTimeout(() => {
-          router.push(`/${locale}/checkout`);
-        }, 2000);
+      .then(() => {
+        // Аккаунт создан, но войти в него нельзя, пока не подтверждена почта,
+        // поэтому ведём не в checkout, а на экран «проверьте почту».
+        setRegisterSuccess(t('checkYourEmailSubtitle'));
+        notifySuccess(t('registerSuccessConfirmEmail'));
+
+        router.push(
+          `/${locale}/confirm-email?email=${encodeURIComponent(data.email)}`
+        );
       })
       .catch((error) => {
         console.error('Registration error details:', {

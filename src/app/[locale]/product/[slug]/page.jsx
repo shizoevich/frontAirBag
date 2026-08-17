@@ -126,7 +126,7 @@ export default async function ProductDetailsPage({ params: awaitedParams }) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Главная', item: `${SITE_URL}/${params.locale}` },
-      { '@type': 'ListItem', position: 2, name: 'Магазин', item: `${SITE_URL}/${params.locale}/shop` },
+      { '@type': 'ListItem', position: 2, name: 'Магазин', item: `${SITE_URL}/${params.locale}` },
       { '@type': 'ListItem', position: 3, name: product.title, item: `${SITE_URL}/${params.locale}/${path}` },
     ],
   };

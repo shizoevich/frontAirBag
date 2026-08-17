@@ -8,8 +8,7 @@
 /* AIRBAG-78: не выделять текст/иконку при многократном клике по +/- */
 .tp-product-quantity,
 .tp-cart-plus,
-.tp-cart-minus,
-.tp-cart-input {
+.tp-cart-minus {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -17,11 +16,20 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* AIRBAG-78: поле количества только для отображения (readOnly) — браузеры
-   игнорируют user-select:none на <input>, поэтому отключаем pointer-events,
-   чтобы промах мимо +/- не выделял число. Клики по +/- не затрагиваются. */
+/* Поле количества редактируемое: значение можно ввести вручную */
 .tp-cart-input {
-  pointer-events: none;
+  text-align: center;
+  cursor: text;
+}
+
+.tp-cart-input:focus {
+  outline: none;
+  background-color: #fff;
+}
+
+.tp-cart-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Стили для кнопки "Купить сейчас" */

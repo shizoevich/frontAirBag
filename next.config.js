@@ -7,12 +7,14 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.js');
 // different (still valid) locale, so it degrades gracefully.
 const DEFAULT_LOCALE = 'uk';
 
+// Must match `locales` in src/i18n-config.js — same CommonJS limitation as above.
+const LOCALES = ['en', 'ru', 'uk'];
+
 // Paths that existed on the old WooCommerce site, before every route gained a locale
 // prefix. They are still in Google's index and still receive traffic, so each one gets a
 // permanent redirect instead of the 404 it used to return. Product and category slugs
 // carry over unchanged (the trailing number is the same id), so the mapping is mechanical.
 const LEGACY_STATIC_PATHS = [
-  'shop',
   'about',
   'returns',
   'terms',
@@ -35,6 +37,30 @@ const nextConfig = {
       {
         source: '/product/:slug',
         destination: `/${DEFAULT_LOCALE}/product/:slug/`,
+        permanent: true,
+      },
+      // The separate shop route is gone: the catalog (categories, filters, sorting,
+      // pagination) lives on the home page, and a single category has its own
+      // /category/<slug>-<id> page. Both /shop URLs are indexed, so they redirect
+      // instead of 404-ing — the slug carries over unchanged.
+      {
+        source: `/:locale(${LOCALES.join('|')})/shop/:slug`,
+        destination: '/:locale/category/:slug/',
+        permanent: true,
+      },
+      {
+        source: `/:locale(${LOCALES.join('|')})/shop`,
+        destination: '/:locale/',
+        permanent: true,
+      },
+      {
+        source: '/shop/:slug',
+        destination: `/${DEFAULT_LOCALE}/category/:slug/`,
+        permanent: true,
+      },
+      {
+        source: '/shop',
+        destination: `/${DEFAULT_LOCALE}/`,
         permanent: true,
       },
       {
@@ -69,6 +95,19 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60,
     remotePatterns: [
+      // Картинки категорий приходят абсолютными URL с нашего же API (/media/…).
+      // Без этих двух записей next/image отвечает 400 на каждую карточку категории.
+      {
+        protocol: "https",
+        hostname: 'api.airbagad.com',
+        pathname: "/media/**",
+      },
+      {
+        protocol: "http",
+        hostname: 'localhost',
+        port: '8000',
+        pathname: "/media/**",
+      },
       {
         protocol: "https",
         hostname: 'i.ibb.co',

@@ -22,11 +22,11 @@ function BannerItem({ sm = false, bg, title }) {
       <div className="tp-banner-content">
         {!sm && <span>Sale 20% off all store</span>}
         <h3 className="tp-banner-title">
-          <Link href="/shop">{title}</Link>
+          <Link href="/">{title}</Link>
         </h3>
         {sm && <p>Sale 35% off</p>}
         <div className="tp-banner-btn">
-          <Link href="/shop" className="tp-link-btn">
+          <Link href="/" className="tp-link-btn">
             Shop Now
             <ArrowRight />
           </Link>
