@@ -54,6 +54,7 @@ const MobileCategory = ({ isCategoryActive }) => {
             <button
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 handleOpenSubMenu(item.title);
               }}
               className="dropdown-toggle-btn"

@@ -59,7 +59,9 @@
     "login": "Login",
     "register": "Register",
     "logout": "Logout",
-    "myProfile": "My Profile"
+    "myProfile": "My Profile",
+    "expand": "show subcategories",
+    "collapse": "hide subcategories"
   },
   "features": {
     "fastDelivery": "Fast Delivery",

@@ -49,7 +49,9 @@
     "login": "Вхід",
     "register": "Реєстрація",
     "logout": "Вихід",
-    "myProfile": "Мій профіль"
+    "myProfile": "Мій профіль",
+    "expand": "показати підкатегорії",
+    "collapse": "сховати підкатегорії"
   },
   "features": {
     "fastDelivery": "Швидка доставка",

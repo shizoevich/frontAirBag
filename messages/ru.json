@@ -47,7 +47,9 @@
     "contacts": "Контакты",
     "discounts": "Скидки",
     "login": "Войти",
-    "register": "Регистрация"
+    "register": "Регистрация",
+    "expand": "показать подкатегории",
+    "collapse": "скрыть подкатегории"
   },
   "features": {
     "fastDelivery": "Быстрая доставка",

@@ -106,18 +106,26 @@ const MobileMenus = ({setIsCanvasOpen}) => {
       );
     }
 
-    // Категория с детьми
+    // Категория с детьми: название ведёт в саму категорию, стрелка раскрывает уровень ниже
     return (
       <li key={category.id} className={`has-dropdown ${isOpen ? 'dropdown-opened':''}`}>
-        <a className={`${isOpen ? 'expanded':''}`}>
+        <Link
+          href={getLocalizedLink(categoryPath(category))}
+          className={`${isOpen ? 'expanded':''}`}
+          onClick={() => handleNavigation(categoryPath(category))}
+        >
           {category.title}
-          <button 
-            onClick={() => handleToggleSubMenu(category.id)} 
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleToggleSubMenu(category.id);
+            }}
             className={`dropdown-toggle-btn ${isOpen ? 'dropdown-opened':''}`}
           >
             <i className="fa-regular fa-angle-right"></i>
           </button>
-        </a>
+        </Link>
         <ul className={`tp-submenu ${isOpen ? 'active':''}`}>
           {sortedChildren.map((child) => (
             <CategoryMenuItem key={child.id} category={child} level={level + 1} />
@@ -134,12 +142,20 @@ const MobileMenus = ({setIsCanvasOpen}) => {
           {menu.products && (
             <ul>
               <li className={`has-dropdown ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
-                <a className={`${isActiveMenu === menu.titleKey ? 'expanded':''}`}>
+                {/* «Каталог» ведёт в общий каталог, стрелка — раскрывает дерево категорий */}
+                <Link
+                  href={getLocalizedLink(menu.link)}
+                  className={`${isActiveMenu === menu.titleKey ? 'expanded':''}`}
+                  onClick={() => handleNavigation(menu.link)}
+                >
                   {menu.titleKey ? t(menu.titleKey.replace('menu.', '')) : menu.title}
-                  <button onClick={()=> handleOpenMenu(menu.titleKey)} className={`dropdown-toggle-btn ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}>
+                  <button
+                    onClick={(e)=> { e.preventDefault(); e.stopPropagation(); handleOpenMenu(menu.titleKey); }}
+                    className={`dropdown-toggle-btn ${isActiveMenu === menu.titleKey ? 'dropdown-opened':''}`}
+                  >
                     <i className="fa-regular fa-angle-right"></i>
                   </button>
-                </a>
+                </Link>
                 <ul className={`tp-submenu ${isActiveMenu === menu.titleKey ? 'active':''}`}>
                   {/* Рекурсивное отображение всех уровней категорий */}
                   {firstLevelCategories.map((category) => (
