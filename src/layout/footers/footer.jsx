@@ -33,21 +33,18 @@ const Footer = ({ style_2 = false, style_3 = false,primary_style=false }) => {
                 <div className="tp-footer-widget footer-col-1 mb-50">
                   <div className="tp-footer-widget-content">
                     <div className="tp-footer-logo text-center mb-3">
-                      <Link href={getLocalizedLink("/")}>
-                        <Image 
-                          src={logo} 
-                          alt="logo" 
+                      <Link href={getLocalizedLink("/")} style={{ display: 'block' }}>
+                        <Image
+                          src={logo}
+                          alt="logo"
                           style={{
-                            maxWidth: '200px',
-                            maxHeight: '46px',
-                            width: 'auto',
+                            width: '100%',
                             height: 'auto',
                             objectFit: 'contain',
-                            display: 'block',
-                            margin: '0 auto'
+                            display: 'block'
                           }}
-                          width={200}
-                          height={33}
+                          width={1320}
+                          height={215}
                         />
                       </Link>
                     </div>
