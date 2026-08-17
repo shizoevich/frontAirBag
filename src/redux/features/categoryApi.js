@@ -6,10 +6,6 @@ export const categoryApi = apiSlice.injectEndpoints({
     // Получение дерева категорий
     getCategoryTree: builder.query({
       query: () => '/good-categories/tree/',
-      transformResponse: (response) => {
-        console.log('🌳 API ответ дерева категорий:', response);
-        return response;
-      },
       providesTags: ['CategoryTree'],
     }),
 
@@ -39,29 +35,12 @@ export const categoryApi = apiSlice.injectEndpoints({
       invalidatesTags: ['categories', 'CategoryTree'],
     }),
 
-    // Получение всех категорий (плоский список)
+    // Получение всех категорий (плоский список).
+    // Отдаём именно массив: раньше здесь возвращался объект { data, count, success },
+    // а компоненты искали в ответе `results`/`result` — и молча рисовали пустоту.
     getShowCategory: builder.query({
       query: () => '/good-categories/',
-      transformResponse: (response) => {
-        console.log('📋 API ответ категорий (список):', response);
-        
-        if (response && response.results) {
-          return {
-            data: response.results,
-            count: response.count,
-            success: true
-          };
-        }
-        
-        return {
-          data: [],
-          count: 0,
-          success: false
-        };
-      },
-      onError: (error) => {
-        console.error('Ошибка загрузки категорий:', error);
-      },
+      transformResponse: (response) => response?.results || response?.data || [],
       providesTags: ['categories'],
     }),
 

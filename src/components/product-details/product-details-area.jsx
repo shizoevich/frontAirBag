@@ -60,7 +60,7 @@ const ProductDetailsArea = ({ id }) => {
                 <div className="text-center">
                   <h3>Товар не найден</h3>
                   <p>К сожалению, запрашиваемый товар не найден в нашем каталоге.</p>
-                  <Link href="/shop" className="tp-btn mt-20">Перейти в каталог</Link>
+                  <Link href="/" className="tp-btn mt-20">Перейти в каталог</Link>
                 </div>
               </div>
             </div>

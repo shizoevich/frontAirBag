@@ -76,7 +76,7 @@ const ProductGadgetArea = () => {
                 </div>
 
                 <div className="tp-product-gadget-btn">
-                  <Link href="/shop" className="tp-link-btn">
+                  <Link href="/" className="tp-link-btn">
                     More Products
                     <ArrowRight />
                   </Link>

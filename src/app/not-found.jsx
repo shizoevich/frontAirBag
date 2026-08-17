@@ -47,7 +47,7 @@ export default function RootNotFound() {
 
             <p>
               <Link
-                href={L('/shop/')}
+                href={L('/')}
                 style={{
                   display: 'inline-block',
                   padding: '0.7rem 1.4rem',

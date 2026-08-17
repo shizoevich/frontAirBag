@@ -1,17 +1,22 @@
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
-import ShopCategoryArea from '@/components/categories/shop-category-area';
+import CatalogArea from '@/components/products/catalog-area';
+import HomePrdLoader from '@/components/loader/home/home-prd-loader';
+import MobileSearch from '@/components/search/mobile-search';
 import { getTranslations } from 'next-intl/server';
 import { buildAlternates, getServerApiBase } from '@/utils/seo';
+import { categoryIdFromSlug } from '@/utils/category-link';
+
+export const revalidate = 600; // ISR, как на главной
 
 // Helper function to fetch a single category by the id embedded at the end of the slug
 // (slug format is `transliterated-title-<id>`, matching how category links are built).
 async function fetchCategory(slug) {
-  if (!slug || typeof slug !== 'string') return null;
-  const id = slug.split('-').pop();
-  if (!id || isNaN(parseInt(id, 10))) return null;
+  const id = categoryIdFromSlug(slug);
+  if (!id) return null;
 
   const base = getServerApiBase();
   try {
@@ -42,7 +47,8 @@ export async function generateMetadata({ params: awaitedParams }) {
   };
 }
 
-// The main page component
+// Same catalog as the home page, with this category preselected: the category rows,
+// filters and pagination must behave identically no matter how the user got here.
 export default async function ShopCategoryPage({ params: awaitedParams }) {
   const params = await awaitedParams;
   const category = await fetchCategory(params.categorySlug);
@@ -54,7 +60,10 @@ export default async function ShopCategoryPage({ params: awaitedParams }) {
   return (
     <Wrapper>
       <Header />
-      <ShopCategoryArea category={category} />
+      <MobileSearch />
+      <Suspense fallback={<HomePrdLoader loading />}>
+        <CatalogArea activeCategoryId={category.id} />
+      </Suspense>
       <Footer />
     </Wrapper>
   );

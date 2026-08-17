@@ -1,15 +1,19 @@
 'use client';
 import { useState } from "react";
-import Image from "next/image";
+import Link from "next/link";
+import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 // internal
-import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
+import { useGetCategoryTreeQuery } from "@/redux/features/categoryApi";
 import ErrorMsg from "@/components/common/error-msg";
 import Loader from "@/components/loader/loader";
+import { categoryPath } from "@/utils/category-link";
+import { sortAlphabetically } from "@/utils/categoryTreeHelpers";
 
 const MobileCategory = ({ isCategoryActive }) => {
-  const { data: categories, isError, isLoading } = useGetShowCategoryQuery();
+  const { data: categoryTree, isError, isLoading } = useGetCategoryTreeQuery();
   const [isActiveSubMenu, setIsActiveSubMenu] = useState("");
+  const locale = useLocale();
   const router = useRouter();
 
   // Открытие/закрытие подменю
@@ -17,14 +21,9 @@ const MobileCategory = ({ isCategoryActive }) => {
     setIsActiveSubMenu(prev => (prev === title ? "" : title));
   };
 
-  // Переход по категории
-  const handleCategoryRoute = (title, type = "parent") => {
-    const slug = title.toLowerCase().replace("&", "").split(" ").join("-");
-    if (type === "parent") {
-      router.push(`/shop?category=${slug}`);
-    } else {
-      router.push(`/shop?subCategory=${slug}`);
-    }
+  // Переход по категории — на её собственную страницу, как и во всех остальных меню
+  const goToCategory = (category) => {
+    router.push(`/${locale}${categoryPath(category)}`);
   };
 
   // Контент
@@ -42,29 +41,27 @@ const MobileCategory = ({ isCategoryActive }) => {
     content = <ErrorMsg msg="There was an error" />;
   }
 
-  if (!isLoading && !isError && categories?.length === 0) {
+  if (!isLoading && !isError && !categoryTree?.length) {
     content = <ErrorMsg msg="No Category found!" />;
   }
 
-  if (!isLoading && !isError && categories?.length > 0) {
-    content = categories.map((item) => (
+  if (!isLoading && !isError && categoryTree?.length > 0) {
+    content = sortAlphabetically(categoryTree).map((item) => (
       <li className="has-dropdown" key={item.id}>
-        <a className="cursor-pointer">
-          {item.img && (
-            <span>
-              <Image src={item.img} alt="cate img" width={50} height={50} />
-            </span>
-          )}
+        <Link href={`/${locale}${categoryPath(item)}`}>
           {item.title}
           {item.children?.length > 0 && (
             <button
-              onClick={() => handleOpenSubMenu(item.title)}
+              onClick={(e) => {
+                e.preventDefault();
+                handleOpenSubMenu(item.title);
+              }}
               className="dropdown-toggle-btn"
             >
               <i className="fa-regular fa-angle-right"></i>
             </button>
           )}
-        </a>
+        </Link>
 
         {item.children?.length > 0 && (
           <ul
@@ -72,11 +69,8 @@ const MobileCategory = ({ isCategoryActive }) => {
               isActiveSubMenu === item.title ? "active" : ""
             }`}
           >
-            {item.children.map((child) => (
-              <li
-                key={child.id}
-                onClick={() => handleCategoryRoute(child.title, "child")}
-              >
+            {sortAlphabetically(item.children).map((child) => (
+              <li key={child.id} onClick={() => goToCategory(child)}>
                 <a className="cursor-pointer">{child.title}</a>
               </li>
             ))}

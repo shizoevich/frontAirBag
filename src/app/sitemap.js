@@ -1,5 +1,6 @@
 import { locales, defaultLocale, getServerApiBase, localeUrl } from '@/utils/seo';
 import { slugify } from '@/utils/slugify';
+import { categoryPath } from '@/utils/category-link';
 
 // Regenerate at most once per hour.
 export const revalidate = 3600;
@@ -9,8 +10,6 @@ const API_BASE = getServerApiBase();
 // Static, indexable routes (path WITHOUT locale prefix).
 const STATIC_PATHS = [
   '',
-  'shop',
-  'category',
   'discounts',
   'pyrotechnics',
   'airbag-components',
@@ -68,8 +67,10 @@ export default async function sitemap() {
     fetchAll('good-categories'),
   ]);
 
+  // `categoryPath` is the single source of truth for the category URL format, so the
+  // sitemap cannot drift away from what the site actually links to.
   const categoryEntries = categories.map((c) =>
-    entry(`category/${slugify(c.title)}-${c.id}`, { changeFrequency: 'weekly', priority: 0.6 })
+    entry(categoryPath(c).replace(/^\//, ''), { changeFrequency: 'weekly', priority: 0.6 })
   );
 
   const productEntries = goods.map((g) =>

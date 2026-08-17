@@ -72,7 +72,7 @@ const ProductBanner = () => {
                           <p className="new-price">${item.newPrice.toFixed(2)}</p>
                         </div>
                         <div className="tp-product-banner-btn">
-                          <Link href="/shop" className="tp-btn tp-btn-2">Shop now</Link>
+                          <Link href="/" className="tp-btn tp-btn-2">Shop now</Link>
                         </div>
                       </div>
                     </div>

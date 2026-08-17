@@ -2,14 +2,17 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import ErrorMsg from "../common/error-msg";
+import { categoryPath } from "@/utils/category-link";
+import { categoryImage, FALLBACK_CATEGORY_IMAGE } from "@/utils/category-image";
 import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
 import { useRouter } from "next/navigation";
 import ShopCategoryLoader from "../loader/shop/shop-category-loader";
 
 const AirbagComponentsArea = () => {
   const t = useTranslations('Categories');
+  const locale = useLocale();
   const { data: categories, isLoading, isError } = useGetShowCategoryQuery();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
@@ -56,7 +59,28 @@ const AirbagComponentsArea = () => {
 
   // Обработчик клика по компоненту
   const handleComponentClick = (component) => {
-    router.push(`/search?category=${component.id}`);
+    router.push(`/${locale}${categoryPath(component)}`);
+  };
+
+  // Функция для получения описания компонента на основе его названия
+  const getComponentDescription = (title) => {
+    const descriptions = {
+      'Конектори': t('connectors_description'),
+      'Кріплення': t('fasteners_description'),
+      'Обманки (Резистори)': t('resistors_description'),
+      'Парашути (Мішки)': t('airbags_description'),
+      'Запчастини для Ременів': t('belt_parts_description'),
+      // Добавьте другие описания по необходимости
+    };
+    
+    // Ищем соответствие по ключевым словам в названии
+    for (const key in descriptions) {
+      if (title.includes(key)) {
+        return descriptions[key];
+      }
+    }
+    
+    return '';
   };
 
   // Решаем, что отображать
@@ -85,19 +109,19 @@ const AirbagComponentsArea = () => {
             >
               <div className="tp-category-thumb">
                 <Image 
-                  src={`/assets/img/category/${component.image || 'noimage.png'}`} 
+                  src={categoryImage(component)} 
                   alt={component.title}
                   width={200}
                   height={200}
                   style={{ objectFit: 'contain' }}
                   onError={(e) => {
-                    e.target.src = '/assets/img/category/noimage.png';
+                    e.target.src = FALLBACK_CATEGORY_IMAGE;
                   }}
                 />
               </div>
               <div className="tp-category-content">
                 <h3 className="tp-category-title">
-                  <Link href={`/search?category=${component.id}`}>
+                  <Link href={`/${locale}${categoryPath(component)}`}>
                     {component.title}
                   </Link>
                 </h3>
@@ -112,26 +136,6 @@ const AirbagComponentsArea = () => {
     );
   }
 
-  // Функция для получения описания компонента на основе его названия
-  const getComponentDescription = (title) => {
-    const descriptions = {
-      'Конектори': t('connectors_description'),
-      'Кріплення': t('fasteners_description'),
-      'Обманки (Резистори)': t('resistors_description'),
-      'Парашути (Мішки)': t('airbags_description'),
-      'Запчастини для Ременів': t('belt_parts_description'),
-      // Добавьте другие описания по необходимости
-    };
-    
-    // Ищем соответствие по ключевым словам в названии
-    for (const key in descriptions) {
-      if (title.includes(key)) {
-        return descriptions[key];
-      }
-    }
-    
-    return '';
-  };
 
   return (
     <section className="tp-category-area pb-120 pt-95">

@@ -7,7 +7,7 @@ import DeliveryCities from "@/components/features/delivery-cities";
 import InstagramArea from "@/components/instagram/instagram-area";
 import NewArrivals from "@/components/products/electronics/new-arrivals";
 import ProductBanner from "@/components/products/electronics/product-banner";
-import HomeProductsArea from "@/components/products/home-products-area";
+import CatalogArea from "@/components/products/catalog-area";
 import MobileSearch from "@/components/search/mobile-search";
 import Footer from "@/layout/footers/footer";
 import ProductItem from "@/components/products/electronics/product-item";
@@ -36,7 +36,7 @@ export default async function HomePage({ params }) {
       <MobileSearch/>
       {/* Оставляем клиентский раздел для интерактива, фильтров и пагинации */}
       <Suspense fallback={<HomePrdLoader loading />}>
-        <HomeProductsArea/>
+        <CatalogArea/>
       </Suspense>
       {/*<NewArrivals/>*/}
       <YouTubeVideosSlider key={`youtube-${Date.now()}`} />

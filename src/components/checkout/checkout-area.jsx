@@ -34,7 +34,7 @@ const CheckoutArea = () => {
           {cart_products.length === 0 && (
             <div className="text-center pt-50">
               <h3 className="py-2">No items found in cart to checkout</h3>
-              <Link href="/shop" className="tp-checkout-btn">
+              <Link href="/" className="tp-checkout-btn">
                 Return to shop
               </Link>
             </div>

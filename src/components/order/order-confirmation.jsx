@@ -208,7 +208,7 @@ const OrderConfirmation = ({ orderId }) => {
                     <Link href={`/${locale}/orders`} className="tp-btn tp-btn-2 me-3">
                       {t('view_all_orders')}
                     </Link>
-                    <Link href="/shop" className="tp-btn">
+                    <Link href="/" className="tp-btn">
                       {t('continue_shopping')}
                     </Link>
                   </div>

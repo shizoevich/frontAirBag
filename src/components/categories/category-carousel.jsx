@@ -10,7 +10,7 @@ import ErrorMsg from '../common/error-msg';
 import HomeCateLoader from '../loader/home/home-cate-loader';
 import { useTranslations } from 'next-intl';
 
-const FALLBACK_IMAGE = '/assets/img/category/noimage.png';
+import { categoryImage, FALLBACK_CATEGORY_IMAGE as FALLBACK_IMAGE } from '@/utils/category-image';
 
 const CategoryCarousel = ({ 
   categories = [],      // Массив категорий для отображения
@@ -88,10 +88,7 @@ const CategoryCarousel = ({
             const isSelected = selectedCategory === categoryId;
             const hasSubcategories = category.children && category.children.length > 0;
             
-            // Изображение: если начинается с http - используем как есть, иначе берем из папки
-            const imagePath = category.image?.startsWith('http') 
-              ? category.image 
-              : `/assets/img/category/${category.image || 'noimage.png'}`;
+            const imagePath = categoryImage(category);
 
             return (
               <SwiperSlide key={category.id}>

@@ -2,14 +2,17 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import ErrorMsg from "../common/error-msg";
+import { categoryPath } from "@/utils/category-link";
+import { categoryImage, FALLBACK_CATEGORY_IMAGE } from "@/utils/category-image";
 import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
 import { useRouter } from "next/navigation";
 import ShopCategoryLoader from "../loader/shop/shop-category-loader";
 
 const CarBrandsArea = () => {
   const t = useTranslations('Categories');
+  const locale = useLocale();
   const { data: categories, isLoading, isError } = useGetShowCategoryQuery();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
@@ -46,7 +49,7 @@ const CarBrandsArea = () => {
 
   // Обработчик клика по бренду
   const handleBrandClick = (brand) => {
-    router.push(`/search?category=${brand.id}`);
+    router.push(`/${locale}${categoryPath(brand)}`);
   };
 
   // Решаем, что отображать
@@ -75,19 +78,19 @@ const CarBrandsArea = () => {
             >
               <div className="tp-category-thumb">
                 <Image 
-                  src={`/assets/img/category/${brand.image || 'noimage.png'}`} 
+                  src={categoryImage(brand)} 
                   alt={brand.title}
                   width={200}
                   height={200}
                   style={{ objectFit: 'contain' }}
                   onError={(e) => {
-                    e.target.src = '/assets/img/category/noimage.png';
+                    e.target.src = FALLBACK_CATEGORY_IMAGE;
                   }}
                 />
               </div>
               <div className="tp-category-content">
                 <h3 className="tp-category-title">
-                  <Link href={`/search?category=${brand.id}`}>
+                  <Link href={`/${locale}${categoryPath(brand)}`}>
                     {brand.title}
                   </Link>
                 </h3>

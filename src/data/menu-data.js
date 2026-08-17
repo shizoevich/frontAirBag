@@ -8,41 +8,11 @@ const menu_data = [
   },
   {
     id: 2,
+    // Мега-меню каталога строится из дерева категорий (см. menus.jsx / mobile-menus.jsx),
+    // поэтому захардкоженных пунктов здесь нет — ссылки на категории собирает categoryPath.
     products: true,
     titleKey: 'menu.catalog',
-    link: '/shop',
-    product_pages: [
-      {
-        titleKey: 'menu.covers',
-        link: '/shop/covers-754099',
-        mega_menus: [
-          { titleKey: 'menu.allBrands', link: '/search/brand', hasDropdown: true },
-        ]
-      },
-      {
-        titleKey: 'menu.airbagComponents',
-        link: '/category/airbag-components',
-        mega_menus: [
-          { titleKey: 'menu.connectors', link: '/shop/konnektory-753917' },
-          { titleKey: 'menu.mounts', link: '/shop/krepleniia-753918' },
-          { titleKey: 'menu.resistors', link: '/shop/obmanki-rezistory-753919' },
-          { titleKey: 'menu.airbags', link: '/shop/parashiuty-meshki-753897' },
-          { titleKey: 'menu.beltParts', link: '/shop/zapchasti-dlia-remnei-753899' },
-        ]
-      },
-      {
-        titleKey: 'menu.pyrotechnics',
-        link: '/category/pyrotechnics',
-        mega_menus: [
-          { titleKey: 'menu.pyroBelts', link: '/shop/pp-v-remni-753920' },
-          { titleKey: 'menu.pyroSeats', link: '/shop/pp-v-nogi-sidenie-753898' },
-          { titleKey: 'menu.pyroCurtains', link: '/shop/pp-v-shtory-753924' },
-          { titleKey: 'menu.pyroSteering', link: '/shop/pp-v-rul-753925' },
-          { titleKey: 'menu.pyroDashboard', link: '/shop/pp-torpedo-753927' },
-        ]
-      },
-
-    ]
+    link: '/',
   },
   {
     id: 4,
