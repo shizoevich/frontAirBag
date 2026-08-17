@@ -3,7 +3,7 @@
 import React from "react";
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import phones from '@/data/contact-data';
+import phones, { viberLink } from '@/data/contact-data';
 
 const ContactInfo = ({ locale }) => {
   const t = useTranslations('Contact');
@@ -49,14 +49,14 @@ const ContactInfo = ({ locale }) => {
                           <a href={`tel:${phone.tel}`} className="text-success text-decoration-none">
                             {phone.displayFull}
                           </a>
-                          <a href={`viber://add?number=${phone.viber}`} title="Viber" style={{fontSize: '1.2rem', color: '#7360f2'}}>
-                            <i className="fab fa-viber"></i>
-                          </a>
                         </div>
                       ))}
-                      <div className="d-flex gap-2 mt-1">
+                      <div className="d-flex align-items-center gap-2 mt-1">
                         <a href="https://t.me/airbagsale" target="_blank" rel="noopener noreferrer" title="Telegram" style={{fontSize: '1.4rem', color: '#0088cc'}}>
                           <i className="fab fa-telegram"></i>
+                        </a>
+                        <a href={viberLink} title="Viber" style={{fontSize: '1.4rem', color: '#7360f2'}}>
+                          <i className="fab fa-viber"></i>
                         </a>
                       </div>
                     </div>
