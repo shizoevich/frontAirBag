@@ -1,0 +1,426 @@
+/* Карусель баннеров главной.
+   Геометрия полосы повторяет прежнюю SEO-плашку (.tp-hero-seo): 218px высоты,
+   фирменный оранжевый, текст внутри бутстраповского .container — поэтому левый
+   край текста остаётся там же, где был (≈344px при ширине окна 1900px). */
+
+.band {
+  --s: 1;                     /* масштаб фотографий, ужимается на узких экранах */
+  --dark: #14100c;
+  --orange: #e0793c;
+  --orange-2: #d16d31;
+
+  position: relative;
+  width: 100%;
+  height: 218px;
+  background: var(--orange);
+  overflow: hidden;
+  font-family: var(--tp-ff-montserrat), sans-serif;
+}
+
+.viewport {
+  height: 100%;
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  transition: transform 700ms cubic-bezier(0.45, 0, 0.15, 1);
+  will-change: transform;
+}
+
+.slide {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Контейнер контента: тот же .container, что и во всей теме, но по вертикали
+   центрирован внутри полосы. */
+.content {
+  position: relative;
+  z-index: 3;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 18px;       /* место под индикаторы */
+}
+
+.contentCenter {
+  align-items: center;
+  text-align: center;
+}
+
+.textCol {
+  max-width: 840px;
+}
+
+/* Заголовки и кнопки темы объявляют собственный font-family, поэтому шрифт
+   баннера задаём на самих элементах, а не наследованием от полосы. */
+.title,
+.subtitle,
+.btn,
+.note,
+.phone {
+  font-family: var(--tp-ff-montserrat), sans-serif;
+}
+
+.title {
+  margin: 0;
+  font-size: 31px;
+  line-height: 1.28;
+  font-weight: 700;
+  color: #1c1a17;
+  letter-spacing: -0.01em;
+}
+
+.titleOffer {
+  font-size: 33px;
+  font-weight: 800;
+  line-height: 1.2;
+  max-width: 620px;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #3a2618;
+}
+
+.eyebrow {
+  display: block;
+  margin: 0 0 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #5b2b06;
+}
+
+.eyebrowLight {
+  color: #f0d3bd;
+}
+
+.titleLight {
+  color: #ffffff;
+}
+
+/* ---------- кнопки ---------- */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--dark);
+  border-radius: 3px;
+  background: var(--dark);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  color: #fff;
+  opacity: 0.88;
+}
+
+.btnGhost {
+  background: transparent;
+  color: var(--dark);
+}
+
+.btnGhost:hover,
+.btnGhost:focus-visible {
+  color: var(--dark);
+  background: rgba(20, 16, 12, 0.08);
+  opacity: 1;
+}
+
+.btnGhostLight {
+  border-color: #fff;
+  background: transparent;
+  color: #fff;
+}
+
+.btnGhostLight:hover,
+.btnGhostLight:focus-visible {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  opacity: 1;
+}
+
+.note {
+  font-size: 13px;
+  color: #3a2618;
+}
+
+.noteLight {
+  color: #e7dcd3;
+}
+
+.phone {
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.phone:hover,
+.phone:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* ---------- фон слайдов ---------- */
+
+.wedgeOrange,
+.wedgeDark {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.wedgeOrange {
+  background: var(--orange-2);
+  clip-path: polygon(26% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.wedgeDark {
+  background: #16130f;
+  clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.glow {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 90px;
+  width: 620px;
+  height: 620px;
+  transform: translateY(-50%);
+  background: radial-gradient(circle, #ffb97a66, transparent 68%);
+  pointer-events: none;
+}
+
+/* Два тонких контурных круга слева сверху — декор фирменного слайда. */
+.ring {
+  position: absolute;
+  z-index: 1;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.ring1 {
+  width: 230px;
+  height: 230px;
+  top: -96px;
+  left: -40px;
+}
+
+.ring2 {
+  width: 140px;
+  height: 140px;
+  top: -18px;
+  left: 96px;
+}
+
+/* ---------- фотографии ---------- */
+
+.photo {
+  position: absolute;
+  z-index: 2;
+  width: calc(var(--w) * var(--s));
+  transform: rotate(var(--rot));
+  filter: drop-shadow(0 16px 22px rgba(20, 16, 12, 0.4));
+  pointer-events: none;
+}
+
+.photoOnDark {
+  filter: drop-shadow(0 18px 26px rgba(0, 0, 0, 0.5));
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.fromLeft { left: calc(var(--x) * var(--s)); }
+.fromRight { right: calc(var(--x) * var(--s)); }
+.fromTop { top: calc(var(--y) * var(--s)); }
+.fromBottom { bottom: calc(var(--y) * var(--s)); }
+
+/* ---------- стрелки ---------- */
+
+.arrow {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--dark);
+  box-shadow: 0 4px 14px rgba(20, 16, 12, 0.28);
+  cursor: pointer;
+}
+
+.arrow:hover { background: #fff8f3; }
+
+.arrow:focus-visible {
+  outline: 2px solid var(--dark);
+  outline-offset: 2px;
+}
+
+.arrowPrev { left: 18px; }
+.arrowNext { right: 18px; }
+
+.arrow svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- индикаторы ---------- */
+
+.indicators {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  pointer-events: none;
+}
+
+.indicatorsRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.dot {
+  width: 18px;
+  height: 4px;
+  padding: 0;
+  border: none;
+  border-radius: 2px;
+  background: #ffffff96;
+  cursor: pointer;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.dotActive {
+  width: 48px;
+  background: var(--dark);
+}
+
+.dot:focus-visible {
+  outline: 2px solid var(--dark);
+  outline-offset: 3px;
+}
+
+/* На тёмном слайде тёмная активная полоса и тёмный счётчик были бы не видны. */
+.indicatorsOnDark .dot {
+  background: #ffffff5c;
+}
+
+.indicatorsOnDark .dotActive {
+  background: #fff;
+}
+
+.indicatorsOnDark .counter {
+  color: #e7dcd3;
+}
+
+.counter {
+  margin-left: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: #3a2618;
+}
+
+/* ---------- адаптив ---------- */
+
+@media (max-width: 1399px) {
+  .band { --s: 0.86; }
+}
+
+/* Ниже 1200px крайние детали фирменного слайда (текст там по центру и первым
+   упирается в фото) убираем совсем, остальные ужимаем, полосе даём больше
+   высоты — текст ни на одной ширине не должен наезжать на фото. */
+@media (max-width: 1199px) {
+  .band { --s: 0.78; height: 320px; }
+  .photoEdge { display: none; }
+  /* Фирменный слайд: текст по центру, поэтому оставшиеся детали ужимаем сильнее
+     и сужаем текстовую колонку — иначе заголовок ложится прямо на фото. */
+  .slideBrand { --s: 0.5; }
+  .contentCenter .textCol { max-width: 620px; }
+  .title { font-size: 27px; }
+  .titleOffer { font-size: 28px; max-width: 460px; }
+}
+
+@media (max-width: 991px) {
+  .band { --s: 0.58; }
+  .photoEdgeWide { display: none; }
+  .textCol { max-width: 100%; }
+  .titleOffer { max-width: 380px; }
+}
+
+/* На телефонах фотографии убираем целиком: места под них нет, а текст первичен. */
+@media (max-width: 767px) {
+  .band { height: 320px; }
+  .photo { display: none; }
+  .glow { display: none; }
+  /* Без фотографий скос теряет смысл: у слайда-оффера остаётся чистый фирменный
+     оранжевый, у слайда с подбором — сплошной тёмный фон. */
+  .wedgeOrange { display: none; }
+  .wedgeDark { clip-path: none; }
+  .title { font-size: 22px; }
+  .titleOffer { font-size: 22px; max-width: 100%; }
+  .subtitle { font-size: 13px; }
+  .arrow { width: 36px; height: 36px; }
+  .arrowPrev { left: 6px; }
+  .arrowNext { right: 6px; }
+  /* .container темы задаёт свои паддинги через !important, поэтому место под
+     стрелки отводим на самой текстовой колонке. */
+  .textCol { padding: 0 38px; }
+}
+
+@media (max-width: 575px) {
+  .title { font-size: 19px; }
+  .titleOffer { font-size: 19px; }
+  .actions { gap: 10px; }
+  .btn { height: 36px; padding: 0 14px; font-size: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track { transition: none; }
+  .dot { transition: none; }
+}
