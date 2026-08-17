@@ -1,11 +1,5 @@
-import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import Wrapper from "@/layout/wrapper";
-import Header from "@/layout/headers/header";
-import Footer from "@/layout/footers/footer";
-import CatalogArea from '@/components/products/catalog-area';
-import HomePrdLoader from '@/components/loader/home/home-prd-loader';
-import MobileSearch from '@/components/search/mobile-search';
+import CatalogPageView from '@/components/catalog/catalog-page-view';
 import { getTranslations } from 'next-intl/server';
 import { buildAlternates, getServerApiBase } from '@/utils/seo';
 import { categoryIdFromSlug } from '@/utils/category-link';
@@ -47,8 +41,8 @@ export async function generateMetadata({ params: awaitedParams }) {
   };
 }
 
-// Same catalog as the home page, with this category preselected: the category rows,
-// filters and pagination must behave identically no matter how the user got here.
+// Ровно тот же вид, что и главная (баннер, поиск, каталог, видео, города, CTA) —
+// отличается только предвыбранной категорией и метаданными.
 export default async function ShopCategoryPage({ params: awaitedParams }) {
   const params = await awaitedParams;
   const category = await fetchCategory(params.categorySlug);
@@ -57,14 +51,5 @@ export default async function ShopCategoryPage({ params: awaitedParams }) {
     notFound();
   }
 
-  return (
-    <Wrapper>
-      <Header />
-      <MobileSearch />
-      <Suspense fallback={<HomePrdLoader loading />}>
-        <CatalogArea activeCategoryId={category.id} />
-      </Suspense>
-      <Footer />
-    </Wrapper>
-  );
+  return <CatalogPageView locale={params.locale} activeCategoryId={category.id} />;
 }
