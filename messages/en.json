@@ -150,6 +150,7 @@
   },
   "Profile": {
     "profilePage": "My Profile",
+    "myAccount": "My Account",
     "personalDetails": "Personal Details",
     "accountCreated": "Account created",
     "email": "Email",

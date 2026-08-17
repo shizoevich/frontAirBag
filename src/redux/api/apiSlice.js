@@ -80,6 +80,13 @@ function isAccessTokenExpiredError(result) {
     return true;
   }
 
+  // Пароль сменили (в том числе через восстановление) — выданные ранее токены
+  // больше не принимаются. Возвращаем true, чтобы сработала общая ветка:
+  // попытка refresh тоже упрётся в password_changed, и пользователя разлогинит.
+  if ((status === 401 || status === 403) && data?.code === 'password_changed') {
+    return true;
+  }
+
   // Some backends return 403 with { code: 'token_not_valid', messages: [{ message: 'Token is expired' }] }
   if (status === 403 && data && typeof data === 'object') {
     if (data.code === 'token_not_valid') {
