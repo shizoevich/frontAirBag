@@ -3,7 +3,7 @@ import Wrapper from "@/layout/wrapper";
 import Header from "@/layout/headers/header";
 import Footer from "@/layout/footers/footer";
 import CtaArea from "@/components/cta/cta-area";
-import FeatureArea from "@/components/features/feature-area";
+import HomeBannerCarousel from "@/components/hero-banner/home-banner-carousel";
 import DeliveryCities from "@/components/features/delivery-cities";
 import CatalogArea from "@/components/products/catalog-area";
 import MobileSearch from "@/components/search/mobile-search";
@@ -21,7 +21,7 @@ export default function CatalogPageView({ locale, activeCategoryId = null }) {
   return (
     <Wrapper>
       <Header />
-      <FeatureArea locale={locale} />
+      <HomeBannerCarousel locale={locale} />
       <MobileSearch />
       {/* Оставляем клиентский раздел для интерактива, фильтров и пагинации */}
       <Suspense fallback={<HomePrdLoader loading />}>
