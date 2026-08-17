@@ -140,6 +140,10 @@ const baseQuery = fetchBaseQuery({
         'getProductsByCategoryId',
         'getDiscounts',
         'getDiscountById',
+        // восстановление пароля: пользователь здесь заведомо разлогинен, а
+        // протухший токен увёл бы baseQueryWithReauth в разлогин на 401
+        'requestPasswordReset',
+        'confirmPasswordReset',
       ]);
 
       if (endpoint && publicEndpoints.has(endpoint)) {

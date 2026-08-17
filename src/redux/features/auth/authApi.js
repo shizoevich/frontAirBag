@@ -404,6 +404,26 @@ export const authApi = apiSlice.injectEndpoints({
       }),
     }),
     
+    // Запрос ссылки на восстановление пароля.
+    // Бэкенд всегда отвечает 200, даже если аккаунта нет, — чтобы форму нельзя
+    // было использовать для проверки, какие email зарегистрированы.
+    requestPasswordReset: builder.mutation({
+      query: ({ email, locale }) => ({
+        url: "/auth/password-reset/",
+        method: "POST",
+        body: { email, locale },
+      }),
+    }),
+
+    // Установка нового пароля по uid/token из письма
+    confirmPasswordReset: builder.mutation({
+      query: ({ uid, token, new_password }) => ({
+        url: "/auth/password-reset/confirm/",
+        method: "POST",
+        body: { uid, token, new_password },
+      }),
+    }),
+
     // Регистрация пользователя
     register: builder.mutation({
       query: (data) => ({
@@ -653,6 +673,8 @@ export const authApi = apiSlice.injectEndpoints({
 export const {
   useLoginMutation,
   useChangePasswordMutation,
+  useRequestPasswordResetMutation,
+  useConfirmPasswordResetMutation,
   useRegisterMutation,
   useRegisterMutation: useRegisterUserMutation,
   useCreateGuestMutation,
