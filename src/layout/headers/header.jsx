@@ -81,21 +81,20 @@ const Header = () => {
           <div className="tp-header-main tp-header-sticky">
             <div className="container">
               <div className="row align-items-center">
-                <div className="col-xl-2 col-lg-2 col-md-4 col-6">
+                <div className="col-xl-2 col-lg-2 col-md-4 col-6 header-logo-col">
                   <div className="logo">
                     <Link href={getLocalizedLink("/")}>
-                      <Image 
-                        src={logo} 
-                        alt="logo" 
+                      <Image
+                        src={logo}
+                        alt="logo"
+                        className="header-logo-main"
                         style={{
-                          maxWidth: '190px',
-                          maxHeight: '44px',
                           width: 'auto',
                           height: 'auto',
                           objectFit: 'contain'
                         }}
-                        width={190}
-                        height={31}
+                        width={285}
+                        height={47}
                       />
                     </Link>
                   </div>
