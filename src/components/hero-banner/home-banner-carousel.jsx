@@ -12,8 +12,8 @@ import airbagAudi from '@banner/cut/airbag-audi.png';
 import pyroLShaped from '@banner/cut/pyro-l-shaped.png';
 import pyroModules from '@banner/cut/pyro-modules.png';
 import beltBmwMNarrow from '@banner/cut/belt-bmw-m-narrow.png';
-import airbagChevrolet from '@banner/cut/airbag-chevrolet.png';
-import kneeHonda from '@banner/cut/knee-honda.png';
+import airbagPorsche from '@banner/cut/airbag-porsche.png';
+import airbagRangeRoverRed from '@banner/cut/airbag-range-rover-red.png';
 import s from './home-banner-carousel.module.css';
 
 const AUTOPLAY_MS = 6000;
@@ -115,8 +115,8 @@ const PHOTOS = {
     { img: beltBmwMNarrow, x: '40px', y: '-28px', w: '285px', rot: '-7deg', from: 'right', at: 'bottom' },
   ],
   help: [
-    { img: airbagChevrolet, x: '330px', y: '16px', w: '250px', rot: '-9deg', from: 'right', at: 'top', edge: 'wide' },
-    { img: kneeHonda, x: '90px', y: '-24px', w: '280px', rot: '7deg', from: 'right', at: 'bottom' },
+    { img: airbagPorsche, x: '350px', y: '0px', w: '235px', rot: '-9deg', from: 'right', at: 'top', edge: 'wide' },
+    { img: airbagRangeRoverRed, x: '70px', y: '-14px', w: '235px', rot: '7deg', from: 'right', at: 'bottom' },
   ],
 };
 

@@ -29,8 +29,8 @@ const SOURCES = [
   { id: 663, name: 'pyro-l-shaped' },
   { id: 613, name: 'pyro-modules' },
   { id: 571, name: 'belt-bmw-m-narrow' },
-  { id: 586, name: 'airbag-chevrolet' },
-  { id: 665, name: 'knee-honda' },
+  { id: 542, name: 'airbag-porsche' },
+  { id: 642, name: 'airbag-range-rover-red' },
 ];
 
 const API = 'https://api.airbagad.com/api/v2/goods/';
