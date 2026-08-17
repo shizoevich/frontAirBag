@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import CancelOrderModal from './cancel-order-modal';
+import { cancelReasonKey, refundStateKey, statusBadgeClass, statusOf } from './order-status';
 
 const LIMIT = 20;
 
@@ -80,13 +81,8 @@ const OrderPage = () => {
     return 0;
   };
   const formatDate = (d) => (d ? new Date(d).toLocaleDateString('uk-UA') : '');
-  // Скасування важливіше за оплату/виконання: скасоване замовлення не має
-  // показуватись як «Оплачено».
-  const statusOf = (o) => {
-    if (o?.cancel_state === 'canceled') return 'canceled';
-    if (o?.cancel_state === 'requested') return 'cancel_requested';
-    return o?.is_completed ? 'completed' : o?.is_paid ? 'paid' : 'pending';
-  };
+  // Похідні стани — в order-status.js, щоб перевірятись юніт-тестами окремо
+  // від рендера. Тут лише підстановка перекладів.
   const STATUS_LABELS = {
     canceled: t('status_canceled'),
     cancel_requested: t('status_cancel_requested'),
@@ -94,29 +90,16 @@ const OrderPage = () => {
     paid: l.statusPaid,
     pending: l.statusPending,
   };
-  const STATUS_BADGES = {
-    canceled: 'bg-danger',
-    cancel_requested: 'bg-warning text-dark',
-    completed: 'bg-success',
-    paid: 'bg-info',
-    pending: 'bg-secondary',
-  };
   const renderStatus = (o) => STATUS_LABELS[statusOf(o)];
-  const statusBadgeClass = (o) => STATUS_BADGES[statusOf(o)];
 
-  // Адмінські причини (no_contact, out_of_stock…) клієнту не показуємо —
-  // перекладів для них немає, і вони не його справа.
-  const TRANSLATED_CANCEL_REASONS = [
-    'changed_mind', 'found_cheaper', 'wrong_items',
-    'delivery_too_long', 'duplicate', 'payment_failed', 'other',
-  ];
-  const cancelReasonLabel = (code) =>
-    (TRANSLATED_CANCEL_REASONS.includes(code) ? t(`cancel_reason_${code}`) : null);
+  const cancelReasonLabel = (code) => {
+    const key = cancelReasonKey(code);
+    return key ? t(key) : null;
+  };
 
   const refundLabel = (o) => {
-    if (o?.refund_state === 'done' || o?.refund_state === 'manual') return t('refund_done');
-    if (o?.refund_state === 'pending') return t('refund_processing');
-    return null;
+    const key = refundStateKey(o);
+    return key ? t(key) : null;
   };
 
   // Бесконечный скролл: подгружаем следующую страницу при достижении низа списка

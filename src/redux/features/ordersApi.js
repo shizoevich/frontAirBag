@@ -1,5 +1,41 @@
 import { apiSlice } from "../api/apiSlice";
 
+/**
+ * Збирає URL для списку замовлень з фільтрів кабінету.
+ *
+ * Винесено з `getOrdersList.query`, бо RTK Query назовні raw-`query` не віддає,
+ * а маппінг статусів на параметри бекенда варто перевіряти юніт-тестами.
+ */
+export function buildOrdersListQuery({
+  client, ordering = '-date', limit = 20, offset = 0, dateFrom, dateTo, status,
+} = {}) {
+  const p = new URLSearchParams();
+  if (client) p.set('client', String(client));
+  p.set('ordering', ordering);
+  p.set('limit', String(limit));
+  p.set('offset', String(offset));
+  if (dateFrom) p.set('date__gte', dateFrom);
+  if (dateTo) p.set('date__lte', `${dateTo}T23:59:59`);
+  // Бэкенд принимает 1/0 для булевых полей (не 'true'/'false')
+  // Скасовані відсіюємо через canceled_at: cancel_state='' у фільтрі
+  // прибрав би і замовлення із запитом на скасування, які ще активні.
+  if (status === 'canceled') {
+    p.set('canceled_at__isnull', 'false');
+  } else if (status === 'completed') {
+    p.set('canceled_at__isnull', 'true');
+    p.set('is_completed', '1');
+  } else if (status === 'paid') {
+    p.set('canceled_at__isnull', 'true');
+    p.set('is_completed', '0');
+    p.set('is_paid', '1');
+  } else if (status === 'pending') {
+    p.set('canceled_at__isnull', 'true');
+    p.set('is_completed', '0');
+    p.set('is_paid', '0');
+  }
+  return `/orders/?${p.toString()}`;
+}
+
 export const ordersApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
@@ -12,33 +48,7 @@ export const ordersApi = apiSlice.injectEndpoints({
     // AIRBAG-88: серверная фильтрация/сортировка/пагинация + infinite scroll.
     // Отдельный endpoint, чтобы не влиять на getOrders (discounts/checkout).
     getOrdersList: builder.query({
-      query: ({ client, ordering = '-date', limit = 20, offset = 0, dateFrom, dateTo, status } = {}) => {
-        const p = new URLSearchParams();
-        if (client) p.set('client', String(client));
-        p.set('ordering', ordering);
-        p.set('limit', String(limit));
-        p.set('offset', String(offset));
-        if (dateFrom) p.set('date__gte', dateFrom);
-        if (dateTo) p.set('date__lte', `${dateTo}T23:59:59`);
-        // Бэкенд принимает 1/0 для булевых полей (не 'true'/'false')
-        // Скасовані відсіюємо через canceled_at: cancel_state='' у фільтрі
-        // прибрав би і замовлення із запитом на скасування, які ще активні.
-        if (status === 'canceled') {
-          p.set('canceled_at__isnull', 'false');
-        } else if (status === 'completed') {
-          p.set('canceled_at__isnull', 'true');
-          p.set('is_completed', '1');
-        } else if (status === 'paid') {
-          p.set('canceled_at__isnull', 'true');
-          p.set('is_completed', '0');
-          p.set('is_paid', '1');
-        } else if (status === 'pending') {
-          p.set('canceled_at__isnull', 'true');
-          p.set('is_completed', '0');
-          p.set('is_paid', '0');
-        }
-        return `/orders/?${p.toString()}`;
-      },
+      query: (args) => buildOrdersListQuery(args),
       // Один кэш-энтри на набор фильтров (без offset) — страницы склеиваются
       serializeQueryArgs: ({ queryArgs }) => {
         const { offset, ...rest } = queryArgs || {};
