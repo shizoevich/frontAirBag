@@ -131,12 +131,11 @@ const Menus = () => {
               style={{
                 left: '0',
                 right: '0',
-                width: '100vw',
-                marginLeft: 'calc(-50vw + 50%)',
-                padding: '16px 40px 20px',
+                width: '100%',
+                padding: '16px 12px 20px',
                 boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
                 backgroundColor: '#fff',
-                borderRadius: '0',
+                borderRadius: '0 0 6px 6px',
               }}
             >
               {mounted && (
