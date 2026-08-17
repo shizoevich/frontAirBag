@@ -19,7 +19,7 @@ import s from './home-banner-carousel.module.css';
 
 const AUTOPLAY_MS = 6000;
 const PYRO_CATEGORY = '/category/piropatrony-754101';
-const TELEGRAM_URL = 'https://t.me/AirBagAD_bot';
+const TELEGRAM_URL = 'https://t.me/airbagsale';
 const PHONE = phones[0];
 const MOTION_FILTER_ID = 'airbag-banner-motion';
 
