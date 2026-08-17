@@ -424,6 +424,27 @@ export const authApi = apiSlice.injectEndpoints({
       }),
     }),
 
+    // Подтверждение почты по токену из письма
+    confirmEmail: builder.mutation({
+      query: ({ token }) => ({
+        url: "/auth/email/confirm/",
+        method: "POST",
+        body: { token },
+      }),
+    }),
+
+    // Повторная отправка письма с подтверждением.
+    // Бэкенд всегда отвечает 200 — и для неизвестного адреса, и для уже
+    // подтверждённого, чтобы форму нельзя было использовать для проверки,
+    // какие email зарегистрированы.
+    resendEmailConfirmation: builder.mutation({
+      query: ({ email, locale }) => ({
+        url: "/auth/email/resend/",
+        method: "POST",
+        body: { email, locale },
+      }),
+    }),
+
     // Регистрация пользователя
     register: builder.mutation({
       query: (data) => ({
@@ -675,6 +696,8 @@ export const {
   useChangePasswordMutation,
   useRequestPasswordResetMutation,
   useConfirmPasswordResetMutation,
+  useConfirmEmailMutation,
+  useResendEmailConfirmationMutation,
   useRegisterMutation,
   useRegisterMutation: useRegisterUserMutation,
   useCreateGuestMutation,

@@ -144,6 +144,9 @@ const baseQuery = fetchBaseQuery({
         // протухший токен увёл бы baseQueryWithReauth в разлогин на 401
         'requestPasswordReset',
         'confirmPasswordReset',
+        // подтверждение почты: пользователь ещё не залогинен
+        'confirmEmail',
+        'resendEmailConfirmation',
       ]);
 
       if (endpoint && publicEndpoints.has(endpoint)) {
