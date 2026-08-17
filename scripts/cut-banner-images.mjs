@@ -33,6 +33,11 @@ const SOURCES = [
   { id: 642, name: 'airbag-range-rover-red' },
 ];
 
+// Картинки, у которых фон уже снят вручную: их только обрезаем и ужимаем.
+const READY = [
+  { file: 'squibs-white.png', name: 'squibs' },
+];
+
 const API = 'https://api.airbagad.com/api/v2/goods/';
 const MAX_SIDE = 900;
 const OUT_SIDE = 600;
@@ -202,10 +207,23 @@ async function cut(name) {
   console.log(`${name}.png — ${meta.width}x${meta.height}`);
 }
 
+/** Готовая вырезка: без снятия фона, только обрезка полей и ужатие. */
+async function passthrough({ file, name }) {
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  const dst = path.join(OUT_DIR, `${name}.png`);
+  await sharp(path.join(SRC_DIR, file))
+    .trim({ threshold: 1 })
+    .resize({ width: OUT_SIDE, height: OUT_SIDE, fit: 'inside', withoutEnlargement: true })
+    .png({ compressionLevel: 9, palette: true, quality: 82 })
+    .toFile(dst);
+  const meta = await sharp(dst).metadata();
+  console.log(`${name}.png — ${meta.width}x${meta.height} (фон был снят заранее)`);
+}
+
 /** Контактный лист вырезок на фирменном оранжевом — визуальная приёмка. */
 async function contactSheet() {
   const cell = 300;
-  const files = SOURCES.map((s) => path.join(OUT_DIR, `${s.name}.png`));
+  const files = [...SOURCES, ...READY].map((s) => path.join(OUT_DIR, `${s.name}.png`));
   const cols = 3;
   const rows = Math.ceil(files.length / cols);
   const layers = [];
@@ -233,4 +251,5 @@ async function contactSheet() {
 const args = process.argv.slice(2);
 if (args.includes('--fetch')) await fetchSources();
 for (const { name } of SOURCES) await cut(name);
+for (const item of READY) await passthrough(item);
 if (args.includes('--sheet')) await contactSheet();

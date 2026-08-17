@@ -14,12 +14,14 @@ import pyroModules from '@banner/cut/pyro-modules.png';
 import beltBmwMNarrow from '@banner/cut/belt-bmw-m-narrow.png';
 import airbagPorsche from '@banner/cut/airbag-porsche.png';
 import airbagRangeRoverRed from '@banner/cut/airbag-range-rover-red.png';
+import squibs from '@banner/cut/squibs.png';
 import s from './home-banner-carousel.module.css';
 
 const AUTOPLAY_MS = 6000;
 const PYRO_CATEGORY = '/category/piropatrony-754101';
 const TELEGRAM_URL = 'https://t.me/AirBagAD_bot';
 const PHONE = phones[0];
+const MOTION_FILTER_ID = 'airbag-banner-motion';
 
 /**
  * Тексты слайдов. Живут здесь, а не в messages/*.json, по той же причине, что и
@@ -115,6 +117,8 @@ const PHOTOS = {
     { img: beltBmwMNarrow, x: '40px', y: '-28px', w: '285px', rot: '-7deg', from: 'right', at: 'bottom' },
   ],
   help: [
+    // Пульки в промежутке между текстом и подушками — смазаны, будто пролетают мимо.
+    { img: squibs, x: '470px', w: '118px', rot: '-24deg', from: 'right', at: 'middle', motion: true, edge: 'wide' },
     // Каскад: Porsche выше и правее, красный Range Rover заходит на него снизу слева.
     { img: airbagPorsche, x: '72px', y: '-6px', w: '195px', rot: '-9deg', from: 'right', at: 'top' },
     { img: airbagRangeRoverRed, x: '236px', y: '-22px', w: '185px', rot: '7deg', from: 'right', at: 'bottom', edge: 'wide' },
@@ -129,12 +133,13 @@ function Photos({ items, onDark = false, priority = false }) {
       className={[
         s.photo,
         p.from === 'left' ? s.fromLeft : s.fromRight,
-        p.at === 'top' ? s.fromTop : s.fromBottom,
+        p.at === 'middle' ? s.fromMiddle : (p.at === 'top' ? s.fromTop : s.fromBottom),
+        p.motion ? s.photoMotion : '',
         p.edge === 'wide' ? s.photoEdgeWide : '',
         p.edge === true ? s.photoEdge : '',
         onDark ? s.photoOnDark : '',
       ].filter(Boolean).join(' ')}
-      style={{ '--x': p.x, '--y': p.y, '--w': p.w, '--rot': p.rot }}
+      style={{ '--x': p.x, '--y': p.y || '0px', '--w': p.w, '--rot': p.rot }}
     >
       {/* Декор: alt пустой — смысл слайда несёт текст, а не фотография детали. */}
       <Image src={p.img} alt="" sizes="320px" priority={priority} />
@@ -208,6 +213,16 @@ const HomeBannerCarousel = ({ locale = 'ru' }) => {
       onBlur={() => setPaused(false)}
       onKeyDown={onKeyDown}
     >
+      {/* Смаз «в движении» для пролетающих деталей: гауссиан вытянут по горизонтали,
+          обычный CSS blur даёт равномерное, а не направленное размытие. */}
+      <svg className={s.svgDefs} aria-hidden="true" focusable="false">
+        <defs>
+          <filter id={MOTION_FILTER_ID} x="-25%" y="-25%" width="150%" height="150%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="7 2" />
+          </filter>
+        </defs>
+      </svg>
+
       <div className={s.viewport}>
         <div className={s.track} style={{ transform: `translateX(-${index * 100}%)` }}>
           {/* 1. Фирменный */}

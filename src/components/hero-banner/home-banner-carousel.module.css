@@ -251,8 +251,22 @@
   position: absolute;
   z-index: 2;
   width: calc(var(--w) * var(--s));
-  transform: rotate(var(--rot));
+  transform: translateY(var(--ty, 0)) rotate(var(--rot));
   filter: drop-shadow(0 16px 22px rgba(20, 16, 12, 0.4));
+  pointer-events: none;
+}
+
+/* Деталь «в движении»: направленный смаз задаёт SVG-фильтр из компонента,
+   прозрачность отодвигает её на второй план за подушками. */
+.photoMotion {
+  filter: url(#airbag-banner-motion);
+  opacity: 0.7;
+}
+
+.svgDefs {
+  position: absolute;
+  width: 0;
+  height: 0;
   pointer-events: none;
 }
 
@@ -270,6 +284,8 @@
 .fromRight { right: calc(var(--x) * var(--s)); }
 .fromTop { top: calc(var(--y) * var(--s)); }
 .fromBottom { bottom: calc(var(--y) * var(--s)); }
+/* По центру полосы: сдвиг на половину высоты складывается с поворотом. */
+.fromMiddle { top: 50%; --ty: -50%; }
 
 /* ---------- стрелки ---------- */
 
