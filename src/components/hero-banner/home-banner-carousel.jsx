@@ -58,7 +58,7 @@ const COPY = {
     slide: (n, total) => `${n} из ${total}`,
     brand: {
       title: 'AirbagAD — подушки безопасности, ремни и пиропатроны с доставкой по Украине',
-      subtitle: 'Одесса, Киев, Харьков, Днепр, Львов и другие города — отправка в день заказа.',
+      subtitle: 'Продажа и доставка подушек безопасности, ремней безопасности, пиропатронов, пулек и парашютов по всей Украине — Одесса, Киев, Харьков, Днепр, Львов и другие города.',
     },
     offer: {
       eyebrow: 'В наличии на складе в Одессе',
@@ -115,8 +115,9 @@ const PHOTOS = {
     { img: beltBmwMNarrow, x: '40px', y: '-28px', w: '285px', rot: '-7deg', from: 'right', at: 'bottom' },
   ],
   help: [
-    { img: airbagPorsche, x: '350px', y: '0px', w: '235px', rot: '-9deg', from: 'right', at: 'top', edge: 'wide' },
-    { img: airbagRangeRoverRed, x: '70px', y: '-14px', w: '235px', rot: '7deg', from: 'right', at: 'bottom' },
+    // Каскад: Porsche выше и правее, красный Range Rover заходит на него снизу слева.
+    { img: airbagPorsche, x: '72px', y: '-6px', w: '195px', rot: '-9deg', from: 'right', at: 'top' },
+    { img: airbagRangeRoverRed, x: '236px', y: '-22px', w: '185px', rot: '7deg', from: 'right', at: 'bottom', edge: 'wide' },
   ],
 };
 
