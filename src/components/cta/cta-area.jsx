@@ -34,7 +34,7 @@ const CtaArea = () => {
         <div className="row align-items-center justify-content-center">
           <div className="col-xl-8 col-lg-8 text-center">
             <div className="tp-subscribe-content">
-              <h3 className="tp-subscribe-title text-white mb-4">Слідкуйте за нашими новинами</h3>
+              <h3 className="tp-subscribe-title text-white mb-4">{t('followNews')}</h3>
               
               <div className="d-flex justify-content-center gap-3 flex-wrap mt-4">
                 {/* Telegram */}

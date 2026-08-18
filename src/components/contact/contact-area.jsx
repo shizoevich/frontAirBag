@@ -62,9 +62,9 @@ const ContactArea = () => {
                   
                   <div className="tp-contact-social-wrapper">
                     <h4 className="tp-contact-social-title mb-3">
-                      Знайдіть нас у соціальних мережах
+                      {t('socialNetworks')}
                     </h4>
-                    <p className="mb-3">Слідкуйте за нами в соціальних мережах, щоб бути в курсі останніх новин та акцій</p>
+                    <p className="mb-3">{t('socialDescription')}</p>
                     <div className="tp-contact-social-icon">
                       <a href="https://t.me/AirBagAD_bot" target="_blank" rel="noopener noreferrer" aria-label="Telegram" className="me-2">
                         <i className="fa-brands fa-telegram fs-4"></i>
