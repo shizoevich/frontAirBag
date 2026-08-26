@@ -356,7 +356,20 @@
     "resendConfirmation": "Send the link again",
     "confirmationResent": "If an account with that email exists and is not confirmed yet, we've sent it a new link.",
     "emailNotConfirmed": "Your email is not confirmed. Check your inbox or request a new link.",
-    "registerSuccessConfirmEmail": "Registration successful. Confirm your email to log in."
+    "registerSuccessConfirmEmail": "Registration successful. Confirm your email to log in.",
+    "claimTitle": "Your account from the old bot",
+    "claimSubtitle": "Check that this is you and create a website login. Your order history and discount stay with you.",
+    "claimOrdersCount": "Orders in history: {count}",
+    "claimDiscount": "Your discount: {percent}%",
+    "claimPhoneHint": "Phone: {phone}",
+    "claimCreateLogin": "Create login",
+    "claimInvalidLink": "This link is not valid",
+    "claimInvalidLinkText": "You may have copied it incompletely. Open the link from the bot message again.",
+    "claimAlreadyDone": "This account is already activated",
+    "claimAlreadyDoneText": "Sign in with your email and password.",
+    "claimSuccessTitle": "Almost done",
+    "claimSuccessText": "We sent a letter to your email. Confirm it and you will be able to sign in.",
+    "claimEmailTaken": "This email is already used by another account."
   },
   "ProfileExtra": {
     "enterPhone": "Enter your phone number",

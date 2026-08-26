@@ -19,6 +19,9 @@ export default function robots() {
           '/*/checkout',
           '/*/login',
           '/*/register',
+          // Персональные ссылки для клиентов старой системы: в адресе код,
+          // страница существует только для одного человека.
+          '/*/claim',
           '/*/order-success',
           '/*/payment-error',
           '/*/payment-redirect',

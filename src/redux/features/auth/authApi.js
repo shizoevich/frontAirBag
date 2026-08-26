@@ -445,6 +445,21 @@ export const authApi = apiSlice.injectEndpoints({
       }),
     }),
 
+    // Забор аккаунта, приехавшего из старой системы бота.
+    // Код приходит клиенту персональной ссылкой в Telegram — у таких аккаунтов
+    // нет почты, и обычный вход с восстановлением пароля им недоступен.
+    getAccountClaim: builder.query({
+      query: (code) => `/auth/claim/${code}/`,
+    }),
+
+    claimAccount: builder.mutation({
+      query: ({ code, email, password, locale }) => ({
+        url: "/auth/claim/",
+        method: "POST",
+        body: { code, email, password, locale },
+      }),
+    }),
+
     // Регистрация пользователя
     register: builder.mutation({
       query: (data) => ({
@@ -697,6 +712,8 @@ export const {
   useRequestPasswordResetMutation,
   useConfirmPasswordResetMutation,
   useConfirmEmailMutation,
+  useGetAccountClaimQuery,
+  useClaimAccountMutation,
   useResendEmailConfirmationMutation,
   useRegisterMutation,
   useRegisterMutation: useRegisterUserMutation,
