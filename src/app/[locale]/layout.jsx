@@ -1,6 +1,7 @@
 import Script from 'next/script';
 import { Jost, Roboto, Charm, Oregano, Montserrat } from 'next/font/google';
 import { notFound } from 'next/navigation';
+import { setRequestLocale } from 'next-intl/server';
 import Providers from '@/components/provider';
 import { defaultLocale } from '@/i18n';
 import { SITE_URL, CITY, REGION, UA_CITIES } from '@/utils/seo';
@@ -208,6 +209,9 @@ export default async function RootLayout({ children, params }) {
   // Получаем текущую локаль из params (с await)
   const { locale } = await params || {};
   const lang = locale || defaultLocale;
+  // Статический рендер: без этого `requestLocale` в `src/i18n.js` пуст, и серверные
+  // компоненты берут язык по умолчанию вместо языка URL.
+  setRequestLocale(lang);
   const messages = await getMessages(lang);
 
   return (

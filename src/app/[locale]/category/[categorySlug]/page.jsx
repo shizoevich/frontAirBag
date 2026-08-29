@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import CatalogPageView from '@/components/catalog/catalog-page-view';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { buildAlternates, getServerApiBase } from '@/utils/seo';
 import { categoryIdFromSlug } from '@/utils/category-link';
 
@@ -45,6 +45,7 @@ export async function generateMetadata({ params: awaitedParams }) {
 // отличается только предвыбранной категорией и метаданными.
 export default async function ShopCategoryPage({ params: awaitedParams }) {
   const params = await awaitedParams;
+  setRequestLocale(params.locale);
   const category = await fetchCategory(params.categorySlug);
 
   if (!category) {

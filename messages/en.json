@@ -135,7 +135,8 @@
     "emailAddress": "Noxnew@hotmail.com",
     "address": "AirbagAD, Одеса, вул. В. Самофалова, 16А/1",
     "copyright": "© {year} AirbagAD — All Rights Reserved",
-    "madeBy": "Developed by:"
+    "madeBy": "Developed by:",
+    "aboutUs": "About Us"
   },
   "ProductItem": {
     "outOfStock": "Out of Stock",
@@ -187,7 +188,9 @@
     "enterUsername": "Enter your username",
     "enterEmail": "Enter your email",
     "enterPhone": "Enter your phone",
-    "enterAddress": "Enter your address"
+    "enterAddress": "Enter your address",
+    "update": "Update",
+    "updating": "Updating..."
   },
   "ProductDetails": {
     "boughtTogether": "Products Bought Together",
@@ -224,7 +227,8 @@
     "priceHighToLow": "Price high to low",
     "breakLabel": "...",
     "nextPage": "→",
-    "previousPage": "←"
+    "previousPage": "←",
+    "loadingError": "Failed to load products"
   },
   "OffCanvas": {
     "all_categories": "All Categories",
@@ -448,7 +452,8 @@
     "pyro_dashboard_seo_title": "Pyrotechnics in Dashboard (1-2 igniters)",
     "pyro_dashboard_seo_description": "Pyrotechnics for passenger airbag in dashboard with one or two igniters. Pyrotechnic devices for instrument panel.",
     "covers_seo_title": "Covers and Overlays for Safety Systems",
-    "covers_seo_description": "Covers, overlays and decorative elements for vehicle safety systems. Quality accessories for Airbag SRS components."
+    "covers_seo_description": "Covers, overlays and decorative elements for vehicle safety systems. Quality accessories for Airbag SRS components.",
+    "default_seo_title": "Catalog category — AirbagAD"
   },
   "YouTube": {
     "title": "Our Videos",
@@ -537,7 +542,8 @@
     "rules_footer": "We hope that the cumulative discount will make our cooperation even more successful.",
     "from": "From",
     "to": "to",
-    "and_more": "and more"
+    "and_more": "and more",
+    "predicted_next_month_discount": "Estimated discount for next month: {percentage}%"
   },
   "Orders": {
     "title": "My Orders",
@@ -631,7 +637,11 @@
     "no_orders_description": "You don't have any orders yet. Start shopping now!",
     "start_shopping": "Start Shopping",
     "discount": "Discount",
-    "error_loading_orders": "Error loading orders"
+    "error_loading_orders": "Error loading orders",
+    "amount_no_discount": "Amount without discount",
+    "description": "Description",
+    "grand_total_label": "Total",
+    "order_info": "Order information"
   },
   "Checkout": {
     "returning_customer": "Returning customer? Click here to login",
@@ -920,7 +930,10 @@
     "step4": "We will notify you when ready for pickup",
     "myOrders": "My orders",
     "continueShopping": "Continue Shopping",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "pickupDescription": "Thank you for your order! We will prepare it for pickup and let you know when it is ready.",
+    "pickupStep1": "We will prepare your order for pickup",
+    "pickupStep3": "We will let you know when the order can be picked up at the store"
   },
   "ContactPage": {
     "title": "AirBag - Contact Us",

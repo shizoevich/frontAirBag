@@ -178,7 +178,9 @@
     "enterUsername": "Введіть ім'я користувача",
     "enterEmail": "Введіть електронну пошту",
     "enterPhone": "Введіть телефон",
-    "enterAddress": "Введіть адресу"
+    "enterAddress": "Введіть адресу",
+    "update": "Оновити",
+    "updating": "Оновлення..."
   },
   "ProductDetails": {
     "boughtTogether": "Товари, які купують разом",
@@ -216,7 +218,8 @@
     "priceHighToLow": "Від дорогих до дешевих",
     "breakLabel": "...",
     "nextPage": "→",
-    "previousPage": "←"
+    "previousPage": "←",
+    "loadingError": "Помилка завантаження товарів"
   },
   "OffCanvas": {
     "all_categories": "Всі категорії",
@@ -238,7 +241,8 @@
     "ourProducts": "Наші товари",
     "noProductsFound": "Товарів не знайдено",
     "showing": "Показано",
-    "products": "товарів"
+    "products": "товарів",
+    "loadingError": "Помилка завантаження товарів"
   },
   "ProductsFilterBar": {
     "filtersTitle": "Фільтри",
@@ -447,7 +451,8 @@
     "pyro_dashboard_seo_title": "Піропатрони в торпедо (1-2 запала)",
     "pyro_dashboard_seo_description": "Піропатрони для пасажирської подушки безпеки в торпедо з одним або двома запалами. Піротехнічні пристрої для панелі приладів.",
     "covers_seo_title": "Накладки та покриття для систем безпеки",
-    "covers_seo_description": "Накладки, покриття та декоративні елементи для систем безпеки автомобілів. Якісні аксесуари для компонентів Airbag SRS."
+    "covers_seo_description": "Накладки, покриття та декоративні елементи для систем безпеки автомобілів. Якісні аксесуари для компонентів Airbag SRS.",
+    "default_seo_title": "Категорія каталогу — AirbagAD"
   },
   "Discounts": {
     "discount_banner_text": "Знижка {percentage}% при оплаті від ₴{monthPayment} на місяць!",
