@@ -75,7 +75,8 @@ const Menus = () => {
     }
   };
 
-  // Раскрытие/сворачивание категории внутри выпадающего меню (без навигации)
+  // Раскрытие/сворачивание категории внутри выпадающего меню (без навигации).
+  // Переключатель — под клик по стрелке.
   const handleCatalogExpand = (cat, levelIndex) => {
     const isSame = catalogPath[levelIndex]?.id === cat.id;
     if (isSame) {
@@ -83,6 +84,15 @@ const Menus = () => {
     } else {
       setCatalogPath((prev) => [...prev.slice(0, levelIndex), cat]);
     }
+  };
+
+  // Раскрытие по наведению. Отдельная операция, а не handleCatalogExpand:
+  // тот переключает, и повторный вход курсора в уже открытый чип его бы
+  // закрывал — курсор дрожит на границе, меню мигает.
+  const openCatalogLevel = (cat, levelIndex) => {
+    if (!cat.children?.length) return;                  // лист: чужую ветку не трогаем
+    if (catalogPath[levelIndex]?.id === cat.id) return; // уже открыт: без лишнего ре-рендера
+    setCatalogPath((prev) => [...prev.slice(0, levelIndex), cat]);
   };
 
   // У категории с подкатегориями два действия: название ведёт в саму категорию
@@ -95,7 +105,22 @@ const Menus = () => {
 
     if (hasChildren) {
       return (
-        <span key={cat.id} className={className}>
+        // onMouseEnter, а не onMouseOver: второй всплывает и срабатывает заново
+        // при переходе курсора между названием и стрелкой внутри чипа. С ним
+        // клик по стрелке открытой категории тут же отменялся бы повторным
+        // раскрытием.
+        //
+        // Сворачивание сюда не вешается намеренно: ряд подкатегорий — соседний
+        // блок под чипом, между ними 26 px без единого интерактивного элемента
+        // (см. docs/specs/catalog-hover-expand.md в основном репозитории).
+        // Закрытие по уходу с чипа сделало бы подкатегории недостижимыми.
+        // Ветка живёт до выхода из всего мега-меню (onMouseLeave на <li> ниже)
+        // или до наведения на соседа того же уровня.
+        <span
+          key={cat.id}
+          className={className}
+          onMouseEnter={() => openCatalogLevel(cat, levelIndex)}
+        >
           <Link
             href={getLocalizedLink(categoryPath(cat))}
             className="tp-cat-chip__label"

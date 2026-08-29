@@ -21,6 +21,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(process.cwd(), 'src'),
+      // Тот же алиас, что в jsconfig.json. Без него не импортируется ни один
+      // модуль, который тянет картинку из public/assets, — например
+      // src/data/menu-data.js, а через него всё меню хедера.
+      '@assets': path.resolve(process.cwd(), 'public/assets'),
     },
   },
 });
