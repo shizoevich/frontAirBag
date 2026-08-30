@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { notifyError, notifyInfo, notifySuccess } from '@/utils/toast';
 import { useDispatch } from 'react-redux';
 import { clearCart } from '@/redux/features/cartSlice';
-import { useGetOrderByIdQuery, useUpdateOrderMutation } from '@/redux/features/ordersApi';
+import { useGetOrderByIdQuery } from '@/redux/features/ordersApi';
 import { useGetPaymentConfigQuery } from '@/redux/features/paymentsApi';
 
 const PaymentModal = ({
@@ -20,7 +20,6 @@ const PaymentModal = ({
   const { locale } = useParams();
   const t = useTranslations('Payments');
   const dispatch = useDispatch();
-  const [updateOrder] = useUpdateOrderMutation();
   const handledSuccessRef = React.useRef(false);
   const hasConfirmedRef = React.useRef(false);
   const { data: orderData } = useGetOrderByIdQuery(orderIdProp, {
@@ -37,14 +36,17 @@ const PaymentModal = ({
       if (handledSuccessRef.current) return;
       handledSuccessRef.current = true;
       notifySuccess(t('payment_success'));
-      if (orderId) {
-        updateOrder({ id: orderId, is_paid: true, is_completed: true }).catch(() => null);
-      }
+      // Статус заказа отсюда не трогаем. Оплату подтверждает вебхук monobank
+      // (mark_order_as_paid): он ставит is_paid, пишет PAYMENT_CONFIRMED и
+      // синхронизирует предоплатный заказ с RemOnline. PATCH из браузера гонялся
+      // с вебхуком и, выигрывая гонку, отменял эту синхронизацию. А is_completed
+      // означает «работа по заказу окончена» — это решают RemOnline, админ или
+      // статус Новой Почты, но не факт оплаты.
       dispatch(clearCart());
       onClose?.();
       router.push(`/${locale}/order-success?payment=paid`);
     },
-    [dispatch, locale, onClose, router, t, updateOrder]
+    [dispatch, locale, onClose, router, t]
   );
 
   const resolveFailureMessage = React.useCallback(
@@ -105,7 +107,7 @@ const PaymentModal = ({
 
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, [dispatch, isOpen, locale, onClose, onPaymentResult, resolveFailureMessage, router, t, updateOrder]);
+  }, [dispatch, isOpen, locale, onClose, onPaymentResult, resolveFailureMessage, router, t]);
 
   React.useEffect(() => {
     if (!isOpen) return;
