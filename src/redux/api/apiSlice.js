@@ -126,7 +126,7 @@ console.log('API Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
 // Создаем базовый запрос с обработкой токенов
 const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
-  prepareHeaders: async (headers, { endpoint }) => {
+  prepareHeaders: async (headers, { endpoint, getState }) => {
     headers.set('ngrok-skip-browser-warning', '1');
     try {
       // Public endpoints should not send Authorization at all.
@@ -188,7 +188,17 @@ const baseQuery = fetchBaseQuery({
           cookieExp: cookieMeta.exp,
         });
       } else {
-        console.log('🔐 prepareHeaders auth token missing:', { endpoint });
+        // Хранилище может быть недоступно — так ведёт себя WebView Telegram
+        // Desktop. Токен при этом лежит в Redux: его положил успешный вход.
+        // Без этого отката запрос уходил без заголовка, и бэкенд отвечал 403
+        // «Authentication credentials were not provided».
+        const reduxToken = getState()?.auth?.accessToken || null;
+        if (reduxToken) {
+          headers.set('Authorization', `Bearer ${reduxToken}`);
+          console.log('🔐 prepareHeaders: хранилище пусто, взят токен из Redux', { endpoint });
+        } else {
+          console.log('🔐 prepareHeaders auth token missing:', { endpoint });
+        }
       }
     } catch (error) {
       console.error('Error reading auth from storage:', error);

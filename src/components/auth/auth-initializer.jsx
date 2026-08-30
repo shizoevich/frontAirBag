@@ -9,7 +9,7 @@ import {
   hasTelegramInitData,
   buildTelegramInitPayload,
 } from '@/utils/telegram';
-import { getAuth } from '@/utils/authStorage';
+import { getAuth, isStorageWritable } from '@/utils/authStorage';
 import Cookies from 'js-cookie';
 
 const AuthInitializer = ({ children }) => {
@@ -50,9 +50,16 @@ const AuthInitializer = ({ children }) => {
           }));
         } else {
           console.log('AuthInitializer: No valid auth data found');
-          if (accessToken) {
+          // Разлогинивать можно, только если хранилище рабочее и в нём правда
+          // пусто. В WebView Telegram Desktop оно недоступно, и без этой
+          // проверки эффект срабатывал на появление токена в Redux после
+          // успешного входа и тут же его снимал: тост показан, редиректа нет,
+          // а следующий запрос уходил без заголовка авторизации.
+          if (accessToken && isStorageWritable()) {
             console.log('AuthInitializer: Clearing stale Redux state');
             dispatch(userLoggedOut());
+          } else if (accessToken) {
+            console.log('AuthInitializer: storage unavailable, keeping Redux session');
           }
         }
 

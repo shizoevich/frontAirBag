@@ -3,6 +3,30 @@
 
 const STORAGE_KEY = 'userInfo';
 
+/**
+ * Пишется ли localStorage на самом деле.
+ *
+ * В WebView Telegram Desktop хранилище недоступно: запись либо бросает
+ * исключение, либо молча не сохраняется. Отличать «хранилище пустое» от
+ * «хранилища нет» обязательно — иначе успешный вход тут же отменяется как
+ * «протухшее состояние» (см. AuthInitializer).
+ *
+ * Проверка round-trip, а не только setItem: приватные режимы некоторых
+ * браузеров запись принимают, но при чтении возвращают null.
+ */
+export function isStorageWritable() {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return false;
+    const probe = '__auth_probe__';
+    localStorage.setItem(probe, '1');
+    const ok = localStorage.getItem(probe) === '1';
+    localStorage.removeItem(probe);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 export function getAuth() {
   try {
     const raw = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
