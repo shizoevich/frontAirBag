@@ -105,3 +105,28 @@ describe('хранилище рабочее', () => {
     expect(types()).not.toContain('auth/userLoggedIn');
   });
 });
+
+describe('синхронизация между вкладками', () => {
+  it('событие storage при мёртвом хранилище не разлогинивает', () => {
+    storage.writable = false;
+    authState = { accessToken: 'fresh-token' };
+    render(<AuthInitializer><div /></AuthInitializer>);
+    dispatch.mockClear();
+
+    window.dispatchEvent(new Event('storage'));
+
+    expect(types()).not.toContain('auth/userLoggedOut');
+  });
+
+  it('выход в другой вкладке по-прежнему разлогинивает', () => {
+    storage.writable = true;
+    storage.data = null;
+    authState = { accessToken: 'token-from-other-tab' };
+    render(<AuthInitializer><div /></AuthInitializer>);
+    dispatch.mockClear();
+
+    window.dispatchEvent(new Event('storage'));
+
+    expect(types()).toContain('auth/userLoggedOut');
+  });
+});

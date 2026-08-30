@@ -133,7 +133,9 @@ const AuthInitializer = ({ children }) => {
           isGuest: authData.isGuest || false,
           guestId: authData.guestId || null,
         }));
-      } else if (accessToken) {
+      } else if (accessToken && isStorageWritable()) {
+        // Та же оговорка, что и в инициализации: пустое хранилище означает
+        // разлогин только тогда, когда хранилище вообще работает.
         dispatch(userLoggedOut());
       }
     };
