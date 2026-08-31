@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useSelector } from 'react-redux';
 import { useLogoutMutation } from '@/redux/features/auth/authApi';
 import { useGetCategoryTreeQuery } from '@/redux/features/categoryApi';
-import { sortAlphabetically } from '@/utils/categoryTreeHelpers';
+import { sortAlphabetically, sortRootCategories } from '@/utils/categoryTreeHelpers';
 import { categoryPath } from '@/utils/category-link';
 import { useRouter } from 'next/navigation';
 
@@ -52,7 +52,7 @@ const Menus = () => {
   // Получаем отсортированные категории первого уровня
   const firstLevelCategories = useMemo(() => {
     if (!categoryTree) return [];
-    return sortAlphabetically(categoryTree);
+    return sortRootCategories(categoryTree);
   }, [categoryTree]);
 
   // Функция для добавления локали к ссылкам

@@ -8,7 +8,7 @@ import { closeCartMini } from "@/redux/features/cartSlice";
 import { useTranslations, useLocale } from 'next-intl';
 import { useLogoutMutation } from '@/redux/features/auth/authApi';
 import { useGetCategoryTreeQuery } from '@/redux/features/categoryApi';
-import { sortAlphabetically } from '@/utils/categoryTreeHelpers';
+import { sortAlphabetically, sortRootCategories } from '@/utils/categoryTreeHelpers';
 import { categoryPath } from '@/utils/category-link';
 
 const MobileMenus = ({setIsCanvasOpen}) => {
@@ -39,7 +39,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
   // Получаем отсортированные категории первого уровня
   const firstLevelCategories = useMemo(() => {
     if (!categoryTree) return [];
-    return sortAlphabetically(categoryTree);
+    return sortRootCategories(categoryTree);
   }, [categoryTree]);
 
   const filterAccountPages = (pages) => {

@@ -16,7 +16,7 @@ import { categoryPath } from '@/utils/category-link';
 import {
   getChildrenAtLevel,
   hasChildren,
-  sortAlphabetically,
+  sortRootCategories,
   getCategoryFromTree,
   getCategoryPath,
 } from '@/utils/categoryTreeHelpers';
@@ -142,7 +142,7 @@ const CatalogArea = ({ activeCategoryId = null }) => {
   }, [categoryTree, selectedPath]);
 
   const firstLevelCategories = useMemo(
-    () => (categoryTree ? sortAlphabetically(categoryTree) : []),
+    () => (categoryTree ? sortRootCategories(categoryTree) : []),
     [categoryTree]
   );
 

@@ -8,7 +8,7 @@ import { useGetCategoryTreeQuery } from "@/redux/features/categoryApi";
 import ErrorMsg from "@/components/common/error-msg";
 import Loader from "@/components/loader/loader";
 import { categoryPath } from "@/utils/category-link";
-import { sortAlphabetically } from "@/utils/categoryTreeHelpers";
+import { sortAlphabetically, sortRootCategories } from "@/utils/categoryTreeHelpers";
 
 const MobileCategory = ({ isCategoryActive }) => {
   const { data: categoryTree, isError, isLoading } = useGetCategoryTreeQuery();
@@ -46,7 +46,7 @@ const MobileCategory = ({ isCategoryActive }) => {
   }
 
   if (!isLoading && !isError && categoryTree?.length > 0) {
-    content = sortAlphabetically(categoryTree).map((item) => (
+    content = sortRootCategories(categoryTree).map((item) => (
       <li className="has-dropdown" key={item.id}>
         <Link href={`/${locale}${categoryPath(item)}`}>
           {item.title}
