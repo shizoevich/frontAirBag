@@ -20,6 +20,39 @@ export const sortAlphabetically = (items) => {
   });
 };
 
+/**
+ * Закреплённый порядок верхнего уровня.
+ *
+ * Клиент попросил исключение: три основных раздела всегда идут в этом порядке,
+ * а всё, что появится в каталоге дальше, выстраивается за ними по алфавиту.
+ * По алфавиту эти три встали бы иначе — «Комплектующие, Накладки, Пиропатроны».
+ *
+ * Сопоставляем по id, а не по названию: id приходят из RemOnline и на них уже
+ * держится вся навигация (они стоят в адресах страниц), тогда как название
+ * можно переименовать в любой момент.
+ */
+export const PINNED_ROOT_CATEGORY_IDS = [
+  754099, // Накладки
+  754101, // Пиропатроны
+  754100, // Комплектующие Airbag SRS
+];
+
+/**
+ * Порядок категорий верхнего уровня: сначала закреплённые, потом по алфавиту.
+ *
+ * Только для корня. Внутри разделов порядок остаётся алфавитным — там
+ * закреплять нечего, это марки машин и типы деталей.
+ */
+export const sortRootCategories = (items) => {
+  if (!Array.isArray(items)) return [];
+
+  const rank = (item) => PINNED_ROOT_CATEGORY_IDS.indexOf(Number(item?.id));
+  const pinned = items.filter((item) => rank(item) !== -1).sort((a, b) => rank(a) - rank(b));
+  const rest = items.filter((item) => rank(item) === -1);
+
+  return [...pinned, ...sortAlphabetically(rest)];
+};
+
 // Преобразование дерева в плоский список категорий
 export const flattenCategoryTree = (tree, parentId = null) => {
   if (!Array.isArray(tree)) return [];
@@ -123,7 +156,8 @@ export const getChildrenAtLevel = (tree, selectedPath, level) => {
     currentLevel = category.children;
   }
   
-  return sortAlphabetically(currentLevel);
+  // level === 0 — это корень каталога, у него свой порядок.
+  return level === 0 ? sortRootCategories(currentLevel) : sortAlphabetically(currentLevel);
 };
 
 // Проверить, есть ли у категории дети
