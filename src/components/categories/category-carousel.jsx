@@ -1,5 +1,5 @@
 'use client';
-import React, { useRef, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation as SwiperNavigation, Grid as SwiperGrid } from 'swiper/modules';
@@ -11,6 +11,62 @@ import HomeCateLoader from '../loader/home/home-cate-loader';
 import { useTranslations } from 'next-intl';
 
 import { categoryImage, FALLBACK_CATEGORY_IMAGE as FALLBACK_IMAGE } from '@/utils/category-image';
+
+// Единственный источник правды по раскладке: и Swiper, и перестановка ниже
+// считают по нему. Порядок — от широкого экрана к узкому.
+const LAYOUT_BREAKPOINTS = [
+  { minWidth: 1400, slidesPerView: 6, rows: 2 },
+  { minWidth: 1200, slidesPerView: 5, rows: 2 },
+  { minWidth: 992, slidesPerView: 4, rows: 2 },
+  { minWidth: 0, slidesPerView: 4, rows: 1 },
+];
+
+const SWIPER_BREAKPOINTS = Object.fromEntries(
+  LAYOUT_BREAKPOINTS.map(({ minWidth, slidesPerView, rows }) => [
+    minWidth,
+    { slidesPerView, grid: { rows } },
+  ])
+);
+
+function activeLayout(width) {
+  return LAYOUT_BREAKPOINTS.find((b) => width >= b.minWidth) ?? LAYOUT_BREAKPOINTS.at(-1);
+}
+
+/**
+ * Сколько рядов Swiper построит на самом деле.
+ *
+ * Измерено на живой странице: при `grid.rows = 2` Swiper раскладывает слайды в
+ * два ряда только если их больше, чем помещается в видимую часть. Список из
+ * шести категорий при slidesPerView=6 он выстраивает в одну строку — и
+ * перестановка под две строки в таком случае просто перемешивает алфавит.
+ */
+export function effectiveRows(count, { slidesPerView, rows }) {
+  return rows === 2 && count > slidesPerView ? 2 : 1;
+}
+
+/**
+ * Порядок слайдов для сетки из двух рядов.
+ *
+ * Swiper с `fill: 'row'` заполняет сначала весь верхний ряд, потом нижний, а
+ * читать список нужно колонками — сверху вниз, затем вправо. Поэтому массив
+ * транспонируется. Для одного ряда транспонировать нечего: раньше это делали
+ * безусловно, и на телефоне выходило «сначала верхний ряд, следом нижний» —
+ * алфавит начинался заново с середины.
+ */
+export function orderForGrid(categories, rows) {
+  if (!Array.isArray(categories) || categories.length === 0) return [];
+  if (rows < 2) return categories;
+
+  const cols = Math.ceil(categories.length / rows);
+  const result = [];
+  for (let row = 0; row < rows; row += 1) {
+    for (let col = 0; col < cols; col += 1) {
+      const index = row + col * rows;
+      if (index < categories.length) result.push(categories[index]);
+    }
+  }
+  return result;
+}
 
 const CategoryCarousel = ({ 
   categories = [],      // Массив категорий для отображения
@@ -24,25 +80,22 @@ const CategoryCarousel = ({
   const navigationPrevRef = useRef(null);
   const navigationNextRef = useRef(null);
 
-  // Пересортировываем для вертикального отображения (по колонкам)
-  const sortedCategories = useMemo(() => {
-    if (!Array.isArray(categories) || categories.length === 0) return [];
-    
-    const rows = 2;
-    const cols = Math.ceil(categories.length / rows);
-    const result = [];
-    
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const index = row + col * rows;
-        if (index < categories.length) {
-          result.push(categories[index]);
-        }
-      }
-    }
-    
-    return result;
-  }, [categories]);
+  // Ширина окна нужна, чтобы знать, сколько рядов построит Swiper. На сервере
+  // её нет, поэтому стартуем с самой широкой раскладки и уточняем после
+  // монтирования — до первого кадра в браузере.
+  const [viewportWidth, setViewportWidth] = useState(LAYOUT_BREAKPOINTS[0].minWidth);
+
+  useEffect(() => {
+    const update = () => setViewportWidth(window.innerWidth);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  const sortedCategories = useMemo(
+    () => orderForGrid(categories, effectiveRows(categories.length, activeLayout(viewportWidth))),
+    [categories, viewportWidth]
+  );
 
   if (isLoading) {
     return <HomeCateLoader loading={isLoading} />;
@@ -72,14 +125,7 @@ const CategoryCarousel = ({
             swiper.params.navigation.prevEl = navigationPrevRef.current;
             swiper.params.navigation.nextEl = navigationNextRef.current;
           }}
-          breakpoints={{
-            1400: { slidesPerView: 6, grid: { rows: 2 } },
-            1200: { slidesPerView: 5, grid: { rows: 2 } },
-            992: { slidesPerView: 4, grid: { rows: 2 } },
-            768: { slidesPerView: 4, grid: { rows: 1 } },
-            576: { slidesPerView: 4, grid: { rows: 1 } },
-            0: { slidesPerView: 4, grid: { rows: 1 } },
-          }}
+          breakpoints={SWIPER_BREAKPOINTS}
           className="category-carousel"
         >
           {sortedCategories.map((category) => {
