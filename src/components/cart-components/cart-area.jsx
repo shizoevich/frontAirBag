@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation';
 import { clearCart } from '@/redux/features/cartSlice';
 import CartCheckout from './cart-checkout';
 import CartItem from './cart-item';
-import RenderCartProgress from '../common/render-cart-progress';
+import CartItemCard from './cart-item-card';
 
 const CartArea = () => {
   const { cart_products } = useSelector((state) => state.cart);
@@ -29,10 +29,13 @@ const CartArea = () => {
             <div className="row">
               <div className="col-xl-9 col-lg-8">
                 <div className="tp-cart-list mb-25 mr-30">
-                  <div className="cartmini__shipping">
-                    <RenderCartProgress />
-                  </div>
-                  <table className="table">
+                  {/*
+                    Таблице нужно 840 px, поэтому ниже 1200 px она уезжала в
+                    горизонтальный скролл и колонка количества оставалась за
+                    краем экрана. Там, где таблица не помещается, показываем
+                    карточки — всё видно без прокрутки вбок.
+                  */}
+                  <table className="table d-none d-xl-table">
                     <thead>
                       <tr>
                         <th colSpan="2" className="tp-cart-header-product">{t('product')}</th>
@@ -47,6 +50,12 @@ const CartArea = () => {
                       ))}
                     </tbody>
                   </table>
+
+                  <ul className="tp-cart-cards d-xl-none">
+                    {cart_products.map((item, i) => (
+                      <CartItemCard key={i} product={item} />
+                    ))}
+                  </ul>
                 </div>
                 <div className="tp-cart-bottom">
                   <div className="row align-items-end">
@@ -64,7 +73,7 @@ const CartArea = () => {
                       </div> */}
                     </div>
                     <div className="col-xl-6 col-md-4">
-                      <div className="tp-cart-update text-md-end mr-30">
+                      <div className="tp-cart-update text-md-end">
                         <button onClick={() => dispatch(clearCart())} type="button" className="tp-cart-update-btn">{t('clearCart')}</button>
                       </div>
                     </div>

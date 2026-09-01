@@ -8,9 +8,9 @@ import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 // internal
 import useCartInfo from '@/hooks/use-cart-info';
-import RenderCartProgress from './render-cart-progress';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
-import { closeCartMini, remove_product } from '@/redux/features/cartSlice';
+import QuantityInput from '@/components/common/quantity-input';
+import { clearCart, closeCartMini, remove_product, setCartQuantity } from '@/redux/features/cartSlice';
 import { getProductImage, getProductId } from '@/utils/image-utils';
 import { slugify } from '@/utils/slugify';
 
@@ -45,12 +45,6 @@ const handleCloseCartMini = () => {
                 </button>
               </div>
             </div>
-            <div className="cartmini__shipping">
-              <RenderCartProgress/>
-              <p className="mt-10 mb-0 small text-white-50">
-                {t('discountHint', { amount: `${(total).toFixed(2)}₴` })}
-              </p>
-            </div>
             {cart_products.length > 0 && <div className="cartmini__widget">
               {cart_products.map((item,i) => (
                 <div key={i} className="cartmini__widget-item">
@@ -74,9 +68,18 @@ const handleCloseCartMini = () => {
                     <h5 className="cartmini__title">
                       <Link href={`/${locale}/product/${slugify(item.title)}-${getProductId(item)}`}>{item.title}</Link>
                     </h5>
-                    <div className="cartmini__price-wrapper">
+                    {/*
+                      Счётчик и цена в одну строку: так блок товара укладывается
+                      в высоту картинки. Раньше цена и счётчик шли друг под
+                      другом и уезжали ниже неё.
+                    */}
+                    <div className="cartmini__row">
+                      <QuantityInput
+                        value={item.orderQuantity}
+                        max={Number(item.residue ?? 0)}
+                        onChange={(quantity) => dispatch(setCartQuantity({ id: getProductId(item), quantity }))}
+                      />
                       {item.discount > 0 ? <span className="cartmini__price">${(Number(item.price_minor / 100 || 0)  - (Number(item.price_minor / 100 || 0) * Number(item.discount))).toFixed(2)}</span> : <span className="cartmini__price">{(Number(item.price_minor / 100 || 0)).toFixed(2)}₴</span>}
-                      <span className="cartmini__quantity">{" "}x{item.orderQuantity}</span>
                     </div>
                   </div>
                   <a onClick={() => handleRemovePrd({ title: item.title, id: item.id || item._id })} className="cartmini__del cursor-pointer"><i className="fa-regular fa-xmark"></i></a>
@@ -95,9 +98,22 @@ const handleCloseCartMini = () => {
               <h4>{t('subtotal')}</h4>
               <span>{(total).toFixed(2)}₴</span>
             </div>
+            {/*
+              Кнопки «Переглянути кошик» здесь нет намеренно: модалка и есть
+              корзина, а переход на её страницу уводил клиента на шаг назад
+              вместо оформления. Ведём сразу к оформлению заказа.
+            */}
             <div className="cartmini__checkout-btn">
-              <Link href={`/${locale}/cart`} onClick={handleCloseCartMini} className="tp-btn mb-10 w-100">{t('viewCart')}</Link>
-              <Link href={`/${locale}/checkout`} onClick={handleCloseCartMini} className="tp-btn tp-btn-border w-100">{t('checkout')}</Link>
+              <Link href={`/${locale}/checkout`} onClick={handleCloseCartMini} className="tp-btn w-100">{t('checkout')}</Link>
+              {cart_products.length > 0 && (
+                <button
+                  type="button"
+                  className="cartmini__clear-btn"
+                  onClick={() => dispatch(clearCart())}
+                >
+                  {t('clearCart')}
+                </button>
+              )}
             </div>
           </div>
         </div>

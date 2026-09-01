@@ -3,7 +3,6 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Link from "next/link";
 import CartItem from "@/components/cart-components/cart-item";
-import RenderCartProgress from "@/components/common/render-cart-progress";
 
 const Cart = () => {
   const { cart_products } = useSelector((state) => state.cart);
@@ -23,9 +22,6 @@ const Cart = () => {
           <div className="row">
             <div className="col-xl-9 col-lg-8">
               <div className="tp-cart-list mb-25 mr-30">
-                <div className="cartmini__shipping">
-                  <RenderCartProgress />
-                </div>
                 <table className="table">
                   <thead>
                     <tr>
