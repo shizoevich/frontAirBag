@@ -147,4 +147,36 @@ describe('модалка корзины', () => {
 
     expect(container.querySelectorAll('.cartmini__quantity')).toHaveLength(0);
   });
+
+  it('цена и счётчик стоят в одной строке', () => {
+    // Друг под другом они делали блок выше картинки, и строка товара
+    // разъезжалась: цена и счётчик оказывались ниже её нижнего края.
+    const { container } = render(<CartMiniSidebar />);
+
+    const row = container.querySelector('.cartmini__widget-item .cartmini__row');
+    expect(row).not.toBeNull();
+    expect(row.querySelector('.tp-product-quantity')).not.toBeNull();
+    expect(row.querySelector('.cartmini__price')).not.toBeNull();
+  });
+
+  it('корзину можно очистить прямо из модалки', () => {
+    const { container } = render(<CartMiniSidebar />);
+
+    const clear = container.querySelector('.cartmini__clear-btn');
+    expect(clear).not.toBeNull();
+
+    fireEvent.click(clear);
+
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({ type: expect.stringContaining('clearCart') })
+    );
+  });
+
+  it('в пустой корзине очищать нечего — кнопки нет', () => {
+    cartState = { cart_products: [], cartMiniOpen: true };
+
+    const { container } = render(<CartMiniSidebar />);
+
+    expect(container.querySelector('.cartmini__clear-btn')).toBeNull();
+  });
 });

@@ -179,21 +179,65 @@
         }
     }
     &__thumb{
+        // Рамка рисовалась по флекс-элементу, а тот растягивался на высоту всей
+        // строки: при картинке 70x70 рамка выходила 72x83 и торчала снизу.
+        // Фиксируем размер по картинке и не даём растягиваться.
+        align-self: flex-start;
+        flex: 0 0 70px;
+        width: 70px;
+        height: 70px;
         border: 1px solid var(--tp-border-primary);
+        border-radius: 8px;
+        overflow: hidden;
         margin-right: 15px;
-        & img{
-            width: 70px;
-            height: auto;
-        }
     }
     &__title{
-        font-size: 15px;
+        font-size: 14px;
+        // 2 строки по 17.5px + отступ 4 + счётчик 30 = 69px, ровно в высоту
+        // картинки (70px). С прежними 1.3/6px длинное название давало 72px и
+        // блок на пару пикселей вылезал за рамку.
+        line-height: 1.25;
         margin-bottom: 4px;
         font-weight: 500;
+        // Строка товара должна укладываться в высоту картинки, поэтому длинные
+        // названия обрезаем двумя строками — иначе цена и счётчик количества
+        // уезжали ниже картинки и блок разъезжался.
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        overflow-wrap: anywhere;
+
         & a{
             &:hover{
                 color: var(--tp-theme-primary);
             }
+        }
+    }
+
+    // Цена и счётчик количества в одну строку — так блок товара не выше картинки.
+    &__row{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    &__clear-btn{
+        display: block;
+        width: 100%;
+        margin-top: 10px;
+        padding: 9px 0;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--tp-common-white);
+        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, .35);
+        border-radius: 4px;
+
+        &:hover{
+            border-color: var(--tp-theme-primary);
+            color: var(--tp-theme-primary);
         }
     }
     &__content{

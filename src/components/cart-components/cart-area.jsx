@@ -77,7 +77,7 @@ const CartArea = () => {
                       </div> */}
                     </div>
                     <div className="col-xl-6 col-md-4">
-                      <div className="tp-cart-update text-md-end mr-30">
+                      <div className="tp-cart-update text-md-end">
                         <button onClick={() => dispatch(clearCart())} type="button" className="tp-cart-update-btn">{t('clearCart')}</button>
                       </div>
                     </div>
