@@ -224,20 +224,24 @@
     }
 
     &__clear-btn{
+        // Панель светлая, поэтому белый текст на прозрачном фоне читался только
+        // при наведении — кнопка выглядела скрытой. Тот же вид, что у кнопки
+        // очистки на странице корзины: тёмный текст на белом.
         display: block;
         width: 100%;
         margin-top: 10px;
         padding: 9px 0;
         font-size: 14px;
         font-weight: 500;
-        color: var(--tp-common-white);
-        background-color: transparent;
-        border: 1px solid rgba(255, 255, 255, .35);
+        color: var(--tp-common-black);
+        background-color: var(--tp-common-white);
+        border: 1px solid rgba($color: $black, $alpha: .15);
         border-radius: 4px;
 
         &:hover{
+            background-color: var(--tp-theme-primary);
             border-color: var(--tp-theme-primary);
-            color: var(--tp-theme-primary);
+            color: var(--tp-common-white);
         }
     }
     &__content{

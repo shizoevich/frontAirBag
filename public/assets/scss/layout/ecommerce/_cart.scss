@@ -24,17 +24,20 @@
             border-bottom: 0;
         }
 
+        // Картинка крупнее, чем в мини-корзине: сюда помещается название в две
+        // строки, цена и счётчик, и содержимое не свисает ниже картинки.
         &-thumb{
-            flex: 0 0 72px;
-            width: 72px;
-            height: 72px;
+            align-self: flex-start;
+            flex: 0 0 96px;
+            width: 96px;
+            height: 96px;
             border-radius: 8px;
             background-color: #f8f9fa;
             overflow: hidden;
 
             & img{
-                width: 72px;
-                height: 72px;
+                width: 96px;
+                height: 96px;
                 object-fit: cover;
                 display: block;
             }
@@ -46,10 +49,13 @@
         }
 
         &-title{
-            display: block;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
             font-size: 14px;
             font-weight: 500;
-            line-height: 1.35;
+            line-height: 1.25;
             color: var(--tp-common-black);
             // Длинные названия товаров не должны растягивать строку.
             overflow-wrap: anywhere;
@@ -61,8 +67,9 @@
 
         &-unit{
             display: block;
-            margin-top: 4px;
+            margin-top: 3px;
             font-size: 13px;
+            line-height: 1.3;
             color: #818487;
         }
 
@@ -70,16 +77,26 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            // На 320 px счётчик и сумма вместе шире карточки: пусть сумма
-            // переносится на свою строку, а не вылезает за край.
-            flex-wrap: wrap;
-            gap: 8px 12px;
-            margin-top: 10px;
+            // Переносить сумму на свою строку нельзя: карточка становится выше
+            // картинки, и счётчик с суммой снова свисают ниже неё. На узких
+            // экранах вместо переноса ужимаем счётчик и шрифт суммы.
+            flex-wrap: nowrap;
+            gap: 12px;
+            margin-top: 6px;
 
             & .#{$theme-prifix}-product-quantity{
                 width: 96px;
                 flex: 0 0 96px;
                 padding: 0;
+
+                @media #{$xs}{
+                    width: 84px;
+                    flex: 0 0 84px;
+                }
+            }
+
+            @media #{$xs}{
+                gap: 8px;
             }
         }
 
@@ -88,6 +105,12 @@
             font-weight: 600;
             color: var(--tp-common-black);
             white-space: nowrap;
+            // Сумма прижата вправо, даже когда счётчик уже строки.
+            margin-left: auto;
+
+            @media #{$xs}{
+                font-size: 13px;
+            }
         }
 
         &-remove{
