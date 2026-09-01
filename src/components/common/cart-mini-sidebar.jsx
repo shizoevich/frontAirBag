@@ -10,7 +10,8 @@ import { useParams } from 'next/navigation';
 import useCartInfo from '@/hooks/use-cart-info';
 import RenderCartProgress from './render-cart-progress';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
-import { closeCartMini, remove_product } from '@/redux/features/cartSlice';
+import QuantityInput from '@/components/common/quantity-input';
+import { closeCartMini, remove_product, setCartQuantity } from '@/redux/features/cartSlice';
 import { getProductImage, getProductId } from '@/utils/image-utils';
 import { slugify } from '@/utils/slugify';
 
@@ -76,8 +77,18 @@ const handleCloseCartMini = () => {
                     </h5>
                     <div className="cartmini__price-wrapper">
                       {item.discount > 0 ? <span className="cartmini__price">${(Number(item.price_minor / 100 || 0)  - (Number(item.price_minor / 100 || 0) * Number(item.discount))).toFixed(2)}</span> : <span className="cartmini__price">{(Number(item.price_minor / 100 || 0)).toFixed(2)}₴</span>}
-                      <span className="cartmini__quantity">{" "}x{item.orderQuantity}</span>
                     </div>
+                    {/*
+                      Количество меняется прямо здесь. Раньше в модалке была
+                      только надпись «x2», а поправить его можно было лишь на
+                      странице корзины — и клиенты туда не доходили.
+                    */}
+                    <QuantityInput
+                      className="mt-5"
+                      value={item.orderQuantity}
+                      max={Number(item.residue ?? 0)}
+                      onChange={(quantity) => dispatch(setCartQuantity({ id: getProductId(item), quantity }))}
+                    />
                   </div>
                   <a onClick={() => handleRemovePrd({ title: item.title, id: item.id || item._id })} className="cartmini__del cursor-pointer"><i className="fa-regular fa-xmark"></i></a>
                 </div>
@@ -95,9 +106,13 @@ const handleCloseCartMini = () => {
               <h4>{t('subtotal')}</h4>
               <span>{(total).toFixed(2)}₴</span>
             </div>
+            {/*
+              Кнопки «Переглянути кошик» здесь нет намеренно: модалка и есть
+              корзина, а переход на её страницу уводил клиента на шаг назад
+              вместо оформления. Ведём сразу к оформлению заказа.
+            */}
             <div className="cartmini__checkout-btn">
-              <Link href={`/${locale}/cart`} onClick={handleCloseCartMini} className="tp-btn mb-10 w-100">{t('viewCart')}</Link>
-              <Link href={`/${locale}/checkout`} onClick={handleCloseCartMini} className="tp-btn tp-btn-border w-100">{t('checkout')}</Link>
+              <Link href={`/${locale}/checkout`} onClick={handleCloseCartMini} className="tp-btn w-100">{t('checkout')}</Link>
             </div>
           </div>
         </div>

@@ -5,25 +5,125 @@
 /*----------------------------------------*/
 
 .#{$theme-prifix}-cart{
+    // Карточка товара для узких экранов: изображение, название, цена за штуку,
+    // счётчик количества и сумма строки. Ширина рассчитана на 320 px.
+    &-cards{
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    &-card{
+        position: relative;
+        display: flex;
+        gap: 12px;
+        padding: 16px 32px 16px 0;
+        border-bottom: 1px solid #E0E2E3;
+
+        &:last-child{
+            border-bottom: 0;
+        }
+
+        &-thumb{
+            flex: 0 0 72px;
+            width: 72px;
+            height: 72px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            overflow: hidden;
+
+            & img{
+                width: 72px;
+                height: 72px;
+                object-fit: cover;
+                display: block;
+            }
+        }
+
+        &-body{
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        &-title{
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.35;
+            color: var(--tp-common-black);
+            // Длинные названия товаров не должны растягивать строку.
+            overflow-wrap: anywhere;
+
+            &:hover{
+                color: var(--tp-theme-primary);
+            }
+        }
+
+        &-unit{
+            display: block;
+            margin-top: 4px;
+            font-size: 13px;
+            color: #818487;
+        }
+
+        &-controls{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            // На 320 px счётчик и сумма вместе шире карточки: пусть сумма
+            // переносится на свою строку, а не вылезает за край.
+            flex-wrap: wrap;
+            gap: 8px 12px;
+            margin-top: 10px;
+
+            & .#{$theme-prifix}-product-quantity{
+                width: 96px;
+                flex: 0 0 96px;
+                padding: 0;
+            }
+        }
+
+        &-total{
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--tp-common-black);
+            white-space: nowrap;
+        }
+
+        &-remove{
+            position: absolute;
+            top: 12px;
+            right: 0;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #818487;
+            background: transparent;
+            border: 0;
+            padding: 0;
+
+            &:hover{
+                color: #FF1826;
+            }
+        }
+    }
+
     &-header{
         &-product{
             padding-left: 30px !important;
         }
     }
     &-list{
-        @media #{$lg, $md, $sm, $xs}{
-            overflow-x: scroll;
-        }
+        // Ниже 1200 px таблица уступает место карточкам (.tp-cart-cards),
+        // поэтому фиксированная ширина 840 px и горизонтальный скролл больше
+        // не нужны: скроллить было нечего, кроме уехавшей за край колонки
+        // количества, до которой клиенты не добирались.
         .table > :not(caption) > * > * {
             padding: 20px 0;
             box-shadow: none;
             vertical-align: middle;
-        }
-
-        & table{
-            @media #{$lg, $md, $sm, $xs}{
-                width: 840px;
-            }
         }
 
         & thead{

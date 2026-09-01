@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { clearCart } from '@/redux/features/cartSlice';
 import CartCheckout from './cart-checkout';
 import CartItem from './cart-item';
+import CartItemCard from './cart-item-card';
 import RenderCartProgress from '../common/render-cart-progress';
 
 const CartArea = () => {
@@ -32,7 +33,13 @@ const CartArea = () => {
                   <div className="cartmini__shipping">
                     <RenderCartProgress />
                   </div>
-                  <table className="table">
+                  {/*
+                    Таблице нужно 840 px, поэтому ниже 1200 px она уезжала в
+                    горизонтальный скролл и колонка количества оставалась за
+                    краем экрана. Там, где таблица не помещается, показываем
+                    карточки — всё видно без прокрутки вбок.
+                  */}
+                  <table className="table d-none d-xl-table">
                     <thead>
                       <tr>
                         <th colSpan="2" className="tp-cart-header-product">{t('product')}</th>
@@ -47,6 +54,12 @@ const CartArea = () => {
                       ))}
                     </tbody>
                   </table>
+
+                  <ul className="tp-cart-cards d-xl-none">
+                    {cart_products.map((item, i) => (
+                      <CartItemCard key={i} product={item} />
+                    ))}
+                  </ul>
                 </div>
                 <div className="tp-cart-bottom">
                   <div className="row align-items-end">
