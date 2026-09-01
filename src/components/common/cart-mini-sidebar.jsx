@@ -8,7 +8,6 @@ import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 // internal
 import useCartInfo from '@/hooks/use-cart-info';
-import RenderCartProgress from './render-cart-progress';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
 import QuantityInput from '@/components/common/quantity-input';
 import { clearCart, closeCartMini, remove_product, setCartQuantity } from '@/redux/features/cartSlice';
@@ -45,12 +44,6 @@ const handleCloseCartMini = () => {
                   <i className="fal fa-times"></i>
                 </button>
               </div>
-            </div>
-            <div className="cartmini__shipping">
-              <RenderCartProgress/>
-              <p className="mt-10 mb-0 small text-white-50">
-                {t('discountHint', { amount: `${(total).toFixed(2)}₴` })}
-              </p>
             </div>
             {cart_products.length > 0 && <div className="cartmini__widget">
               {cart_products.map((item,i) => (

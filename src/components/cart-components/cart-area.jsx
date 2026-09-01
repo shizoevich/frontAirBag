@@ -9,7 +9,6 @@ import { clearCart } from '@/redux/features/cartSlice';
 import CartCheckout from './cart-checkout';
 import CartItem from './cart-item';
 import CartItemCard from './cart-item-card';
-import RenderCartProgress from '../common/render-cart-progress';
 
 const CartArea = () => {
   const { cart_products } = useSelector((state) => state.cart);
@@ -30,9 +29,6 @@ const CartArea = () => {
             <div className="row">
               <div className="col-xl-9 col-lg-8">
                 <div className="tp-cart-list mb-25 mr-30">
-                  <div className="cartmini__shipping">
-                    <RenderCartProgress />
-                  </div>
                   {/*
                     Таблице нужно 840 px, поэтому ниже 1200 px она уезжала в
                     горизонтальный скролл и колонка количества оставалась за
