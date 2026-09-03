@@ -140,8 +140,10 @@ const OrderConfirmation = ({ orderId }) => {
                   </div>
                   </div>
 
-                  {/* Payment (Monobank iframe) for prepayment orders */}
-                  {displayOrder?.prepayment && (
+                  {/* Оплата картой. Флаг prepayment означает «клиент платит
+                      до отгрузки» и стоит в том числе у оплаты по реквизитам —
+                      ей окно монобанка показывать нельзя. */}
+                  {displayOrder?.prepayment && !displayOrder?.bank_transfer && (
                     <div className="mt-4">
                       <div className="d-flex flex-wrap gap-2 align-items-center justify-content-between">
                         <h4 className="mb-0">{t('monobank_payment_title')}</h4>
@@ -215,7 +217,7 @@ const OrderConfirmation = ({ orderId }) => {
                   
                   <div className="tp-order-confirmation-note mt-4">
                     <p className="text-muted">
-                      {displayOrder.prepayment 
+                      {displayOrder.prepayment && !displayOrder.bank_transfer
                         ? t('payment_confirmation_note')
                         : t('cash_delivery_note')
                       }

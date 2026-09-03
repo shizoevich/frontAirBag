@@ -256,7 +256,7 @@ const OrderPage = () => {
                                 <div className="mb-2"><strong className="text-muted">{t('date')}:</strong><span className="ms-2">{formatDate(orderToShow.date)}</span></div>
                                 <div className="mb-2">
                                   <strong className="text-muted">{t('payment_method')}:</strong>
-                                  <span className="ms-2">{orderToShow.prepayment ? t('pay_now') : orderToShow.bank_transfer ? t('bank_transfer') : orderToShow.nova_post_address ? t('cash_on_delivery') : t('pickup_payment')}</span>
+                                  <span className="ms-2">{orderToShow.bank_transfer ? t('bank_transfer') : orderToShow.prepayment ? t('pay_now') : orderToShow.nova_post_address ? t('cash_on_delivery') : t('pickup_payment')}</span>
                                 </div>
                                 <div className="mb-2">
                                   <strong className="text-muted">{t('payment_status')}:</strong>
