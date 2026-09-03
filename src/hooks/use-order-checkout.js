@@ -14,6 +14,7 @@ import { useUpdateClientPutMutation } from '@/redux/features/clientsApi';
 import { userLoggedIn } from "@/redux/features/auth/authSlice";
 import { clearCart } from "@/redux/features/cartSlice";
 import { notifySuccess, notifyError } from "@/utils/toast";
+import { uploadPaymentDocWithRetry } from "@/utils/upload-payment-doc";
 import Cookies from "js-cookie";
 import { getAuth } from "@/utils/authStorage";
 
@@ -407,11 +408,22 @@ const useOrderCheckout = () => {
       const result = await createOrder(orderData).unwrap();
 
       // Bank transfer: upload the payment confirmation document (order_id is now available)
+      //
+      // Раньше ошибка загрузки уходила в console.warn как «non-blocking», и
+      // клиент об этом не узнавал: заказ создан, а квитанции к нему нет. Пока
+      // существовал путь через бота, документ можно было донести оттуда; после
+      // его удаления это единственный способ, поэтому о неудаче надо сказать.
       if (paymentMethod === "bank_transfer" && bankTransferFile) {
-        try {
-          await uploadPaymentDoc({ orderId: result.id, file: bankTransferFile }).unwrap();
-        } catch (uploadErr) {
-          console.warn("Payment document upload failed (non-blocking):", uploadErr);
+        const uploaded = await uploadPaymentDocWithRetry(
+          (args) => uploadPaymentDoc(args).unwrap(),
+          result.id,
+          bankTransferFile
+        );
+        if (!uploaded) {
+          notifyError(
+            `Замовлення №${result.id} створено, але документ про оплату не завантажився. ` +
+            `Будь ласка, зв'яжіться з нами і надішліть квитанцію.`
+          );
         }
       }
 
