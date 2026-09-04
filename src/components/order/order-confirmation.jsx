@@ -18,27 +18,7 @@ const OrderConfirmation = ({ orderId }) => {
   const [isCreatingPayment, setIsCreatingPayment] = React.useState(false);
   const [paymentError, setPaymentError] = React.useState(null);
 
-  // Тестовые данные для демонстрации
-  const mockOrder = {
-    id: orderId,
-    date: new Date().toISOString(),
-    name: 'Іван',
-    last_name: 'Петренко',
-    phone: '+380501234567',
-    nova_post_address: 'Відділення №1, вул. Хрещатик, 1, Київ',
-    prepayment: false,
-    grand_total_minor: 125000,
-    items: [
-      {
-        id: 1,
-        title: 'Подушка безпеки водія BMW X5',
-        quantity: 1,
-        original_price_minor: 85000,
-      }
-    ]
-  };
-
-  const displayOrder = order || mockOrder;
+  const displayOrder = order;
 
   const formatPrice = (priceMinor) => {
     return (priceMinor / 100).toFixed(2);
@@ -81,6 +61,34 @@ const OrderConfirmation = ({ orderId }) => {
       setIsCreatingPayment(false);
     }
   };
+
+  // Заказ не пришёл — показываем это, а не выдуманный.
+  //
+  // Раньше здесь подставлялся mockOrder: «Подушка безпеки водія BMW X5» на
+  // 1250 грн с чужим адресом и телефоном. Клиент видел правдоподобный чужой
+  // заказ вместо ошибки. Для оплаты картой эта страница — единственное место,
+  // где заказ вообще доступен, поэтому цена такой подмены особенно велика.
+  if (!isLoading && (error || !order)) {
+    return (
+      <div className="container">
+        <div className="row">
+          <div className="col-12">
+            <div className="text-center py-5">
+              <h4>{t('order_not_found', { defaultValue: 'Замовлення не знайдено' })}</h4>
+              <p className="text-muted">
+                {t('order_not_found_hint', {
+                  defaultValue: 'Перевірте посилання або зверніться до нас.',
+                })}
+              </p>
+              <Link href={`/${locale}`} className="tp-btn mt-3">
+                {t('back_to_home', { defaultValue: 'На головну' })}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -140,8 +148,10 @@ const OrderConfirmation = ({ orderId }) => {
                   </div>
                   </div>
 
-                  {/* Payment (Monobank iframe) for prepayment orders */}
-                  {displayOrder?.prepayment && (
+                  {/* Оплата картой. Флаг prepayment означает «клиент платит
+                      до отгрузки» и стоит в том числе у оплаты по реквизитам —
+                      ей окно монобанка показывать нельзя. */}
+                  {displayOrder?.prepayment && !displayOrder?.bank_transfer && (
                     <div className="mt-4">
                       <div className="d-flex flex-wrap gap-2 align-items-center justify-content-between">
                         <h4 className="mb-0">{t('monobank_payment_title')}</h4>
@@ -215,7 +225,7 @@ const OrderConfirmation = ({ orderId }) => {
                   
                   <div className="tp-order-confirmation-note mt-4">
                     <p className="text-muted">
-                      {displayOrder.prepayment 
+                      {displayOrder.prepayment && !displayOrder.bank_transfer
                         ? t('payment_confirmation_note')
                         : t('cash_delivery_note')
                       }
