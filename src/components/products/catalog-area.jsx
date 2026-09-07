@@ -32,9 +32,14 @@ const ITEMS_PER_PAGE = 12;
  * path (never in a `?category=<id>` query), and filters/page live in the query so any
  * catalog state can be linked to and restored.
  *
- * A search query is one more filter, `?searchText=`, and not a separate page: entering
- * one used to replace the whole view with a bare product grid, so the shopper lost the
- * banner and every category row at once and had no way left to narrow the results.
+ * A search query is one more state of the same view, `?searchText=`, and not a separate
+ * page: entering one used to replace the whole view with a bare product grid, so the
+ * shopper lost the banner and every category row at once and had no way left to move on
+ * except going back to the home page.
+ *
+ * Query and category exclude each other, last action wins: picking a category drops the
+ * query, and a new query leaves the category. Ordering, price and stock are true filters
+ * and survive both.
  */
 const CatalogArea = ({ activeCategoryId = null }) => {
   const t = useTranslations('AllProductsArea');
@@ -114,12 +119,11 @@ const CatalogArea = ({ activeCategoryId = null }) => {
     );
   };
 
-  // Сброс запроса уводит с `/search` на витрину: страница поиска без запроса — это
-  // тот же полный каталог, но по адресу, который ничего о себе не говорит. Внутри
-  // категории остаёмся в ней, снимая только запрос.
+  // Сброс запроса уводит на витрину: страница поиска без запроса — это тот же полный
+  // каталог, но по адресу, который ничего о себе не говорит. Категории здесь быть не
+  // может — запрос её снял, — поэтому возвращаться всегда есть куда.
   const handleClearSearch = () => {
-    const base = activeCategoryId ? pathname : `/${locale}`;
-    router.push(`${base}${queryString({ searchText: '', page: '' })}`);
+    router.push(`/${locale}${queryString({ searchText: '', page: '' })}`);
   };
 
   const handlePageClick = (event) => {
@@ -129,6 +133,11 @@ const CatalogArea = ({ activeCategoryId = null }) => {
 
   // Clicking the selected category again steps one level up (to the parent category,
   // or to the full catalog from the top level).
+  //
+  // Категория и поисковый запрос — взаимоисключающие способы сузить выдачу, и
+  // побеждает последнее действие: выбор категории снимает запрос так же, как
+  // новый запрос уводит из категории. Иначе одно и то же слово в строке поиска
+  // давало бы разный результат в зависимости от того, где человек стоял.
   const handleCategorySelect = (category, level) => {
     const isToggleOff = !category?.id || selectedPath[level] === category.id;
     const target = isToggleOff
@@ -136,7 +145,7 @@ const CatalogArea = ({ activeCategoryId = null }) => {
       : category;
 
     const base = target ? `/${locale}${categoryPath(target)}` : `/${locale}`;
-    router.push(`${base}${queryString({ page: '' })}`);
+    router.push(`${base}${queryString({ searchText: '', page: '' })}`);
   };
 
   const carouselLevelsToShow = useMemo(() => {
@@ -292,8 +301,10 @@ const CatalogArea = ({ activeCategoryId = null }) => {
             <div className="col-12">
               <div className="tp-section-title-wrapper mb-40">
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
-                  {/* Заголовком страницы служат хлебные крошки, когда выбрана
-                      категория, — тогда запрос идёт подписью, а не вторым h1. */}
+                  {/* Запрос и категория друг друга исключают, поэтому обычно запрос и
+                      есть заголовок страницы. Страховка на случай адреса, набранного
+                      руками: если категория всё же выбрана, заголовок остаётся за
+                      крошками, а запрос идёт подписью — двух h1 не возникает. */}
                   {React.createElement(
                     breadcrumbs.length > 0 ? 'p' : 'h1',
                     {
