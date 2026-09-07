@@ -1,27 +1,17 @@
-import Wrapper from "@/layout/wrapper";
-import Header from "@/layout/headers/header";
-import BrandSearchArea from "@/components/search/brand-search-area";
-import Footer from "@/layout/footers/footer";
-import { getTranslations } from 'next-intl/server';
+import { redirect } from 'next/navigation';
 
-export async function generateMetadata({ params }) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'SearchPage' });
-  
-  return {
-    title: t('brandTitle'),
-  };
-}
-
+/**
+ * Марки автомобилей живут по адресу `/car-brands`.
+ *
+ * Страниц с марками было две. `/car-brands` лежит в sitemap, у неё canonical и описания
+ * на трёх языках — но ссылок на неё не было нигде, кроме страницы 404. А меню вело сюда,
+ * на страницу, закрытую от индексации лейаутом `/search`. Получалось, что покупатели
+ * ходили на закрытый дубль, а открытую версию не видел никто.
+ *
+ * Оставлена одна — `/car-brands`, потому что её адрес уже в индексе. Плитка «Все накладки»
+ * перенесена туда же, чтобы переезд ничего не унёс с собой.
+ */
 export default async function BrandSearchPage({ params }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'SearchPage' });
-  
-  return (
-    <Wrapper>
-      <Header />
-      <BrandSearchArea />
-      <Footer primary_style={true} />
-    </Wrapper>
-  );
+  redirect(`/${locale}/car-brands`);
 }

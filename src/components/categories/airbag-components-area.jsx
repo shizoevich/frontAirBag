@@ -143,12 +143,8 @@ const AirbagComponentsArea = () => {
         <div className="row">
           <div className="col-xl-12">
             <div className="tp-section-title-wrapper text-center mb-50">
-              <h3 className="tp-section-title">
-                {t('airbag_components')}
-                <span className="tp-section-title-inner">
-                  {t('airbag_components_subtitle')}
-                </span>
-              </h3>
+              <h3 className="tp-section-title">{t('airbag_components')}</h3>
+              <p className="tp-section-title-sub">{t('airbag_components_subtitle')}</p>
             </div>
           </div>
         </div>

@@ -59,7 +59,7 @@ export const mobile_menu = [
     title: '🔧 Каталог',
     link: '/shop',
     sub_menus: [
-      { title: '🚘 Марки автомобилей', link: '/search/brand' },
+      { title: '🚘 Марки автомобилей', link: '/car-brands' },
       { title: '🛡️ Комплектующие Airbag SRS', link: '/category/airbag-components' },
       { title: '💥 Пиропатроны', link: '/category/pyrotechnics' },
     ],

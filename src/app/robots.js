@@ -25,7 +25,9 @@ export default function robots() {
           '/*/order-success',
           '/*/payment-error',
           '/*/payment-redirect',
-          '/*/search',
+          // `/search` и `/search/brand` из этого списка убраны: страниц там больше нет,
+          // остались редиректы на витрину и на `/car-brands`. Краулер должен их пройти —
+          // иначе старые адреса в индексе так и не узнают, куда переехали.
         ],
       },
     ],

@@ -22,25 +22,28 @@ const CarBrandsArea = () => {
     setSearchTerm(e.target.value);
   };
 
-  // Получаем только марки автомобилей (parent_id === 754099)
-  const getCarBrands = () => {
+  // «Накладки» — родитель всех марок. Марки это его подкатегории.
+  const COVERS_CATEGORY_ID = '754099';
+
+  const allCategories = React.useMemo(() => {
     if (!categories) return [];
-    
-    // Получаем категории из правильного поля в зависимости от структуры данных
-    let allCategories = [];
-    if (categories?.results && Array.isArray(categories.results)) {
-      allCategories = categories.results;
-    } else if (Array.isArray(categories)) {
-      allCategories = categories;
-    }
-    
-    // Фильтруем только марки автомобилей (parent_id === 754099)
-    return allCategories.filter(category => 
-      category && 
-      category.parent_id && 
-      String(category.parent_id) === '754099'
+    if (Array.isArray(categories?.results)) return categories.results;
+    return Array.isArray(categories) ? categories : [];
+  }, [categories]);
+
+  // Получаем только марки автомобилей (parent_id === 754099)
+  const getCarBrands = () =>
+    allCategories.filter(
+      (category) =>
+        category && category.parent_id && String(category.parent_id) === COVERS_CATEGORY_ID
     );
-  };
+
+  // Сама категория «Накладки»: с неё начинается список, чтобы можно было посмотреть
+  // все накладки сразу, не выбирая марку. На прежней странице марок такая плитка была,
+  // и терять её при переезде незачем.
+  const coversCategory = allCategories.find(
+    (category) => category && String(category.id) === COVERS_CATEGORY_ID
+  );
   
   // Фильтруем марки по поисковому запросу
   const filteredBrands = getCarBrands().filter(brand => 
@@ -70,6 +73,34 @@ const CarBrandsArea = () => {
   if (!isLoading && !isError && filteredBrands.length > 0) {
     content = (
       <div className="row">
+        {coversCategory && !searchTerm && (
+          <div key="all-covers" className="col-lg-3 col-md-4 col-sm-6 mb-30">
+            <div
+              className="tp-category-item text-center p-relative mb-40 fix"
+              onClick={() => handleBrandClick(coversCategory)}
+            >
+              <div className="tp-category-thumb">
+                <Image
+                  src={categoryImage(coversCategory)}
+                  alt={t('all_covers')}
+                  width={200}
+                  height={200}
+                  style={{ objectFit: 'contain' }}
+                  onError={(e) => {
+                    e.target.src = FALLBACK_CATEGORY_IMAGE;
+                  }}
+                />
+              </div>
+              <div className="tp-category-content">
+                <h3 className="tp-category-title">
+                  <Link href={`/${locale}${categoryPath(coversCategory)}`}>
+                    {t('all_covers')}
+                  </Link>
+                </h3>
+              </div>
+            </div>
+          </div>
+        )}
         {filteredBrands.map((brand) => (
           <div key={brand.id} className="col-lg-3 col-md-4 col-sm-6 mb-30">
             <div 
@@ -108,12 +139,8 @@ const CarBrandsArea = () => {
         <div className="row">
           <div className="col-xl-12">
             <div className="tp-section-title-wrapper text-center mb-50">
-              <h3 className="tp-section-title">
-                {t('car_brands')}
-                <span className="tp-section-title-inner">
-                  {t('select_car_brand')}
-                </span>
-              </h3>
+              <h3 className="tp-section-title">{t('car_brands')}</h3>
+              <p className="tp-section-title-sub">{t('select_car_brand')}</p>
             </div>
           </div>
         </div>
