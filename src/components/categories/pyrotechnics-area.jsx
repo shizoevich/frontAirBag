@@ -134,12 +134,8 @@ const PyrotechnicsArea = () => {
         <div className="row">
           <div className="col-xl-12">
             <div className="tp-section-title-wrapper text-center mb-50">
-              <h3 className="tp-section-title">
-                {t('pyrotechnics')}
-                <span className="tp-section-title-inner">
-                  {t('pyrotechnics_subtitle')}
-                </span>
-              </h3>
+              <h3 className="tp-section-title">{t('pyrotechnics')}</h3>
+              <p className="tp-section-title-sub">{t('pyrotechnics_subtitle')}</p>
             </div>
           </div>
         </div>
