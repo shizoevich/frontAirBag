@@ -1,26 +1,27 @@
-import CatalogPageView from '@/components/catalog/catalog-page-view';
-import { setRequestLocale } from 'next-intl/server';
-import { getTranslations } from 'next-intl/server';
-
-export async function generateMetadata({ params }) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'SearchPage' });
-  return {
-    title: t('title') || 'Search - AirBag',
-  };
-}
+import { redirect } from 'next/navigation';
 
 /**
- * Поиск — это витрина с заполненным запросом, а не отдельная страница.
+ * Отдельной страницы поиска больше нет: запрос — это состояние витрины, `?searchText=`.
  *
- * Раньше здесь был свой вид: только сетка товаров, без баннера и без уровней
- * категорий. Введённый запрос убирал со страницы всю навигацию, и сузить выдачу
- * было нечем. Теперь рендерим тот же `CatalogPageView`, что главная и страница
- * категории; запрос `CatalogArea` берёт из `?searchText=`.
+ * Пока `/search` рендерил свой вид, у него был смысл. Когда вид стал общим с главной
+ * и категорией, остались два адреса на одну страницу — а два адреса на одно состояние
+ * рано или поздно расходятся. Тем же способом раньше свели `/category`.
+ *
+ * Адрес оставлен редиректом, а не удалён: на него ведут закладки, история браузера и
+ * разметка `SearchAction`, которую сайт отдавал поисковикам.
  */
-export default async function SearchPage({ params }) {
-  const locale = (await params)?.locale || 'uk';
-  setRequestLocale(locale);
+export default async function SearchPage({ params, searchParams }) {
+  const { locale } = await params;
+  const query = new URLSearchParams();
 
-  return <CatalogPageView locale={locale} />;
+  Object.entries((await searchParams) || {}).forEach(([key, value]) => {
+    if (value === undefined) return;
+    // Старая разметка SearchAction слала запрос как `q` — параметр, которого не читал
+    // никто. Раз уж адрес всё равно проходит через это место, приводим его к рабочему.
+    const name = key === 'q' ? 'searchText' : key;
+    (Array.isArray(value) ? value : [value]).forEach((v) => query.append(name, v));
+  });
+
+  const qs = query.toString();
+  redirect(`/${locale}${qs ? `?${qs}` : ''}`);
 }

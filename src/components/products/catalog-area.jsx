@@ -26,16 +26,15 @@ const ITEMS_PER_PAGE = 12;
 /**
  * The whole catalog: category levels, filters, product grid and pagination.
  *
- * One component serves the home page, `/category/<slug>-<id>` and `/search` so they can
+ * One component serves the home page and `/category/<slug>-<id>` so they can
  * never drift apart — picking a category in the rows below navigates to that category's
  * own URL, which renders this very same view. Category state therefore lives in the
  * path (never in a `?category=<id>` query), and filters/page live in the query so any
  * catalog state can be linked to and restored.
  *
- * A search query is one more state of the same view, `?searchText=`, and not a separate
- * page: entering one used to replace the whole view with a bare product grid, so the
- * shopper lost the banner and every category row at once and had no way left to move on
- * except going back to the home page.
+ * A search query is one more state of this view, `?searchText=`, and not a page of its
+ * own: `/search` used to render a bare product grid, so entering a query cost the shopper
+ * the banner and every category row at once, leaving no way on except the home page.
  *
  * Query and category exclude each other, last action wins: picking a category drops the
  * query, and a new query leaves the category. Ordering, price and stock are true filters

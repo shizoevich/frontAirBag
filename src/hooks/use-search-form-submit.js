@@ -24,7 +24,9 @@ const useSearchFormSubmit = () => {
 
       // Extract current locale from pathname
       const locale = pathname.split('/')[1] || 'uk';
-      const route = `/${locale}/search?${queryParams.join('&')}`;
+      // Запрос ведёт на витрину, а не на отдельную страницу поиска: он её состояние.
+      // Адрес всегда без категории — новый запрос снимает выбранную, как и наоборот.
+      const route = `/${locale}?${queryParams.join('&')}`;
       router.push(route);
 
       // Reset fields after search
