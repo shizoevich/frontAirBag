@@ -26,15 +26,19 @@ const ITEMS_PER_PAGE = 12;
 /**
  * The whole catalog: category levels, filters, product grid and pagination.
  *
- * One component serves both the home page and `/category/<slug>-<id>` so the two can
+ * One component serves the home page, `/category/<slug>-<id>` and `/search` so they can
  * never drift apart — picking a category in the rows below navigates to that category's
  * own URL, which renders this very same view. Category state therefore lives in the
  * path (never in a `?category=<id>` query), and filters/page live in the query so any
  * catalog state can be linked to and restored.
+ *
+ * A search query is one more filter, `?searchText=`, and not a separate page: entering
+ * one used to replace the whole view with a bare product grid, so the shopper lost the
+ * banner and every category row at once and had no way left to narrow the results.
  */
 const CatalogArea = ({ activeCategoryId = null }) => {
   const t = useTranslations('AllProductsArea');
-  const tPagination = useTranslations('SearchArea');
+  const tSearch = useTranslations('SearchArea');
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -51,6 +55,7 @@ const CatalogArea = ({ activeCategoryId = null }) => {
   );
 
   const currentPage = Math.max(0, Number(searchParams.get('page') || '0'));
+  const searchText = searchParams.get('searchText') || '';
 
   const { data: categoryTree, isLoading: catLoading, isError: catError } = useGetCategoryTreeQuery();
 
@@ -66,6 +71,7 @@ const CatalogArea = ({ activeCategoryId = null }) => {
     limit: ITEMS_PER_PAGE,
     offset: currentPage * ITEMS_PER_PAGE,
     categoryId: activeCategoryId,
+    searchText,
     ordering: filters.ordering,
     priceMin: filters.priceMin,
     priceMax: filters.priceMax,
@@ -106,6 +112,14 @@ const CatalogArea = ({ activeCategoryId = null }) => {
       `${pathname}${queryString({ ordering: '', priceMin: '', priceMax: '', inStock: false, page: '' })}`,
       { scroll: false }
     );
+  };
+
+  // Сброс запроса уводит с `/search` на витрину: страница поиска без запроса — это
+  // тот же полный каталог, но по адресу, который ничего о себе не говорит. Внутри
+  // категории остаёмся в ней, снимая только запрос.
+  const handleClearSearch = () => {
+    const base = activeCategoryId ? pathname : `/${locale}`;
+    router.push(`${base}${queryString({ searchText: '', page: '' })}`);
   };
 
   const handlePageClick = (event) => {
@@ -162,7 +176,17 @@ const CatalogArea = ({ activeCategoryId = null }) => {
   } else if (isError) {
     content = <ErrorMsg msg={t('loadingError') || 'Ошибка загрузки'} />;
   } else if (products.length === 0) {
-    content = <ErrorMsg msg={t('noProductsFound') || 'Товары не найдены'} />;
+    // По пустому поиску говорим, чего именно не нашли: иначе на странице с
+    // непустым запросом стоит безличное «товары не найдены».
+    content = (
+      <ErrorMsg
+        msg={
+          searchText
+            ? tSearch('noResults', { searchText })
+            : t('noProductsFound') || 'Товары не найдены'
+        }
+      />
+    );
   } else {
     content = products.map((product) => (
       <div key={product.id} className="col-xl-3 col-lg-3 col-sm-6">
@@ -262,6 +286,53 @@ const CatalogArea = ({ activeCategoryId = null }) => {
           </div>
         )}
 
+        {/* Запрос и способ его снять */}
+        {searchText && (
+          <div className="row">
+            <div className="col-12">
+              <div className="tp-section-title-wrapper mb-40">
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
+                  {/* Заголовком страницы служат хлебные крошки, когда выбрана
+                      категория, — тогда запрос идёт подписью, а не вторым h1. */}
+                  {React.createElement(
+                    breadcrumbs.length > 0 ? 'p' : 'h1',
+                    {
+                      style: {
+                        margin: 0,
+                        fontSize: breadcrumbs.length > 0 ? '18px' : '24px',
+                        fontWeight: breadcrumbs.length > 0 ? '400' : '600',
+                        color: breadcrumbs.length > 0 ? '#444' : '#222',
+                        lineHeight: '1.2',
+                      },
+                    },
+                    `${tSearch('searchResults')}: «${searchText}»`
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleClearSearch}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      fontSize: '14px',
+                      color: '#de8043',
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {tSearch('clearSearch')}
+                  </button>
+                </div>
+                {!isLoading && (
+                  <p className="text-muted" style={{ margin: '6px 0 0' }}>
+                    {tSearch('productsFound')}: {totalCount}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Товары */}
         <div className="row">{content}</div>
 
@@ -271,12 +342,12 @@ const CatalogArea = ({ activeCategoryId = null }) => {
             <div className="col-xl-12">
               <div className="tp-pagination mt-35">
                 <ReactPaginate
-                  breakLabel={tPagination('breakLabel') || '...'}
-                  nextLabel={tPagination('nextPage') || 'Далее'}
+                  breakLabel={tSearch('breakLabel') || '...'}
+                  nextLabel={tSearch('nextPage') || 'Далее'}
                   onPageChange={handlePageClick}
                   pageRangeDisplayed={3}
                   pageCount={pageCount}
-                  previousLabel={tPagination('previousPage') || 'Назад'}
+                  previousLabel={tSearch('previousPage') || 'Назад'}
                   renderOnZeroPageCount={null}
                   forcePage={Math.min(currentPage, Math.max(pageCount - 1, 0))}
                   containerClassName="tp-pagination-style mb-20 text-center"

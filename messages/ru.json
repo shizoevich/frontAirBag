@@ -206,6 +206,7 @@
     "searchResults": "Результаты поиска",
     "productsFound": "Найдено товаров",
     "searchResultsFor": "Результаты поиска для",
+    "clearSearch": "Сбросить поиск",
     "error": "Что-то пошло не так...",
     "noProductsFound": "Товары не найдены",
     "noResults": "К сожалению, по вашему запросу {searchText} ничего не найдено",
