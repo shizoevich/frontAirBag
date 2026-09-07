@@ -250,8 +250,22 @@ export default async function RootLayout({ children, params }) {
               const markLoaded = () => {
                 if (typeof window === 'undefined') return;
                 if (window.__telegramScriptLoaded) return;
-                if (window.Telegram?.WebApp) {
+                const webApp = window.Telegram?.WebApp;
+                if (webApp) {
                   window.__telegramScriptLoaded = true;
+                  // Telegram открывает мини-апп из кнопки меню свёрнутым, примерно на
+                  // половину экрана, — развернуть на всю высоту должен сам веб-апп.
+                  if (webApp.platform && webApp.platform !== 'unknown') {
+                    try {
+                      webApp.ready();
+                      webApp.expand();
+                      // Без этого свайп вниз по странице сворачивает мини-апп обратно.
+                      // Метод появился в Bot API 7.7, в старых клиентах его нет.
+                      webApp.disableVerticalSwipes?.();
+                    } catch (error) {
+                      console.warn('Telegram WebApp expand failed', error);
+                    }
+                  }
                   window.dispatchEvent(new Event('telegram-webapp-loaded'));
                 }
               };
