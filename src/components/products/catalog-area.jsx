@@ -26,15 +26,23 @@ const ITEMS_PER_PAGE = 12;
 /**
  * The whole catalog: category levels, filters, product grid and pagination.
  *
- * One component serves both the home page and `/category/<slug>-<id>` so the two can
+ * One component serves the home page and `/category/<slug>-<id>` so they can
  * never drift apart — picking a category in the rows below navigates to that category's
  * own URL, which renders this very same view. Category state therefore lives in the
  * path (never in a `?category=<id>` query), and filters/page live in the query so any
  * catalog state can be linked to and restored.
+ *
+ * A search query is one more state of this view, `?searchText=`, and not a page of its
+ * own: `/search` used to render a bare product grid, so entering a query cost the shopper
+ * the banner and every category row at once, leaving no way on except the home page.
+ *
+ * Query and category exclude each other, last action wins: picking a category drops the
+ * query, and a new query leaves the category. Ordering, price and stock are true filters
+ * and survive both.
  */
 const CatalogArea = ({ activeCategoryId = null }) => {
   const t = useTranslations('AllProductsArea');
-  const tPagination = useTranslations('SearchArea');
+  const tSearch = useTranslations('SearchArea');
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -51,6 +59,7 @@ const CatalogArea = ({ activeCategoryId = null }) => {
   );
 
   const currentPage = Math.max(0, Number(searchParams.get('page') || '0'));
+  const searchText = searchParams.get('searchText') || '';
 
   const { data: categoryTree, isLoading: catLoading, isError: catError } = useGetCategoryTreeQuery();
 
@@ -66,6 +75,7 @@ const CatalogArea = ({ activeCategoryId = null }) => {
     limit: ITEMS_PER_PAGE,
     offset: currentPage * ITEMS_PER_PAGE,
     categoryId: activeCategoryId,
+    searchText,
     ordering: filters.ordering,
     priceMin: filters.priceMin,
     priceMax: filters.priceMax,
@@ -108,6 +118,13 @@ const CatalogArea = ({ activeCategoryId = null }) => {
     );
   };
 
+  // Сброс запроса уводит на витрину: страница поиска без запроса — это тот же полный
+  // каталог, но по адресу, который ничего о себе не говорит. Категории здесь быть не
+  // может — запрос её снял, — поэтому возвращаться всегда есть куда.
+  const handleClearSearch = () => {
+    router.push(`/${locale}${queryString({ searchText: '', page: '' })}`);
+  };
+
   const handlePageClick = (event) => {
     router.replace(`${pathname}${queryString({ page: event.selected || '' })}`, { scroll: false });
     document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -115,6 +132,11 @@ const CatalogArea = ({ activeCategoryId = null }) => {
 
   // Clicking the selected category again steps one level up (to the parent category,
   // or to the full catalog from the top level).
+  //
+  // Категория и поисковый запрос — взаимоисключающие способы сузить выдачу, и
+  // побеждает последнее действие: выбор категории снимает запрос так же, как
+  // новый запрос уводит из категории. Иначе одно и то же слово в строке поиска
+  // давало бы разный результат в зависимости от того, где человек стоял.
   const handleCategorySelect = (category, level) => {
     const isToggleOff = !category?.id || selectedPath[level] === category.id;
     const target = isToggleOff
@@ -122,7 +144,7 @@ const CatalogArea = ({ activeCategoryId = null }) => {
       : category;
 
     const base = target ? `/${locale}${categoryPath(target)}` : `/${locale}`;
-    router.push(`${base}${queryString({ page: '' })}`);
+    router.push(`${base}${queryString({ searchText: '', page: '' })}`);
   };
 
   const carouselLevelsToShow = useMemo(() => {
@@ -162,7 +184,17 @@ const CatalogArea = ({ activeCategoryId = null }) => {
   } else if (isError) {
     content = <ErrorMsg msg={t('loadingError') || 'Ошибка загрузки'} />;
   } else if (products.length === 0) {
-    content = <ErrorMsg msg={t('noProductsFound') || 'Товары не найдены'} />;
+    // По пустому поиску говорим, чего именно не нашли: иначе на странице с
+    // непустым запросом стоит безличное «товары не найдены».
+    content = (
+      <ErrorMsg
+        msg={
+          searchText
+            ? tSearch('noResults', { searchText })
+            : t('noProductsFound') || 'Товары не найдены'
+        }
+      />
+    );
   } else {
     content = products.map((product) => (
       <div key={product.id} className="col-xl-3 col-lg-3 col-sm-6">
@@ -262,6 +294,55 @@ const CatalogArea = ({ activeCategoryId = null }) => {
           </div>
         )}
 
+        {/* Запрос и способ его снять */}
+        {searchText && (
+          <div className="row">
+            <div className="col-12">
+              <div className="tp-section-title-wrapper mb-40">
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
+                  {/* Запрос и категория друг друга исключают, поэтому обычно запрос и
+                      есть заголовок страницы. Страховка на случай адреса, набранного
+                      руками: если категория всё же выбрана, заголовок остаётся за
+                      крошками, а запрос идёт подписью — двух h1 не возникает. */}
+                  {React.createElement(
+                    breadcrumbs.length > 0 ? 'p' : 'h1',
+                    {
+                      style: {
+                        margin: 0,
+                        fontSize: breadcrumbs.length > 0 ? '18px' : '24px',
+                        fontWeight: breadcrumbs.length > 0 ? '400' : '600',
+                        color: breadcrumbs.length > 0 ? '#444' : '#222',
+                        lineHeight: '1.2',
+                      },
+                    },
+                    `${tSearch('searchResults')}: «${searchText}»`
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleClearSearch}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      fontSize: '14px',
+                      color: '#de8043',
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {tSearch('clearSearch')}
+                  </button>
+                </div>
+                {!isLoading && (
+                  <p className="text-muted" style={{ margin: '6px 0 0' }}>
+                    {tSearch('productsFound')}: {totalCount}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Товары */}
         <div className="row">{content}</div>
 
@@ -271,12 +352,12 @@ const CatalogArea = ({ activeCategoryId = null }) => {
             <div className="col-xl-12">
               <div className="tp-pagination mt-35">
                 <ReactPaginate
-                  breakLabel={tPagination('breakLabel') || '...'}
-                  nextLabel={tPagination('nextPage') || 'Далее'}
+                  breakLabel={tSearch('breakLabel') || '...'}
+                  nextLabel={tSearch('nextPage') || 'Далее'}
                   onPageChange={handlePageClick}
                   pageRangeDisplayed={3}
                   pageCount={pageCount}
-                  previousLabel={tPagination('previousPage') || 'Назад'}
+                  previousLabel={tSearch('previousPage') || 'Назад'}
                   renderOnZeroPageCount={null}
                   forcePage={Math.min(currentPage, Math.max(pageCount - 1, 0))}
                   containerClassName="tp-pagination-style mb-20 text-center"

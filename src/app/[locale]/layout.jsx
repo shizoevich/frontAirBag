@@ -198,7 +198,10 @@ const websiteJsonLd = {
     '@type': 'SearchAction',
     target: {
       '@type': 'EntryPoint',
-      urlTemplate: `${SITE_URL}/uk/search?q={search_term_string}`,
+      // Витрина с заполненным запросом. Раньше здесь стоял `/uk/search?q=`: и адрес
+      // отдельной страницы поиска, которой больше нет, и параметр `q`, которого не
+      // читал никто, — строка поиска по сайту вела бы в пустую выдачу.
+      urlTemplate: `${SITE_URL}/uk?searchText={search_term_string}`,
     },
     'query-input': 'required name=search_term_string',
   },

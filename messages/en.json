@@ -218,6 +218,7 @@
     "searchResults": "Search Results",
     "productsFound": "Products Found",
     "searchResultsFor": "Search results for",
+    "clearSearch": "Clear search",
     "error": "Something went wrong...",
     "noProductsFound": "No products found",
     "noResults": "Sorry, but nothing matched your search terms: {searchText}",

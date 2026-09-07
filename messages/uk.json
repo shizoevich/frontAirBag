@@ -209,6 +209,7 @@
     "searchResults": "Результати пошуку",
     "productsFound": "Знайдено товарів",
     "searchResultsFor": "Результати пошуку для",
+    "clearSearch": "Скинути пошук",
     "error": "Щось пішло не так...",
     "noProductsFound": "Товарів не знайдено",
     "noResults": "На жаль, за вашим запитом {searchText} нічого не знайдено",
