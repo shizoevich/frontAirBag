@@ -62,12 +62,18 @@ test.describe('Scenario 9: order phone rule', () => {
     await page.locator('input[name="firstName"]').fill('НЕ ВІДПРАВЛЯТИ');
     await page.locator('input[name="lastName"]').fill('E2E');
     await page.getByTestId('phone-input').fill(foreignPhone.slice(4));
-    await page.locator('#pickup').check();
-    await page.locator('input[value="cash_on_delivery"]').check();
-    await page.evaluate(() => {
-      (document.querySelector('input[name="city"]') as HTMLInputElement).value = 'Київ';
-      (document.querySelector('input[name="warehouse"]') as HTMLInputElement).value = 'Відділення №1';
-    });
+      await page.locator('label[for="cash_on_delivery"]').click();
+    // Скрытые поля адреса заполняет выпадашка Новой Почты через setValue; React
+    // на input[type=hidden] onChange не шлёт, поэтому дёргаем обработчик RHF напрямую.
+    for (const [name, value] of [['city', 'Київ'], ['warehouse', 'Відділення №1']]) {
+      await page.locator(`input[name="${name}"]`).evaluate((el: any, v) => {
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(el, v);
+        const propsKey = Object.keys(el).find((k) => k.startsWith('__reactProps'));
+        if (propsKey && typeof el[propsKey].onChange === 'function') {
+          el[propsKey].onChange({ target: el, type: 'change' });
+        }
+      }, value);
+    }
 
     const refused = page.waitForResponse(
       (res) => res.url().includes('/api/v2/orders/') && res.request().method() === 'POST'

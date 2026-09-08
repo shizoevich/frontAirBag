@@ -21,8 +21,8 @@ test.describe('Scenario 4: Regular email/password login (no Telegram)', () => {
   test('should log in and redirect away from /login', async ({ page }) => {
     await page.goto(`${BASE}/login`);
 
-    await page.getByLabel(/email/i).fill(EMAIL);
-    await page.getByLabel(/password|пароль/i).fill(PASSWORD);
+    await page.locator('input[name="email"]').fill(EMAIL);
+    await page.locator('input[name="password"]').fill(PASSWORD);
     await page.getByRole('button', { name: /sign in|войти|увійти|login/i }).click();
 
     await page.waitForTimeout(2_500);
@@ -52,8 +52,8 @@ test.describe('Scenario 4: Regular email/password login (no Telegram)', () => {
     });
 
     await page.goto(`${BASE}/login`);
-    await page.getByLabel(/email/i).fill(EMAIL);
-    await page.getByLabel(/password|пароль/i).fill(PASSWORD);
+    await page.locator('input[name="email"]').fill(EMAIL);
+    await page.locator('input[name="password"]').fill(PASSWORD);
     await page.getByRole('button', { name: /sign in|войти|увійти|login/i }).click();
 
     await page.waitForTimeout(3_000);
@@ -62,13 +62,13 @@ test.describe('Scenario 4: Regular email/password login (no Telegram)', () => {
 
   test('profile is accessible after regular login', async ({ page }) => {
     await page.goto(`${BASE}/login`);
-    await page.getByLabel(/email/i).fill(EMAIL);
-    await page.getByLabel(/password|пароль/i).fill(PASSWORD);
+    await page.locator('input[name="email"]').fill(EMAIL);
+    await page.locator('input[name="password"]').fill(PASSWORD);
     await page.getByRole('button', { name: /sign in|войти|увійти|login/i }).click();
     await page.waitForTimeout(2_500);
 
     await page.goto(`${BASE}/profile`);
     await expect(page).not.toHaveURL(/\/login/);
-    await expect(page.locator('h1, h2, h3').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('h1, h2, h3').locator('visible=true').first()).toBeVisible({ timeout: 10_000 });
   });
 });

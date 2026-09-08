@@ -4,7 +4,7 @@
 # ТОЛЬКО ДЛЯ ЛОКАЛЬНЫХ ПРОВЕРОК: используется тестовый бот, боевой бот и его
 # кнопка меню в BotFather не трогаются. После сессии — `./scripts/webapp-local.sh down`.
 #
-#   up      открыть Funnel на фронт (443) и бэкенд (8443), напечатать адреса и
+#   up      открыть Funnel на фронт (443) и бэкенд (10000; 8443 на этой машине занят), напечатать адреса и
 #           переменные окружения для бэкенда, фронта и бота
 #   status  что сейчас опубликовано
 #   down    закрыть всё (tailscale funnel reset)
@@ -26,10 +26,10 @@ case "${1:-}" in
   up)
     need tailscale
     tailscale funnel --bg --https=443  "localhost:${FRONT_PORT}"
-    tailscale funnel --bg --https=8443 "localhost:${BACKEND_PORT}"
+    tailscale funnel --bg --https=10000 "localhost:${BACKEND_PORT}"
     H="$(host)"
     FRONT_URL="https://${H}"
-    API_URL="https://${H}:8443"
+    API_URL="https://${H}:10000"
     cat <<EOF
 
 Фронт:   ${FRONT_URL}

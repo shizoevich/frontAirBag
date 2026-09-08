@@ -4,7 +4,7 @@
  * +380XXXXXXXXX (в спеке 03 это проверено по телу запроса регистрации).
  */
 import { test, expect, Page } from '../fixtures';
-import { BASE } from '../helpers/api';
+import { BASE, firstGood, cartItemFor } from '../helpers/api';
 
 async function checkPhoneField(page: Page) {
   const input = page.getByTestId('phone-input').first();
@@ -32,7 +32,11 @@ test.describe('Scenario 8: phone input', () => {
     await checkPhoneField(page);
   });
 
-  test('checkout form', async ({ linkedTelegramPage: page }) => {
+  test('checkout form', async ({ linkedTelegramPage: page, request }) => {
+    const good = await firstGood(request);
+    await page.addInitScript((item) => {
+      localStorage.setItem('cart_products', JSON.stringify([item]));
+    }, cartItemFor(good));
     await page.goto(`${BASE}/checkout`);
     await checkPhoneField(page);
   });

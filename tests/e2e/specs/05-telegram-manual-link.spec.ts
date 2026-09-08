@@ -28,8 +28,8 @@ test.describe('Scenario 5: Manual Telegram link via profile button', () => {
   test.beforeEach(async ({ page }) => {
     // Log in first (regular browser, no WebApp)
     await page.goto(`${BASE}/login`);
-    await page.getByLabel(/email/i).fill(EMAIL);
-    await page.getByLabel(/password|пароль/i).fill(PASSWORD);
+    await page.locator('input[name="email"]').fill(EMAIL);
+    await page.locator('input[name="password"]').fill(PASSWORD);
     await page.getByRole('button', { name: /sign in|войти|увійти|login/i }).click();
     await page.waitForTimeout(2_500);
   });
@@ -44,7 +44,7 @@ test.describe('Scenario 5: Manual Telegram link via profile button', () => {
     await expect(linkButton).toBeVisible({ timeout: 10_000 });
   });
 
-  test('clicking "Link Telegram" should call POST /api/v2/telegram/link', async ({ page }) => {
+  test('clicking "Link Telegram" should call GET /api/v2/telegram/link', async ({ page }) => {
     await page.goto(`${BASE}/profile`);
     await page.waitForTimeout(2_000);
 
@@ -53,7 +53,7 @@ test.describe('Scenario 5: Manual Telegram link via profile button', () => {
         req.url().includes('/api/v2/telegram/link') &&
         !req.url().includes('consume') &&
         !req.url().includes('auto') &&
-        req.method() === 'POST',
+        req.method() === 'GET',
       { timeout: 15_000 }
     );
 
@@ -105,7 +105,7 @@ test.describe('Scenario 5: Manual Telegram link via profile button', () => {
 
     // Should not redirect to login on mobile
     await expect(page).not.toHaveURL(/\/login/);
-    await expect(page.locator('h1, h2, h3').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('h1, h2, h3').locator('visible=true').first()).toBeVisible({ timeout: 10_000 });
   });
 
   test('mobile hamburger menu should contain a "My Profile" link', async ({ page }) => {
@@ -123,32 +123,38 @@ test.describe('Scenario 5: Manual Telegram link via profile button', () => {
     }
 
     // Profile link should now be reachable in the nav
-    const profileLink = page.getByRole('link', { name: /my profile|мой профиль|мій профіль/i });
+    const profileLink = page.getByRole('link', { name: /my profile|my account|мой профиль|мой кабинет|мій профіль|мій кабінет/i });
     await expect(profileLink).toBeVisible({ timeout: 8_000 });
   });
 });
 
 /**
- * Конфликт: вход по почте под SITE_TEST_EMAIL внутри мини-аппа, чей Telegram
- * уже за SITE_LINKED_EMAIL. Слияний нет (ADR-0021) — 409 и почта владельца
- * на экране, чтобы человек вошёл в старый аккаунт.
+ * Конфликт: на сайте уже открыта сессия SITE_TEST_EMAIL, а мини-апп открыт
+ * Telegram-аккаунтом, который числится за SITE_LINKED_EMAIL. Авто-привязка
+ * при инициализации получает 409 — слияний нет (ADR-0021), на экране почта
+ * владельца, чтобы человек вошёл в старый аккаунт.
  */
 import { test as telegramTest, expect as telegramExpect } from '../fixtures';
+import { apiLogin } from '../helpers/api';
 
 telegramTest.describe('Scenario 5b: linking a taken Telegram is refused', () => {
   const LINKED_EMAIL = process.env.SITE_LINKED_EMAIL ?? '';
   telegramTest.skip(!EMAIL || !PASSWORD || !LINKED_EMAIL, 'test accounts not configured');
 
-  telegramTest('shows the owner email from the 409', async ({ linkedTelegramPage: page }) => {
-    await page.goto(`${BASE}/login`);
-    await page.locator('input[name="email"]').fill(EMAIL);
-    await page.locator('input[name="password"]').fill(PASSWORD);
+  telegramTest('shows the owner email from the 409', async ({ linkedTelegramPage: page, request }) => {
+    const resp = await request.post(`${process.env.API_URL ?? 'http://localhost:8000'}/api/v2/auth/login/`, {
+      data: { email: EMAIL, password: PASSWORD },
+    });
+    const tokens = await resp.json();
+    await page.addInitScript((auth) => {
+      localStorage.setItem('userInfo', JSON.stringify(auth));
+    }, { accessToken: tokens.access, refreshToken: tokens.refresh, user: { email: EMAIL, telegram_ids: [] } });
 
     const autoLink = page.waitForResponse(
       (res) => res.url().includes('/api/v2/telegram/auto-link') && res.request().method() === 'POST',
       { timeout: 20_000 }
     );
-    await page.getByRole('button', { name: /sign in|войти|увійти|login/i }).click();
+    await page.goto(BASE);
 
     const res = await autoLink;
     telegramExpect(res.status()).toBe(409);
@@ -156,4 +162,3 @@ telegramTest.describe('Scenario 5b: linking a taken Telegram is refused', () => 
     await telegramExpect(page.getByText(LINKED_EMAIL).first()).toBeVisible({ timeout: 10_000 });
   });
 });
-

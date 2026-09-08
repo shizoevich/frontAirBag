@@ -34,8 +34,8 @@ test.describe('Scenario 1: unknown Telegram browses as anonymous', () => {
     await page.goto(BASE);
     await expect(page.locator('#wrapper')).toBeVisible({ timeout: 10_000 });
 
-    const loginLink = page.getByRole('link', { name: /sign in|войти|увійти/i }).first();
-    await expect(loginLink).toBeVisible({ timeout: 10_000 });
+    // На телефоне ссылка входа живёт в бургер-меню — проверяем наличие, не видимость
+    await expect(page.locator('a[href*="/login"]').first()).toBeAttached({ timeout: 10_000 });
   });
 
   test('cabinet and checkout redirect to login', async ({ unknownTelegramPage: page }) => {

@@ -14,8 +14,10 @@ export async function injectTelegramWebApp(
 
   await page.addInitScript(
     ({ initData, user }) => {
-      (window as any).Telegram = {
-        WebApp: {
+      // Сайт грузит настоящий telegram-web-app.js, и тот присваивает
+      // window.Telegram.WebApp заново — с пустым initData, ведь мы не в Telegram.
+      // Подделка должна пережить это: свойство неперезаписываемое.
+      const fakeWebApp = {
           initData,
           initDataUnsafe: {
             user,
@@ -39,8 +41,10 @@ export async function injectTelegramWebApp(
             notificationOccurred: () => {},
             selectionChanged: () => {},
           },
-        },
       };
+      const telegram = {};
+      Object.defineProperty(telegram, 'WebApp', { value: fakeWebApp, writable: false, configurable: false });
+      Object.defineProperty(window, 'Telegram', { value: telegram, writable: false, configurable: false });
     },
     { initData, user: opts.user }
   );

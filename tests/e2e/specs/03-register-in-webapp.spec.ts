@@ -62,7 +62,11 @@ test.describe('Scenario 3: register inside the WebApp', () => {
     const cartSize = await page.evaluate(() => JSON.parse(localStorage.getItem('cart_products') || '[]').length);
     expect(cartSize).toBeGreaterThan(0);
 
-    // Повторное открытие — бесшовно
+    // Повторное открытие мини-аппа (хранилище пустое, как на новом устройстве) — бесшовно
+    await page.evaluate(() => {
+      localStorage.removeItem('userInfo');
+      document.cookie = 'userInfo=; Max-Age=0; path=/';
+    });
     const secondAuth = page.waitForResponse(
       (res) => res.url().includes('/api/v2/telegram/auth') && res.request().method() === 'POST'
     );
