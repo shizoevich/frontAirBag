@@ -67,6 +67,23 @@ export function buildTelegramInitPayload(source) {
   return fallback ? { init_data: fallback } : null;
 }
 
+/**
+ * Открыть страницу снаружи мини-аппа: в системном браузере (Safari/Chrome),
+ * где работают Apple Pay и Google Pay. Внутри WebView Telegram они не
+ * работают: Google Pay не может открыть окно, Apple Pay не проходит во
+ * вложенном фрейме (ADR-0022). Вне Telegram — обычная новая вкладка.
+ */
+export function openExternalLink(url) {
+  if (!url) return false;
+  const webApp = getTelegramWebApp();
+  if (webApp && typeof webApp.openLink === 'function') {
+    webApp.openLink(url, { try_instant_view: false });
+    return true;
+  }
+  if (isBrowser()) window.open(url, '_blank', 'noopener');
+  return false;
+}
+
 export function ensureTelegramScript() {
   if (!isBrowser()) return Promise.resolve(false);
 

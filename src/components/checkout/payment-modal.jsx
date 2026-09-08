@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import { clearCart } from '@/redux/features/cartSlice';
 import { useGetOrderByIdQuery } from '@/redux/features/ordersApi';
 import { useGetPaymentConfigQuery } from '@/redux/features/paymentsApi';
+import { openExternalLink } from '@/utils/telegram';
 
 const PaymentModal = ({
   isOpen,
@@ -15,6 +16,8 @@ const PaymentModal = ({
   orderId: orderIdProp,
   title = 'Payment',
   onPaymentResult,
+  // Мини-апп: страница Monobank открыта снаружи, здесь — ожидание с опросом заказа
+  external = false,
 }) => {
   const router = useRouter();
   const { locale } = useParams();
@@ -276,7 +279,18 @@ const PaymentModal = ({
         </div>
 
         <div style={{ background: '#fff' }}>
-          {iframeUrl ? (
+          {external ? (
+            <div data-testid="payment-waiting" style={{ padding: '28px 20px', textAlign: 'center', display: 'grid', gap: 12 }}>
+              <div style={{ fontSize: 40 }}>⏳</div>
+              <h4 style={{ margin: 0 }}>{t('webapp_waiting_title')}</h4>
+              <p style={{ margin: 0, color: '#55585b' }}>{t('webapp_waiting_text')}</p>
+              {iframeUrl && (
+                <button type="button" className="tp-btn" onClick={() => openExternalLink(iframeUrl)}>
+                  {t('webapp_open_payment_again')}
+                </button>
+              )}
+            </div>
+          ) : iframeUrl ? (
             <iframe
               title="payment"
               src={iframeUrl}

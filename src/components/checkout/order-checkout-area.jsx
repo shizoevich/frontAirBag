@@ -17,7 +17,9 @@ import useOrderCheckout from "@/hooks/use-order-checkout";
 import useCartInfo from "@/hooks/use-cart-info";
 import { useGetOrdersQuery } from "@/redux/features/ordersApi";
 import { useGetDiscountsQuery } from "@/redux/features/discountsApi";
-import { useCreatePaymentMutation } from "@/redux/features/paymentsApi";
+import { useCreatePaymentMutation, useGetPaymentConfigQuery } from "@/redux/features/paymentsApi";
+import useTelegramWebApp from "@/hooks/use-telegram-webapp";
+import { openExternalLink } from "@/utils/telegram";
 import { notifyError, notifyInfo } from '@/utils/toast';
 import { resolveMonobankPageUrl } from '@/utils/monobank-url';
 
@@ -33,6 +35,13 @@ const OrderCheckoutArea = () => {
   const [monoPaymentError, setMonoPaymentError] = React.useState(null);
 
   const [createPayment] = useCreatePaymentMutation();
+  // Мини-апп Telegram: кошельки в WebView не работают, поэтому страница Monobank
+  // открывается снаружи, а возврат — ссылкой в бота (ADR-0022).
+  const { hasInitData: isTelegramWebApp } = useTelegramWebApp();
+  const { data: paymentConfig } = useGetPaymentConfigQuery();
+  const telegramBotUsername = paymentConfig?.telegram_bot_username || null;
+  const backToBotUrl = (orderId) =>
+    telegramBotUsername ? `https://t.me/${telegramBotUsername}?start=order_${orderId}` : null;
 
   const {
     handleSubmit,
@@ -213,13 +222,17 @@ const OrderCheckoutArea = () => {
         locale
       )}&order_id=${encodeURIComponent(orderId)}&result=failed`;
       const redirect_url = fail_url;
-      console.log('Creating Monobank payment (RTK):', { orderId, redirect_url, success_url, fail_url });
+      // Из мини-аппа страница оплаты живёт в Safari/Chrome — после оплаты
+      // Monobank ведёт обратно в бота, а мини-апп тем временем опрашивает заказ.
+      const botUrl = isTelegramWebApp ? backToBotUrl(orderId) : null;
+      const urls = botUrl
+        ? { redirect_url: botUrl, success_url: botUrl, fail_url: botUrl }
+        : { redirect_url, success_url, fail_url };
+      console.log('Creating Monobank payment (RTK):', { orderId, ...urls, isTelegramWebApp });
 
       const data = await createPayment({
         order_id: orderId,
-        redirect_url,
-        success_url,
-        fail_url,
+        ...urls,
       }).unwrap();
 
       console.log('Monobank payment raw response:', { data });
@@ -231,9 +244,9 @@ const OrderCheckoutArea = () => {
 
       if (pageUrl) {
         setMonoPageUrl(pageUrl);
+        if (isTelegramWebApp) openExternalLink(pageUrl);
+        // В мини-аппе модалка — экран ожидания с опросом заказа, а не iframe
         setIsPaymentModalOpen(true);
-
-        // Modal-only UX: no inline iframe scroll
       } else {
         throw new Error(`Payment creation succeeded but payment URL is missing. Response: ${JSON.stringify(data)}`);
       }
@@ -270,6 +283,7 @@ const OrderCheckoutArea = () => {
         isOpen={isPaymentModalOpen}
         onClose={() => setIsPaymentModalOpen(false)}
         iframeUrl={monoPageUrl}
+        external={isTelegramWebApp}
         orderId={lastOrderId}
         title={t('monobank_payment_title')}
         onPaymentResult={({ result }) => {
@@ -536,6 +550,8 @@ const OrderCheckoutArea = () => {
                               // next-intl supports rich formatting, but we keep it simple.
                               return null;
                             })()}
+                            {/* Google Pay внутри WebView Telegram не работает (OR_BIBED_15) — кошельки на странице Monobank */}
+                            {!isTelegramWebApp && (
                             <div style={{ display: 'grid', gap: 10 }}>
                               <GooglePayButton
                                 amountMinor={Math.round(
@@ -549,6 +565,7 @@ const OrderCheckoutArea = () => {
                              />
                               {/* Apple Pay button hidden: flow not implemented and should not be shown */}
                            </div>
+                            )}
 
                             <div className="mt-3" style={{ display: 'grid', gap: 10 }}>
                               {isCreatingPayment && (
@@ -578,6 +595,7 @@ const OrderCheckoutArea = () => {
                                     disabled={isCheckoutSubmit || isCreatingPayment}
                                     onClick={async () => {
                                       if (monoPageUrl) {
+                                        if (isTelegramWebApp) openExternalLink(monoPageUrl);
                                         setIsPaymentModalOpen(true);
                                         return;
                                       }
@@ -620,7 +638,10 @@ const OrderCheckoutArea = () => {
                                 <button
                                   type="button"
                                   className="tp-btn w-100"
-                                  onClick={() => setIsPaymentModalOpen(true)}
+                                  onClick={() => {
+                                    if (isTelegramWebApp) openExternalLink(monoPageUrl);
+                                    setIsPaymentModalOpen(true);
+                                  }}
                                 >
                                   {t('open_payment')}
                                 </button>

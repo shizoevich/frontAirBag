@@ -829,7 +829,10 @@
     "err_DECLINED": "Payment declined by issuer",
     "err_3DS": "3D Secure authentication failed",
     "err_LIMIT_EXCEEDED": "Card operation limit exceeded",
-    "err_BANK_UNAVAILABLE": "Bank is temporarily unavailable. Please try again later"
+    "err_BANK_UNAVAILABLE": "Bank is temporarily unavailable. Please try again later",
+    "webapp_waiting_title": "Waiting for payment…",
+    "webapp_waiting_text": "The payment page opened in your browser. Pay there and come back to Telegram — the order status updates by itself.",
+    "webapp_open_payment_again": "Open the payment page again"
   },
   "Terms": {
     "metaTitle": "Terms and Conditions - AirBag",

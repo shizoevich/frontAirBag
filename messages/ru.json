@@ -882,7 +882,10 @@
     "err_DECLINED": "Платеж отклонен банком",
     "err_3DS": "Не пройдена 3D Secure аутентификация",
     "err_LIMIT_EXCEEDED": "Превышен лимит операций по карте",
-    "err_BANK_UNAVAILABLE": "Банк временно недоступен. Попробуйте позже"
+    "err_BANK_UNAVAILABLE": "Банк временно недоступен. Попробуйте позже",
+    "webapp_waiting_title": "Ожидаем оплату…",
+    "webapp_waiting_text": "Страница оплаты открылась в браузере. Оплатите там и вернитесь в Telegram — статус заказа обновится сам.",
+    "webapp_open_payment_again": "Открыть страницу оплаты ещё раз"
   },
   "CheckoutValidation": {
     "first_name_required": "Имя обязательно",
