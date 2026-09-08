@@ -90,3 +90,17 @@ export function ensureTelegramScript() {
 }
 
 export { TELEGRAM_WEBAPP_SRC, TELEGRAM_WEBAPP_SCRIPT_ID };
+
+// Вход по Telegram при открытии — одна попытка на загрузку страницы, кто бы её
+// ни делал. Истечение сессии в середине работы обрабатывает apiSlice отдельно.
+let telegramAuthAttempted = false;
+
+export function claimTelegramAuthAttempt() {
+  if (telegramAuthAttempted) return false;
+  telegramAuthAttempted = true;
+  return true;
+}
+
+export function resetTelegramAuthAttempt() {
+  telegramAuthAttempted = false;
+}

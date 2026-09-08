@@ -37,3 +37,7 @@ next-env.d.ts
 
 # Контактный лист вырезок баннера — генерируется скриптом cut-banner-images.mjs
 scripts/banner-src/_contact-sheet.png
+
+# Playwright
+/playwright-report/
+/test-results/

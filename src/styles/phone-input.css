@@ -1,0 +1,23 @@
+/* Поле телефона: неизменяемый +380 внутри поля, набираются только девять цифр. */
+.phone-input {
+  position: relative;
+}
+.phone-input__prefix {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #55585b;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.phone-input .phone-input__digits {
+  padding-left: 66px !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.phone-input.is-invalid .phone-input__digits {
+  border-color: #ff4d4f;
+}

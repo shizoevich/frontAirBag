@@ -127,3 +127,33 @@ test.describe('Scenario 5: Manual Telegram link via profile button', () => {
     await expect(profileLink).toBeVisible({ timeout: 8_000 });
   });
 });
+
+/**
+ * Конфликт: вход по почте под SITE_TEST_EMAIL внутри мини-аппа, чей Telegram
+ * уже за SITE_LINKED_EMAIL. Слияний нет (ADR-0021) — 409 и почта владельца
+ * на экране, чтобы человек вошёл в старый аккаунт.
+ */
+import { test as telegramTest, expect as telegramExpect } from '../fixtures';
+
+telegramTest.describe('Scenario 5b: linking a taken Telegram is refused', () => {
+  const LINKED_EMAIL = process.env.SITE_LINKED_EMAIL ?? '';
+  telegramTest.skip(!EMAIL || !PASSWORD || !LINKED_EMAIL, 'test accounts not configured');
+
+  telegramTest('shows the owner email from the 409', async ({ linkedTelegramPage: page }) => {
+    await page.goto(`${BASE}/login`);
+    await page.locator('input[name="email"]').fill(EMAIL);
+    await page.locator('input[name="password"]').fill(PASSWORD);
+
+    const autoLink = page.waitForResponse(
+      (res) => res.url().includes('/api/v2/telegram/auto-link') && res.request().method() === 'POST',
+      { timeout: 20_000 }
+    );
+    await page.getByRole('button', { name: /sign in|войти|увійти|login/i }).click();
+
+    const res = await autoLink;
+    telegramExpect(res.status()).toBe(409);
+    telegramExpect((await res.json()).email).toBe(LINKED_EMAIL);
+    await telegramExpect(page.getByText(LINKED_EMAIL).first()).toBeVisible({ timeout: 10_000 });
+  });
+});
+

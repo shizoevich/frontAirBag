@@ -10,7 +10,6 @@ import Link from "next/link";
 import SimplifiedBillingArea from "./simplified-billing-area";
 import CheckoutLoginDiscount from "./checkout-login-discount";
 import UserInfoModal from "./user-info-modal";
-import GuestRegistrationModal from './guest-registration-modal';
 import PaymentModal from './payment-modal';
 import GooglePayButton from './google-pay-button';
 import BankTransferDetails from './bank-transfer-details';
@@ -39,6 +38,7 @@ const OrderCheckoutArea = () => {
     handleSubmit,
     submitHandler,
     register,
+    control,
     formState: { errors },
     setValue,
     watch,
@@ -49,9 +49,6 @@ const OrderCheckoutArea = () => {
     showUserInfoModal,
     setShowUserInfoModal,
     handleUserInfoSubmit,
-    showGuestRegistrationModal,
-    handleGuestRegistrationClose,
-    handleGuestRegistrationRegister,
     paymentMethod,
     setPaymentMethod,
     bankTransferFile,
@@ -95,7 +92,6 @@ const OrderCheckoutArea = () => {
   }, [accessToken]);
   
   const { cart_products } = useSelector((state) => state.cart);
-  const { isGuest } = useSelector((state) => state.auth);
   const { quantity } = useCartInfo();
 
   const showPaymentFrame = paymentMethod === "pay_now" && (isCreatingPayment || !!monoPageUrl);
@@ -104,9 +100,8 @@ const OrderCheckoutArea = () => {
   // This ensures we still create a payment URL once when pay_now is active.
   const didAutoCreatePaymentRef = React.useRef(false);
 
-  // Guests typically don't have permission to list orders -> avoid noisy 403
   const { data: ordersData } = useGetOrdersQuery(undefined, {
-    skip: !accessToken || isGuest,
+    skip: !accessToken,
   });
   const { data: discountsData } = useGetDiscountsQuery();
 
@@ -116,7 +111,6 @@ const OrderCheckoutArea = () => {
 
   // Рассчитываем текущую скидку пользователя
   const calculateCurrentDiscount = () => {
-    if (isGuest) return 0;
     if (!ordersData || !discountsData) return 0;
     
     const orders = ordersData.results || ordersData.data || ordersData;
@@ -322,6 +316,7 @@ const OrderCheckoutArea = () => {
                 <div className="row">
                   <div className="col-lg-7">
                     <SimplifiedBillingArea
+                      control={control}
                       register={register}
                       errors={errors}
                       user={user}

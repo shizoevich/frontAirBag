@@ -2,26 +2,12 @@
 import React from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
-import useTelegramWebApp from '@/hooks/use-telegram-webapp';
-import { useTelegramAutoLinkMutation } from '@/redux/features/auth/authApi';
-import { buildTelegramInitPayload } from '@/utils/telegram';
-import { notifyError } from '@/utils/toast';
 
+// Аноним видит только «войти / зарегистрироваться»: привязка Telegram — действие
+// под аккаунтом, и после входа внутри мини-аппа она происходит сама (ADR-0021).
 const CheckoutLoginDiscount = ({ user, accessToken }) => {
   const t = useTranslations('Checkout');
   const locale = useLocale();
-  const { hasInitData, rawInitData } = useTelegramWebApp();
-  const [telegramAutoLink, { isLoading: isTelegramLinking }] = useTelegramAutoLinkMutation();
-
-  const handleTelegramAutoLink = async () => {
-    try {
-      const payload = buildTelegramInitPayload({ rawInitData }) || {};
-      await telegramAutoLink(payload);
-    } catch (error) {
-      const message = error?.data?.detail || error?.data?.message || t('telegramAutoLinkFailed');
-      notifyError(message);
-    }
-  };
 
   return (
     <div className="tp-checkout-login-form-reveal-wrapper">
@@ -46,17 +32,6 @@ const CheckoutLoginDiscount = ({ user, accessToken }) => {
                     <Link href={`/${locale}/register?redirect=/${locale}/checkout`} className="btn btn-sm btn-primary">
                       {t('register_button')}
                     </Link>
-                    {hasInitData && !user?.telegram_id && (
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-success d-flex align-items-center gap-2"
-                        onClick={handleTelegramAutoLink}
-                        disabled={isTelegramLinking}
-                      >
-                        <i className="fab fa-telegram" aria-hidden="true" />
-                        {isTelegramLinking ? t('telegram_linking') : t('telegram_link')}
-                      </button>
-                    )}
                   </div>
                 </div>
               ) : (

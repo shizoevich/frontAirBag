@@ -1,13 +1,16 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
+import PhoneInput from '@/components/common/phone-input';
+import { PHONE_RE } from '@/utils/phone';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import ErrorMsg from '../common/error-msg';
 import { notifyError, notifySuccess } from '@/utils/toast';
-import { useRegisterMutation, useLoginMutation } from '@/redux/features/auth/authApi';
+import { useRegisterMutation, useLoginMutation, useTelegramAuthMutation } from '@/redux/features/auth/authApi';
+import { readTelegramInitData } from '@/utils/telegram';
 import '@/styles/register-form.css';
 
 const RegisterForm = () => {
@@ -42,12 +45,11 @@ const RegisterForm = () => {
       .max(100, t('maxCharacters', { count: 100 }))
       .min(1, t('minCharacters', { count: 1 }))
       .required(t('emailRequired')),
+    // Телефон обязателен и в одном формате: по нему заводится контрагент в CRM
+    // и ищется аккаунт (ADR-0021).
     phone: Yup.string()
-      .trim()
-      .transform(value => value === '' ? undefined : value)
-      .max(20, t('maxCharacters', { count: 20 }))
-      .nullable()
-      .optional(),
+      .required(t('phoneRequired'))
+      .matches(PHONE_RE, t('invalidPhone')),
     password: Yup.string()
       .min(1, t('minCharacters', { count: 1 }))
       .required(t('passwordRequired')),
@@ -68,6 +70,7 @@ const RegisterForm = () => {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
     reset,
   } = useForm({
@@ -77,6 +80,7 @@ const RegisterForm = () => {
   // Используем RTK Query для регистрации и входа
   const [registerUser, { isLoading: isRegistering }] = useRegisterMutation();
   const [login, { isLoading: isLoggingIn }] = useLoginMutation();
+  const [telegramAuth] = useTelegramAuthMutation();
   
   // Общий статус загрузки
   const isLoading = loading || isRegistering || isLoggingIn;
@@ -265,8 +269,12 @@ const RegisterForm = () => {
       // Добавляем опциональные поля только если они заполнены
       if (data.name) registerData.name = data.name;
       if (data.last_name) registerData.last_name = data.last_name;
-      if (data.phone) registerData.phone = data.phone;
+      registerData.phone = data.phone;
       if (novaPostAddress) registerData.nova_post_address = novaPostAddress;
+      // Регистрация внутри мини-аппа: Telegram привязывается на сервере сразу,
+      // до подтверждения почты (ADR-0021).
+      const initData = readTelegramInitData();
+      if (initData) registerData.init_data = initData;
       
       console.log('Registration data:', registerData);
       
@@ -275,13 +283,19 @@ const RegisterForm = () => {
       
       notifySuccess(t('registerSuccess'));
       
-      // Автоматически выполняем вход после успешной регистрации
+      // Автоматически выполняем вход после успешной регистрации. В мини-аппе —
+      // по Telegram: вход по паролю до подтверждения почты закрыт, а Telegram
+      // уже привязан.
       try {
-        await login({
-          email: data.email,
-          password: data.password,
-          remember: false
-        }).unwrap();
+        if (initData) {
+          await telegramAuth({ init_data: initData }).unwrap();
+        } else {
+          await login({
+            email: data.email,
+            password: data.password,
+            remember: false
+          }).unwrap();
+        }
         
         // Проверяем, есть ли параметр redirect в URL или localStorage
         const urlParams = new URLSearchParams(window.location.search);
@@ -314,8 +328,14 @@ const RegisterForm = () => {
         // Если есть структурированный ответ с ошибками
         const errorData = error.data;
         
-        if (errorData.email) {
+        if (errorData.init_data) {
+          // Этот Telegram уже за другим аккаунтом — слияний нет, решает человек
+          notifyError([].concat(errorData.init_data).join(', '));
+        } else if (errorData.email) {
           notifyError(`Email: ${errorData.email.join(', ')}`);
+        } else if (errorData.phone) {
+          // «Телефон занят» — без подсказок, чей он (ADR-0021).
+          notifyError(`${t('phoneNumber')}: ${[].concat(errorData.phone).join(', ')}`);
         } else if (errorData.password) {
           notifyError(`Пароль: ${errorData.password.join(', ')}`);
         } else if (errorData.non_field_errors) {
@@ -405,13 +425,21 @@ const RegisterForm = () => {
           
           <div className="tp-login-input-box">
             <div className="tp-login-input-label">
-              <label>{t('phoneNumber')}</label>
+              <label>{t('phoneNumber')} <span className="required-star">*</span></label>
             </div>
             <div className="tp-login-input">
-              <input 
-                {...register('phone')} 
-                placeholder={t('phoneNumber')} 
-                type="tel" 
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field }) => (
+                  <PhoneInput
+                    name={field.name}
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    invalid={Boolean(errors.phone)}
+                  />
+                )}
               />
             </div>
             {errors.phone && <ErrorMsg msg={errors.phone.message} />}

@@ -7,15 +7,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCreateOrderMutation, useUploadPaymentDocMutation } from "@/redux/features/ordersApi";
-import { useGetUserQuery, useCreateGuestMutation, useTelegramAutoLinkMutation } from "@/redux/features/auth/authApi";
-import useTelegramWebApp from "@/hooks/use-telegram-webapp";
-import { buildTelegramInitPayload } from "@/utils/telegram";
+import { useGetUserQuery } from "@/redux/features/auth/authApi";
+import { readTelegramInitData } from "@/utils/telegram";
+import { PHONE_RE } from "@/utils/phone";
 import { useUpdateClientPutMutation } from '@/redux/features/clientsApi';
-import { userLoggedIn } from "@/redux/features/auth/authSlice";
 import { clearCart } from "@/redux/features/cartSlice";
 import { notifySuccess, notifyError } from "@/utils/toast";
 import { uploadPaymentDocWithRetry } from "@/utils/upload-payment-doc";
-import Cookies from "js-cookie";
 import { getAuth } from "@/utils/authStorage";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -75,7 +73,7 @@ const buildCheckoutSchema = (t) =>
       .min(2, t("min_characters", { count: 2 })),
     phone: Yup.string()
       .required(t("phone_required"))
-      .matches(/^[\+]?[0-9\(\)\-\s]+$/, t("phone_invalid")),
+      .matches(PHONE_RE, t("phone_invalid")),
     city: Yup.string().required(t("city_required")),
     warehouse: Yup.string().required(t("warehouse_required")),
     orderNotes: Yup.string().max(500, t("order_notes_max", { count: 500 })),
@@ -83,7 +81,6 @@ const buildCheckoutSchema = (t) =>
 
 const useOrderCheckout = () => {
   const tv = useTranslations("CheckoutValidation");
-  const tg = useTranslations("GuestValidation");
   const checkoutSchema = buildCheckoutSchema(tv);
   const [shippingCost, setShippingCost] = useState(0);
   const [discountAmount, setDiscountAmount] = useState(0);
@@ -92,7 +89,6 @@ const useOrderCheckout = () => {
   const [couponApplyMsg, setCouponApplyMsg] = useState("");
   const [isCheckoutSubmit, setIsCheckoutSubmit] = useState(false);
   const [showUserInfoModal, setShowUserInfoModal] = useState(false);
-  const [showGuestRegistrationModal, setShowGuestRegistrationModal] = useState(false);
   // Checkout UX: default to card payment ("pay now").
   const [paymentMethod, setPaymentMethod] = useState("pay_now"); // "cash_on_delivery" | "pay_now" | "bank_transfer"
   // Bank transfer payment confirmation document (uploaded after order creation)
@@ -108,12 +104,9 @@ const useOrderCheckout = () => {
   const { data: userData } = useGetUserQuery(undefined, { skip: true });
   const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
   const [uploadPaymentDoc] = useUploadPaymentDocMutation();
-  const [createGuest, { isLoading: isCreatingGuest }] = useCreateGuestMutation();
   const [updateClientPut] = useUpdateClientPutMutation();
-  const [telegramAutoLink] = useTelegramAutoLinkMutation();
-  const { hasInitData, rawInitData } = useTelegramWebApp();
 
-  const { register, handleSubmit, setValue, formState: { errors }, watch } = useForm({
+  const { register, handleSubmit, setValue, control, formState: { errors }, watch } = useForm({
     resolver: yupResolver(checkoutSchema),
     mode: 'onChange', // Валидация при изменении полей
   });
@@ -156,9 +149,14 @@ const useOrderCheckout = () => {
     setIsCheckoutSubmit(true);
 
     try {
-      // Remember whether user started checkout without auth.
-      // We use this later to decide whether to show guest registration suggestions.
-      const startedUnauthenticated = !accessToken;
+      // Оформление — только под аккаунтом (ADR-0021). Сессия могла умереть уже
+      // после открытия страницы: тогда на вход, корзина в localStorage дождётся.
+      if (!accessToken && !getAuth()?.accessToken) {
+        localStorage.setItem('redirectAfterLogin', `/${locale}/checkout`);
+        setIsCheckoutSubmit(false);
+        router.push(`/${locale}/login`);
+        return;
+      }
 
       // Проверяем, что все обязательные поля заполнены
       if (!data.firstName || !data.lastName || !data.phone || !data.city || !data.warehouse) {
@@ -248,161 +246,9 @@ const useOrderCheckout = () => {
       console.log("Access token exists:", !!accessToken);
       console.log("========================");
 
-      // Если пользователь не авторизован, создаем гостевой аккаунт
-      if (!accessToken) {
-        // If we already have guest/user tokens in storage, sync them and do NOT create another guest.
-        // This prevents situations where guest was created on backend, but checkout retries and hits
-        // `phone already exists`.
-        try {
-          const ls = getAuth();
-          if (ls?.accessToken) {
-            dispatch(
-              userLoggedIn({
-                accessToken: ls.accessToken,
-                user: ls.user ?? null,
-                isGuest: ls.isGuest ?? false,
-                guestId: ls.guestId ?? null,
-              })
-            );
-            console.log("Using existing auth token from localStorage, skipping guest creation");
-          }
-        } catch (e) {
-          console.warn("Failed to sync auth from localStorage:", e);
-        }
-
-        const cookieRaw = Cookies.get("userInfo");
-        if (!accessToken && cookieRaw) {
-          try {
-            const c = JSON.parse(cookieRaw);
-            if (c?.accessToken) {
-              dispatch(
-                userLoggedIn({
-                  accessToken: c.accessToken,
-                  user: c.user ?? null,
-                  isGuest: c.isGuest ?? false,
-                  guestId: c.guestId ?? null,
-                })
-              );
-              console.log("Using existing auth token from cookies, skipping guest creation");
-            }
-          } catch (e) {
-            console.warn("Failed to parse cookie userInfo:", e);
-          }
-        }
-
-        // After sync attempt, if token exists in storage, proceed to create order
-        const finalLs = (() => {
-          try {
-            return getAuth();
-          } catch {
-            return null;
-          }
-        })();
-        if (finalLs?.accessToken) {
-          console.log("Auth token is present in storage, continuing order creation without new guest");
-        } else {
-        console.log("Creating guest account for order...");
-        const guestData = {
-          name: data.firstName,
-          last_name: data.lastName,
-          phone: data.phone,
-          nova_post_address: novaPostAddress
-        };
-        
-        try {
-          const guestResult = await createGuest(guestData).unwrap();
-          console.log("Guest account created successfully:", guestResult);
-          if (hasInitData) {
-            try {
-              const tgPayload = buildTelegramInitPayload({ rawInitData });
-              if (tgPayload) await telegramAutoLink(tgPayload).unwrap();
-            } catch {
-              // Некритично — гость создан, привязка Telegram не обязательна
-            }
-          }
-        } catch (guestError) {
-          console.error("Failed to create guest account:", guestError);
-          console.error("Guest error details:", {
-            message: guestError?.message,
-            status: guestError?.status,
-            data: guestError?.data
-          });
-
-          // If backend says the phone already exists, we might be retrying after a successful guest create.
-          // If tokens are already in storage, allow checkout to continue.
-          if (guestError?.status === 400 && guestError?.data?.phone?.[0]?.includes("already exists")) {
-            const existing = (() => {
-              try {
-                return getAuth();
-              } catch {
-                return null;
-              }
-            })();
-            if (existing?.accessToken) {
-              console.warn("Guest already exists by phone, but token is present in storage. Continuing...");
-              // do not throw
-              return;
-            }
-          }
-
-          // If we failed due to client-side validation, surface the exact fields
-          if (guestError?.status === "CLIENT_VALIDATION_ERROR") {
-            const errs = guestError?.data?.errors || {};
-
-            const formatGuestFieldError = (field, err) => {
-              if (!err) return null;
-              const label = (() => {
-                try {
-                  return tg(field);
-                } catch {
-                  return field;
-                }
-              })();
-
-              if (typeof err === "string") return `${label}: ${err}`;
-              const code = err?.code;
-              if (!code) return `${label}: ${JSON.stringify(err)}`;
-
-              if (code === "maxLength") return `${label}: ${tg("maxLength", { max: err.max })}`;
-              return `${label}: ${tg(code)}`;
-            };
-
-            const parts = Object.entries(errs)
-              .map(([field, err]) => formatGuestFieldError(field, err))
-              .filter(Boolean);
-
-            const details = parts.length ? parts.join("; ") : tv("guest_validation_failed_generic");
-            throw new Error(`${tv("guest_create_failed")}: ${details}`);
-          }
-
-          // If backend returns 400 with field errors, show them as well
-          if (guestError?.status === 400 && guestError?.data) {
-            const d = guestError.data;
-
-            // translate common backend messages
-            const phoneAlreadyExists =
-              Array.isArray(d.phone) &&
-              typeof d.phone[0] === "string" &&
-              d.phone[0].includes("already exists");
-
-            const msg =
-              d.detail ||
-              (phoneAlreadyExists && tv("phone_already_exists")) ||
-              (d.phone && `Телефон: ${d.phone[0]}`) ||
-              (d.name && `Имя: ${d.name[0]}`) ||
-              (d.last_name && `Фамилия: ${d.last_name[0]}`) ||
-              (d.nova_post_address && `Адрес доставки: ${d.nova_post_address[0]}`) ||
-              (d.email && `Email: ${d.email[0]}`) ||
-              (d.login && `Логин: ${d.login[0]}`) ||
-              (d.telegram_id && `Telegram: ${d.telegram_id[0]}`) ||
-              "Некорректные данные гостя";
-            throw new Error(`Не удалось создать гостевой аккаунт: ${msg}`);
-          }
-          
-          throw new Error(tv("guest_create_failed_try_again"));
-        }
-        }
-      }
+      // Заказ из мини-аппа: бэкенд запишет, с какого Telegram оформили
+      const initData = readTelegramInitData();
+      if (initData) orderData.init_data = initData;
 
       // Создаем заказ
       const result = await createOrder(orderData).unwrap();
@@ -449,21 +295,11 @@ const useOrderCheckout = () => {
         return result;
       }
 
-      // Если пользователь не авторизован, показываем модальное окно предложения регистрации
-      if (startedUnauthenticated) {
-        setShowGuestRegistrationModal(true);
-        // Сохраняем информацию о заказе для последующего перенаправления
-        sessionStorage.setItem('pendingOrderRedirect', JSON.stringify({
-          orderId: result.id,
-          paymentMethod
-        }));
-      } else {
-        // Самовывоз / оплата потом — заказ создан, оплата не подтверждена.
-        // AIRBAG-83: прокидываем способ доставки, чтобы на странице успеха
-        // не показывать текст про отправку при самовывозе.
-        const deliveryParam = novaPostAddress ? "shipping" : "pickup";
-        router.push(`/${locale}/order-success?payment=pending&delivery=${deliveryParam}`);
-      }
+      // Самовывоз / оплата потом — заказ создан, оплата не подтверждена.
+      // AIRBAG-83: прокидываем способ доставки, чтобы на странице успеха
+      // не показывать текст про отправку при самовывозе.
+      const deliveryParam = novaPostAddress ? "shipping" : "pickup";
+      router.push(`/${locale}/order-success?payment=pending&delivery=${deliveryParam}`);
       
     } catch (error) {
       // RTK Query / fetch errors can look like {} in console (non-enumerable fields).
@@ -516,7 +352,11 @@ const useOrderCheckout = () => {
         } else if (error.data.non_field_errors) {
           errorMessage = error.data.non_field_errors[0];
         } else if (error.data.phone) {
-          errorMessage = `Телефон: ${error.data.phone[0]}`;
+          // Чужой номер — код от бэкенда, текст наш (ADR-0021)
+          const phoneError = [].concat(error.data.phone)[0];
+          errorMessage = phoneError === "phone_belongs_to_other_account"
+            ? tv("phone_belongs_to_other_account")
+            : phoneError;
         } else if (error.data.nova_post_address) {
           errorMessage = `Адрес доставки: ${error.data.nova_post_address[0]}`;
         }
@@ -549,35 +389,11 @@ const useOrderCheckout = () => {
     handleSubmit(submitHandler)();
   };
 
-  // Обработка закрытия модального окна регистрации
-  const handleGuestRegistrationClose = () => {
-    setShowGuestRegistrationModal(false);
-    
-    // Получаем сохраненную информацию о заказе и перенаправляем
-    const pendingRedirect = sessionStorage.getItem('pendingOrderRedirect');
-    if (pendingRedirect) {
-      const { orderId, paymentMethod: savedPaymentMethod } = JSON.parse(pendingRedirect);
-      sessionStorage.removeItem('pendingOrderRedirect');
-      
-      if (savedPaymentMethod === "pay_now") {
-        router.push(`/payment/${orderId}`);
-      } else {
-        router.push(`/order-confirmation/${orderId}`);
-      }
-    }
-  };
-
-  // Обработка перехода к регистрации
-  const handleGuestRegistrationRegister = () => {
-    setShowGuestRegistrationModal(false);
-    // Перенаправляем на страницу регистрации, сохраняя информацию о заказе
-    router.push('/register');
-  };
-
   return {
     handleSubmit,
     submitHandler,
     register,
+    control,
     formState: { errors },
     setValue,
     watch,
@@ -594,9 +410,6 @@ const useOrderCheckout = () => {
     showUserInfoModal,
     setShowUserInfoModal,
     handleUserInfoSubmit,
-    showGuestRegistrationModal,
-    handleGuestRegistrationClose,
-    handleGuestRegistrationRegister,
     paymentMethod,
     setPaymentMethod,
     bankTransferFile,

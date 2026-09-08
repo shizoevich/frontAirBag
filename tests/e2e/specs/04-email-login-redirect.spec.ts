@@ -2,9 +2,9 @@
  * Scenario 4 — Regular browser (no Telegram WebApp) email/password login.
  *
  * Expected behaviour:
- * - No Telegram initData available → no guest session created
+ * - No Telegram initData available → the visitor is simply anonymous
  * - User logs in normally; redirected to home/profile after success
- * - isGuest is false; no auto-link request fires (no initData)
+ * - No auto-link request fires (no initData)
  * - Profile accessible; no Telegram badge shown (account has none linked)
  */
 import { test, expect } from '@playwright/test';
