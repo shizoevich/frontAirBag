@@ -10,7 +10,14 @@ function loadScriptOnce(src) {
   return new Promise((resolve, reject) => {
     if (typeof window === 'undefined') return resolve(false);
     const existing = document.querySelector(`script[src="${src}"]`);
-    if (existing) return resolve(true);
+    if (existing) {
+      // Тег уже вставлен, но мог ещё не загрузиться (второй запуск эффекта в
+      // Strict Mode): «готово» — только когда API действительно на месте.
+      if (window.google?.payments?.api) return resolve(true);
+      existing.addEventListener('load', () => resolve(true), { once: true });
+      existing.addEventListener('error', reject, { once: true });
+      return undefined;
+    }
     const s = document.createElement('script');
     s.async = true;
     s.src = src;
