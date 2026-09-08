@@ -33,6 +33,10 @@ export async function injectTelegramWebApp(
           viewportStableHeight: 720,
           ready: () => {},
           expand: () => {},
+          // Ссылки наружу (страница оплаты) — записываем, чтобы спека их проверила
+          openLink: (url: string) => {
+            (window as any).__telegramOpenedLinks = [...((window as any).__telegramOpenedLinks || []), url];
+          },
           close: () => {},
           MainButton: { show: () => {}, hide: () => {}, setText: () => {}, onClick: () => {} },
           BackButton: { isVisible: false, show: () => {}, hide: () => {}, onClick: () => {} },
