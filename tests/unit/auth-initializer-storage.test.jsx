@@ -33,6 +33,7 @@ vi.mock('@/utils/telegram', () => ({
   readTelegramInitDataUnsafe: () => null,
   hasTelegramInitData: () => false,
   buildTelegramInitPayload: () => null,
+  getTelegramUser: () => null,
 }));
 
 const storage = { writable: true, data: null };
@@ -90,7 +91,7 @@ describe('хранилище рабочее', () => {
   });
 
   it('найденный токен восстанавливает сессию', () => {
-    storage.data = { accessToken: 'stored', user: { id: 3 }, isGuest: false };
+    storage.data = { accessToken: 'stored', user: { id: 3 } };
 
     render(<AuthInitializer><div /></AuthInitializer>);
 

@@ -339,7 +339,7 @@
     "warehouse": "Nova Poshta Warehouse",
     "warehouseRequired": "Warehouse is required",
     "maxCharacters": "Max. {count} characters",
-    "invalidPhone": "Invalid phone number format",
+    "invalidPhone": "Phone number: +380 followed by 9 digits",
     "invalidCredentials": "Invalid login or password",
     "userAlreadyExists": "User with this phone or email already exists",
     "emailAlreadyExists": "User with this email already exists",
@@ -374,7 +374,9 @@
     "claimAlreadyDoneText": "Sign in with your email and password.",
     "claimSuccessTitle": "Almost done",
     "claimSuccessText": "We sent a letter to your email. Confirm it and you will be able to sign in.",
-    "claimEmailTaken": "This email is already used by another account."
+    "claimEmailTaken": "This email is already used by another account.",
+    "noPasswordHint": "No password? Open the shop from the Telegram bot — you will be signed in automatically.",
+    "telegramTaken": "This Telegram is already registered to another account"
   },
   "ProfileExtra": {
     "enterPhone": "Enter your phone number",
@@ -718,7 +720,7 @@
     "first_name_required": "First name is required",
     "last_name_required": "Last name is required",
     "phone_required": "Phone is required",
-    "phone_invalid": "Invalid phone format",
+    "phone_invalid": "Phone number: +380 followed by 9 digits",
     "address_required": "Address is required",
     "cancel": "Cancel",
     "save_and_continue": "Save and Continue",
@@ -743,30 +745,13 @@
     "first_name_required": "First name is required",
     "last_name_required": "Last name is required",
     "phone_required": "Phone is required",
-    "phone_invalid": "Invalid phone format",
+    "phone_invalid": "Phone number: +380 followed by 9 digits",
     "city_required": "City is required",
     "warehouse_required": "Warehouse is required",
     "min_characters": "Must be at least {count} characters",
     "order_notes_max": "Order notes must be at most {count} characters",
     "fill_required_fields": "Please fill in all required fields",
-    "guest_create_failed": "Failed to create guest account",
-    "guest_validation_failed_generic": "Please check the entered data",
-    "guest_create_failed_try_again": "Failed to create guest account. Please try again.",
-    "phone_already_exists": "A client with this phone number already exists"
-  },
-  "GuestValidation": {
-    "required": "This field is required",
-    "maxLength": "Maximum length is {max}",
-    "invalidPhone": "Invalid phone format",
-    "invalidEmail": "Invalid email format",
-    "integer": "Must be an integer",
-    "outOfRange": "Value is out of range",
-    "name": "Name",
-    "last_name": "Last name",
-    "phone": "Phone",
-    "email": "Email",
-    "login": "Login",
-    "telegram_id": "Telegram id"
+    "phone_belongs_to_other_account": "This phone number seems to belong to another account. Enter a different number or place the order from that account"
   },
   "PrivacyPolicy": {
     "metaTitle": "Privacy Policy - AirBag",
@@ -845,26 +830,6 @@
     "err_3DS": "3D Secure authentication failed",
     "err_LIMIT_EXCEEDED": "Card operation limit exceeded",
     "err_BANK_UNAVAILABLE": "Bank is temporarily unavailable. Please try again later"
-  },
-  "PreCheckout": {
-    "title": "Checkout",
-    "chooseOption": "Choose your checkout method",
-    "registrationBenefits": "Register to get discounts, track orders and save purchase history",
-    "register": "Register",
-    "continueAsGuest": "Continue as Guest",
-    "processing": "Processing...",
-    "name": "Name",
-    "lastName": "Last Name",
-    "email": "Email",
-    "phone": "Phone",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "registerAndContinue": "Register and Continue",
-    "registering": "Registering...",
-    "back": "Back",
-    "passwordMismatch": "Passwords do not match",
-    "registrationSuccess": "Registration successful!",
-    "registrationError": "Registration error. Please try again."
   },
   "Terms": {
     "metaTitle": "Terms and Conditions - AirBag",

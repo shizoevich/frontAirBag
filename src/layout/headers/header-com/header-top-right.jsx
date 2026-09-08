@@ -12,11 +12,11 @@ function ProfileSetting() {
   const t = useTranslations('HeaderTopRight');
   const locale = useLocale();
   const [isActive, setIsActive] = useState(false);
-  const { user, accessToken, isGuest } = useSelector((state) => state.auth);
+  const { user, accessToken } = useSelector((state) => state.auth);
   
   // Проверяем, авторизован ли пользователь
   const isAuthenticated = !!accessToken;
-  const isAuthenticatedUser = isAuthenticated && !isGuest;
+  const isAuthenticatedUser = isAuthenticated;
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const router = useRouter();
   const pathname = usePathname();

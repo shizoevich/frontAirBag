@@ -17,6 +17,7 @@ import useTelegramWebApp from "@/hooks/use-telegram-webapp";
 import { buildTelegramInitPayload } from "@/utils/telegram";
 import Loader from "../loader/loader";
 import ErrorMsg from "../common/error-msg";
+import PhoneInput from "../common/phone-input";
 import { notifyError, notifySuccess } from '@/utils/toast';
 import '@/styles/register-form.css';
 
@@ -87,7 +88,8 @@ const UserProfileArea = () => {
   }, [router, locale, accessToken]);
   
   const profileUser = userData || user;
-  const isTelegramLinked = Boolean(profileUser?.telegram_id || profileUser?.telegram_username);
+  const linkedTelegramIds = (profileUser?.telegram_ids || []).map(Number);
+  const isTelegramLinked = linkedTelegramIds.length > 0;
 
   // Auto-link / auto-replace Telegram when profile is opened via Telegram WebApp.
   // Fires if: in WebApp context, profile loaded, and the WebApp Telegram ID differs
@@ -99,17 +101,17 @@ const UserProfileArea = () => {
 
     const webAppTgId = telegramUser?.id ? Number(telegramUser.id) : null;
     if (!webAppTgId) return;
-    // Same Telegram already linked — nothing to do
-    if (profileUser.telegram_id && Number(profileUser.telegram_id) === webAppTgId) return;
+    // Этот Telegram уже среди привязок — делать нечего
+    if (linkedTelegramIds.includes(webAppTgId)) return;
 
     autoLinkRef.current = true;
     const payload = buildTelegramInitPayload({ rawInitData }) || {};
-    const isChange = Boolean(profileUser.telegram_id);
+    const isChange = linkedTelegramIds.length > 0;
     telegramAutoLink(payload)
       .unwrap()
       .then(() => notifySuccess(profileExtra(isChange ? 'telegramChangedSuccess' : 'telegramLinkedSuccess')))
       .catch(() => null);
-  }, [hasInitData, rawInitData, telegramUser, profileUser, telegramAutoLink, profileExtra]);
+  }, [hasInitData, rawInitData, telegramUser, profileUser, linkedTelegramIds, telegramAutoLink, profileExtra]);
 
   const profileName = profileUser?.name || profileUser?.first_name || '';
   const profileLastName = profileUser?.last_name || '';
@@ -251,10 +253,9 @@ const UserProfileArea = () => {
   // Обработчик изменения полей формы
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const normalizedValue = name === 'phone' ? value.replace(/\s+/g, '') : value;
     setFormData(prev => ({
       ...prev,
-      [name]: normalizedValue,
+      [name]: value,
     }));
   };
 
@@ -769,13 +770,11 @@ const UserProfileArea = () => {
                           <div className="profile__input-box">
                             <label className="form-label fw-medium mb-2">{t('phone')}</label>
                             <div className="profile__input">
-                              <input 
-                                type="tel" 
+                              <PhoneInput
                                 name="phone"
-                                className="form-control"
-                                placeholder={t('phone')} 
+                                inputClassName="form-control"
                                 value={formData.phone}
-                                onChange={handleChange}
+                                onChange={(phone) => setFormData((prev) => ({ ...prev, phone }))}
                               />
                             </div>
                           </div>

@@ -16,7 +16,7 @@ const NavProfileTab = ({ orderData }) => {
 
   const [getTelegramLink, { isFetching: isLinkLoading }] = useLazyTelegramLinkQuery();
 
-  // Актуализируем профиль при открытии страницы, чтобы telegram_id был свежим
+  // Актуализируем профиль при открытии страницы, чтобы список привязок Telegram был свежим
   useGetUserQuery(undefined, { refetchOnMountOrArgChange: true });
 
   const getLocalizedLink = (link) => {
@@ -123,7 +123,7 @@ const NavProfileTab = ({ orderData }) => {
       <div className="profile__telegram mt-40 pt-35" style={{ borderTop: '1px solid #e8ecef' }}>
         <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
           <div>
-            {user?.telegram_id ? (
+            {user?.telegram_ids?.length ? (
               <>
                 <h5 className="mb-1" style={{ color: '#2ca5e0' }}>
                   ✓ Telegram підключено
@@ -145,12 +145,12 @@ const NavProfileTab = ({ orderData }) => {
             type="button"
             onClick={handleTelegramConnect}
             disabled={isLinkLoading}
-            className={user?.telegram_id ? 'tp-btn tp-btn-border' : 'tp-btn'}
+            className={user?.telegram_ids?.length ? 'tp-btn tp-btn-border' : 'tp-btn'}
             style={{ minWidth: 160, whiteSpace: 'nowrap' }}
           >
             {isLinkLoading
               ? 'Завантаження...'
-              : user?.telegram_id
+              : user?.telegram_ids?.length
               ? 'Змінити Telegram'
               : 'Підключити Telegram'}
           </button>

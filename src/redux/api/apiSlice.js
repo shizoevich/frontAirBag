@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { userLoggedOut } from "../features/auth/authSlice";
+import { userLoggedIn, userLoggedOut } from "../features/auth/authSlice";
 import { getAccessToken, getRefreshToken, setAuth, getAuth } from "@/utils/authStorage";
+import { readTelegramInitData } from "@/utils/telegram";
 
 function decodeJwtPayload(token) {
   try {
@@ -154,6 +155,8 @@ const baseQuery = fetchBaseQuery({
         // подтверждение почты: пользователь ещё не залогинен
         'confirmEmail',
         'resendEmailConfirmation',
+        // вход по Telegram: сюда приходят как раз с мёртвым токеном
+        'telegramAuth',
       ]);
 
       if (endpoint && publicEndpoints.has(endpoint)) {
@@ -207,8 +210,48 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
+// Запросы без Authorization: сюда нельзя тащить протухший токен из хранилища.
+const publicBaseQuery = fetchBaseQuery({
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+  prepareHeaders: (headers) => {
+    headers.set('ngrok-skip-browser-warning', '1');
+    return headers;
+  },
+});
+
+/**
+ * Сессия умерла, но мы внутри мини-аппа — входим по Telegram заново.
+ *
+ * Так сессия переживает истечение refresh без перезапуска мини-аппа: раньше
+ * фронт разлогинивал, чекаут заводил гостя, и заказ падал в 403 четыре раза
+ * подряд (Сидоренко, 05.09.2026). Неизвестный Telegram (404) или протухший
+ * initData (400) — честный разлогин.
+ */
+export async function loginViaTelegram(api, extraOptions) {
+  const initData = readTelegramInitData();
+  if (!initData) return false;
+
+  const result = await publicBaseQuery(
+    { url: '/telegram/auth', method: 'POST', body: { init_data: initData } },
+    api,
+    extraOptions
+  );
+  const { access, refresh, user } = result?.data || {};
+  if (!access) return false;
+
+  setAuth({ accessToken: access, refreshToken: refresh ?? null, user: user || null });
+  syncCookieAccessToken(access);
+  api.dispatch(userLoggedIn({ accessToken: access, user: user || null }));
+  return true;
+}
+
+// Сами точки входа/обновления сессии повторному входу не подлежат — иначе цикл.
+function isSessionEndpoint(url) {
+  return typeof url === 'string' && (url.includes('/telegram/auth') || url.includes('/auth/token/refresh/'));
+}
+
 // Создаем обертку для базового запроса с обработкой ошибок и обновлением токенов
-const baseQueryWithReauth = async (args, api, extraOptions) => {
+export const baseQueryWithReauth = async (args, api, extraOptions) => {
   const reqUrl = typeof args === 'string' ? args : args.url;
   const reqMethod = typeof args === 'string' ? 'GET' : args.method;
   console.log('🌐 API Request:', { 
@@ -236,54 +279,45 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     });
   }
   
-  // If access token expired/invalid, try refresh and retry
-  if (isAccessTokenExpiredError(result)) {
-    // Проверяем, есть ли refresh токен
+  // Токен истёк: сначала refresh, затем — в мини-аппе — вход по Telegram, и
+  // только потом разлогин. Удачное восстановление повторяет исходный запрос.
+  if (isAccessTokenExpiredError(result) && !isSessionEndpoint(reqUrl)) {
     try {
       const userInfo = getAuth() || {};
       const refreshToken = getRefreshToken();
-      
-      if (!refreshToken) {
-        // Если нет refresh токена, выполняем logout
+      let restored = false;
+
+      if (refreshToken) {
+        console.log('🔁 Refresh token request: /auth/token/refresh/');
+        const refreshResult = await baseQuery(
+          { url: '/auth/token/refresh/', method: 'POST', body: { refresh: refreshToken } },
+          api,
+          extraOptions
+        );
+        const access = refreshResult?.data?.access;
+        if (access) {
+          setAuth({ ...userInfo, accessToken: access });
+          syncCookieAccessToken(access);
+          restored = true;
+        }
+      }
+
+      if (!restored) {
+        restored = await loginViaTelegram(api, extraOptions);
+      }
+
+      if (!restored) {
         api.dispatch(userLoggedOut());
         return result;
       }
-      
-      // Пытаемся обновить access токен
-      console.log('🔁 Refresh token request: /auth/token/refresh/');
-      const refreshResult = await baseQuery(
-        { url: '/auth/token/refresh/', method: 'POST', body: { refresh: refreshToken } },
-        api,
-        extraOptions
-      );
 
-      console.log('🔁 Refresh token response:', {
-        status: refreshResult?.error?.status || refreshResult?.meta?.response?.status || 'success',
-        hasAccess: !!refreshResult?.data?.access,
-        hasError: !!refreshResult?.error,
-      });
-      
-      if (refreshResult?.data) {
-        // Сохраняем новый access токен
-        const { access } = refreshResult.data;
-        
-        // Обновляем токены в localStorage
-        setAuth({ ...userInfo, accessToken: access });
-        // Keep cookie in sync for middleware/initializer
-        syncCookieAccessToken(access);
-        
-        // Повторяем исходный запрос с новым токеном
-        result = await baseQuery(args, api, extraOptions);
-      } else {
-        // Если не удалось обновить токен, выполняем logout
-        api.dispatch(userLoggedOut());
-      }
+      result = await baseQuery(args, api, extraOptions);
     } catch (error) {
       console.error('Token refresh error:', error);
       api.dispatch(userLoggedOut());
     }
   }
-  
+
   return result;
 };
 

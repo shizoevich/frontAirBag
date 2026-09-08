@@ -27,8 +27,6 @@ function syncAuthUserEverywhere(dispatch, user) {
         accessToken: cookieTokens.accessToken || existing?.accessToken || null,
         refreshToken: cookieTokens.refreshToken || existing?.refreshToken || null,
         user,
-        isGuest: user?.is_guest || false,
-        guestId: user?.guest_id || existing?.guestId || null,
       }),
       { expires: 7 }
     );

@@ -14,7 +14,7 @@ const Menus = () => {
   const t = useTranslations('menu');
   const locale = useLocale();
   const router = useRouter();
-  const { user, accessToken, isGuest } = useSelector((state) => state.auth);
+  const { user, accessToken } = useSelector((state) => state.auth);
   const [logout] = useLogoutMutation();
   const [catalogPath, setCatalogPath] = useState([]);
   const [mounted, setMounted] = useState(false);
@@ -25,8 +25,8 @@ const Menus = () => {
 
   // Определяем статус пользователя
   const isAuthenticated = !!accessToken;
-  const isAuthenticatedUser = isAuthenticated && !isGuest;
-  const isGuestOrUnauthenticated = !isAuthenticated || isGuest;
+  const isAuthenticatedUser = isAuthenticated;
+  const isAnonymous = !isAuthenticated;
 
   // Обработка выхода
   const handleLogout = async (e) => {
@@ -43,7 +43,7 @@ const Menus = () => {
   const filterAccountPages = (pages) => {
     return pages.filter(page => {
       if (page.showAlways) return true;
-      if (page.showForGuests && isGuestOrUnauthenticated) return true;
+      if (page.showForAnonymous && isAnonymous) return true;
       if (page.showForAuth && isAuthenticatedUser) return true;
       return false;
     });

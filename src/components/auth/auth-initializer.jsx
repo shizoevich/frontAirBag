@@ -2,12 +2,13 @@
 import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { userLoggedIn, userLoggedOut } from '@/redux/features/auth/authSlice';
-import { useTelegramAuthMutation, useTelegramAutoLinkMutation } from '@/redux/features/auth/authApi';
+import { useTelegramAutoLinkMutation } from '@/redux/features/auth/authApi';
 import {
   readTelegramInitData,
   readTelegramInitDataUnsafe,
   hasTelegramInitData,
   buildTelegramInitPayload,
+  getTelegramUser,
 } from '@/utils/telegram';
 import { getAuth, isStorageWritable } from '@/utils/authStorage';
 import Cookies from 'js-cookie';
@@ -16,12 +17,12 @@ const AuthInitializer = ({ children }) => {
   const dispatch = useDispatch();
   const [isInitialized, setIsInitialized] = useState(false);
   const { accessToken } = useSelector((state) => state.auth);
-  const telegramAttempted = useRef(false);
+  const autoLinkAttempted = useRef(false);
 
-  const [telegramAuth] = useTelegramAuthMutation();
   const [telegramAutoLink] = useTelegramAutoLinkMutation();
 
-  // Basic auth initialization from storage/cookies
+  // Восстановление состояния из хранилища. Порядок тот же, что в authSlice:
+  // localStorage — источник правды, cookie — зеркало.
   useEffect(() => {
     const initializeAuth = () => {
       try {
@@ -30,36 +31,29 @@ const AuthInitializer = ({ children }) => {
           return;
         }
 
-        const cookieRaw = Cookies.get('userInfo');
-        const cookieData = cookieRaw ? JSON.parse(cookieRaw) : null;
         const lsData = getAuth();
-        const authData = cookieData || lsData;
-
-        console.log('AuthInitializer: Cookie userInfo:', cookieData);
-        console.log('AuthInitializer: LocalStorage userInfo:', lsData);
-        console.log('AuthInitializer: Using authData source:', cookieData ? 'cookie' : (lsData ? 'localStorage' : 'none'));
-        console.log('AuthInitializer: Current Redux accessToken:', accessToken);
+        let cookieData = null;
+        try {
+          const cookieRaw = Cookies.get('userInfo');
+          cookieData = cookieRaw ? JSON.parse(cookieRaw) : null;
+        } catch {
+          cookieData = null;
+        }
+        const authData = lsData?.accessToken ? lsData : cookieData;
 
         if (authData && authData.accessToken) {
-          console.log('AuthInitializer: Found valid auth data, initializing Redux state');
           dispatch(userLoggedIn({
             accessToken: authData.accessToken,
             user: authData.user || null,
-            isGuest: authData.isGuest || false,
-            guestId: authData.guestId || null,
           }));
         } else {
-          console.log('AuthInitializer: No valid auth data found');
           // Разлогинивать можно, только если хранилище рабочее и в нём правда
           // пусто. В WebView Telegram Desktop оно недоступно, и без этой
           // проверки эффект срабатывал на появление токена в Redux после
           // успешного входа и тут же его снимал: тост показан, редиректа нет,
           // а следующий запрос уходил без заголовка авторизации.
           if (accessToken && isStorageWritable()) {
-            console.log('AuthInitializer: Clearing stale Redux state');
             dispatch(userLoggedOut());
-          } else if (accessToken) {
-            console.log('AuthInitializer: storage unavailable, keeping Redux session');
           }
         }
 
@@ -73,65 +67,55 @@ const AuthInitializer = ({ children }) => {
     initializeAuth();
   }, [dispatch, accessToken]);
 
-  // Telegram WebApp auto-auth / auto-link
+  // Мини-апп открыт под аккаунтом, к которому этот Telegram ещё не привязан
+  // (вошли по почте на сайте, потом открыли бота) — привязываем без вопросов.
+  // Сам вход по Telegram при открытии делает useAuthCheck.
   useEffect(() => {
     if (!isInitialized) return;
-    if (telegramAttempted.current) return;
+    if (autoLinkAttempted.current) return;
 
-    const attemptTelegramAuth = () => {
-      if (telegramAttempted.current) return;
+    const attemptAutoLink = () => {
+      if (autoLinkAttempted.current) return;
 
       const rawInitData = readTelegramInitData();
       const initDataUnsafe = readTelegramInitDataUnsafe();
       if (!hasTelegramInitData(rawInitData, initDataUnsafe)) return;
 
-      telegramAttempted.current = true;
+      const currentAuth = getAuth();
+      if (!currentAuth?.accessToken) return;
+
+      const webAppUserId = Number(getTelegramUser()?.id);
+      const linked = (currentAuth?.user?.telegram_ids || []).map(Number);
+      if (!webAppUserId || linked.includes(webAppUserId)) return;
 
       const payload = buildTelegramInitPayload({ rawInitData });
       if (!payload) return;
 
-      // Read fresh auth state from storage to avoid stale closure values
-      const currentAuth = getAuth();
-      const currentAccessToken = currentAuth?.accessToken || null;
-      const currentTelegramId = currentAuth?.user?.telegram_id ?? null;
-
-      if (!currentAccessToken) {
-        console.log('AuthInitializer: Attempting Telegram auto-auth');
-        telegramAuth(payload).catch((err) => {
-          console.warn('AuthInitializer: Telegram auto-auth failed', err);
-        });
-      } else if (!currentTelegramId) {
-        console.log('AuthInitializer: Attempting Telegram auto-link');
-        telegramAutoLink(payload).catch((err) => {
-          console.warn('AuthInitializer: Telegram auto-link failed', err);
-        });
-      }
+      autoLinkAttempted.current = true;
+      telegramAutoLink(payload).catch((err) => {
+        console.warn('AuthInitializer: Telegram auto-link failed', err);
+      });
     };
 
-    // Attempt immediately (SDK may already be available)
-    attemptTelegramAuth();
+    attemptAutoLink();
 
-    // Also listen for async SDK load if not yet attempted
-    if (!telegramAttempted.current) {
-      window.addEventListener('telegram-webapp-loaded', attemptTelegramAuth, { once: true });
-      return () => window.removeEventListener('telegram-webapp-loaded', attemptTelegramAuth);
+    if (!autoLinkAttempted.current) {
+      window.addEventListener('telegram-webapp-loaded', attemptAutoLink, { once: true });
+      return () => window.removeEventListener('telegram-webapp-loaded', attemptAutoLink);
     }
-  }, [isInitialized, telegramAuth, telegramAutoLink]);
+  }, [isInitialized, telegramAutoLink]);
 
   // Cross-tab storage sync
   useEffect(() => {
     if (!isInitialized) return;
 
     const handleStorageChange = () => {
-      console.log('AuthInitializer: Storage changed, re-initializing...');
       const authData = getAuth();
 
       if (authData && authData.accessToken) {
         dispatch(userLoggedIn({
           accessToken: authData.accessToken,
           user: authData.user || null,
-          isGuest: authData.isGuest || false,
-          guestId: authData.guestId || null,
         }));
       } else if (accessToken && isStorageWritable()) {
         // Та же оговорка, что и в инициализации: пустое хранилище означает

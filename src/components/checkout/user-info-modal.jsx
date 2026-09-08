@@ -1,12 +1,14 @@
 'use client';
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
+import PhoneInput from '@/components/common/phone-input';
+import { PHONE_RE } from '@/utils/phone';
 import { useTranslations } from 'next-intl';
 
 const UserInfoModal = ({ isOpen, onClose, onSubmit, user }) => {
   const t = useTranslations('Checkout');
   const tv = useTranslations('CheckoutValidation');
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, control, formState: { errors } } = useForm({
     defaultValues: {
       firstName: user?.name || '',
       lastName: user?.last_name || '',
@@ -77,16 +79,22 @@ const UserInfoModal = ({ isOpen, onClose, onSubmit, user }) => {
             
             <div className="tp-checkout-input">
               <label>{t('phone')} *</label>
-              <input
-                {...register("phone", { 
+              <Controller
+                name="phone"
+                control={control}
+                rules={{
                   required: tv('phone_required'),
-                  pattern: {
-                    value: /^(\+380|380|0)[0-9]{9}$/,
-                    message: tv('phone_invalid')
-                  }
-                })}
-                type="tel"
-                placeholder="+380501234567"
+                  pattern: { value: PHONE_RE, message: tv('phone_invalid') },
+                }}
+                render={({ field }) => (
+                  <PhoneInput
+                    name={field.name}
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    invalid={Boolean(errors.phone)}
+                  />
+                )}
               />
               {errors.phone && (
                 <span className="error-message">{errors.phone.message}</span>

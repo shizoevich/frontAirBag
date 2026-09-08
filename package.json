@@ -15,7 +15,7 @@
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report",
-    "test:e2e:setup": "playwright test --project=chromium --headed tests/e2e/setup/telegram-login.setup.ts"
+    "test:e2e:setup": "playwright test --project=setup --headed"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",

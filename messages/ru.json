@@ -331,7 +331,7 @@
     "warehouse": "Отделение Новой Почты",
     "warehouseRequired": "Отделение обязательно",
     "maxCharacters": "Максимум {count} символов",
-    "invalidPhone": "Неверный формат номера телефона",
+    "invalidPhone": "Номер телефона: +380 и ещё 9 цифр",
     "invalidCredentials": "Неверный логин или пароль",
     "userAlreadyExists": "Пользователь с таким телефоном или email уже существует",
     "emailAlreadyExists": "Пользователь с таким email уже существует",
@@ -366,7 +366,9 @@
     "claimAlreadyDoneText": "Войдите на сайт своей почтой и паролем.",
     "claimSuccessTitle": "Почти готово",
     "claimSuccessText": "Мы отправили письмо на вашу почту. Подтвердите её — и сможете войти на сайт.",
-    "claimEmailTaken": "Эта почта уже используется другим аккаунтом."
+    "claimEmailTaken": "Эта почта уже используется другим аккаунтом.",
+    "noPasswordHint": "Нет пароля? Откройте магазин через Telegram-бота — вход произойдёт автоматически.",
+    "telegramTaken": "Этот Telegram уже зарегистрирован за другим аккаунтом"
   },
   "ProfileExtra": {
     "phoneRequired": "Телефон обязателен",
@@ -853,7 +855,8 @@
     "register_benefits": "Преимущества регистрации:",
     "register_now": "Зарегистрироваться сейчас",
     "register_suggestion": "Зарегистрируйтесь, чтобы отслеживать заказы и получать скидки",
-    "save_and_continue": "Сохранить и продолжить"
+    "save_and_continue": "Сохранить и продолжить",
+    "phone_invalid": "Номер телефона: +380 и ещё 9 цифр"
   },
   "Payments": {
     "test_mode_badge": "ТЕСТОВЫЙ РЕЖИМ — реальное списание не происходит",
@@ -885,30 +888,13 @@
     "first_name_required": "Имя обязательно",
     "last_name_required": "Фамилия обязательна",
     "phone_required": "Телефон обязателен",
-    "phone_invalid": "Некорректный формат телефона",
+    "phone_invalid": "Номер телефона: +380 и ещё 9 цифр",
     "city_required": "Город обязателен",
     "warehouse_required": "Отделение обязательно",
     "min_characters": "Минимум {count} символа(ов)",
     "order_notes_max": "Комментарий не должен превышать {count} символов",
     "fill_required_fields": "Пожалуйста, заполните все обязательные поля",
-    "guest_create_failed": "Не удалось создать гостевой аккаунт",
-    "guest_validation_failed_generic": "Проверьте введённые данные",
-    "guest_create_failed_try_again": "Не удалось создать гостевой аккаунт. Попробуйте еще раз.",
-    "phone_already_exists": "Клиент с таким телефоном уже существует"
-  },
-  "GuestValidation": {
-    "required": "Поле обязательно",
-    "maxLength": "Максимальная длина {max}",
-    "invalidPhone": "Некорректный формат телефона",
-    "invalidEmail": "Некорректный формат email",
-    "integer": "Должно быть целым числом",
-    "outOfRange": "Значение вне диапазона",
-    "name": "Имя",
-    "last_name": "Фамилия",
-    "phone": "Телефон",
-    "email": "Email",
-    "login": "Логин",
-    "telegram_id": "Telegram id"
+    "phone_belongs_to_other_account": "Похоже, этот номер телефона уже привязан к другому аккаунту. Введите другой номер или сделайте заказ с другого аккаунта"
   },
   "Products": {
     "default_seo_title": "AirBag - Автозапчасти",
@@ -932,25 +918,5 @@
     "product_text": "Эту позицию сняли с продажи или её никогда не было. Вот что сейчас покупают чаще всего:",
     "category_title": "Категория не найдена",
     "category_text": "Возможно, категорию переименовали или убрали. Выберите нужный раздел каталога:"
-  },
-  "PreCheckout": {
-    "back": "Назад",
-    "chooseOption": "Выберите способ оформления заказа",
-    "confirmPassword": "Подтвердите пароль",
-    "continueAsGuest": "Продолжить как гость",
-    "email": "Email",
-    "lastName": "Фамилия",
-    "name": "Имя",
-    "password": "Пароль",
-    "passwordMismatch": "Пароли не совпадают",
-    "phone": "Телефон",
-    "processing": "Обработка...",
-    "register": "Зарегистрироваться",
-    "registerAndContinue": "Зарегистрироваться и продолжить",
-    "registering": "Регистрация...",
-    "registrationBenefits": "Зарегистрируйтесь, чтобы получать скидки, отслеживать заказы и хранить историю покупок",
-    "registrationError": "Ошибка регистрации. Попробуйте ещё раз.",
-    "registrationSuccess": "Регистрация успешна!",
-    "title": "Оформление заказа"
   }
 }

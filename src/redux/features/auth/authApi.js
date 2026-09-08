@@ -6,89 +6,6 @@ import Cookies from "js-cookie";
 import { toast, notifySuccess, notifyError } from "@/utils/toast";
 import { buildTelegramInitPayload } from "@/utils/telegram";
 
-function isBlankString(v) {
-  return v === undefined || v === null || String(v).trim() === "";
-}
-
-function normalizeGuestClientPayload(input) {
-  const data = input || {};
-
-  const name = isBlankString(data.name) ? "" : String(data.name).trim();
-  const last_name = isBlankString(data.last_name) ? "" : String(data.last_name).trim();
-  const phone = isBlankString(data.phone) ? "" : String(data.phone).trim();
-
-  const payload = {
-    name,
-    last_name,
-    phone,
-  };
-
-  // Optional fields (send only when non-empty)
-  if (!isBlankString(data.nova_post_address)) {
-    payload.nova_post_address = String(data.nova_post_address).trim();
-  }
-  if (!isBlankString(data.title)) {
-    payload.title = String(data.title).trim();
-  }
-  if (!isBlankString(data.login)) {
-    payload.login = String(data.login).trim();
-  }
-  if (!isBlankString(data.email)) {
-    payload.email = String(data.email).trim();
-  }
-  if (data.telegram_id !== undefined && data.telegram_id !== null && data.telegram_id !== "") {
-    const tg = Number(data.telegram_id);
-    if (Number.isFinite(tg)) payload.telegram_id = Math.trunc(tg);
-  }
-
-  // Validation (based on backend schema)
-  const errors = {};
-  if (isBlankString(payload.name)) errors.name = { code: "required" };
-  if (isBlankString(payload.last_name)) errors.last_name = { code: "required" };
-  if (isBlankString(payload.phone)) errors.phone = { code: "required" };
-
-  if (payload.name && payload.name.length > 255) errors.name = { code: "maxLength", max: 255 };
-  if (payload.last_name && payload.last_name.length > 255) errors.last_name = { code: "maxLength", max: 255 };
-  if (payload.phone && payload.phone.length > 20) errors.phone = { code: "maxLength", max: 20 };
-  if (payload.login && payload.login.length > 128) errors.login = { code: "maxLength", max: 128 };
-  if (payload.email && payload.email.length > 100) errors.email = { code: "maxLength", max: 100 };
-
-  // Lightweight phone validation (backend may be stricter)
-  if (payload.phone && !/^[\+]?[- 0-9()]+$/.test(payload.phone)) {
-    errors.phone = { code: "invalidPhone" };
-  }
-
-  // Lightweight email validation
-  if (payload.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-    errors.email = { code: "invalidEmail" };
-  }
-
-  if (payload.telegram_id !== undefined) {
-    // Backend int64 range from swagger
-    const min = -9223372036854776000;
-    const max = 9223372036854776000;
-    if (!Number.isInteger(payload.telegram_id)) errors.telegram_id = { code: "integer" };
-    else if (payload.telegram_id < min || payload.telegram_id > max) errors.telegram_id = { code: "outOfRange" };
-  }
-
-  return {
-    payload,
-    errors,
-    isValid: Object.keys(errors).length === 0,
-  };
-}
-
-function normalizeGuestCreateResponse(data) {
-  // Backend responses can vary. Supported shapes:
-  // 1) { access, refresh, guest_id }
-  // 2) { client_id, tokens: { access, refresh } }
-  // 3) { tokens: { access, refresh }, guest_id|client_id }
-  const access = data?.access || data?.tokens?.access;
-  const refresh = data?.refresh || data?.tokens?.refresh;
-  const guest_id = data?.guest_id ?? data?.client_id ?? data?.id ?? null;
-  return { access, refresh, guest_id };
-}
-
 function mergeAuthUsers(existingUser, incomingUser) {
   if (!existingUser && !incomingUser) return null;
 
@@ -156,8 +73,6 @@ export const authApi = apiSlice.injectEndpoints({
             accessToken: access,
             refreshToken: refresh,
             user: minimalUser,
-            isGuest: false,
-            guestId: null,
           });
           console.log('Tokens and minimal user data saved to localStorage');
 
@@ -166,8 +81,6 @@ export const authApi = apiSlice.injectEndpoints({
             userLoggedIn({
               accessToken: access,
               user: minimalUser,
-              isGuest: false,
-              guestId: null,
             })
           );
           console.log('Redux state updated with access token and minimal user data');
@@ -180,8 +93,6 @@ export const authApi = apiSlice.injectEndpoints({
                 accessToken: access,
                 refreshToken: refresh,
                 user: minimalUser,
-                isGuest: false,
-                guestId: null,
               }),
               { expires: 7 }
             );
@@ -190,6 +101,17 @@ export const authApi = apiSlice.injectEndpoints({
             console.error('Failed to set cookies userInfo after login:', cookieErr);
           }
           
+          // Вход внутри мини-аппа: этот Telegram привязывается к аккаунту сразу,
+          // до подтверждения почты (ADR-0021). Конфликт 409 покажет сама привязка.
+          const telegramPayload = buildTelegramInitPayload();
+          if (telegramPayload) {
+            try {
+              await dispatch(authApi.endpoints.telegramAutoLink.initiate(telegramPayload)).unwrap();
+            } catch {
+              // сообщение уже показано в onQueryStarted привязки
+            }
+          }
+
           // Загружаем полный профиль и даем onQueryStarted(getUser) слить данные в auth state/storage
           try {
             console.log('Fetching user data...');
@@ -252,17 +174,12 @@ export const authApi = apiSlice.injectEndpoints({
           console.log('Current auth data in localStorage:', existing);
 
           const mergedUser = mergeAuthUsers(existing?.user || null, result.data);
-          // Explicitly use is_guest from user object; don't inherit from a previous guest session
-          const mergedIsGuest = mergedUser?.is_guest === true;
-          const mergedGuestId = mergedIsGuest ? (mergedUser?.guest_id ?? existing?.guestId ?? null) : null;
           
           // Обновляем данные пользователя в store с сохранением токена
           dispatch(
             userLoggedIn({
               accessToken: existing?.accessToken || null, // Сохраняем токен
               user: mergedUser,
-              isGuest: mergedIsGuest,
-              guestId: mergedGuestId,
             })
           );
           console.log('Redux state updated with user data and token');
@@ -272,8 +189,6 @@ export const authApi = apiSlice.injectEndpoints({
             try {
               const updatedData = {
                 user: mergedUser,
-                isGuest: mergedIsGuest,
-                guestId: mergedGuestId,
               };
               updateAuth(updatedData);
               console.log('Updated localStorage with user data:', updatedData);
@@ -298,8 +213,6 @@ export const authApi = apiSlice.injectEndpoints({
                 accessToken: cookieTokens.accessToken || existing?.accessToken || null,
                 refreshToken: cookieTokens.refreshToken || null,
                 user: mergedUser,
-                isGuest: mergedIsGuest,
-                guestId: mergedGuestId,
               }),
               { expires: 7 }
             );
@@ -460,128 +373,23 @@ export const authApi = apiSlice.injectEndpoints({
       }),
     }),
 
-    // Регистрация пользователя
+    // Регистрация пользователя. Телефон обязателен (ADR-0021); занятый телефон —
+    // просто ошибка поля, без подсказок.
     register: builder.mutation({
       query: (data) => ({
         url: "/auth/register/",
         method: "POST",
         body: data,
       }),
-      
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+
+      async onQueryStarted(arg, { queryFulfilled }) {
         try {
-          const result = await queryFulfilled;
-          console.log("Registration successful:", result);
-          
-          // Если была передана guest_id, это конверсия гостя в клиента
-          if (arg.guest_id) {
-            console.log("Guest-to-client conversion completed");
-            
-            // После конверсии нужно выполнить логин для получения новых токенов
-            const loginResult = await dispatch(
-              authApi.endpoints.login.initiate({
-                email: arg.email,
-                password: arg.password,
-                remember: true,
-              })
-            ).unwrap();
-            
-            console.log("Post-conversion login successful:", loginResult);
-          }
+          await queryFulfilled;
         } catch (err) {
-          // RTK Query errors can look empty in console due to non-enumerable props.
           const status = err?.error?.status ?? err?.status;
           const data = err?.error?.data ?? err?.data;
-          const message = data?.detail || data?.message || err?.error || err?.message || 'Unknown error';
-          console.error('Registration error (details):', {
-            status,
-            message,
-            data,
-            raw: err,
-          });
+          console.error('Registration error (details):', { status, data });
         }
-      },
-    }),
-
-    // Создание гостевого аккаунта
-    createGuest: builder.mutation({
-      // Use queryFn to validate & normalize payload BEFORE request
-      async queryFn(arg, api, extraOptions, baseQuery) {
-        const { payload, errors, isValid } = normalizeGuestClientPayload(arg);
-
-        if (!isValid) {
-          return {
-            error: {
-              status: "CLIENT_VALIDATION_ERROR",
-              data: {
-                detail: "Guest client data validation failed",
-                errors,
-              },
-            },
-          };
-        }
-
-        const result = await baseQuery(
-          {
-            url: "/auth/guest/",
-            method: "POST",
-            body: payload,
-          },
-          api,
-          extraOptions
-        );
-
-        // Normalize response to a stable shape for the app + persist tokens immediately
-        // (do not rely on onQueryStarted timing)
-        if (!result?.data) return result;
-
-        const { access, refresh, guest_id } = normalizeGuestCreateResponse(result.data);
-
-        if (!access || !refresh) {
-          return {
-            error: {
-              status: "RESPONSE_FORMAT_ERROR",
-              data: {
-                detail: "Guest create response does not contain tokens",
-              },
-            },
-          };
-        }
-
-        const guestData = {
-          accessToken: access,
-          refreshToken: refresh,
-          isGuest: true,
-          guestId: guest_id,
-        };
-
-        // localStorage (apiSlice uses authStorage)
-        setAuth({
-          ...guestData,
-          user: null,
-        });
-
-        // cookie (compatibility with middleware/initialState)
-        Cookies.set("userInfo", JSON.stringify(guestData), { expires: 365 });
-
-        // redux state
-        api.dispatch(
-          userLoggedIn({
-            accessToken: access,
-            user: null,
-            isGuest: true,
-            guestId: guest_id,
-          })
-        );
-
-        return {
-          data: {
-            access,
-            refresh,
-            guest_id,
-            raw: result.data,
-          },
-        };
       },
     }),
 
@@ -610,11 +418,17 @@ export const authApi = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const { data } = await queryFulfilled;
-          const detail = data?.detail || data?.message;
-          if (detail) notifySuccess(detail);
+          // Повторная привязка того же Telegram идемпотентна — молчим; тост
+          // только когда привязок стало больше.
+          const before = (getAuth()?.user?.telegram_ids || []).length;
+          const after = (data?.telegram_ids || []).length;
+          if (after > before) notifySuccess(data?.detail || 'Telegram linked');
           dispatch(authApi.endpoints.getUser.initiate(undefined, { forceRefetch: true }));
         } catch (error) {
-          const message = error?.data?.detail || error?.data?.message || 'Telegram auto-link failed';
+          // 409 telegram_taken: слияний нет (ADR-0021) — показываем, за какой
+          // почтой числится этот Telegram, решает человек.
+          const data = error?.error?.data ?? error?.data;
+          const message = data?.detail || data?.message || 'Telegram auto-link failed';
           notifyError(message);
           console.warn('Telegram auto link failed', error);
         }
@@ -650,8 +464,6 @@ export const authApi = apiSlice.injectEndpoints({
                   accessToken: access,
                   refreshToken: refresh ?? null,
                   user: user || null,
-                  isGuest: user?.is_guest ?? false,
-                  guestId: user?.guest_id ?? null,
                 }),
                 { expires: 7 }
               );
@@ -672,9 +484,9 @@ export const authApi = apiSlice.injectEndpoints({
             notifySuccess(detail || message || 'Telegram authorization successful');
           }
         } catch (error) {
-          const message = error?.data?.detail || error?.data?.message || 'Telegram auth failed';
-          notifyError(message);
-          console.error('Telegram auth failed', error);
+          // 404 telegram_unknown или протухший initData: остаёмся анонимом,
+          // каталог и корзина открыты, тост не нужен (ADR-0021).
+          console.info('Telegram auth: no account for this Telegram', error?.error?.status ?? error?.status);
         }
       },
     }),
@@ -717,7 +529,6 @@ export const {
   useResendEmailConfirmationMutation,
   useRegisterMutation,
   useRegisterMutation: useRegisterUserMutation,
-  useCreateGuestMutation,
   useGetUserQuery,
   useTelegramLinkQuery,
   useLazyTelegramLinkQuery,

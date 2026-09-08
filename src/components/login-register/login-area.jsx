@@ -1,45 +1,23 @@
 'use client'
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
-import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 // internal
 import LoginForm from "../forms/login-form";
 import LoginShapes from "./login-shapes";
-import GoogleSignUp from "./google-sign-up";
-import { useTelegramAutoLinkMutation } from '@/redux/features/auth/authApi';
-import useTelegramWebApp from '@/hooks/use-telegram-webapp';
 
 const LoginArea = () => {
   const t = useTranslations('Common');
   const { locale } = useParams();
   const router = useRouter();
-  const { accessToken, isGuest, user } = useSelector((state) => state.auth);
-  const [telegramAutoLink] = useTelegramAutoLinkMutation();
-  const { rawInitData, hasInitData } = useTelegramWebApp();
-  const autoLinkAttempted = useRef(false);
+  const { accessToken } = useSelector((state) => state.auth);
 
-  // Auto-link Telegram after login — only if:
-  // 1. logged in as real user (not guest)
-  // 2. user profile confirms no telegram_id yet
-  // 3. we have valid initData from Telegram WebApp
+  // Привязку Telegram после входа делает сама мутация login — здесь только
+  // возврат туда, откуда человека увели на вход.
   useEffect(() => {
-    if (!accessToken || isGuest) return;
-    if (!hasInitData || !rawInitData) return;
-    // Wait until user profile is loaded to check telegram_id
-    if (user === null) return;
-    if (user?.telegram_id) return; // already linked — don't touch it
-    if (autoLinkAttempted.current) return;
-
-    autoLinkAttempted.current = true;
-    telegramAutoLink({ rawInitData }).catch(() => null);
-  }, [accessToken, isGuest, user, hasInitData, rawInitData, telegramAutoLink]);
-
-  useEffect(() => {
-    // Гостей не редиректим — они могут зайти по email/паролю
-    if (!accessToken || isGuest) return;
+    if (!accessToken) return;
     const redirect = typeof window !== 'undefined'
       ? localStorage.getItem('redirectAfterLogin')
       : null;
@@ -50,7 +28,7 @@ const LoginArea = () => {
     } else {
       router.replace(`/${locale}`);
     }
-  }, [accessToken, isGuest, router, locale]);
+  }, [accessToken, router, locale]);
 
   return (
     <>
@@ -72,6 +50,10 @@ const LoginArea = () => {
                 <div className="tp-login-option">
                   <LoginForm />
                 </div>
+                {/* Старые Telegram-записи без почты и пароля: входить им — через бота. */}
+                <p className="text-center mt-20" style={{ fontSize: 13, color: '#6c757d' }}>
+                  {t('noPasswordHint')}
+                </p>
               </div>
             </div>
           </div>

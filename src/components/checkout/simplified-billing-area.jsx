@@ -1,9 +1,12 @@
 'use client';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+import { Controller } from 'react-hook-form';
+import PhoneInput from '@/components/common/phone-input';
+import { PHONE_RE } from '@/utils/phone';
 import '@/styles/register-form.css';
 
-const SimplifiedBillingArea = ({ register, errors, user, setValue, isPickup = false }) => {
+const SimplifiedBillingArea = ({ register, control, errors, user, setValue, isPickup = false }) => {
   const t = useTranslations('Checkout');
   
   // Состояние для Nova Poshta API
@@ -296,16 +299,22 @@ const SimplifiedBillingArea = ({ register, errors, user, setValue, isPickup = fa
             <div className="col-md-12">
               <div className="tp-checkout-input">
                 <label>{t('phone')} *</label>
-                <input
-                  {...register('phone', {
+                <Controller
+                  name="phone"
+                  control={control}
+                  rules={{
                     required: tv('phone_required'),
-                    pattern: {
-                      value: /^[\+]?[0-9\(\)\-\s]+$/,
-                      message: tv('phone_invalid')
-                    }
-                  })}
-                  type="tel"
-                  placeholder={t('enter_phone')}
+                    pattern: { value: PHONE_RE, message: tv('phone_invalid') },
+                  }}
+                  render={({ field }) => (
+                    <PhoneInput
+                      name={field.name}
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      invalid={Boolean(errors?.phone)}
+                    />
+                  )}
                 />
                 {errors?.phone && (
                   <span className="error-msg">{errors.phone.message}</span>

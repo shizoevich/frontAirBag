@@ -1,70 +1,63 @@
 /**
- * Scenario 2 — Telegram WebApp, user IS linked to a site account.
+ * Сценарий 2 — Telegram привязан к аккаунту: вход бесшовный.
  *
- * Expected behaviour:
- * - Site detects initData → calls POST /api/v2/telegram/auth
- * - Backend finds client with matching telegram_id, returns JWT with is_guest=false
- * - Frontend stores real-user token; user sees their real profile data
- * - No manual login required
+ * Один аккаунт — много Telegram (ADR-0021): второй привязанный Telegram
+ * открывает тот же аккаунт. Гостевого флага в ответе больше нет.
  *
- * Prerequisites:
- *   - TELEGRAM_LINKED_USER_ID env var matches a client in the database
- *     that has SITE_LINKED_EMAIL set as login
+ * Требуется: TELEGRAM_LINKED_USER_ID привязан к SITE_LINKED_EMAIL;
+ * TELEGRAM_SECOND_USER_ID свободен или уже за тем же аккаунтом.
  */
-import { test, expect } from '../fixtures';
+import { test, expect, linkedTelegramUser, secondTelegramUser } from '../fixtures';
+import { BASE, apiLogin, ensureTelegramLinked } from '../helpers/api';
 
-const SITE_URL = process.env.SITE_URL ?? 'http://localhost:3000';
-const LOCALE = process.env.LOCALE ?? 'ru';
-const BASE = `${SITE_URL}/${LOCALE}`;
+const LINKED_EMAIL = process.env.SITE_LINKED_EMAIL ?? '';
+const LINKED_PASSWORD = process.env.SITE_LINKED_PASSWORD ?? '';
 
-test.describe('Scenario 2: Auto-login for linked Telegram account', () => {
-  test('should authenticate as real user (is_guest=false)', async ({
-    linkedTelegramPage: page,
-  }) => {
-    const authRequest = page.waitForRequest(
-      (req) => req.url().includes('/api/v2/telegram/auth') && req.method() === 'POST'
+test.describe('Scenario 2: seamless login for a linked Telegram', () => {
+  test('backend returns tokens and the account with its telegram_ids', async ({ linkedTelegramPage: page }) => {
+    const authResponse = page.waitForResponse(
+      (res) => res.url().includes('/api/v2/telegram/auth') && res.request().method() === 'POST'
     );
 
     await page.goto(BASE);
 
-    const req = await authRequest;
-    const res = await req.response();
-    expect(res?.status()).toBeLessThan(300);
-
-    const body = await res?.json().catch(() => null);
-    // Backend should return is_guest: false for linked users
-    if (body) {
-      expect(body.is_guest).toBe(false);
-    }
-  });
-
-  test('profile should show real account data (not guest placeholder)', async ({
-    linkedTelegramPage: page,
-  }) => {
-    await page.goto(`${BASE}/profile`);
-
-    // Wait for profile to load
-    await page.waitForTimeout(2_500);
-
-    // Should not be redirected to login
+    const res = await authResponse;
+    expect(res.status()).toBe(200);
+    const body = await res.json();
+    expect(body.access).toBeTruthy();
+    expect(body.user.telegram_ids).toContain(linkedTelegramUser.id);
+    expect(body.user.is_guest).toBeUndefined();
     await expect(page).not.toHaveURL(/\/login/);
+  });
 
-    // Email field should contain the linked account's email
-    const linkedEmail = process.env.SITE_LINKED_EMAIL ?? '';
-    if (linkedEmail) {
-      const emailText = page.locator(`text=${linkedEmail}`);
-      await expect(emailText).toBeVisible({ timeout: 10_000 });
+  test('profile shows the linked account', async ({ linkedTelegramPage: page }) => {
+    await page.goto(`${BASE}/profile`);
+    await expect(page).not.toHaveURL(/\/login/, { timeout: 15_000 });
+    if (LINKED_EMAIL) {
+      await expect(page.getByText(LINKED_EMAIL).first()).toBeVisible({ timeout: 15_000 });
     }
   });
 
-  test('Telegram linked badge should be visible on profile', async ({
-    linkedTelegramPage: page,
-  }) => {
-    await page.goto(`${BASE}/profile`);
-    await page.waitForTimeout(2_500);
+  test.describe('second Telegram of the same account', () => {
+    test.skip(!LINKED_EMAIL || !LINKED_PASSWORD, 'SITE_LINKED_EMAIL / SITE_LINKED_PASSWORD not configured');
 
-    // Profile page should show a "Telegram linked" indicator, not a "Link" button
-    const linkButton = page.getByRole('button', { name: /link telegram|привязать telegram/i });
-    await expect(linkButton).not.toBeVisible();
+    test.beforeAll(async ({ request }) => {
+      const token = await apiLogin(request, LINKED_EMAIL, LINKED_PASSWORD);
+      await ensureTelegramLinked(request, token, secondTelegramUser);
+    });
+
+    test('opens the same account', async ({ secondTelegramPage: page }) => {
+      const authResponse = page.waitForResponse(
+        (res) => res.url().includes('/api/v2/telegram/auth') && res.request().method() === 'POST'
+      );
+
+      await page.goto(BASE);
+
+      const body = await (await authResponse).json();
+      expect(body.user.email).toBe(LINKED_EMAIL);
+      expect(body.user.telegram_ids).toEqual(
+        expect.arrayContaining([linkedTelegramUser.id, secondTelegramUser.id])
+      );
+    });
   });
 });

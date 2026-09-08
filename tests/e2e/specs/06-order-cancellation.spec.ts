@@ -30,6 +30,8 @@ type OrderState = {
   ttn?: string;
 };
 
+let ownPhone = '';
+
 async function apiLogin(request: APIRequestContext): Promise<string> {
   const resp = await request.post(`${API_URL}/api/v2/auth/login/`, {
     data: { email: EMAIL, password: PASSWORD },
@@ -55,10 +57,10 @@ async function seedOrder(
     data: {
       name: 'E2E',
       last_name: 'Cancel',
-      phone: '+380991110001',
+      phone: ownPhone,
       nova_post_address: 'Київ, відділення 1',
       description: state.description,
-      prepayment: state.prepayment ?? true,
+      prepayment: state.prepayment ?? false,
       items: [],
     },
   });
@@ -71,8 +73,11 @@ async function seedOrder(
   if (state.ttn) patch.ttn = state.ttn;
   if (state.is_completed) patch.is_completed = true;
   if (Object.keys(patch).length) {
+    // is_paid/ttn/is_completed клиент менять не может (ADR-0010) — ставим
+    // служебным ключом бота, как это делает вебхук/админ.
+    const staffKey = process.env.API_STAFF_KEY ?? '';
     const updated = await request.patch(`${API_URL}/api/v2/orders/${orderId}/`, {
-      headers,
+      headers: staffKey ? { 'X-Api-Key': staffKey } : headers,
       data: patch,
     });
     expect(updated.ok(), `order patch failed: ${updated.status()}`).toBeTruthy();
@@ -108,6 +113,8 @@ test.describe('Scenario 6: order cancellation', () => {
 
   test.beforeEach(async ({ request, page }) => {
     token = await apiLogin(request);
+    const me = await request.get(`${API_URL}/api/v2/auth/me/`, { headers: { Authorization: `Bearer ${token}` } });
+    ownPhone = (await me.json()).phone;
     await loginViaUi(page);
   });
 

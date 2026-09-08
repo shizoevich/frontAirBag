@@ -36,8 +36,8 @@ const menu_data = [
       { titleKey: 'menu.checkout', link: '/checkout', showAlways: true },
       { titleKey: 'menu.myOrders', link: '/orders', showAlways: true },
       { titleKey: 'menu.myProfile', link: '/profile', showForAuth: true },
-      { titleKey: 'menu.login', link: '/login', showForGuests: true },
-      { titleKey: 'menu.register', link: '/register', showForGuests: true },
+      { titleKey: 'menu.login', link: '/login', showForAnonymous: true },
+      { titleKey: 'menu.register', link: '/register', showForAnonymous: true },
       { titleKey: 'menu.logout', link: '/logout', showForAuth: true },
     ]
   },

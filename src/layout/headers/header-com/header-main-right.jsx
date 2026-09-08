@@ -16,7 +16,7 @@ import Cookies from "js-cookie";
 
 const HeaderMainRight = ({ setIsCanvasOpen }) => {
   const t = useTranslations('HeaderMainRight');
-  const { user: userInfo, accessToken, isGuest } = useSelector((state) => state.auth);
+  const { user: userInfo, accessToken } = useSelector((state) => state.auth);
   const { quantity } = useCartInfo();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -25,7 +25,7 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
   
   // Проверяем, авторизован ли пользователь
   const isAuthenticated = !!accessToken;
-  const isAuthenticatedUser = isAuthenticated && !isGuest;
+  const isAuthenticatedUser = isAuthenticated;
   
   // Временно отключаем автозагрузку пользователя пока /auth/me/ не заработает
   const { data: userData, error: userError, isLoading: isLoadingUser } = useGetUserQuery(undefined, {
@@ -46,10 +46,9 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
     currentUser,
     accessToken: !!accessToken,
     rawAccessToken: accessToken,
-    isGuest,
     userError,
     isLoadingUser,
-    fullReduxState: { accessToken, user: userInfo, isGuest }
+    fullReduxState: { accessToken, user: userInfo }
   });
   
   // Логируем ошибку получения пользователя

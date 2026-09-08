@@ -181,10 +181,10 @@ const MOCK_DISCOUNTS = {
   const DiscountsPage = () => {
     const t = useTranslations('Discounts');
     const { data: apiDiscounts, isLoading, isError, error } = useGetDiscountsQuery();
-    const { accessToken, isGuest } = useSelector((state) => state.auth);
-    // Guests / unauthenticated users can't list orders -> avoid noisy 403
+    const { accessToken } = useSelector((state) => state.auth);
+    // Аноним не может смотреть заказы — не шумим 403
     const { data: ordersData, isLoading: ordersLoading } = useGetOrdersQuery(undefined, {
-      skip: !accessToken || isGuest,
+      skip: !accessToken,
     });
     const { user } = useSelector((state) => state.auth);
   

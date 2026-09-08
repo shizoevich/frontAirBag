@@ -18,15 +18,15 @@ const MobileMenus = ({setIsCanvasOpen}) => {
   const dispatch = useDispatch();
   const t = useTranslations('menu');
   const locale = useLocale();
-  const { user, accessToken, isGuest } = useSelector((state) => state.auth);
+  const { user, accessToken } = useSelector((state) => state.auth);
   const [logout] = useLogoutMutation();
   
   // Загружаем дерево категорий
   const { data: categoryTree } = useGetCategoryTreeQuery();
 
   const isAuthenticated = !!accessToken;
-  const isAuthenticatedUser = isAuthenticated && !isGuest;
-  const isGuestOrUnauthenticated = !isAuthenticated || isGuest;
+  const isAuthenticatedUser = isAuthenticated;
+  const isAnonymous = !isAuthenticated;
 
   const getLocalizedLink = (link) => {
     if (!link) return '#';
@@ -45,7 +45,7 @@ const MobileMenus = ({setIsCanvasOpen}) => {
   const filterAccountPages = (pages) => {
     return pages.filter(page => {
       if (page.showAlways) return true;
-      if (page.showForGuests && isGuestOrUnauthenticated) return true;
+      if (page.showForAnonymous && isAnonymous) return true;
       if (page.showForAuth && isAuthenticatedUser) return true;
       return false;
     });

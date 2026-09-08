@@ -19,44 +19,31 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 const SESSION_PATH = path.resolve(__dirname, '../.telegram-session.json');
 
 setup('log in to web.telegram.org', async ({ page }) => {
-  const phone = process.env.TELEGRAM_PHONE;
-  if (!phone) {
-    console.warn('TELEGRAM_PHONE not set — skipping Telegram session setup');
-    return;
-  }
-
+  setup.setTimeout(15 * 60_000);
   await page.goto('https://web.telegram.org/k/');
 
-  // Click "Log in by phone number"
-  await page.getByText(/log in by phone|войти по номеру/i).click();
-
-  // Enter phone number
-  await page.getByPlaceholder(/phone number|номер телефона/i).fill(phone);
-  await page.keyboard.press('Enter');
-
-  // Wait for code input
-  await page.waitForSelector('input[type="text"], input[autocomplete="one-time-code"]', {
-    timeout: 30_000,
-  });
-
-  // Pause so the tester can manually enter the SMS / app code
-  // (Playwright has no API to intercept Telegram OTP automatically)
-  console.log('⏸  Enter the Telegram login code in the browser window, then press Enter here…');
-  await page.pause();
-
-  // If a cloud password is configured, enter it
-  const cloudPassword = process.env.TELEGRAM_CLOUD_PASSWORD;
-  if (cloudPassword) {
-    const passwordInput = page.locator('input[type="password"]');
-    if (await passwordInput.isVisible({ timeout: 5_000 }).catch(() => false)) {
-      await passwordInput.fill(cloudPassword);
+  // Номер, код из Telegram и облачный пароль вводит человек в открывшемся окне:
+  // Playwright перехватить одноразовый код не может, а номер в .env не нужен.
+  // Если TELEGRAM_PHONE всё же задан — подставим его в форму.
+  const phone = process.env.TELEGRAM_PHONE;
+  if (phone) {
+    await page.getByText(/log in by phone|войти по номеру|увійти за номером/i).click().catch(() => null);
+    const input = page.getByPlaceholder(/phone number|номер телефона|номер телефону/i);
+    if (await input.isVisible({ timeout: 5_000 }).catch(() => false)) {
+      await input.fill(phone);
       await page.keyboard.press('Enter');
     }
   }
 
-  // Wait until the main chat list is visible
-  await expect(page.locator('.chatlist-top, .chats-container')).toBeVisible({ timeout: 30_000 });
-
+  // Без паузы и без Inspector: просто ждём, пока в окне появится список чатов.
+  console.log('⏳  Войдите в Telegram в открывшемся окне — сессия сохранится сама, как только появится список чатов (до 10 минут)…');
+  // Признак входа в Telegram Web K — ключ user_auth в localStorage; вёрстка
+  // списка чатов ненадёжна (на странице входа тоже есть списки).
+  await page.waitForFunction(() => Boolean(localStorage.getItem('user_auth')), null, {
+    timeout: 10 * 60_000,
+    polling: 1_000,
+  });
+  await page.waitForTimeout(5_000);
   await page.context().storageState({ path: SESSION_PATH });
   console.log(`✅  Telegram session saved to ${SESSION_PATH}`);
 });

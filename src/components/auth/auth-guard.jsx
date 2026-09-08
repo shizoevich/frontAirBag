@@ -6,10 +6,17 @@ import { useLocale } from 'next-intl';
 import { getAuth } from '@/utils/authStorage';
 import Loader from '../loader/loader';
 
+/**
+ * Страницы только для вошедших: кабинет, заказы, профиль, чекаут.
+ *
+ * Аноним уводится на вход, а адрес запоминается — после входа вернём сюда.
+ * Гостей нет (ADR-0021), поэтому `requireAuth="user"` и `requireAuth={true}`
+ * означают одно и то же; старое написание оставлено ради вызывающего кода.
+ */
 const AuthGuard = ({ children, requireAuth = true, redirectTo = null }) => {
   const router = useRouter();
   const locale = useLocale();
-  const { accessToken, user } = useSelector((state) => state.auth);
+  const { accessToken } = useSelector((state) => state.auth);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -22,48 +29,22 @@ const AuthGuard = ({ children, requireAuth = true, redirectTo = null }) => {
   }, []);
 
   useEffect(() => {
-    // Проверяем авторизацию только после инициализации
-    if (!isInitialized) return;
+    if (!isInitialized || !requireAuth) return;
 
-    const authData = getAuth();
-    const isAuthenticated = authData?.accessToken || accessToken;
-    const isAuthenticatedUser = isAuthenticated && user && !user.is_guest;
+    const isAuthenticated = getAuth()?.accessToken || accessToken;
+    if (isAuthenticated) return;
 
-    if (requireAuth && !isAuthenticated) {
-      // Сохраняем текущий URL для редиректа после логина
-      const currentPath = window.location.pathname + window.location.search;
-      localStorage.setItem('redirectAfterLogin', currentPath);
-      
-      const loginUrl = redirectTo || `/${locale}/login`;
-      router.push(loginUrl);
-      return;
-    }
+    const currentPath = window.location.pathname + window.location.search;
+    localStorage.setItem('redirectAfterLogin', currentPath);
+    router.push(redirectTo || `/${locale}/login`);
+  }, [isInitialized, accessToken, router, locale, requireAuth, redirectTo]);
 
-    // Если требуется полная авторизация (не гость), но пользователь гость
-    if (requireAuth === 'user' && (!isAuthenticatedUser)) {
-      const currentPath = window.location.pathname + window.location.search;
-      localStorage.setItem('redirectAfterLogin', currentPath);
-      
-      const loginUrl = redirectTo || `/${locale}/login`;
-      router.push(loginUrl);
-      return;
-    }
-  }, [isInitialized, accessToken, user, router, locale, requireAuth, redirectTo]);
-
-  // Показываем лоадер пока не инициализировались
   if (!isInitialized) {
     return <Loader loading={true} />;
   }
 
-  // Проверяем авторизацию после инициализации
-  const authData = getAuth();
-  const isAuthenticated = authData?.accessToken || accessToken;
-  
+  const isAuthenticated = getAuth()?.accessToken || accessToken;
   if (requireAuth && !isAuthenticated) {
-    return <Loader loading={true} />;
-  }
-
-  if (requireAuth === 'user' && (!user || user.is_guest)) {
     return <Loader loading={true} />;
   }
 
