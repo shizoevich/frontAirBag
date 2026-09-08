@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations, useLocale } from 'next-intl';
@@ -20,6 +20,12 @@ const ProductItem = ({ product }) => {
   const [isClient, setIsClient] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  // Какое фото показано на телефоне. На десктопе картинку выбирает наведение.
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const touchStart = useRef(null);
+  // Свайп и тап приходят одним жестом; флаг отличает одно от другого, чтобы
+  // листание фото не открывало карточку.
+  const swiped = useRef(false);
   const { cart_products } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   
@@ -74,24 +80,33 @@ const ProductItem = ({ product }) => {
     }
   };
 
-// Получаем вторую картинку для hover эффекта
-const getHoverImage = () => {
-  // Проверяем images массив (основной способ хранения картинок)
-  if (product?.images && Array.isArray(product.images) && product.images.length > 1) {
-    const imageItem = product.images[1];
-    if (typeof imageItem === 'string') {
-      return imageItem;
-    }
-    return imageItem?.url || imageItem?.img || imageItem?.src || getProductImage(product);
-  }
-  
+// Все фотографии товара по порядку. Раньше отсюда брали только вторую — для
+// наведения; теперь по ним же листают свайпом, поэтому нужен весь список.
+const getGallery = () => {
+  const fromImages = Array.isArray(product?.images) ? product.images : [];
+  const urls = fromImages
+    .map((item) => (typeof item === 'string' ? item : item?.url || item?.img || item?.src))
+    .filter(Boolean);
+
+  if (urls.length > 0) return urls;
+
   // Запасной вариант - проверяем imageURLs
-  if (product?.imageURLs && Array.isArray(product.imageURLs) && product.imageURLs.length > 1) {
-    return product.imageURLs[1];
+  if (Array.isArray(product?.imageURLs) && product.imageURLs.length > 0) {
+    return product.imageURLs.filter(Boolean);
   }
-  
-  return getProductImage(product); // Основная картинка если второй нет
+
+  return [getProductImage(product)];
 };
+
+const gallery = getGallery();
+const hasGallery = gallery.length > 1;
+
+// На десктопе наведение показывает второе фото — как было. На телефоне картинку
+// выбирает свайп. Одна общая величина, чтобы полоски всегда показывали то же,
+// что видно на экране.
+const shownIndex = hasGallery && isDesktop && isHovered ? 1 : photoIndex;
+const shownImage = gallery[shownIndex] || gallery[0];
+
 const handleMouseEnter = () => {
   setIsHovered(true);
 };
@@ -100,10 +115,60 @@ const handleMouseLeave = () => {
   setIsHovered(false);
 };
 
+// Свайп — только на телефоне. Карусель кольцевая: листать в одну сторону можно
+// сколько угодно.
+const SWIPE_THRESHOLD = 40;
+
+const handleTouchStart = (event) => {
+  if (!hasGallery) return;
+  const touch = event.touches[0];
+  touchStart.current = { x: touch.clientX, y: touch.clientY };
+  swiped.current = false;
+};
+
+const handleTouchMove = (event) => {
+  if (!hasGallery || !touchStart.current) return;
+  const touch = event.touches[0];
+  const dx = touch.clientX - touchStart.current.x;
+  const dy = touch.clientY - touchStart.current.y;
+
+  // Горизонтальное движение — листаем. Вертикальное не трогаем: это прокрутка
+  // страницы, и перехватывать её нельзя.
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD) {
+    swiped.current = true;
+  }
+};
+
+const handleTouchEnd = (event) => {
+  if (!hasGallery || !touchStart.current) return;
+  const touch = event.changedTouches[0];
+  const dx = touch.clientX - touchStart.current.x;
+  const dy = touch.clientY - touchStart.current.y;
+  touchStart.current = null;
+
+  if (Math.abs(dx) <= Math.abs(dy) || Math.abs(dx) < SWIPE_THRESHOLD) {
+    swiped.current = false;
+    return;
+  }
+
+  swiped.current = true;
+  const step = dx < 0 ? 1 : -1;
+  setPhotoIndex((current) => (current + step + gallery.length) % gallery.length);
+};
+
+// Тап открывает карточку, свайп — нет. Без этого палец, листающий фото,
+// каждый раз уводил бы со страницы.
+const handleClick = (event) => {
+  if (swiped.current) {
+    event.preventDefault();
+    swiped.current = false;
+  }
+};
+
   return (
     <div className="tp-product-item mb-25 transition-3">
       <div className="tp-product-thumb p-relative fix">
-        <Link href={`/${locale}/product/${slugify(title)}-${id}`}>
+        <Link href={`/${locale}/product/${slugify(title)}-${id}`} onClick={handleClick}>
           <div 
             style={{
               width: '100%',
@@ -113,11 +178,59 @@ const handleMouseLeave = () => {
             }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             <BlurImage 
-              image={isHovered ? getHoverImage() : getProductImage(product)}
+              image={shownImage}
               alt={title || "product image"}
             />
+            {/* Полоски: сообщают, что фото несколько, и показывают, какое открыто.
+                Видны и на десктопе, и на телефоне.
+
+                Подложка нужна по делу: фон у снимков товара любой — от светлого
+                мрамора до чёрной детали во весь кадр, — и полоски без неё пропадали
+                на тёмных фото. `pointer-events: none` — чтобы они не перехватывали
+                тап, который должен открыть карточку. */}
+            {hasGallery && (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  bottom: '10px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  pointerEvents: 'none',
+                  zIndex: 2,
+                }}
+              >
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '5px 8px',
+                    borderRadius: '999px',
+                    background: 'rgba(0, 0, 0, 0.35)',
+                  }}
+                >
+                  {gallery.map((url, i) => (
+                    <span
+                      key={url || i}
+                      style={{
+                        width: i === shownIndex ? '20px' : '10px',
+                        height: '3px',
+                        borderRadius: '2px',
+                        background: i === shownIndex ? '#ffffff' : 'rgba(255, 255, 255, 0.5)',
+                        transition: 'width 0.25s ease, background-color 0.25s ease',
+                      }}
+                    />
+                  ))}
+                </span>
+              </div>
+            )}
           </div>
           {/* Out of Stock Badge - красная плашка поверх фотографии */}
           {isOutOfStock && (
