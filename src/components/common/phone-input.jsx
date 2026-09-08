@@ -12,7 +12,7 @@ import '@/styles/phone-input.css';
  * же девяти цифрам, так что клиенту не надо думать о формате.
  */
 const PhoneInput = React.forwardRef(function PhoneInput(
-  { value, onChange, onBlur, name, id, placeholder = '501234567', disabled = false, className = '', invalid = false, ...rest },
+  { value, onChange, onBlur, name, id, placeholder = '501234567', disabled = false, className = '', inputClassName = '', invalid = false, ...rest },
   ref
 ) {
   const digits = phoneDigits(value);
@@ -40,7 +40,7 @@ const PhoneInput = React.forwardRef(function PhoneInput(
         type="tel"
         inputMode="numeric"
         autoComplete="tel-national"
-        className={`phone-input__digits${rest.inputClassName ? ` ${rest.inputClassName}` : ''}`}
+        className={`phone-input__digits${inputClassName ? ` ${inputClassName}` : ''}`}
         value={digits}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
