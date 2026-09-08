@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 import { userLoggedIn } from "@/redux/features/auth/authSlice";
 import { getAuth } from "@/utils/authStorage";
 import useTelegramWebApp from "@/hooks/use-telegram-webapp";
-import { buildTelegramInitPayload, claimTelegramAuthAttempt } from "@/utils/telegram";
+import { buildTelegramInitPayload, runTelegramAuthOnce } from "@/utils/telegram";
 import { useTelegramAuthMutation } from "@/redux/features/auth/authApi";
 
 function readStoredAuth() {
@@ -33,7 +33,7 @@ function readStoredAuth() {
 export default function useAuthCheck() {
     const dispatch = useDispatch();
     const [authChecked, setAuthChecked] = useState(false);
-    const { rawInitData, hasInitData } = useTelegramWebApp();
+    const { rawInitData, hasInitData, sdkSettled } = useTelegramWebApp();
     const [telegramAuth] = useTelegramAuthMutation();
 
     useEffect(() => {
@@ -44,17 +44,20 @@ export default function useAuthCheck() {
             return;
         }
 
+        // SDK ещё грузится — рано решать, что мы не в Telegram
+        if (!sdkSettled) return;
+
         const payload = hasInitData ? buildTelegramInitPayload({ rawInitData }) : null;
-        if (!payload || !claimTelegramAuthAttempt()) {
+        if (!payload) {
             setAuthChecked(true);
             return;
         }
 
-        telegramAuth(payload)
-            .unwrap()
-            .catch(() => null)
-            .finally(() => setAuthChecked(true));
-    }, [dispatch, hasInitData, rawInitData, telegramAuth]);
+        let cancelled = false;
+        runTelegramAuthOnce(() => telegramAuth(payload).unwrap().catch(() => null))
+            .finally(() => { if (!cancelled) setAuthChecked(true); });
+        return () => { cancelled = true; };
+    }, [dispatch, hasInitData, rawInitData, sdkSettled, telegramAuth]);
 
     return authChecked;
 }
