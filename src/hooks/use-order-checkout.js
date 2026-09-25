@@ -62,8 +62,16 @@ function getRemonlineId(client) {
   return null;
 }
 
+// Город и отделение нужны только для доставки: при самовывозе их поля скрыты,
+// и ошибка на них молча блокировала отправку формы.
+const requiredUnlessPickup = (message) =>
+  Yup.string().when("shippingOption", {
+    is: (v) => v !== "pickup",
+    then: (s) => s.required(message),
+  });
+
 // Валидационная схема для checkout формы
-const buildCheckoutSchema = (t) =>
+export const buildCheckoutSchema = (t) =>
   Yup.object().shape({
     firstName: Yup.string()
       .required(t("first_name_required"))
@@ -74,8 +82,9 @@ const buildCheckoutSchema = (t) =>
     phone: Yup.string()
       .required(t("phone_required"))
       .matches(PHONE_RE, t("phone_invalid")),
-    city: Yup.string().required(t("city_required")),
-    warehouse: Yup.string().required(t("warehouse_required")),
+    shippingOption: Yup.string(),
+    city: requiredUnlessPickup(t("city_required")),
+    warehouse: requiredUnlessPickup(t("warehouse_required")),
     orderNotes: Yup.string().max(500, t("order_notes_max", { count: 500 })),
   });
 
@@ -159,7 +168,8 @@ const useOrderCheckout = () => {
       }
 
       // Проверяем, что все обязательные поля заполнены
-      if (!data.firstName || !data.lastName || !data.phone || !data.city || !data.warehouse) {
+      const isPickup = data.shippingOption === 'pickup';
+      if (!data.firstName || !data.lastName || !data.phone || (!isPickup && (!data.city || !data.warehouse))) {
         notifyError(tv("fill_required_fields"));
         setIsCheckoutSubmit(false);
         return;
@@ -172,7 +182,6 @@ const useOrderCheckout = () => {
       // AIRBAG-82/83: при самовывозе (shippingOption === 'pickup') адрес НЕ отправляем,
       // даже если поля города/отделения остались заполнены — иначе бэкенд считает
       // заказ доставкой ("Накладений платіж") и success-страница показывает доставку.
-      const isPickup = data.shippingOption === 'pickup';
       const novaPostAddress = (!isPickup && data.city && data.warehouse)
         ? `${data.city}, ${data.warehouse}`
         : "";

@@ -25,6 +25,7 @@ import { resolveMonobankPageUrl } from '@/utils/monobank-url';
 
 const OrderCheckoutArea = () => {
   const t = useTranslations('Checkout');
+  const tv = useTranslations('CheckoutValidation');
   const router = useRouter();
   const { locale } = useParams();
   
@@ -72,6 +73,10 @@ const OrderCheckoutArea = () => {
   } = useOrderCheckout();
 
   const [isPickup, setIsPickup] = useState(false);
+
+  // Форма не прошла проверку — говорим об этом явно: ошибка может висеть на
+  // поле, которого не видно, и тогда кнопка «молча не реагирует».
+  const onInvalid = () => notifyError(tv('fill_required_fields'));
 
   const getCurrentAccessToken = React.useCallback(() => {
     // Redux token can be stale inside an async handler before re-render.
@@ -187,7 +192,7 @@ const OrderCheckoutArea = () => {
         createdId = createdOrder.id;
         setLastOrderId(createdOrder.id);
       }
-    })();
+    }, onInvalid)();
 
     return createdId;
   };
@@ -324,7 +329,7 @@ const OrderCheckoutArea = () => {
                      e.preventDefault();
                      return;
                    }
-                   return handleSubmit(customSubmitHandler)(e);
+                   return handleSubmit(customSubmitHandler, onInvalid)(e);
                  }}
                >
                 <div className="row">
@@ -606,7 +611,7 @@ const OrderCheckoutArea = () => {
 
                                         setLastOrderId(createdOrder.id);
                                         await createMonoPayment(createdOrder.id);
-                                      })();
+                                      }, onInvalid)();
                                     }}
                                   >
                                     <div className="monopay-btn--text-wrapper">
