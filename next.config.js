@@ -32,6 +32,12 @@ const nextConfig = {
 
   trailingSlash: true,
 
+  // Ограничивает stale-while-revalidate в Cache-Control ISR-страниц одним
+  // часом (дефолт — год). Деплой полностью заменяет контейнер, чанки старой
+  // сборки исчезают, а Telegram WebView агрессивно кэширует HTML: годовалая
+  // копия ссылалась на несуществующие /_next/static и роняла мини-апп.
+  expireTime: 3600,
+
   async redirects() {
     return [
       {

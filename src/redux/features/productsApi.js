@@ -64,9 +64,10 @@ export const productsApi = apiSlice.injectEndpoints({
           if (Array.isArray(ids) && ids.length > 0) {
             // Убираем дубликаты ID
             const uniqueIds = [...new Set(ids)];
-            // Создаем строку запроса с несколькими id
+            // together_buy хранит id из RemOnline, а не внутренние id,
+            // поэтому фильтруем по id_remonline (список через запятую).
             const idsParam = uniqueIds.join(',');
-            return `/goods/?id=${idsParam}`;
+            return `/goods/?id_remonline__in=${idsParam}`;
           }
           return '/goods/';
         },
