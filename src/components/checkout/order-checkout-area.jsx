@@ -13,6 +13,7 @@ import UserInfoModal from "./user-info-modal";
 import PaymentModal from './payment-modal';
 import GooglePayButton from './google-pay-button';
 import BankTransferDetails from './bank-transfer-details';
+import PaymentMethodsHint from './payment-methods-hint';
 import useOrderCheckout from "@/hooks/use-order-checkout";
 import useCartInfo from "@/hooks/use-cart-info";
 import { useGetOrdersQuery } from "@/redux/features/ordersApi";
@@ -629,6 +630,7 @@ const OrderCheckoutArea = () => {
                                       </svg>
                                     </div>
                                   </button>
+                                  <PaymentMethodsHint />
                               </div>
 
                               {monoPaymentError && (

@@ -814,3 +814,51 @@ button.tp-cat-chip__arrow:hover {
     max-width: 309px;
   }
 }
+
+/* Підказка про способи оплати під кнопкою mono Pay (checkout).
+   Файл src/styles/custom.css ніде не підключений, тому стилі живуть тут. */
+.payment-methods-hint {
+  text-align: center;
+}
+
+.payment-methods-hint__badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.payment-methods-hint__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid #d9dce1;
+  border-radius: 8px;
+  background: #fff;
+  color: #1a1a1a;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+
+  svg {
+    display: block;
+  }
+}
+
+.payment-methods-hint__badge--mono {
+  background: #0b0b0b;
+  border-color: #0b0b0b;
+  color: #fff;
+  font-weight: 700;
+}
+
+.payment-methods-hint__text {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #6b7280;
+}
