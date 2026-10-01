@@ -806,7 +806,7 @@
     "loading": "Загрузка...",
     "pay_now": "Оплатить сейчас",
     "pay_now_description": "Apple Pay, Google Pay или банковской картой — через защищённую страницу Monobank",
-    "payment_methods_hint": "На странице оплаты доступны Apple Pay, Google Pay и оплата любой картой",
+    "payment_methods_hint": "На странице оплаты MonoPay доступны Apple Pay, Google Pay и оплата любой картой",
     "payment_card_badge": "Карта",
     "place_order": "Оформить заказ",
     "processing": "Обработка...",
