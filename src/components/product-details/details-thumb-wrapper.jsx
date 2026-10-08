@@ -25,6 +25,10 @@ const DetailsThumbWrapper = ({
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const mainSwiperRef = useRef(null);
   const defaultImage = 'https://t3.ftcdn.net/jpg/04/34/72/82/360_F_434728286_OWQQvAFoXZLdGHlObozsolNeuSxhpr84.jpg'; // Используем стандартную заглушку для всего сайта
+  // Фото товаров приходят из RemOnline как есть, и их домен там меняется без
+  // предупреждения (storage.roapp.io → store.roapp.io). Поэтому <Image> здесь с
+  // unoptimized: браузер грузит оригинал напрямую, мимо /_next/image и его
+  // белого списка remotePatterns — так же, как карточки каталога (BlurImage).
 
   // Безопасная обработка изображений
   const normalizedImages = useMemo(() => {
@@ -99,6 +103,7 @@ const DetailsThumbWrapper = ({
               width={0}
               height={0}
               sizes="100vw"
+              unoptimized
               style={{
                 width: '100%',
                 height: 'auto',
@@ -153,6 +158,7 @@ const DetailsThumbWrapper = ({
                     width={0}
                     height={0}
                     sizes="100vw"
+                    unoptimized
                     style={{
                       width: '100%',
                       height: 'auto',
