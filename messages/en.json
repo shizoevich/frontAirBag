@@ -684,7 +684,7 @@
     "loading": "Loading...",
     "pay_now": "Pay Now",
     "pay_now_description": "Apple Pay, Google Pay or any bank card — via the secure Monobank page",
-    "payment_methods_hint": "Apple Pay, Google Pay and any bank card are available on the MonoPay payment page",
+    "pay_with_mono": "Using",
     "payment_card_badge": "Card",
     "place_order": "Place Order",
     "processing": "Processing...",

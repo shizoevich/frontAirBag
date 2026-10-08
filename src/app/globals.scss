@@ -815,50 +815,59 @@ button.tp-cat-chip__arrow:hover {
   }
 }
 
-/* Підказка про способи оплати під кнопкою mono Pay (checkout).
-   Файл src/styles/custom.css ніде не підключений, тому стилі живуть тут. */
-.payment-methods-hint {
-  text-align: center;
-}
-
-.payment-methods-hint__badges {
+/* Способи оплати (Apple Pay / Google Pay / картка) прямо всередині кнопки
+   mono Pay (checkout). Файл src/styles/custom.css ніде не підключений,
+   тому стилі живуть тут. */
+.monopay-btn--icons {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  margin-top: 10px;
+  flex-shrink: 0;
 }
 
-.payment-methods-hint__badge {
+.monopay-btn--icon {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
-  border: 1px solid #d9dce1;
-  border-radius: 8px;
-  background: #fff;
-  color: #1a1a1a;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1;
-  white-space: nowrap;
+  justify-content: center;
+  color: #fff;
 
   svg {
     display: block;
   }
 }
 
-.payment-methods-hint__badge--mono {
-  background: #0b0b0b;
-  border-color: #0b0b0b;
-  color: #fff;
-  font-weight: 700;
+.monopay-btn--divider {
+  width: 1px;
+  align-self: stretch;
+  min-height: 20px;
+  background: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
 }
 
-.payment-methods-hint__text {
-  margin: 8px 0 0;
+.monopay-btn--brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.monopay-btn--brand-text {
   font-size: 13px;
-  line-height: 1.4;
-  color: #6b7280;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: nowrap;
+}
+
+@media (max-width: 400px) {
+  .monopay-btn--icons {
+    gap: 6px;
+  }
+
+  .monopay-btn--brand {
+    gap: 6px;
+  }
+
+  .monopay-btn--brand-text {
+    font-size: 12px;
+  }
 }

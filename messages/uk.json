@@ -642,7 +642,7 @@
     "loading": "Завантаження...",
     "pay_now": "Оплатити зараз",
     "pay_now_description": "Apple Pay, Google Pay або банківською карткою — через захищену сторінку Monobank",
-    "payment_methods_hint": "На сторінці MonoPay оплати доступні Apple Pay, Google Pay та оплата будь-якою карткою",
+    "pay_with_mono": "З допомогою",
     "payment_card_badge": "Картка",
     "place_order": "Оформити замовлення",
     "processing": "Обробка...",
