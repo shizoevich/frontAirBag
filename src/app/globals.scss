@@ -836,6 +836,10 @@ button.tp-cat-chip__arrow:hover {
   }
 }
 
+.monopay-btn--icon-mono {
+  opacity: 0.9;
+}
+
 .monopay-btn--divider {
   width: 1px;
   align-self: stretch;
@@ -844,17 +848,10 @@ button.tp-cat-chip__arrow:hover {
   flex-shrink: 0;
 }
 
-.monopay-btn--brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.monopay-btn--brand-text {
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
+.monopay-btn--label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
   white-space: nowrap;
 }
 
@@ -863,11 +860,7 @@ button.tp-cat-chip__arrow:hover {
     gap: 6px;
   }
 
-  .monopay-btn--brand {
-    gap: 6px;
-  }
-
-  .monopay-btn--brand-text {
-    font-size: 12px;
+  .monopay-btn--label {
+    font-size: 14px;
   }
 }
