@@ -814,3 +814,53 @@ button.tp-cat-chip__arrow:hover {
     max-width: 309px;
   }
 }
+
+/* Способи оплати (Apple Pay / Google Pay / картка) прямо всередині кнопки
+   mono Pay (checkout). Файл src/styles/custom.css ніде не підключений,
+   тому стилі живуть тут. */
+.monopay-btn--icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.monopay-btn--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+
+  svg {
+    display: block;
+  }
+}
+
+.monopay-btn--icon-mono {
+  opacity: 0.9;
+}
+
+.monopay-btn--divider {
+  width: 1px;
+  align-self: stretch;
+  min-height: 20px;
+  background: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+
+.monopay-btn--label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+@media (max-width: 400px) {
+  .monopay-btn--icons {
+    gap: 6px;
+  }
+
+  .monopay-btn--label {
+    font-size: 14px;
+  }
+}
