@@ -11,7 +11,6 @@ import SimplifiedBillingArea from "./simplified-billing-area";
 import CheckoutLoginDiscount from "./checkout-login-discount";
 import UserInfoModal from "./user-info-modal";
 import PaymentModal from './payment-modal';
-import GooglePayButton from './google-pay-button';
 import BankTransferDetails from './bank-transfer-details';
 import useOrderCheckout from "@/hooks/use-order-checkout";
 import useCartInfo from "@/hooks/use-cart-info";
@@ -179,39 +178,6 @@ const OrderCheckoutArea = () => {
        await createMonoPayment(createdOrder.id);
      }
    };
-
-  // Google Pay: заказ создаётся уже после того, как пользователь подтвердил
-  // оплату в шите, поэтому нужен отдельный резолвер, а не общий submit-флоу.
-  const resolveGooglePayOrderId = async () => {
-    if (lastOrderId) return lastOrderId;
-
-    let createdId = null;
-    await handleSubmit(async (formData) => {
-      const createdOrder = await submitHandler(formData);
-      if (createdOrder?.id) {
-        createdId = createdOrder.id;
-        setLastOrderId(createdOrder.id);
-      }
-    }, onInvalid)();
-
-    return createdId;
-  };
-
-  const handleGooglePayResult = (res, orderId) => {
-    // 3DS: Monobank отдаёт tdsUrl — открываем его в той же модалке, что и mono-флоу.
-    // resolveMonobankPageUrl здесь не подходит: он достраивает ссылку из invoiceId,
-    // который приходит всегда, и увёл бы в 3DS даже успешный платёж без челленджа.
-    const tdsUrl = res?.monobank?.tdsUrl;
-    if (tdsUrl) {
-      setMonoPageUrl(tdsUrl);
-      setIsPaymentModalOpen(true);
-      return;
-    }
-
-    const status = res?.payment?.status;
-    const result = status === 'success' ? 'success' : status === 'failure' ? 'failed' : 'pending';
-    router.push(`/${locale}/payment-redirect?result=${result}&orderId=${orderId}`);
-  };
 
   const createMonoPayment = async (orderId) => {
     try {
@@ -550,28 +516,6 @@ const OrderCheckoutArea = () => {
                        {/* Pay-now buttons must be at the bottom and only visible for pay_now */}
                        {paymentMethod === "pay_now" && (
                           <div className="mt-4">
-                            {(() => {
-                              // Precompute to avoid nested t() calls inside message formatting.
-                              // next-intl supports rich formatting, but we keep it simple.
-                              return null;
-                            })()}
-                            {/* Google Pay внутри WebView Telegram не работает (OR_BIBED_15) — кошельки на странице Monobank */}
-                            {!isTelegramWebApp && (
-                            <div style={{ display: 'grid', gap: 10 }}>
-                              <GooglePayButton
-                                amountMinor={Math.round(
-                                  (subtotal - (subtotal * currentDiscountPercent / 100) + shippingCost - discountAmount) * 100
-                                )}
-                               currencyCode="UAH"
-                               merchantName="AirbagAD"
-                               gatewayMerchantId={process.env.NEXT_PUBLIC_GOOGLE_PAY_MERCHANT_ID}
-                               resolveOrderId={resolveGooglePayOrderId}
-                               onResult={handleGooglePayResult}
-                             />
-                              {/* Apple Pay button hidden: flow not implemented and should not be shown */}
-                           </div>
-                            )}
-
                             <div className="mt-3" style={{ display: 'grid', gap: 10 }}>
                               {isCreatingPayment && (
                                 <p className="mb-2">{t('processing')}</p>

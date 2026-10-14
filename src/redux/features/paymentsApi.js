@@ -16,16 +16,6 @@ export const paymentsApi = apiSlice.injectEndpoints({
       }),
     }),
 
-    googlePay: builder.mutation({
-      // Backend accepts Google Pay token as gToken и требует order_id:
-      // сумма списывается из заказа (order.grand_total_minor), а не из тела запроса.
-      query: ({ gToken, order_id, redirectUrl }) => ({
-        url: "/payments/googlepay/",
-        method: "POST",
-        body: { gToken, order_id, redirectUrl },
-      }),
-    }),
-
     getPaymentConfig: builder.query({
       // Публичная конфигурация оплаты:
       // { mode, google_pay_environment, google_pay_merchant_id }.
@@ -42,6 +32,5 @@ export const paymentsApi = apiSlice.injectEndpoints({
 
 export const {
   useCreatePaymentMutation,
-  useGooglePayMutation,
   useGetPaymentConfigQuery,
 } = paymentsApi;
