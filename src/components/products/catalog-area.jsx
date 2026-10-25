@@ -13,6 +13,7 @@ import ProductsFilterBar from '@/components/products/products-filter-bar';
 import { useGetAllProductsQuery } from '@/redux/features/productsApi';
 import { useGetCategoryTreeQuery } from '@/redux/features/categoryApi';
 import { categoryPath } from '@/utils/category-link';
+import { getVisitSeed } from '@/utils/visit-seed';
 import {
   getChildrenAtLevel,
   hasChildren,
@@ -71,6 +72,8 @@ const CatalogArea = ({ activeCategoryId = null }) => {
     return path?.length ? path.map((cat) => cat.id) : [activeCategoryId];
   }, [categoryTree, activeCategoryId]);
 
+  // Seed один на загрузку страницы: все страницы и фильтры этого визита
+  // приходят из одной раскладки, и товар не повторяется между страницами.
   const { data: productsData, isLoading, isError } = useGetAllProductsQuery({
     limit: ITEMS_PER_PAGE,
     offset: currentPage * ITEMS_PER_PAGE,
@@ -80,6 +83,7 @@ const CatalogArea = ({ activeCategoryId = null }) => {
     priceMin: filters.priceMin,
     priceMax: filters.priceMax,
     inStock: filters.inStock,
+    seed: getVisitSeed(),
   });
 
   const { products, totalCount } = useMemo(() => {

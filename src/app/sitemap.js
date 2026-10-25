@@ -38,10 +38,14 @@ function entry(path, { lastModified, changeFrequency, priority } = {}) {
 }
 
 // Fetch every page of a paginated DRF (LimitOffset) endpoint.
+//
+// `ordering=id`: без явной сортировки витрина перемешана, а страницы здесь
+// кэшируются по отдельности и в разное время — обход мог бы повторить одни
+// товары и потерять другие. Полный обход должен идти по неизменному порядку.
 async function fetchAll(resource) {
   if (!API_BASE) return [];
   const out = [];
-  let url = `${API_BASE}/${resource}/?limit=100&offset=0`;
+  let url = `${API_BASE}/${resource}/?limit=100&offset=0&ordering=id`;
   try {
     while (url) {
       const res = await fetch(url, { next: { revalidate } });
