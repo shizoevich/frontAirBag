@@ -52,7 +52,9 @@ const LoginArea = () => {
                 </div>
                 {/* Старые Telegram-записи без почты и пароля: входить им — через бота. */}
                 <p className="text-center mt-20" style={{ fontSize: 13, color: '#6c757d' }}>
-                  {t('noPasswordHint')}
+                  {t.rich('noPasswordHint', {
+                    bot: (chunks) => <a href="https://t.me/AirBagAD_bot" target="_blank" rel="noopener noreferrer">{chunks}</a>,
+                  })}
                 </p>
               </div>
             </div>

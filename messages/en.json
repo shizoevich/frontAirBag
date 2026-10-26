@@ -375,7 +375,7 @@
     "claimSuccessTitle": "Almost done",
     "claimSuccessText": "We sent a letter to your email. Confirm it and you will be able to sign in.",
     "claimEmailTaken": "This email is already used by another account.",
-    "noPasswordHint": "No password? Open the shop from the Telegram bot — you will be signed in automatically.",
+    "noPasswordHint": "No password? Open the shop from the <bot>Telegram bot</bot> — you will be signed in automatically.",
     "telegramTaken": "This Telegram is already registered to another account"
   },
   "ProfileExtra": {
@@ -849,7 +849,7 @@
     },
     "section2": {
       "title": "2. Order Placement",
-      "description1": "2.1. Orders can be placed through the website or Telegram bot.",
+      "description1": "2.1. Orders can be placed through the website or <bot>Telegram bot</bot>.",
       "description2": "2.2. Valid contact information must be provided to confirm the order.",
       "description3": "2.3. We reserve the right to contact you to clarify details."
     },
@@ -863,7 +863,7 @@
       "title": "4. Returns and Exchanges",
       "description1": "4.1. Returns or exchanges are possible within 14 days from the receipt of the goods, if they have not been used and are preserved in their original condition.",
       "description2": "4.2. Delivery costs for returns/exchanges are paid by the buyer, except in cases of defects or our mistake.",
-      "description3": "4.3. To arrange a return, please contact our support service."
+      "description3": "4.3. To arrange a return, please contact <contact>our support service</contact>."
     },
     "section5": {
       "title": "5. Liability of the Parties",

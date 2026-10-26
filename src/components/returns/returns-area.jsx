@@ -3,7 +3,20 @@ import React from 'react';
 import { useLocale } from 'next-intl';
 import phones from '@/data/contact-data';
 
-const PHONES_TEXT = phones.map((phone) => phone.displayFull).join(', ');
+// Телефоны и Telegram — кликабельные, как в футере и на странице контактов.
+const PhoneLinks = () =>
+  phones.map((phone, index) => (
+    <React.Fragment key={phone.id}>
+      {index > 0 && ', '}
+      <a href={`tel:${phone.tel}`} className="text-primary">{phone.displayFull}</a>
+    </React.Fragment>
+  ));
+
+const TelegramLink = ({ children }) => (
+  <a href="https://t.me/airbagsale" target="_blank" rel="noopener noreferrer" className="text-primary">
+    {children}
+  </a>
+);
 
 // AIRBAG-92: страница «Повернення» с правилами возврата.
 const CONTENT = {
@@ -30,7 +43,7 @@ const CONTENT = {
       {
         h: 'Як оформити повернення',
         items: [
-          `Зв’яжіться з нами за телефонами ${PHONES_TEXT} або у Telegram.`,
+          <>Зв’яжіться з нами за телефонами <PhoneLinks /> або у <TelegramLink>Telegram</TelegramLink>.</>,
           'Вкажіть номер замовлення та причину повернення.',
           'Наш менеджер підкаже подальші кроки та адресу для відправки.',
         ],
@@ -60,7 +73,7 @@ const CONTENT = {
       {
         h: 'Как оформить возврат',
         items: [
-          `Свяжитесь с нами по телефонам ${PHONES_TEXT} или в Telegram.`,
+          <>Свяжитесь с нами по телефонам <PhoneLinks /> или в <TelegramLink>Telegram</TelegramLink>.</>,
           'Укажите номер заказа и причину возврата.',
           'Наш менеджер подскажет дальнейшие шаги и адрес для отправки.',
         ],
