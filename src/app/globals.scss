@@ -772,6 +772,7 @@ button.tp-cat-chip__arrow:hover {
 
     input {
       cursor: pointer;
+      line-height: normal; /* тема даёт 56px при высоте 46px — в Safari текст уезжает вниз */
     }
   }
 

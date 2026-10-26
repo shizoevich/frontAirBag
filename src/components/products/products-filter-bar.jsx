@@ -7,6 +7,8 @@ const ORANGE = '#de8043';
 
 const inputStyle = {
   height: '36px',
+  // тема задаёт инпутам line-height: 56px — Safari применяет его буквально и текст уезжает вниз
+  lineHeight: 'normal',
   padding: '0 10px',
   border: '1.5px solid #ddd',
   borderRadius: '6px',
