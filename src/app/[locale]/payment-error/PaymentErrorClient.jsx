@@ -117,9 +117,9 @@ export default function PaymentErrorClient() {
                   <span className="badge bg-light text-dark border">
                     <i className="fas fa-tools me-1" /> Допомога з підбором деталей
                   </span>
-                  <span className="badge bg-light text-dark border">
+                  <Link href={`/${locale}/contact`} className="badge bg-light text-dark border text-decoration-none">
                     <i className="fas fa-phone-alt me-1" /> Підтримка менеджера
-                  </span>
+                  </Link>
                 </div>
 
                 <div className="tp-order-success-info mb-4 text-start mx-auto" style={{ maxWidth: 560 }}>
