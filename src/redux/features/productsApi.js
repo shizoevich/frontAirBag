@@ -1,37 +1,57 @@
 import { apiSlice } from "../api/apiSlice";
 
+/**
+ * Запрос списка товаров витрины.
+ *
+ * `seed` — соль перемешивания на визит (см. utils/visit-seed.js). Без явной
+ * сортировки бэкенд перемешивает каталог по ней, поэтому seed идёт во все
+ * запросы витрины — и в поиск, и в категорию, и с фильтрами: иначе каждая
+ * комбинация жила бы в своей раскладке. При `ordering` бэкенд seed игнорирует.
+ */
+export function buildGoodsListQuery({
+  limit = 12, offset = 0, categoryId = null, searchText = '', ordering = '',
+  priceMin = '', priceMax = '', inStock = false, seed = '',
+} = {}) {
+  let url = `/goods/?limit=${limit}&offset=${offset}`;
+
+  if (categoryId) {
+    url += `&category_id=${categoryId}`;
+  }
+
+  if (searchText) {
+    url += `&title__icontains=${encodeURIComponent(searchText)}`;
+  }
+
+  if (ordering) {
+    url += `&ordering=${ordering}`;
+  }
+
+  if (priceMin !== '' && priceMin !== null) {
+    url += `&price_minor__gte=${Math.round(Number(priceMin) * 100)}`;
+  }
+
+  if (priceMax !== '' && priceMax !== null) {
+    url += `&price_minor__lte=${Math.round(Number(priceMax) * 100)}`;
+  }
+
+  if (inStock) {
+    url += `&residue__gt=0`;
+  }
+
+  if (seed) {
+    url += `&seed=${encodeURIComponent(seed)}`;
+  }
+
+  return url;
+}
+
 export const productsApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
     // Получение всех товаров с фильтрацией и пагинацией
     getAllProducts: builder.query({
-      query: ({ limit = 12, offset = 0, categoryId = null, searchText = '', ordering = '', priceMin = '', priceMax = '', inStock = false } = {}) => {
-        let url = `/goods/?limit=${limit}&offset=${offset}`;
-
-        if (categoryId) {
-          url += `&category_id=${categoryId}`;
-        }
-
-        if (searchText) {
-          url += `&title__icontains=${encodeURIComponent(searchText)}`;
-        }
-
-        if (ordering) {
-          url += `&ordering=${ordering}`;
-        }
-
-        if (priceMin !== '' && priceMin !== null) {
-          url += `&price_minor__gte=${Math.round(Number(priceMin) * 100)}`;
-        }
-
-        if (priceMax !== '' && priceMax !== null) {
-          url += `&price_minor__lte=${Math.round(Number(priceMax) * 100)}`;
-        }
-
-        if (inStock) {
-          url += `&residue__gt=0`;
-        }
-
+      query: (args) => {
+        const url = buildGoodsListQuery(args);
         console.log('Запрос всех товаров:', url);
         return url;
       },
