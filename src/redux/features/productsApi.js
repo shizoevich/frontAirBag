@@ -115,11 +115,6 @@ export const productsApi = apiSlice.injectEndpoints({
       providesTags: (result, error, params) => [{ type: 'products', id: params.categoryId }],
     }),
 
-    getFeaturedProducts: builder.query({
-      query: () => `/goods/featured/`,
-      providesTags: ['FeaturedProducts'],
-    }),
-
     // Поиск товаров
     searchProducts: builder.query({
       query: ({ searchText, categoryId = null, limit = 12, offset = 0 }) => {
@@ -198,7 +193,6 @@ export const {
   useGetAllProductsNoLimitQuery,
   useGetProductsByIdsQuery,
   useGetProductsByMultipleIdsQuery,
-  useGetFeaturedProductsQuery,
   useGetProductsByCategoryQuery,
   useSearchProductsQuery,
   useAddProductMutation,
