@@ -601,19 +601,6 @@ const OrderCheckoutArea = () => {
                               )}
 
                               {/* We no longer show the "place order" hint for pay_now, because we create order on payment click. */}
-
-                              {monoPageUrl && (
-                                <button
-                                  type="button"
-                                  className="tp-btn w-100"
-                                  onClick={() => {
-                                    if (isTelegramWebApp) openExternalLink(monoPageUrl);
-                                    setIsPaymentModalOpen(true);
-                                  }}
-                                >
-                                  {t('open_payment')}
-                                </button>
-                              )}
                             </div>
                           </div>
                         )}

@@ -810,7 +810,6 @@
     "payment_card_badge": "Карта",
     "place_order": "Оформить заказ",
     "processing": "Обработка...",
-    "open_payment": "Открыть оплату",
     "pay_with_monobank": "Оплатить Monobank",
     "monobank_order_required_hint": "Сначала оформите заказ ({placeOrderLabel}), чтобы получить order_id для оплаты Monobank.",
     "monobank_payment_title": "Оплата Monobank",

@@ -688,7 +688,6 @@
     "payment_card_badge": "Card",
     "place_order": "Place Order",
     "processing": "Processing...",
-    "open_payment": "Open payment",
     "pay_with_monobank": "Pay with Monobank",
     "monobank_order_required_hint": "Create the order first ({placeOrderLabel}) to get an order_id for Monobank payment.",
     "monobank_payment_title": "Monobank payment",
