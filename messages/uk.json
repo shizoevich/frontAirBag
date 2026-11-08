@@ -646,7 +646,6 @@
     "payment_card_badge": "Картка",
     "place_order": "Оформити замовлення",
     "processing": "Обробка...",
-    "open_payment": "Відкрити оплату",
     "pay_with_monobank": "Оплатити Monobank",
     "monobank_order_required_hint": "Спочатку оформіть замовлення ({placeOrderLabel}), щоб отримати order_id для оплати Monobank.",
     "monobank_payment_title": "Оплата Monobank",
